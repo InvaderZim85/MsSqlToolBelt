@@ -1,0 +1,359 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZimLabs.CoreLib</name>
+    </assembly>
+    <members>
+        <member name="T:ZimLabs.CoreLib.Core">
+            <summary>
+            Provides several helper methods for the daily doing
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Core.GetBaseFolder">
+            <summary>
+            Gets the path of the base folder
+            </summary>
+            <returns>The path of the base folder</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Core.GetProperties``1(``0,System.Boolean)">
+            <summary>
+            Gets a list of all public properties of the given class
+            </summary>
+            <typeparam name="T">The type of the value</typeparam>
+            <param name="value">The class</param>
+            <param name="onlyPublic"><see langword="true"/> to load only public properties, <see langword="false"/> to load all properties (optional, default = <see langword="true"/>)</param>
+            <returns>List with all public properties</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the value is empty</exception>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Core.GetPropertyValue(System.Object,System.String)">
+            <summary>
+            Gets the value of a property
+            </summary>
+            <param name="propertyObject">The property object</param>
+            <param name="propertyName">The property name</param>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Core.CompareObjects``1(``0,``0)">
+            <summary>
+            Compares two objects of the same type for equality
+            </summary>
+            <typeparam name="T">The type of the objects</typeparam>
+            <param name="first">The first object</param>
+            <param name="second">The second object</param>
+            <returns>true when the objects equal, otherwise false</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Core.GetNetFrameworkName(System.String)">
+            <summary>
+            Returns, according to the given name, the full name of the .NET target framework
+            </summary>
+            <param name="name"></param>
+            <returns>The full name of the .net framework</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.DirectoryHelper">
+            <summary>
+            Provides several methods for the interaction with directories
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.DirectoryHelper.ClearDirectory(System.String)">
+            <summary>
+            Clears the content of the given directory
+            </summary>
+            <param name="path">The path of the desired directory</param>
+        </member>
+        <member name="M:ZimLabs.CoreLib.DirectoryHelper.CopyDirectory(System.String,System.String,System.Boolean)">
+            <summary>
+            Copies the content of the source directory (including sub directories when the parameter <paramref name="copySubdirectories"/> is set to true) to the desired destination
+            </summary>
+            <param name="source">The source directory</param>
+            <param name="destination">The destination directory</param>
+            <param name="copySubdirectories">true to copy the existing sub directories, otherwise false (optional)</param>
+        </member>
+        <member name="M:ZimLabs.CoreLib.DirectoryHelper.GetDirectory(System.String,System.String)">
+            <summary>
+            Gets the path of a specified directory. Starting point is the given directory path. The first occurence of the directory will be selected
+            </summary>
+            <param name="name">The name of the directory to be searched for</param>
+            <param name="directory">The path of the start directory (optional, when empty the current directory will be chosen)</param>
+            <returns>The full path of the directory to be searched for</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.DateTimeExtensions">
+            <summary>
+            Provides several methods for the interaction with a <see cref="T:System.DateTime"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.DateTimeExtensions.SetTime(System.DateTime,System.Int32)">
+            <summary>
+            Sets the time of the current date
+            </summary>
+            <param name="value">The current date</param>
+            <param name="hour">The desired hour (0 through 23)</param>
+            <returns>The given date with the given time</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.DateTimeExtensions.SetTime(System.DateTime,System.Int32,System.Int32)">
+            <summary>
+            Sets the time of the current date
+            </summary>
+            <param name="value">The current date</param>
+            <param name="hour">The desired hour (0 through 23)</param>
+            <param name="minute">The desired minute (0 through 59)</param>
+            <returns>The given date with the given time</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.DateTimeExtensions.SetTime(System.DateTime,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Sets the time of the current date
+            </summary>
+            <param name="value">The current date</param>
+            <param name="hour">The desired hour (0 through 23)</param>
+            <param name="minute">The desired minute (0 through 59)</param>
+            <param name="second">The desired second (0 through 59)</param>
+            <returns>The given date with the given time</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.DateTimeExtensions.GetStartOfDay(System.DateTime)">
+            <summary>
+            Set the time of the given date to 00:00:00
+            </summary>
+            <param name="value">The current date</param>
+            <returns>The given date which time was set to 00:00:00</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.DateTimeExtensions.GetEndOfDay(System.DateTime)">
+            <summary>
+            Sets the time of the given date to 23:59:59
+            </summary>
+            <param name="value">The current date</param>
+            <returns>The given date which time was set to 23:59:59</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.EnumExtensions">
+            <summary>
+            Provides several methods for the interaction with an <see cref="T:System.Enum"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.EnumExtensions.GetAttribute``1(System.Enum)">
+            <summary>
+            Gets the attribute of the given enum
+            </summary>
+            <typeparam name="T">The type of the attribute</typeparam>
+            <param name="value">The enum</param>
+            <returns>The desired attribute of the enum</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the value is null</exception>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.ListExtensions">
+            <summary>
+            Provides several methods for the interaction with a List
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ListExtensions.ListsEqual``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Checks if two lists are equal
+            </summary>
+            <typeparam name="T">The type of the list</typeparam>
+            <param name="first">The first list</param>
+            <param name="second">The second list</param>
+            <returns>true when the lists are equal, otherwise false</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ListExtensions.AddToList``1(System.Collections.Generic.List{``0},``0)">
+            <summary>
+            Adds an element to a list if it doesn't already exist
+            </summary>
+            <typeparam name="T">The type of the list</typeparam>
+            <param name="list">The list</param>
+            <param name="value">The value which should added</param>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ListExtensions.SplitIntoChunks``1(System.Collections.Generic.List{``0},System.Int32)">
+            <summary>
+            Splits a <see cref="T:System.Collections.Generic.List`1" /> into multiple chunks.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="list">The list to be chunked.</param>
+            <param name="chunkSize">The size of each chunk (if 0 is given, the size will be changed to 1)</param>
+            <returns>A list of chunks.</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ListExtensions.ToSeparatedString``1(System.Collections.Generic.IEnumerable{``0},System.String)">
+            <summary>
+            Converts a string into a separated list
+            </summary>
+            <typeparam name="T">The type of the list</typeparam>
+            <param name="list">The list</param>
+            <param name="separator">The separator (optional)</param>
+            <returns>The separated list</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ListExtensions.WriteIntoFile``1(System.Collections.Generic.IEnumerable{``0},System.String,System.String,System.Boolean)">
+            <summary>
+            Writes a list of objects as delimited string into a file
+            </summary>
+            <typeparam name="T">The type of the object</typeparam>
+            <param name="list">The list with the objects</param>
+            <param name="file">The path of the destination file</param>
+            <param name="delimiter">The desired delimiter (optional)</param>
+            <param name="createHeader">true to create a header, otherwise false (optional)</param>
+            <returns>true when successful, otherwise false</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.ObjectExtensions">
+            <summary>
+            Provides several methods for the interaction with an <see cref="T:System.Object"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.ObjectExtensions.GetAttribute``1(System.Object)">
+            <summary>
+            Gets the attribute of the given object
+            </summary>
+            <typeparam name="T">The type of the attribute</typeparam>
+            <param name="obj">The object</param> 
+            <returns>The desired attribute of the object</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the object is null</exception>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.SecureStringExtensions">
+            <summary>
+            Provides methods for the interaction with a <see cref="T:System.Security.SecureString"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.SecureStringExtensions.ToInsecureString(System.Security.SecureString)">
+            <summary>
+            Converts a secure string into a normal string
+            </summary>
+            <param name="value">The secure string</param>
+            <returns>The insecure string</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the parameter is null</exception>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.SecureStringExtensions.ToSecureString(System.String)">
+            <summary>
+            Converts a string into a secure string
+            </summary>
+            <param name="value">The string</param>
+            <returns>The secure string</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the parameter is null</exception>
+        </member>
+        <member name="T:ZimLabs.CoreLib.Extensions.StringExtensions">
+            <summary>
+            Provides several methods for the interaction with a <see cref="T:System.String"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.ToInt(System.String,System.Int32)">
+            <summary>
+            Converts a string into an int
+            </summary>
+            <param name="value">The string value</param>
+            <param name="fallback">The fallback value which will used when the parse failed (optional).</param>
+            <returns>The int value</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.ToDouble(System.String,System.Double)">
+            <summary>
+            Converts a string into a double
+            </summary>
+            <param name="value">The string value</param>
+            <param name="fallback">The fallback value which will used when the parse failed (optional).</param>
+            <returns>The double value</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.ToDecimal(System.String,System.Decimal)">
+            <summary>
+            Converts a string into a decimal
+            </summary>
+            <param name="value">The string value</param>
+            <param name="fallback">The fallback value which will used when the parse failed (optional).</param>
+            <returns>The decimal value</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.ToBool(System.String,System.Boolean)">
+            <summary>
+            Converts a string into a decimal ("1", "true" = true, rest false)
+            </summary>
+            <param name="value">The string value</param>
+            <param name="fallback">The fallback value which will used when the parse failed (optional).</param>
+            <returns>The bool value</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.ContainsIgnoreCase(System.String,System.String)">
+            <summary>
+            Checks if the string value contains the given substring
+            </summary>
+            <param name="value">The string value</param>
+            <param name="substring">The sub string which should be found</param>
+            <returns>true when the string value contains the substring, otherwise false</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.EqualsIgnoreCase(System.String,System.String)">
+            <summary>
+            Check two strings for equality and ignores the casing
+            </summary>
+            <param name="value">The value which should be checked</param>
+            <param name="match">The comparative value</param>
+            <returns>true when the strings are equal, otherwise false</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.IsNumeric(System.String,System.Globalization.NumberStyles,System.Globalization.CultureInfo)">
+            <summary>
+            Returns true if string is numeric and not empty or null or whitespace.
+            Determines if string is numeric by parsing as Double
+            </summary>
+            <param name="value">The value which should be checked</param>
+            <param name="style">Optional style - defaults to NumberStyles.Number (leading and trailing whitespace, leading and trailing sign, decimal point and thousands separator) </param>
+            <param name="culture">Optional CultureInfo - defaults to InvariantCulture</param>
+            <returns>true when the given string is a valid number, otherwise false</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.FirstCharToUpper(System.String,System.Boolean)">
+            <summary>
+            Converts the first char of a string to upper case
+            </summary>
+            <param name="value">The original string</param>
+            <param name="restToLower">true when the rest of the string should be converted to lower case, otherwise false (optional)</param>
+            <returns>The converted string</returns>
+        </member>
+        <member name="M:ZimLabs.CoreLib.Extensions.StringExtensions.FirstCharToLower(System.String,System.Boolean)">
+            <summary>
+            Converts the first char of a string to lower case
+            </summary>
+            <param name="value">The original value</param>
+            <param name="restToLower">true when the rest of the string should be converted to lower case, otherwise false (optional)</param>
+            <returns>The converted string</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.FileHelper">
+            <summary>
+            Provides several methods for the interaction with files. The first occurence of the file will be selected
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.FileHelper.GetFile(System.String,System.String,System.String)">
+            <summary>
+            Gets the path of a specified file starting from the given directory
+            </summary>
+            <param name="filename">The name of the file</param>
+            <param name="directory">The path of the start directory (optional, when empty the current directory will be chosen)</param>
+            <param name="pattern">The search pattern (optional)</param>
+            <returns>The full path of the file to be searched for</returns>
+        </member>
+        <member name="T:ZimLabs.CoreLib.NuGet.NuGetHelper">
+            <summary>
+            Provides several functions for the interaction with the NuGet packages
+            </summary>
+        </member>
+        <member name="M:ZimLabs.CoreLib.NuGet.NuGetHelper.GetPackageInformation(System.String)">
+            <summary>
+            Gets the package information of the given package file.
+            <para/>
+            For more information about package file: https://docs.microsoft.com/de-de/nuget/reference/packages-config
+            </summary>
+            <param name="packageFile">The path of the package file</param>
+            <returns>The list with the reference data</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the package file parameter is null or empty</exception>
+            <exception cref="T:System.IO.FileNotFoundException">Will be thrown when the package file doesn't exist</exception>
+        </member>
+        <member name="T:ZimLabs.CoreLib.NuGet.ReferenceEntry">
+            <summary>
+            Represents a entry of the NuGet package file
+            </summary>
+        </member>
+        <member name="P:ZimLabs.CoreLib.NuGet.ReferenceEntry.Name">
+            <summary>
+            Gets or sets the name of the package
+            </summary>
+        </member>
+        <member name="P:ZimLabs.CoreLib.NuGet.ReferenceEntry.Version">
+            <summary>
+            Gets or sets the version
+            </summary>
+        </member>
+        <member name="P:ZimLabs.CoreLib.NuGet.ReferenceEntry.IsDevelopmentDependency">
+            <summary>
+            Gets or sets the value which indicates if the package is a development dependency
+            </summary>
+        </member>
+        <member name="P:ZimLabs.CoreLib.NuGet.ReferenceEntry.TargetFramework">
+            <summary>
+            Gets or sets the target framework
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZimLabs.Database.MsSql</name>
+    </assembly>
+    <members>
+        <member name="T:ZimLabs.Database.MsSql.Connector">
+            <summary>
+            Provides functions / properties for the interaction with a MySql database
+            </summary>
+        </member>
+        <member name="F:ZimLabs.Database.MsSql.Connector._disposed">
+            <summary>
+            Contains the value which indicates if the class was already disposed
+            </summary>
+        </member>
+        <member name="F:ZimLabs.Database.MsSql.Connector._settings">
+            <summary>
+            Contains the settings
+            </summary>
+        </member>
+        <member name="F:ZimLabs.Database.MsSql.Connector._connectionString">
+            <summary>
+            Contains the connection string
+            </summary>
+        </member>
+        <member name="F:ZimLabs.Database.MsSql.Connector._connection">
+            <summary>
+            Contains the connection
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.Connector.Connection">
+            <summary>
+            Gets the current connection
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.Connector.DataSource">
+            <summary>
+            Gets the name / path of the current set data source aka server
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.Connector.InitialCatalog">
+            <summary>
+            Gets the name of the current set database aka initial catalog
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.#ctor(ZimLabs.Database.MsSql.DatabaseSettings)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.Connector"/>
+            </summary>
+            <param name="settings">The settings for the database connection</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.#ctor(System.Security.SecureString)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.Connector"/>
+            </summary>
+            <param name="connectionString">The connection string</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.Connector"/> and sets the "IntegratedSecurity" to true
+            </summary>
+            <param name="dataSource">The data source</param>
+            <param name="initialCatalog">The initial catalog</param>
+            <param name="applicationName">The name of the application (optional)</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.Connector"/>
+            </summary>
+            <param name="dataSource">The data source</param>
+            <param name="initialCatalog">The initial catalog</param>
+            <param name="userId">The user id</param>
+            <param name="password">The password</param>
+            <param name="applicationName">The name of the application (optional)</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.#ctor(System.String,System.String,System.String,System.Security.SecureString,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.Connector"/>
+            </summary>
+            <param name="dataSource">The data source</param>
+            <param name="initialCatalog">The initial catalog</param>
+            <param name="userId">The user id</param>
+            <param name="password">The password</param>
+            <param name="applicationName">The name of the application (optional)</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.CreateConnectionString">
+            <summary>
+            Creates the connection string
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.CreateConnection">
+            <summary>
+            Creates a new connection
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.CloseConnection">
+            <summary>
+            Closes the connection
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.SwitchDatabase(System.String)">
+            <summary>
+            Switches the database
+            </summary>
+            <param name="database">The name of the database</param>
+            <exception cref="T:System.ArgumentNullException">Occurs when the database name is null or empty</exception>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Connector.Dispose">
+            <summary>
+            Disposes the class
+            </summary>
+        </member>
+        <member name="T:ZimLabs.Database.MsSql.DatabaseSettings">
+            <summary>
+            Represents the settings for the database connection
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.DataSource">
+            <summary>
+            Gets or sets the name of the server
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.InitialCatalog">
+            <summary>
+            Gets or sets the name of the database
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.UserId">
+            <summary>
+            Gets or sets the user id
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.Password">
+            <summary>
+            Gets or sets the password
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.IntegratedSecurity">
+            <summary>
+            Gets or sets the value which indicates if the integrated security should be used
+            </summary>
+        </member>
+        <member name="P:ZimLabs.Database.MsSql.DatabaseSettings.ApplicationName">
+            <summary>
+            Gets or sets the name of the application
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.DatabaseSettings.#ctor">
+            <summary>
+            Creates a new empty instance of the <see cref="T:ZimLabs.Database.MsSql.DatabaseSettings"/>
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.DatabaseSettings.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.DatabaseSettings"/> and sets the <see cref="P:ZimLabs.Database.MsSql.DatabaseSettings.IntegratedSecurity"/> to true
+            </summary>
+            <param name="dataSource">The data source</param>
+            <param name="initialCatalog">The initial catalog</param>
+            <param name="applicationName">The name of the application</param>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.DatabaseSettings.#ctor(System.String,System.String,System.String,System.Security.SecureString,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ZimLabs.Database.MsSql.DatabaseSettings"/>
+            </summary>
+            <param name="dataSource">The data source</param>
+            <param name="initialCatalog">The initial catalog</param>
+            <param name="userId">The user id</param>
+            <param name="password">The password</param>
+            <param name="applicationName">The name of the application</param>
+        </member>
+        <member name="T:ZimLabs.Database.MsSql.Helper">
+            <summary>
+            Provides several helper functions
+            </summary>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Helper.ToInsecureString(System.Security.SecureString)">
+            <summary>
+            Converts a secure string into a normal string
+            </summary>
+            <param name="value">The secure string</param>
+            <returns>The insecure string</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the parameter is null</exception>
+        </member>
+        <member name="M:ZimLabs.Database.MsSql.Helper.ToSecureString(System.String)">
+            <summary>
+            Converts a string into a secure string
+            </summary>
+            <param name="value">The string</param>
+            <returns>The secure string</returns>
+            <exception cref="T:System.ArgumentNullException">Will be thrown when the parameter is null</exception>
+        </member>
+    </members>
+</doc>
