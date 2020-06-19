@@ -213,4 +213,9 @@
     <Resource Include="MsSqlToolBelt.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>if $(ConfigurationName) == Release (
+    $(SolutionDir)VersionChanger\VersionChanger.exe -p $(ProjectDir)Properties\AssemblyInfo.cs
+)</PreBuildEvent>
+  </PropertyGroup>
 </Project>
