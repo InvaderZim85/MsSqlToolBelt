@@ -1,4 +1,4 @@
-﻿namespace MsSqlToolBelt.DataObjects.Search
+﻿namespace MsSqlToolBelt.DataObjects
 {
     /// <summary>
     /// Represents a table column
@@ -19,5 +19,15 @@
         /// Gets or sets the data type of the column
         /// </summary>
         public string DataType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the column should used for the generation
+        /// </summary>
+        public bool Use { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the alias of the column
+        /// </summary>
+        public string Alias { get; set; }
     }
 }

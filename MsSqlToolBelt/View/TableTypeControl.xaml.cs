@@ -26,5 +26,14 @@ namespace MsSqlToolBelt.View
             if (DataContext is TableTypeControlViewModel viewModel)
                 viewModel.SetConnector(connector);
         }
+
+        /// <summary>
+        /// Loads the data
+        /// </summary>
+        public void LoadData()
+        {
+            if (DataContext is TableTypeControlViewModel viewModel)
+                viewModel.LoadData();
+        }
     }
 }

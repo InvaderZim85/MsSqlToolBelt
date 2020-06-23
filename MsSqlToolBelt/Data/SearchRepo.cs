@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using Dapper;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
 using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
@@ -13,7 +13,7 @@ namespace MsSqlToolBelt.Data
     /// <summary>
     /// Provides the functions to search in the database for a given string
     /// </summary>
-    internal class SearchRepo
+    internal sealed class SearchRepo
     {
         /// <summary>
         /// Contains the instance of the <see cref="Connector"/>

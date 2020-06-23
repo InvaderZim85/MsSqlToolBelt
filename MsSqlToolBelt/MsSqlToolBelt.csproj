@@ -106,13 +106,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Business\ClassGenerator.cs" />
     <Compile Include="Business\ExportHelper.cs" />
     <Compile Include="Business\PackageInfo.cs" />
+    <Compile Include="DataObjects\ClassGenerator\Table.cs" />
+    <Compile Include="DataObjects\CodyType.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
-    <Compile Include="DataObjects\Search\TableColumn.cs" />
+    <Compile Include="DataObjects\TableColumn.cs" />
     <Compile Include="DataObjects\TableType\TableType.cs" />
     <Compile Include="DataObjects\TableType\TableTypeColumn.cs" />
     <Compile Include="DataObjects\TextValueItem.cs" />
+    <Compile Include="Data\GeneratorRepo.cs" />
     <Compile Include="Data\Queries\QueryManager.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -121,12 +125,17 @@
     <Compile Include="Data\Repo.cs" />
     <Compile Include="Data\SearchRepo.cs" />
     <Compile Include="Data\TableTypeRepo.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
     <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
     <Compile Include="ViewModel\TableTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="View\ClassGeneratorControl.xaml.cs">
+      <DependentUpon>ClassGeneratorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ExportTableTypeDialog.xaml.cs">
       <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
     </Compile>
@@ -180,6 +189,10 @@
     <None Include="Data\Queries\LoadTableTypes.sql" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="View\ClassGeneratorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ExportTableTypeDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -211,6 +224,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Queries\LoadTables.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

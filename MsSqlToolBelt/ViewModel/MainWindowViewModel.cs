@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -22,6 +21,11 @@ namespace MsSqlToolBelt.ViewModel
         /// The action to set the connector of the user controls
         /// </summary>
         private Action<Connector> _setConnector;
+
+        /// <summary>
+        /// The action to load the data of the selected tab
+        /// </summary>
+        private Action<int> _loadData;
 
         /// <summary>
         /// The instance for the interaction with the database
@@ -141,12 +145,32 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="TabIndex"/>
+        /// </summary>
+        private int _tabIndex;
+
+        /// <summary>
+        /// Gets or sets the tab index
+        /// </summary>
+        public int TabIndex
+        {
+            get => _tabIndex;
+            set
+            {
+                if (SetField(ref _tabIndex, value) && value != 0)
+                    _loadData(value);
+            }
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setConnector">The action to set the connector of the user controls</param>
-        public void InitViewModel(Action<Connector> setConnector)
+        /// <param name="loadData">The action to load the data</param>
+        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData)
         {
             _setConnector = setConnector;
+            _loadData = loadData;
 
             LoadServerList();
 
@@ -194,8 +218,6 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(SelectedServer))
                 return;
 
-            SaveServer();
-
             ServerConnected = false;
             Connected = false;
 
@@ -207,6 +229,8 @@ namespace MsSqlToolBelt.ViewModel
 
                 Databases = new ObservableCollection<string>(_repo.LoadDatabases());
                 SelectedDatabase = Databases.FirstOrDefault();
+
+                SaveServer();
             }
             catch (Exception ex)
             {

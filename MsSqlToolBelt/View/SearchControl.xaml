@@ -149,7 +149,7 @@
                 <Label Grid.Row="0" Content="Preview" />
                 <Separator Grid.Row="1" Margin="3" />
                 <avalonedit:TextEditor
-                    Name="SqlEditor"
+                    Name="_sqlEditor"
                     Grid.Row="2"
                     BorderBrush="Black"
                     BorderThickness="1"

@@ -1,11 +1,6 @@
-﻿using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Xml;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
@@ -41,7 +36,7 @@ namespace MsSqlToolBelt.View
         /// <param name="text">The desired text</param>
         private void SetSqlText(string text)
         {
-            SqlEditor.Text = text;
+            _sqlEditor.Text = text;
         }
 
         /// <summary>
@@ -49,31 +44,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void SetSqlSchema()
         {
-            //var dark = Properties.Settings.Default.Theme.ContainsIgnoreCase("dark");
-            //var dark = true;
-
-            SqlEditor.Options.HighlightCurrentLine = true;
-            SqlEditor.SyntaxHighlighting = LoadSqlSchema(true);
-            //SqlEditor.Foreground = new SolidColorBrush(dark ? Colors.White : Colors.Black);
-            SqlEditor.Foreground = new SolidColorBrush(Colors.White);
-        }
-
-        /// <summary>
-        /// Loads the highlight definition for the avalon editor
-        /// </summary>
-        /// <returns>The definition</returns>
-        private static IHighlightingDefinition LoadSqlSchema(bool dark)
-        {
-            var fileName = dark ? "AvalonSqlSchema_Dark.xml" : "AvalonSqlSchema.xml";
-            var file = Path.Combine(ZimLabs.CoreLib.Core.GetBaseFolder(), "SqlSchema", fileName);
-
-            using (var reader = File.Open(file, FileMode.Open))
-            {
-                using (var xmlReader = new XmlTextReader(reader))
-                {
-                    return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
-                }
-            }
+            Helper.InitAvalonEditor(_sqlEditor);
         }
 
         /// <summary>

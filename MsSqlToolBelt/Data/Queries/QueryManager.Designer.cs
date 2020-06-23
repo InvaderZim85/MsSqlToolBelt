@@ -64,6 +64,38 @@ namespace MsSqlToolBelt.Data.Queries {
         ///   Looks up a localized string similar to /*
         ///    Author:        A. Pouwels
         ///    Changed by:    /
+        ///    Creation date: 2020-06-22
+        ///    Change date:   /
+        ///    Description:   Loads all available tables
+        ///    Used by:       MsSqlToolBelt
+        ///*/
+        ///
+        ///DECLARE @tables TABLE
+        ///(
+        ///    [Name] sysname NOT NULL
+        ///);
+        ///
+        ///INSERT INTO @tables
+        ///SELECT 
+        ///    t.TABLE_NAME
+        ///FROM
+        ///    INFORMATION_SCHEMA.TABLES AS t
+        ///WHERE
+        ///    t.TABLE_NAME NOT LIKE &apos;syncobj%&apos;
+        ///    AND t.TABLE_NAME NOT LIKE &apos;cdc_%&apos;
+        ///    AND t.TABLE_NAME NOT LIKE &apos;MSpeer%&apos;
+        ///    AND t.TABLE_NAME NOT LIKE &apos;MSpub%&apos;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string LoadTables {
+            get {
+                return ResourceManager.GetString("LoadTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /*
+        ///    Author:        A. Pouwels
+        ///    Changed by:    /
         ///    Creation date: 2020-06-17
         ///    Change date:   /
         ///    Description:   Loads all available table types

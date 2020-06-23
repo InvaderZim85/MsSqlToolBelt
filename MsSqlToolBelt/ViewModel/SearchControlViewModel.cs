@@ -124,6 +124,8 @@ namespace MsSqlToolBelt.ViewModel
         public void SetConnector(Connector connector)
         {
             _repo = new SearchRepo(connector);
+
+            Clear();
         }
 
         /// <summary>
@@ -252,6 +254,16 @@ namespace MsSqlToolBelt.ViewModel
             {
                 entry.Export = selected;
             }
+        }
+
+        /// <summary>
+        /// Clears the content of the control
+        /// </summary>
+        private void Clear()
+        {
+            Result = new ObservableCollection<SearchResult>();
+            SelectedResult = null;
+            _setSqlText("");
         }
     }
 }

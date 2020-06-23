@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
 using ZimLabs.WpfBase;
 
@@ -31,6 +32,16 @@ namespace MsSqlToolBelt.ViewModel
         protected async Task ShowMessage(string title, string message)
         {
             await _dialogCoordinator.ShowMessageAsync(this, title, message);
+        }
+
+        /// <summary>
+        /// Shows an error message
+        /// </summary>
+        /// <param name="ex">The exception which was thrown</param>
+        /// <returns>The awaitable task</returns>
+        protected async Task ShowError(Exception ex)
+        {
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", $"An error has occured: {ex.Message}");
         }
 
         /// <summary>

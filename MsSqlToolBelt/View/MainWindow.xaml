@@ -93,12 +93,20 @@
                 </Grid>
             </Border>
 
-            <TabControl Grid.Row="1" IsEnabled="{Binding Connected}">
+            <TabControl
+                Name="_tabControl"
+                Grid.Row="1"
+                IsEnabled="{Binding Connected}"
+                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
+                SelectionChanged="Selector_OnSelectionChanged">
                 <TabItem Header="Sql search">
                     <Local:SearchControl x:Name="_searchControl" />
                 </TabItem>
                 <TabItem Header="Table types">
                     <Local:TableTypeControl x:Name="_tableTypeControl" />
+                </TabItem>
+                <TabItem Header="Class generator">
+                    <Local:ClassGeneratorControl x:Name="_classGeneratorControl" />
                 </TabItem>
             </TabControl>
         </Grid>

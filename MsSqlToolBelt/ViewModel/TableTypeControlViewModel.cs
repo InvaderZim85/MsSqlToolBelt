@@ -23,6 +23,11 @@ namespace MsSqlToolBelt.ViewModel
         private TableTypeRepo _repo;
 
         /// <summary>
+        /// Contains the value which indicates if the data was already loaded
+        /// </summary>
+        private bool _dataLoaded;
+
+        /// <summary>
         /// Backing field for <see cref="TableTypes"/>
         /// </summary>
         private ObservableCollection<TableType> _tableTypes;
@@ -108,7 +113,20 @@ namespace MsSqlToolBelt.ViewModel
         {
             _repo = new TableTypeRepo(connector);
 
+            _dataLoaded = false;
+        }
+
+        /// <summary>
+        /// Loads the data
+        /// </summary>
+        public void LoadData()
+        {
+            if (_dataLoaded)
+                return;
+
             LoadTableTypes();
+
+            _dataLoaded = true;
         }
 
         /// <summary>
@@ -133,7 +151,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowMessage("Error", $"An error has occured: {ex.Message}");
+                await ShowError(ex);
             }
             finally
             {

@@ -1,0 +1,189 @@
+﻿<UserControl
+    x:Class="MsSqlToolBelt.View.ClassGeneratorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:D="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:DataObjects="clr-namespace:MsSqlToolBelt.DataObjects"
+    xmlns:Local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    D:DesignHeight="450"
+    D:DesignWidth="800"
+    Mah:DialogParticipation.Register="{Binding}"
+    Mc:Ignorable="D">
+    <UserControl.DataContext>
+        <ViewModel:ClassGeneratorControlViewModel />
+    </UserControl.DataContext>
+
+    <Border Style="{StaticResource BorderStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Content="{Binding TableHeader}"
+                FontWeight="Bold" />
+
+            <DataGrid
+                Grid.Row="1"
+                Grid.RowSpan="6"
+                Grid.Column="0"
+                Margin="3"
+                IsReadOnly="True"
+                ItemsSource="{Binding TableList}"
+                SelectedItem="{Binding SelectedTable}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Name}"
+                        Header="Name" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Label
+                Grid.Row="0"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                Content="{Binding ColumnHeader}"
+                FontWeight="Bold" />
+
+            <DataGrid
+                Grid.Row="1"
+                Grid.RowSpan="6"
+                Grid.Column="1"
+                Margin="3"
+                ItemsSource="{Binding Columns}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Column}"
+                        Header="Name"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Alias}"
+                        Header="Alias" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel
+                Grid.Row="0"
+                Grid.Column="3"
+                Orientation="Horizontal">
+                <TextBox
+                    Width="200"
+                    Margin="3"
+                    Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
+                    Text="{Binding ClassName}" />
+                <CheckBox
+                    Margin="3"
+                    Content="With backing field"
+                    IsChecked="{Binding CreateBackingField}" />
+            </StackPanel>
+
+            <Button
+                Grid.Row="0"
+                Grid.Column="3"
+                Margin="3"
+                HorizontalAlignment="Right"
+                Command="{Binding GenerateCommand}"
+                Content="Generate" />
+
+            <Label
+                Grid.Row="1"
+                Grid.Column="3"
+                HorizontalAlignment="Left"
+                Content="C# class" />
+
+
+            <Avalonedit:TextEditor
+                Name="_codeEditor"
+                Grid.Row="2"
+                Grid.Column="3"
+                Margin="3"
+                BorderBrush="Black"
+                BorderThickness="1"
+                FontFamily="Hack,Consolas"
+                FontSize="12"
+                IsReadOnly="True"
+                ShowLineNumbers="True" />
+
+            <StackPanel
+                Grid.Row="3"
+                Grid.Column="3"
+                FlowDirection="RightToLeft"
+                Orientation="Horizontal">
+                <Button
+                    Width="50"
+                    Margin="3"
+                    Command="{Binding ClearCommand}"
+                    CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                    Content="Clear" />
+                <Button
+                    Width="50"
+                    Margin="3"
+                    Command="{Binding CopyCommand}"
+                    CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                    Content="Copy" />
+            </StackPanel>
+
+            <Label
+                Grid.Row="4"
+                Grid.Column="3"
+                HorizontalAlignment="Left"
+                Content="Sql query" />
+
+
+            <Avalonedit:TextEditor
+                Name="_sqlEditor"
+                Grid.Row="5"
+                Grid.Column="3"
+                Margin="3"
+                BorderBrush="Black"
+                BorderThickness="1"
+                FontFamily="Hack,Consolas"
+                FontSize="12"
+                IsReadOnly="True"
+                ShowLineNumbers="True" />
+
+            <StackPanel
+                Grid.Row="6"
+                Grid.Column="3"
+                FlowDirection="RightToLeft"
+                Orientation="Horizontal">
+                <Button
+                    Width="50"
+                    Margin="3"
+                    Command="{Binding ClearCommand}"
+                    CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                    Content="Clear" />
+                <Button
+                    Width="50"
+                    Margin="3"
+                    Command="{Binding CopyCommand}"
+                    CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                    Content="Copy" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

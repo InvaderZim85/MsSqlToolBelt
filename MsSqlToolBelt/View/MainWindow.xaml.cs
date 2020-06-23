@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
@@ -26,6 +28,7 @@ namespace MsSqlToolBelt.View
         {
             _searchControl.SetConnector(connector);
             _tableTypeControl.SetConnector(connector);
+            _classGeneratorControl.SetConnector(connector);
         }
 
         /// <summary>
@@ -34,9 +37,32 @@ namespace MsSqlToolBelt.View
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainWindowViewModel viewModel)
-                viewModel.InitViewModel(SetConnector);
+                viewModel.InitViewModel(SetConnector, LoadData);
 
             _searchControl.InitControl();
+            _classGeneratorControl.InitControl();
+        }
+
+        /// <summary>
+        /// Loads the data of the desired control
+        /// </summary>
+        /// <param name="tabIndex">The tab index</param>
+        private void LoadData(int tabIndex)
+        {
+            switch (tabIndex)
+            {
+                case 1:
+                    _tableTypeControl.LoadData();
+                    break;
+                case 2:
+                    _classGeneratorControl.LoadData();
+                    break;
+            }
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
         }
     }
 }
