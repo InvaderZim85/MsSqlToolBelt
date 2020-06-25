@@ -56,7 +56,7 @@
             Grid.Column="1"
             Margin="3"
             VerticalAlignment="Center">
-            <Hyperlink NavigateUri="http://gitlab/andreas.pouwels/cmshelpertools" RequestNavigate="Hyperlink_OnRequestNavigate">CMS Helper Tools (Gitlab)</Hyperlink>
+            <Hyperlink NavigateUri="https://github.com/InvaderZim85/MsSqlToolBelt" RequestNavigate="Hyperlink_OnRequestNavigate">MsSqlToolBelt on Github</Hyperlink>
         </TextBlock>
 
         <Separator
@@ -69,6 +69,7 @@
             Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
+            HorizontalAlignment="Left"
             Content="This tool uses the following external packages (packages provided via NuGet)" />
         <DataGrid
             Grid.Row="4"
@@ -92,10 +93,6 @@
                     Width="1*"
                     Binding="{Binding TargetFramework}"
                     Header="Target framework" />
-                <DataGridCheckBoxColumn
-                    Width="Auto"
-                    Binding="{Binding IsDevelopmentDependency}"
-                    Header="Dev. dependency" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -64,7 +64,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!(ResultGrid.SelectedItem is SearchResult result))
+            if (!(_resultGrid.SelectedItem is SearchResult result))
                 return;
 
             Clipboard.SetText(result.Name);
