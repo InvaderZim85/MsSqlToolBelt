@@ -1,9 +1,11 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿using ZimLabs.WpfBase;
+
+namespace MsSqlToolBelt.DataObjects
 {
     /// <summary>
     /// Represents a table column
     /// </summary>
-    internal sealed class TableColumn
+    internal sealed class TableColumn : ObservableObject
     {
         /// <summary>
         /// Gets or sets the name of the table
@@ -21,13 +23,31 @@
         public string DataType { get; set; }
 
         /// <summary>
-        /// Gets or sets the value which indicates if the column should used for the generation
+        /// Backing field for <see cref="Use"/>
         /// </summary>
-        public bool Use { get; set; } = true;
+        private bool _use = true;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the column should be used by the class generator
+        /// </summary>
+        public bool Use
+        {
+            get => _use;
+            set => SetField(ref _use, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="Alias"/>
+        /// </summary>
+        private string _alias = "";
 
         /// <summary>
         /// Gets or sets the alias of the column
         /// </summary>
-        public string Alias { get; set; }
+        public string Alias
+        {
+            get => _alias;
+            set => SetField(ref _alias, value);
+        }
     }
 }

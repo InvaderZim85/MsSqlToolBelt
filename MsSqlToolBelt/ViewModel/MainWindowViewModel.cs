@@ -2,13 +2,12 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.View;
-using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
+using Application = System.Windows.Application;
 
 namespace MsSqlToolBelt.ViewModel
 {
@@ -26,6 +25,11 @@ namespace MsSqlToolBelt.ViewModel
         /// The action to load the data of the selected tab
         /// </summary>
         private Action<int> _loadData;
+
+        /// <summary>
+        /// The action to clear the content of the controls
+        /// </summary>
+        private Action _clearControls;
 
         /// <summary>
         /// The instance for the interaction with the database
@@ -167,10 +171,11 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         /// <param name="setConnector">The action to set the connector of the user controls</param>
         /// <param name="loadData">The action to load the data</param>
-        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData)
+        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls)
         {
             _setConnector = setConnector;
             _loadData = loadData;
+            _clearControls = clearControls;
 
             LoadServerList();
 
@@ -197,17 +202,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private void LoadServerList()
         {
-            var server = Properties.Settings.Default.ServerList;
-            if (string.IsNullOrEmpty(server))
-                return;
-
-            var content =
-                Properties.Settings.Default.ServerList.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (content.Length == 0)
-                return;
-
-            ServerList = new ObservableCollection<string>(content);
+            ServerList = new ObservableCollection<string>(Helper.LoadServerList());
         }
 
         /// <summary>
@@ -220,6 +215,7 @@ namespace MsSqlToolBelt.ViewModel
 
             ServerConnected = false;
             Connected = false;
+            _clearControls();
 
             try
             {
@@ -270,18 +266,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private void SaveServer()
         {
-            if (ServerList.Contains(SelectedServer))
-                return;
-
-            // If there are already 10 entries, remove the first one
-            if (ServerList.Count == 10)
-                ServerList.RemoveAt(0);
-
-            ServerList.Add(SelectedServer);
-
-            var server = ServerList.ToList().ToSeparatedString();
-            Properties.Settings.Default.ServerList = server;
-            Properties.Settings.Default.Save();
+            Helper.SaveServer(SelectedServer);
         }
 
         /// <summary>

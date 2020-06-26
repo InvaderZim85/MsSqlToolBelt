@@ -13,6 +13,11 @@ namespace MsSqlToolBelt.DataObjects.ClassGenerator
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the according database schema
+        /// </summary>
+        public string Schema { get; set; }
+
+        /// <summary>
         /// Gets or sets the list with the columns
         /// </summary>
         public List<TableColumn> Columns { get; set; }

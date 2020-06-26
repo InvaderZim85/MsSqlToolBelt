@@ -168,5 +168,15 @@ namespace MsSqlToolBelt.ViewModel
             var exportDialog = new ExportTableTypeDialog(TableTypes.ToList()) {Owner = Application.Current.MainWindow};
             exportDialog.ShowDialog();
         }
+
+        /// <summary>
+        /// Clears the content of the control
+        /// </summary>
+        public void Clear()
+        {
+            TableTypes = new ObservableCollection<TableType>();
+            TableHeader = "Table types";
+            ColumnHeader = "Columns";
+        }
     }
 }

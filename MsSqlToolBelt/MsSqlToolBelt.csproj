@@ -112,6 +112,8 @@
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
     <Compile Include="DataObjects\CodeType.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
+    <Compile Include="DataObjects\SelectionType.cs" />
+    <Compile Include="DataObjects\Settings.cs" />
     <Compile Include="DataObjects\TableColumn.cs" />
     <Compile Include="DataObjects\TableType\TableType.cs" />
     <Compile Include="DataObjects\TableType\TableTypeColumn.cs" />

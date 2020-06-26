@@ -19,171 +19,215 @@
 
     <Border Style="{StaticResource BorderStyle}">
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="1.5*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
-            <Label
-                Grid.Row="0"
-                Grid.Column="0"
-                HorizontalAlignment="Left"
-                Content="{Binding TableHeader}"
-                FontWeight="Bold" />
+            <!--  Table list  -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <DataGrid
-                Grid.Row="1"
-                Grid.RowSpan="6"
-                Grid.Column="0"
-                Margin="3"
-                IsReadOnly="True"
-                ItemsSource="{Binding TableList}"
-                SelectedItem="{Binding SelectedTable}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Name}"
-                        Header="Name" />
-                </DataGrid.Columns>
-            </DataGrid>
+                <Label
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Content="{Binding TableHeader}"
+                    FontWeight="Bold" />
 
-            <Label
-                Grid.Row="0"
-                Grid.Column="1"
-                HorizontalAlignment="Left"
-                Content="{Binding ColumnHeader}"
-                FontWeight="Bold" />
+                <DataGrid
+                    Grid.Row="1"
+                    Margin="3"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding TableList}"
+                    SelectedItem="{Binding SelectedTable}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Name" />
+                    </DataGrid.Columns>
+                </DataGrid>
 
-            <DataGrid
-                Grid.Row="1"
-                Grid.RowSpan="6"
-                Grid.Column="1"
-                Margin="3"
-                ItemsSource="{Binding Columns}">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Column}"
-                        Header="Name"
-                        IsReadOnly="True" />
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Alias}"
-                        Header="Alias" />
-                </DataGrid.Columns>
-            </DataGrid>
-
-            <StackPanel
-                Grid.Row="0"
-                Grid.Column="3"
-                Orientation="Horizontal">
                 <TextBox
-                    Width="200"
+                    Grid.Row="2"
                     Margin="3"
-                    Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
-                    Text="{Binding ClassName}" />
-                <CheckBox
+                    Mah:TextBoxHelper.Watermark="Search..."
+                    Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+            </Grid>
+
+            <!--  Columns  -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Content="{Binding ColumnHeader}"
+                    FontWeight="Bold" />
+
+                <DataGrid
+                    Grid.Row="1"
                     Margin="3"
-                    Content="With backing field"
-                    IsChecked="{Binding CreateBackingField}" />
-            </StackPanel>
+                    ItemsSource="{Binding Columns}">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Column}"
+                            Header="Name"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Alias}"
+                            Header="Alias" />
+                    </DataGrid.Columns>
+                </DataGrid>
 
-            <Button
-                Grid.Row="0"
-                Grid.Column="3"
-                Margin="3"
-                HorizontalAlignment="Right"
-                Command="{Binding GenerateCommand}"
-                Content="Generate" />
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding SetSelectionCommand}"
+                        CommandParameter="{x:Static DataObjects:SelectionType.All}"
+                        Content="Select all"
+                        ToolTip="Checks all entries" />
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding SetSelectionCommand}"
+                        CommandParameter="{x:Static DataObjects:SelectionType.None}"
+                        Content="Select none"
+                        ToolTip="Uncheck all entries" />
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding ClearAliasCommand}"
+                        Content="Clear"
+                        ToolTip="Clears the alias values" />
+                </StackPanel>
+            </Grid>
 
-            <Label
-                Grid.Row="1"
-                Grid.Column="3"
-                HorizontalAlignment="Left"
-                Content="C# class" />
+            <GridSplitter
+                Grid.Column="2"
+                Width="3"
+                HorizontalAlignment="Stretch" />
 
+            <!--  Editor  -->
+            <Grid Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <Avalonedit:TextEditor
-                Name="_codeEditor"
-                Grid.Row="2"
-                Grid.Column="3"
-                Margin="3"
-                BorderBrush="Black"
-                BorderThickness="1"
-                FontFamily="Hack,Consolas"
-                FontSize="12"
-                IsReadOnly="True"
-                ShowLineNumbers="True" />
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBox
+                        Width="200"
+                        Margin="3"
+                        Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
+                        Text="{Binding ClassName}" />
+                    <CheckBox
+                        Margin="3"
+                        Content="With backing field"
+                        IsChecked="{Binding CreateBackingField}" />
+                </StackPanel>
 
-            <StackPanel
-                Grid.Row="3"
-                Grid.Column="3"
-                FlowDirection="RightToLeft"
-                Orientation="Horizontal">
                 <Button
-                    Width="50"
+                    Grid.Row="0"
                     Margin="3"
-                    Command="{Binding ClearCommand}"
-                    CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
-                    Content="Clear" />
-                <Button
-                    Width="50"
-                    Margin="3"
-                    Command="{Binding CopyCommand}"
-                    CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
-                    Content="Copy" />
-            </StackPanel>
+                    HorizontalAlignment="Right"
+                    Command="{Binding GenerateCommand}"
+                    Content="Generate" />
 
-            <Label
-                Grid.Row="4"
-                Grid.Column="3"
-                HorizontalAlignment="Left"
-                Content="Sql query" />
+                <Label
+                    Grid.Row="1"
+                    HorizontalAlignment="Left"
+                    Content="C# class" />
 
 
-            <Avalonedit:TextEditor
-                Name="_sqlEditor"
-                Grid.Row="5"
-                Grid.Column="3"
-                Margin="3"
-                BorderBrush="Black"
-                BorderThickness="1"
-                FontFamily="Hack,Consolas"
-                FontSize="12"
-                IsReadOnly="True"
-                ShowLineNumbers="True" />
+                <Avalonedit:TextEditor
+                    Name="_codeEditor"
+                    Grid.Row="2"
+                    Margin="3"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    FontFamily="Hack,Consolas"
+                    FontSize="12"
+                    IsReadOnly="True"
+                    ShowLineNumbers="True" />
 
-            <StackPanel
-                Grid.Row="6"
-                Grid.Column="3"
-                FlowDirection="RightToLeft"
-                Orientation="Horizontal">
-                <Button
-                    Width="50"
+                <StackPanel
+                    Grid.Row="3"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding ClearCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        Content="Clear" />
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding CopyCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        Content="Copy" />
+                </StackPanel>
+
+                <Label
+                    Grid.Row="4"
+                    HorizontalAlignment="Left"
+                    Content="Sql query" />
+
+
+                <Avalonedit:TextEditor
+                    Name="_sqlEditor"
+                    Grid.Row="5"
                     Margin="3"
-                    Command="{Binding ClearCommand}"
-                    CommandParameter="{x:Static DataObjects:CodeType.Sql}"
-                    Content="Clear" />
-                <Button
-                    Width="50"
-                    Margin="3"
-                    Command="{Binding CopyCommand}"
-                    CommandParameter="{x:Static DataObjects:CodeType.Sql}"
-                    Content="Copy" />
-            </StackPanel>
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    FontFamily="Hack,Consolas"
+                    FontSize="12"
+                    IsReadOnly="True"
+                    ShowLineNumbers="True" />
+
+                <StackPanel
+                    Grid.Row="6"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding ClearCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        Content="Clear" />
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding CopyCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        Content="Copy" />
+                </StackPanel>
+            </Grid>
         </Grid>
+
     </Border>
 </UserControl>

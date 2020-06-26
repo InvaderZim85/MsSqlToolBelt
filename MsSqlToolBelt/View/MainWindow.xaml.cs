@@ -29,6 +29,8 @@ namespace MsSqlToolBelt.View
             _searchControl.SetConnector(connector);
             _tableTypeControl.SetConnector(connector);
             _classGeneratorControl.SetConnector(connector);
+
+            LoadData(_tabControl.SelectedIndex);
         }
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace MsSqlToolBelt.View
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainWindowViewModel viewModel)
-                viewModel.InitViewModel(SetConnector, LoadData);
+                viewModel.InitViewModel(SetConnector, LoadData, ClearControl);
 
             _searchControl.InitControl();
             _classGeneratorControl.InitControl();
@@ -60,9 +62,14 @@ namespace MsSqlToolBelt.View
             }
         }
 
-        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        /// <summary>
+        /// Clears the content of the controls
+        /// </summary>
+        private void ClearControl()
         {
-            
+            _searchControl.Clear();
+            _tableTypeControl.Clear();
+            _classGeneratorControl.Clear();
         }
     }
 }

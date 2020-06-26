@@ -112,7 +112,7 @@ namespace MsSqlToolBelt.Business
             }
 
             sb.AppendLine("FROM");
-            sb.AppendLine($"{Tab}[{table.Name}]");
+            sb.AppendLine($"{Tab}[{table.Schema}].[{table.Name}]");
 
             return sb.ToString();
         }

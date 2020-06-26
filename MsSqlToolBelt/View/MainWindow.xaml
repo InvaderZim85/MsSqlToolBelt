@@ -97,8 +97,7 @@
                 Name="_tabControl"
                 Grid.Row="1"
                 IsEnabled="{Binding Connected}"
-                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
-                SelectionChanged="Selector_OnSelectionChanged">
+                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}">
                 <TabItem Header="Sql search">
                     <Local:SearchControl x:Name="_searchControl" />
                 </TabItem>

@@ -69,5 +69,14 @@ namespace MsSqlToolBelt.View
 
             Clipboard.SetText(result.Name);
         }
+
+        /// <summary>
+        /// Clears the content of the control
+        /// </summary>
+        public void Clear()
+        {
+            if (DataContext is SearchControlViewModel viewModel)
+                viewModel.Clear();
+        }
     }
 }

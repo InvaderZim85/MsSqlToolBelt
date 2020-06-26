@@ -134,10 +134,7 @@
             Height="3"
             HorizontalAlignment="Stretch" />
 
-        <Border
-            Grid.Row="2"
-            IsEnabled="{Binding Connected}"
-            Style="{StaticResource BorderStyle}">
+        <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

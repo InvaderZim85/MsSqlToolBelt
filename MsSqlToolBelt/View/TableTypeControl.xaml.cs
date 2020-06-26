@@ -35,5 +35,14 @@ namespace MsSqlToolBelt.View
             if (DataContext is TableTypeControlViewModel viewModel)
                 viewModel.LoadData();
         }
+
+        /// <summary>
+        /// Clears the content of the control
+        /// </summary>
+        public void Clear()
+        {
+            if (DataContext is TableTypeControlViewModel viewModel)
+                viewModel.Clear();
+        }
     }
 }

@@ -259,7 +259,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Clears the content of the control
         /// </summary>
-        private void Clear()
+        public void Clear()
         {
             Result = new ObservableCollection<SearchResult>();
             SelectedResult = null;

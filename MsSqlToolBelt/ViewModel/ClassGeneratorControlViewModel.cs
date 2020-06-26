@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -7,6 +9,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
+using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 
@@ -41,6 +44,11 @@ namespace MsSqlToolBelt.ViewModel
         /// The method to set the code (sql, csharp)
         /// </summary>
         private Action<string, CodeType> _setCode;
+
+        /// <summary>
+        /// Contains the complete table list
+        /// </summary>
+        private List<Table> _originTableList;
 
         /// <summary>
         /// Backing field for <see cref="TableList"/>
@@ -155,6 +163,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="TableFilter"/>
+        /// </summary>
+        private string _tableFilter;
+
+        /// <summary>
+        /// Gets or sets the table filter
+        /// </summary>
+        public string TableFilter
+        {
+            get => _tableFilter;
+            set => SetField(ref _tableFilter, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setCode">The method to set the code</param>
@@ -177,6 +199,21 @@ namespace MsSqlToolBelt.ViewModel
         /// The command to copy the code
         /// </summary>
         public ICommand CopyCommand => new RelayCommand<CodeType>(Copy);
+
+        /// <summary>
+        /// The command to filter the table list
+        /// </summary>
+        public ICommand FilterCommand => new DelegateCommand(FilterList);
+
+        /// <summary>
+        /// The command to set the column selection
+        /// </summary>
+        public ICommand SetSelectionCommand => new RelayCommand<SelectionType>(SetColumnSelection);
+
+        /// <summary>
+        /// The command to clear the alias values
+        /// </summary>
+        public ICommand ClearAliasCommand => new DelegateCommand(ClearAlias);
 
         /// <summary>
         /// Sets the connector
@@ -214,9 +251,11 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await Task.Run(() => _repo.LoadTables());
+                var result = await Task.Run(() => _repo.LoadTables().OrderBy(o => o.Name).ToList());
 
-                TableList = new ObservableCollection<Table>(result);
+                _originTableList = result;
+
+                FilterList();
             }
             catch (Exception ex)
             {
@@ -238,6 +277,12 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
+                if (Columns.All(a => !a.Use))
+                {
+                    await ShowMessage("Class generator", "You have to select at least one column to generate a class.");
+                    return;
+                }
+
                 var (classCode, sqlStatement) = await Task.Run(() => ClassGenerator.Generate(SelectedTable, ClassName, CreateBackingField));
 
                 _setCode(classCode, CodeType.CSharp);
@@ -253,6 +298,47 @@ namespace MsSqlToolBelt.ViewModel
             finally
             {
                 await controller.CloseAsync();
+            }
+        }
+
+        /// <summary>
+        /// Filters the list of tables according to the given filter string
+        /// </summary>
+        private void FilterList()
+        {
+            TableList = new ObservableCollection<Table>(string.IsNullOrEmpty(TableFilter)
+                ? _originTableList
+                : _originTableList.Where(w => w.Name.ContainsIgnoreCase(TableFilter)));
+
+            SelectedTable = TableList.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Sets the selection of the column entries
+        /// </summary>
+        /// <param name="type">The desired selection type</param>
+        private void SetColumnSelection(SelectionType type)
+        {
+            if (Columns == null || !Columns.Any())
+                return;
+
+            foreach (var entry in Columns)
+            {
+                entry.Use = type == SelectionType.All;
+            }
+        }
+
+        /// <summary>
+        /// Clears the alias values
+        /// </summary>
+        private void ClearAlias()
+        {
+            if (Columns == null || !Columns.Any())
+                return;
+
+            foreach (var entry in Columns)
+            {
+                entry.Alias = "";
             }
         }
 
@@ -275,9 +361,9 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
-        /// Clears the control
+        /// Clears the content of the control
         /// </summary>
-        private void Clear()
+        public void Clear()
         {
             TableList = new ObservableCollection<Table>();
             Columns = new ObservableCollection<TableColumn>();

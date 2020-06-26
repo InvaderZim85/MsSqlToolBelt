@@ -78,5 +78,14 @@ namespace MsSqlToolBelt.View
             if (DataContext is ClassGeneratorControlViewModel viewModel)
                 viewModel.LoadData();
         }
+
+        /// <summary>
+        /// Clears the content of the control
+        /// </summary>
+        public void Clear()
+        {
+            if (DataContext is ClassGeneratorControlViewModel viewModel)
+                viewModel.Clear();
+        }
     }
 }

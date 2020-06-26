@@ -9,12 +9,14 @@
 
 DECLARE @tables TABLE
 (
-    [Name] sysname NOT NULL
+    [Name] sysname NOT NULL,
+    [Schema] sysname NOT NULL
 );
 
 INSERT INTO @tables
 SELECT 
-    t.TABLE_NAME
+    t.TABLE_NAME,
+    t.TABLE_SCHEMA
 FROM
     INFORMATION_SCHEMA.TABLES AS t
 WHERE
@@ -29,7 +31,8 @@ ORDER BY
 
 -- Return the tables
 SELECT
-    t.[Name]
+    t.[Name],
+    t.[Schema]
 FROM
     @tables AS t;
 
