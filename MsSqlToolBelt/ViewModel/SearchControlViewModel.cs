@@ -167,9 +167,7 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(Search))
                 return;
             SearchEnabled = false;
-            var controller =
-                await ShowProgress("Search", "Please wait while searching...");
-            controller.SetIndeterminate();
+            var controller = await ShowProgress("Search", "Please wait while searching...");
 
             try
             {
@@ -208,7 +206,6 @@ namespace MsSqlToolBelt.ViewModel
 
             var controller =
                 await ShowProgress("Export", "Please wait while exporting the data...");
-            controller.SetIndeterminate();
 
             try
             {

@@ -35,6 +35,27 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Shows a question dialog with two buttons
+        /// </summary>
+        /// <param name="title">The title of the dialog</param>
+        /// <param name="message">The message of the dialog</param>
+        /// <param name="okButtonText">The text of the ok button (optional)</param>
+        /// <param name="cancelButtonText">The text of the cancel button (optional)</param>
+        /// <returns>The dialog result</returns>
+        protected async Task<MessageDialogResult> ShowQuestion(string title, string message, string okButtonText = "OK",
+            string cancelButtonText = "Cancel")
+        {
+            var result = await _dialogCoordinator.ShowMessageAsync(this, title, message,
+                MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings
+                {
+                    AffirmativeButtonText = okButtonText,
+                    NegativeButtonText = cancelButtonText
+                });
+
+            return result;
+        }
+
+        /// <summary>
         /// Shows an error message
         /// </summary>
         /// <param name="ex">The exception which was thrown</param>
@@ -49,10 +70,28 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         /// <param name="title">The title of the dialog</param>
         /// <param name="message">The message of the dialog</param>
+        /// <param name="setIndeterminate">true to set the controller to indeterminate, otherwise false (optional)</param>
         /// <returns>The progress controller</returns>
-        protected async Task<ProgressDialogController> ShowProgress(string title, string message)
+        protected async Task<ProgressDialogController> ShowProgress(string title, string message, bool setIndeterminate = true)
         {
-            return await _dialogCoordinator.ShowProgressAsync(this, title, message);
+            var controller = await _dialogCoordinator.ShowProgressAsync(this, title, message);
+            if (setIndeterminate)
+                controller.SetIndeterminate();
+
+            return controller;
+        }
+
+        /// <summary>
+        /// Shows a input dialog
+        /// </summary>
+        /// <param name="title">The title of the dialog</param>
+        /// <param name="message">The message of the dialog</param>
+        /// <returns>The result of the input</returns>
+        protected async Task<string> ShowInput(string title, string message)
+        {
+            var result = await _dialogCoordinator.ShowInputAsync(this, title, message);
+
+            return result;
         }
     }
 }

@@ -16,6 +16,11 @@
         public string Text { get; }
 
         /// <summary>
+        /// Gets or sets the additional text
+        /// </summary>
+        public string AdditionalText { get; set; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="TextValueItem"/>
         /// </summary>
         /// <param name="id">The id of the item</param>

@@ -247,7 +247,6 @@ namespace MsSqlToolBelt.ViewModel
         private async void LoadTables()
         {
             var controller = await ShowProgress("Please wait", "Please wait while loading the tables...");
-            controller.SetIndeterminate();
 
             try
             {
@@ -273,7 +272,6 @@ namespace MsSqlToolBelt.ViewModel
         private async void GenerateCode()
         {
             var controller = await ShowProgress("Please wait", "Please wait while generating the class...");
-            controller.SetIndeterminate();
 
             try
             {

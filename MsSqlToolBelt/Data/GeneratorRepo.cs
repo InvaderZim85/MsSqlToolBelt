@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using MsSqlToolBelt.Data.Queries;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
+using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data
@@ -43,7 +45,45 @@ namespace MsSqlToolBelt.Data
                 table.Columns = columns.Where(w => w.Table.Equals(table.Name)).ToList();
             }
 
+            ClearTableList(tables);
             return tables;
+        }
+
+        /// <summary>
+        /// Removes all tables which should be ignored
+        /// </summary>
+        /// <param name="tableList">The list with the tables</param>
+        private void ClearTableList(List<Table> tableList)
+        {
+            var settings = Helper.LoadSettings();
+            if (!settings.TableIgnoreList.Any())
+                return;
+
+            var removeList = new List<Table>();
+
+            foreach (var ignoreEntry in settings.TableIgnoreList)
+            {
+                switch (ignoreEntry.FilterType)
+                {
+                    case CustomEnums.FilterType.Equals:
+                        removeList.AddRange(tableList.Where(w => w.Name.EqualsIgnoreCase(ignoreEntry.Value)));
+                        break;
+                    case CustomEnums.FilterType.Contains:
+                        removeList.AddRange(tableList.Where(w => w.Name.ContainsIgnoreCase(ignoreEntry.Value)));
+                        break;
+                    case CustomEnums.FilterType.StartsWith:
+                        removeList.AddRange(tableList.Where(w => w.Name.StartsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
+                        break;
+                    case CustomEnums.FilterType.EndsWith:
+                        removeList.AddRange(tableList.Where(w => w.Name.EndsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
+                        break;
+                }
+            }
+
+            foreach (var entry in removeList)
+            {
+                tableList.Remove(entry);
+            }
         }
     }
 }

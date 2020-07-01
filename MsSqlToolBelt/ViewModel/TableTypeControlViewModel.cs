@@ -141,7 +141,6 @@ namespace MsSqlToolBelt.ViewModel
         {
             var controller = await ShowProgress("Please wait",
                 "Please wait while loading the table types...");
-            controller.SetIndeterminate();
 
             try
             {

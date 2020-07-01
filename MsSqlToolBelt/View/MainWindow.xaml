@@ -23,6 +23,7 @@
     <Mah:MetroWindow.RightWindowCommands>
         <Mah:WindowCommands>
             <Button Command="{Binding InfoCommand}" Content="Info" />
+            <Button Command="{Binding SettingsCommand}" Content="Settings" />
         </Mah:WindowCommands>
     </Mah:MetroWindow.RightWindowCommands>
 

@@ -188,10 +188,7 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(DestinationPath) || GetSelectedExportType() == 0)
                 return;
 
-            var controller =
-                await ShowProgress("Export", "Please wait while exporting the data...");
-            controller.SetIndeterminate();
-
+            var controller = await ShowProgress("Export", "Please wait while exporting the data...");
 
             try
             {

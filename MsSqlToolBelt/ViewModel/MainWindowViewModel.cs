@@ -195,7 +195,22 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The command to show the info
         /// </summary>
-        public ICommand InfoCommand => new DelegateCommand(ShowInfo);
+        public ICommand InfoCommand => new DelegateCommand(() =>
+        {
+            var infoWindow = new InfoWindow { Owner = Application.Current.MainWindow };
+            infoWindow.ShowDialog();
+        });
+
+        /// <summary>
+        /// The command to show the settings window
+        /// </summary>
+        public ICommand SettingsCommand => new DelegateCommand(() =>
+        {
+            var settingsWindow = new SettingsWindow {Owner = Application.Current.MainWindow};
+            settingsWindow.ShowDialog();
+
+            LoadServerList();
+        });
 
         /// <summary>
         /// Loads the server list and adds them to the property
@@ -274,8 +289,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private void ShowInfo()
         {
-            var infoWindow = new InfoWindow {Owner = Application.Current.MainWindow};
-            infoWindow.ShowDialog();
+            
         }
     }
 }
