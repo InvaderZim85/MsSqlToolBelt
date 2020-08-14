@@ -23,12 +23,18 @@ namespace MsSqlToolBelt.Business
             if (resultList is null)
                 throw new ArgumentNullException(nameof(resultList));
 
+            var files = new List<string>();
+
             foreach (var entry in resultList)
             {
+                files.Add(entry.Name);
+
                 var path = Path.Combine(destination, $"{GetValidFileName(entry.Name)}.sql");
 
                 File.WriteAllText(path, entry.Definition);
             }
+
+            File.WriteAllLines(Path.Combine(destination, "Files.txt"), files);
         }
 
         /// <summary>
