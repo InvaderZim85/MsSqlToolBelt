@@ -1,6 +1,6 @@
 # MsSqlToolBelt
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/InvaderZim85/MsSqlToolBelt?logo=test)
+[![Releases](https://img.shields.io/github/v/release/InvaderZim85/MsSqlToolBelt)](https://github.com/InvaderZim85/MsSqlToolBelt/releases)
 
 **Content**
 <!-- TOC -->
