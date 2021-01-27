@@ -1,5 +1,7 @@
 # MsSqlToolBelt
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/InvaderZim85/MsSqlToolBelt?logo=test)
+
 **Content**
 <!-- TOC -->
 
