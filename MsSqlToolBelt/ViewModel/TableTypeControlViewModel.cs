@@ -38,7 +38,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableType> TableTypes
         {
             get => _tableTypes;
-            set => SetField(ref _tableTypes, value);
+            private set => SetField(ref _tableTypes, value);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace MsSqlToolBelt.ViewModel
                 SetField(ref _selectedTableType, value);
                 Columns = value == null
                     ? new ObservableCollection<TableTypeColumn>()
-                    : new ObservableCollection<TableTypeColumn>(value.Columns);
+                    : new ObservableCollection<TableTypeColumn>(value.Columns.OrderBy(o => o.ColumnId));
 
                 ColumnHeader = $"{value?.Columns?.Count ?? 0} column(s)";
             }
@@ -74,7 +74,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableTypeColumn> Columns
         {
             get => _columns;
-            set => SetField(ref _columns, value);
+            private set => SetField(ref _columns, value);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace MsSqlToolBelt.ViewModel
         public string TableHeader
         {
             get => _tableHeader;
-            set => SetField(ref _tableHeader, value);
+            private set => SetField(ref _tableHeader, value);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace MsSqlToolBelt.ViewModel
         public string ColumnHeader
         {
             get => _columnHeader;
-            set => SetField(ref _columnHeader, value);
+            private set => SetField(ref _columnHeader, value);
         }
 
         /// <summary>
@@ -133,6 +133,15 @@ namespace MsSqlToolBelt.ViewModel
         /// The command to open the export command
         /// </summary>
         public ICommand ExportCommand => new DelegateCommand(Export);
+
+        /// <summary>
+        /// The command to reload the data
+        /// </summary>
+        public ICommand ReloadCommand => new DelegateCommand(() =>
+        {
+            _dataLoaded = false;
+            LoadData();
+        });
 
         /// <summary>
         /// Loads the table types

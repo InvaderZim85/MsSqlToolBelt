@@ -9,7 +9,6 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
-using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 
@@ -61,7 +60,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<Table> TableList
         {
             get => _tableList;
-            set
+            private set
             {
                 SetField(ref _tableList, value);
                 TableHeader = value != null ? $"{value.Count} tables" : "Tables";
@@ -84,7 +83,7 @@ namespace MsSqlToolBelt.ViewModel
                 SetField(ref _selectedTable, value);
                 Columns = value == null
                     ? new ObservableCollection<TableColumn>()
-                    : new ObservableCollection<TableColumn>(value.Columns);
+                    : new ObservableCollection<TableColumn>(value.Columns.OrderBy(o => o.ColumnPosition));
             }
         }
 
@@ -99,7 +98,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableColumn> Columns
         {
             get => _columns;
-            set
+            private set
             {
                 SetField(ref _columns, value);
                 ColumnHeader = value != null ? $"{value.Count} columns" : "Columns";
@@ -145,7 +144,7 @@ namespace MsSqlToolBelt.ViewModel
         public string TableHeader
         {
             get => _tableHeader;
-            set => SetField(ref _tableHeader, value);
+            private set => SetField(ref _tableHeader, value);
         }
 
         /// <summary>
@@ -159,7 +158,7 @@ namespace MsSqlToolBelt.ViewModel
         public string ColumnHeader
         {
             get => _columnHeader;
-            set => SetField(ref _columnHeader, value);
+            private set => SetField(ref _columnHeader, value);
         }
 
         /// <summary>
@@ -214,6 +213,15 @@ namespace MsSqlToolBelt.ViewModel
         /// The command to clear the alias values
         /// </summary>
         public ICommand ClearAliasCommand => new DelegateCommand(ClearAlias);
+
+        /// <summary>
+        /// The command to reload the tables
+        /// </summary>
+        public ICommand ReloadCommand => new DelegateCommand(() =>
+        {
+            _dataLoaded = false;
+            LoadData();
+        });
 
         /// <summary>
         /// Sets the connector

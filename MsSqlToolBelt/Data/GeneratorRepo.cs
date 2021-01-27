@@ -5,7 +5,6 @@ using Dapper;
 using MsSqlToolBelt.Data.Queries;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
-using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data

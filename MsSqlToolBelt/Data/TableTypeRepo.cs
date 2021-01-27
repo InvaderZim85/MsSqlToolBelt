@@ -36,10 +36,16 @@ namespace MsSqlToolBelt.Data
 
             var tables = reader.Read<TableType>().ToList();
             var columns = reader.Read<TableTypeColumn>().ToList();
+            var keyColumns = reader.Read<KeyValuePair<int, int>>().ToList();
 
             foreach (var table in tables)
             {
                 table.Columns = columns.Where(w => w.TableTypeId == table.Id).ToList();
+
+                foreach (var column in table.Columns)
+                {
+                    column.IsPrimaryKey = keyColumns.Any(a => a.Key == table.Id && a.Value == column.ColumnId);
+                }
             }
 
             return tables;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
-using ZimLabs.CoreLib.Extensions;
 
 namespace MsSqlToolBelt.Business
 {
@@ -16,7 +15,7 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Contains the tab indent
         /// </summary>
-        private static readonly string Tab = new string(' ', 4);
+        private static readonly string Tab = new(' ', 4);
 
         /// <summary>
         /// Generates the code
@@ -124,37 +123,29 @@ namespace MsSqlToolBelt.Business
         /// <returns>The c# data type</returns>
         private static string GetDataType(string sqlType)
         {
-            switch (sqlType.ToLower())
+            return sqlType.ToLower() switch
             {
-                case "bigint":
-                    return "double";
-                case "smallmoney":
-                case "money":
-                case "decimal":
-                case "numeric":
-                    return "decimal";
-                case "int":
-                case "tinyint":
-                case "smallint":
-                    return "int";
-                case "bit":
-                    return "bool";
-                case "nvarchar":
-                case "char":
-                case "text":
-                case "varchar":
-                case "nchar":
-                case "ntext":
-                    return "string";
-                case "date":
-                case "datetime":
-                case "datetime2":
-                    return "DateTime";
-                case "uniqueidentifier":
-                    return "GUID";
-                default:
-                    return sqlType;
-            }
+                "bigint" => "double",
+                "smallmoney" => "decimal",
+                "money" => "decimal",
+                "decimal" => "decimal",
+                "numeric" => "decimal",
+                "int" => "int",
+                "tinyint" => "int",
+                "smallint" => "int",
+                "bit" => "bool",
+                "nvarchar" => "string",
+                "char" => "string",
+                "text" => "string",
+                "varchar" => "string",
+                "nchar" => "string",
+                "ntext" => "string",
+                "date" => "DateTime",
+                "datetime" => "DateTime",
+                "datetime2" => "DateTime",
+                "uniqueidentifier" => "GUID",
+                _ => sqlType
+            };
         }
     }
 }

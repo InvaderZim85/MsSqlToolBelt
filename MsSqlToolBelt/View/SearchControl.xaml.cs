@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
@@ -18,6 +19,7 @@ namespace MsSqlToolBelt.View
         public SearchControl()
         {
             InitializeComponent();
+            SearchPanel.Install(_sqlEditor);
         }
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace MsSqlToolBelt.View
         private void SetSqlText(string text)
         {
             _sqlEditor.Text = text;
+            _sqlEditor.ScrollToHome();
         }
 
         /// <summary>

@@ -1,6 +1,4 @@
-﻿using ZimLabs.CoreLib.Extensions;
-
-namespace MsSqlToolBelt.DataObjects
+﻿namespace MsSqlToolBelt.DataObjects
 {
     /// <summary>
     /// Represents a ignore entry for a table

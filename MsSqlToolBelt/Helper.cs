@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System;
+using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Windows.Media;
 using System.Xml;
@@ -10,9 +12,6 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects;
 using Newtonsoft.Json;
-using ZimLabs.CoreLib;
-using ZimLabs.CoreLib.Extensions;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace MsSqlToolBelt
 {
@@ -22,14 +21,9 @@ namespace MsSqlToolBelt
     internal static class Helper
     {
         /// <summary>
-        /// Contains the path of the file which contains the server
-        /// </summary>
-        private static readonly string ServerListFile = Path.Combine(Core.GetBaseFolder(), "ServerList.cfg");
-
-        /// <summary>
         /// Contains the path of the settings file
         /// </summary>
-        private static readonly string SettingsFile = Path.Combine(Core.GetBaseFolder(), "Settings.json");
+        private static readonly string SettingsFile = Path.Combine(GetBaseFolder(), "Settings.json");
 
         /// <summary>
         /// Init the avalon editor
@@ -49,7 +43,7 @@ namespace MsSqlToolBelt
         public static IHighlightingDefinition LoadSqlSchema(bool dark)
         {
             var fileName = dark ? "AvalonSqlSchema_Dark.xml" : "AvalonSqlSchema.xml";
-            var file = Path.Combine(Core.GetBaseFolder(), "SqlSchema", fileName);
+            var file = Path.Combine(GetBaseFolder(), "SqlSchema", fileName);
 
             using (var reader = File.Open(file, FileMode.Open))
             {
@@ -115,11 +109,132 @@ namespace MsSqlToolBelt
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            var content = JsonConvert.SerializeObject(data, Formatting.Indented);
+            var content = JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented);
 
             File.WriteAllText(SettingsFile, content, Encoding.UTF8);
 
             return File.Exists(SettingsFile);
         }
+
+        /// <summary>
+        /// Gets the path of the base folder
+        /// </summary>
+        /// <returns>The path of the base folder</returns>
+        public static string GetBaseFolder()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        #region Extensions
+        /// <summary>
+        /// Checks if the string value contains the given substring
+        /// </summary>
+        /// <param name="value">The string value</param>
+        /// <param name="substring">The sub string which should be found</param>
+        /// <returns>true when the string value contains the substring, otherwise false</returns>
+        public static bool ContainsIgnoreCase(this string value, string substring)
+        {
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(substring))
+                return false;
+
+            return value.IndexOf(substring, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        /// <summary>
+        /// Check two strings for equality and ignores the casing
+        /// </summary>
+        /// <param name="value">The value which should be checked</param>
+        /// <param name="match">The comparative value</param>
+        /// <returns>true when the strings are equal, otherwise false</returns>
+        public static bool EqualsIgnoreCase(this string value, string match)
+        {
+            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(match))
+                return false;
+
+            return string.Equals(value, match, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Converts the first char of a string to upper case
+        /// </summary>
+        /// <param name="value">The original string</param>
+        /// <param name="restToLower">true when the rest of the string should be converted to lower case, otherwise false (optional)</param>
+        /// <returns>The converted string</returns>
+        public static string FirstCharToUpper(this string value, bool restToLower = false)
+        {
+            return string.IsNullOrEmpty(value)
+                ? value
+                : $"{value.Substring(0, 1).ToUpper()}{(restToLower ? value.Substring(1).ToLower() : value.Substring(1))}";
+        }
+
+        /// <summary>
+        /// Converts the first char of a string to lower case
+        /// </summary>
+        /// <param name="value">The original value</param>
+        /// <param name="restToLower">true when the rest of the string should be converted to lower case, otherwise false (optional)</param>
+        /// <returns>The converted string</returns>
+        public static string FirstCharToLower(this string value, bool restToLower = false)
+        {
+            return string.IsNullOrEmpty(value)
+                ? value
+                : $"{value.Substring(0, 1).ToLower()}{(restToLower ? value.Substring(1).ToLower() : value.Substring(1))}";
+        }
+
+        /// <summary>
+        /// Gets the attribute of the given object
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute</typeparam>
+        /// <param name="obj">The object</param> 
+        /// <returns>The desired attribute of the object</returns>
+        /// <exception cref="ArgumentNullException">Will be thrown when the object is null</exception>
+        public static T GetAttribute<T>(this object obj)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            // Get the attribute for classes
+            var type = obj.GetType();
+
+            var attribute = Attribute.GetCustomAttribute(type, typeof(T));
+
+            if (attribute is T result)
+                return result;
+
+            return default;
+        }
+
+        /// <summary>
+        /// Returns true if string is numeric and not empty or null or whitespace.
+        /// Determines if string is numeric by parsing as Double
+        /// </summary>
+        /// <param name="value">The value which should be checked</param>
+        /// <param name="style">Optional style - defaults to NumberStyles.Number (leading and trailing whitespace, leading and trailing sign, decimal point and thousands separator) </param>
+        /// <param name="culture">Optional CultureInfo - defaults to InvariantCulture</param>
+        /// <returns>true when the given string is a valid number, otherwise false</returns>
+        public static bool IsNumeric(this string value, NumberStyles style = NumberStyles.Number,
+            CultureInfo culture = null)
+        {
+            culture ??= CultureInfo.InvariantCulture;
+
+            return double.TryParse(value, style, culture, out _) && !string.IsNullOrWhiteSpace(value);
+        }
+
+        /// <summary>
+        /// Converts a string into a decimal ("1", "true" = true, rest false)
+        /// </summary>
+        /// <param name="value">The string value</param>
+        /// <param name="fallback">The fallback value which will used when the parse failed (optional).</param>
+        /// <returns>The bool value</returns>
+        public static bool ToBool(this string value, bool fallback = false)
+        {
+            if (string.IsNullOrEmpty(value))
+                return fallback;
+
+            if (value.Equals("1"))
+                return true;
+
+            return bool.TryParse(value, out var result) ? result : fallback;
+        }
+        #endregion
     }
 }

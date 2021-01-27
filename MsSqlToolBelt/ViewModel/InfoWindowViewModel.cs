@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using ZimLabs.CoreLib;
-using ZimLabs.CoreLib.NuGet;
+using MsSqlToolBelt.Business;
+using MsSqlToolBelt.DataObjects;
 
 namespace MsSqlToolBelt.ViewModel
 {
@@ -22,7 +21,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<ReferenceEntry> ReferenceList
         {
             get => _referenceList;
-            set => SetField(ref _referenceList, value);
+            private set => SetField(ref _referenceList, value);
         }
 
         /// <summary>
@@ -32,14 +31,14 @@ namespace MsSqlToolBelt.ViewModel
         {
             try
             {
-                var referenceList = NuGetHelper.GetPackageInformation(Path.Combine(Core.GetBaseFolder(), "packages.config"));
+                var referenceList = PackageInfo.GetPackageInformation();
 
                 ReferenceList = new ObservableCollection<ReferenceEntry>(referenceList);
             }
             catch (Exception ex)
             {
                 await ShowMessage("Error",
-                    $"An error has occured while loading the reference information.\r\n\r\nMessage: {ex.Message}");
+                    $"An error has occurred while loading the reference information.\r\n\r\nMessage: {ex.Message}");
             }
         }
     }

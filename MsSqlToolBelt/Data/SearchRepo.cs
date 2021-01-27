@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Dapper;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
-using ZimLabs.CoreLib.Extensions;
 using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data
@@ -55,10 +55,11 @@ namespace MsSqlToolBelt.Data
         /// Performs a search with the given value
         /// </summary>
         /// <param name="value">The value to search for</param>
+        /// <param name="matchWholeWord">true to match only the whole word, otherwise false</param>
         /// <returns>The result</returns>
-        public List<SearchResult> Search(string value)
+        public List<SearchResult> Search(string value, bool matchWholeWord)
         {
-            value = $"%{value}%";
+            var searchString = $"%{value}%";
 
             const string query =
                 @"DECLARE @result TABLE
@@ -66,7 +67,7 @@ namespace MsSqlToolBelt.Data
                     [Id] INT NOT NULL,
                     [Name] NVARCHAR(200) NOT NULL,
                     [Definition] NVARCHAR(MAX) NULL,
-                    [Type] NVARCHAR(10) NOT NULL
+                    [Type] NVARCHAR(50) NOT NULL
                 );
 
                 INSERT INTO @result
@@ -74,9 +75,42 @@ namespace MsSqlToolBelt.Data
                     m.object_id,
                     OBJECT_NAME(m.object_id) AS [Name],
                     m.[definition] AS [Definition],
-                    'Procedure' AS [Type]
+                    CASE o.[type]
+                        WHEN 'AF' THEN 'Aggregate function'
+                        WHEN 'C' THEN 'Check constraint'
+                        WHEN 'D' THEN 'Default'
+                        WHEN 'F' THEN 'Foreign key constraint'
+                        WHEN 'FN' THEN 'Function'
+                        WHEN 'FS' THEN 'CLR scalar function'
+                        WHEN 'FT' THEN 'CLR table valued function'
+                        WHEN 'IF' THEN 'Inline table valued function'
+                        WHEN 'IT' THEN 'Internal table'
+                        WHEN 'P' THEN 'Procedure'
+                        WHEN 'PC' THEN 'CLR stored procedure'
+                        WHEN 'PG' THEN 'Plan guid'
+                        WHEN 'PK' THEN 'Primary key'
+                        WHEN 'R' THEN 'Rule'
+                        WHEN 'RF' THEN 'Replication filter procedure'
+                        WHEN 'S' THEN 'System base table'
+                        WHEN 'SN' THEN 'Synonym'
+                        WHEN 'SO' THEN 'Sequence object'
+                        WHEN 'U' THEN 'Table (user defined)'
+                        WHEN 'V' THEN 'View'
+                        WHEN 'EC' THEN 'Edge constraint'
+                        WHEN 'SQ' THEN 'Service queue'
+                        WHEN 'TA' THEN 'CLR DML Trigger'
+                        WHEN 'TF' THEN 'Table valued function'
+                        WHEN 'TR' THEN 'Trigger'
+                        WHEN 'TT' THEN 'Table type'
+                        WHEN 'UQ' THEN 'Unique constraint'
+                        WHEN 'X' THEN 'Extended stored procedure'
+                        ELSE o.[type]
+                    END AS [Type]
                 FROM
                     sys.sql_modules m
+
+                    INNER JOIN sys.objects AS o
+                    ON o.object_id = m.object_id
                 WHERE
                     m.[definition] LIKE @search
 
@@ -112,7 +146,7 @@ namespace MsSqlToolBelt.Data
 
             var results = _connector.Connection.Query<SearchResult>(query, new
             {
-                search = value
+                search = searchString
             }).ToList();
 
             var columns = LoadColumns(results.Where(w => w.Type == "Table").Select(s => s.Id).ToList());
@@ -124,10 +158,17 @@ namespace MsSqlToolBelt.Data
                 entry.Definition = CreateTableDefinition(tmpColumns);
             }
 
-            results.Add(SearchJobs(value));
-            results.AddRange(SearchJobSteps(value));
+            results.Add(SearchJobs(searchString));
+            results.AddRange(SearchJobSteps(searchString));
 
-            return results.Where(w => w != null).ToList();
+            if (!matchWholeWord) 
+                return results.Where(w => w != null).ToList();
+
+            var regex = new Regex($@"(^|\s|\.){value}(\s|$)");
+
+            return results.Where(w =>
+                w != null &&
+                (regex.IsMatch(w.Name) || regex.IsMatch(w.Definition))).ToList();
         }
 
         /// <summary>
@@ -424,25 +465,14 @@ namespace MsSqlToolBelt.Data
         /// <returns>The description of the action</returns>
         private string GetAction(int id, int nextStepId, int maxLength = 0)
         {
-            string result;
-            switch (id)
+            string result = id switch
             {
-                case 1:
-                    result = "Quit with success";
-                    break;
-                case 2:
-                    result = "Quit with failure";
-                    break;
-                case 3:
-                    result = "Go to next step";
-                    break;
-                case 4:
-                    result = $"Go to step {nextStepId}";
-                    break;
-                default:
-                    result = "/";
-                    break;
-            }
+                1 => "Quit with success",
+                2 => "Quit with failure",
+                3 => "Go to next step",
+                4 => $"Go to step {nextStepId}",
+                _ => "/"
+            };
 
             return maxLength == 0 ? result : result.PadRight(maxLength);
         }
