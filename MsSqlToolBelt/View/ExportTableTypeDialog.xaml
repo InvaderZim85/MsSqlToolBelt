@@ -12,6 +12,7 @@
     Height="170"
     mah:DialogParticipation.Register="{Binding}"
     Loaded="ExportTableTypeDialog_OnLoaded"
+    TitleCharacterCasing="Normal"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
     <Window.DataContext>

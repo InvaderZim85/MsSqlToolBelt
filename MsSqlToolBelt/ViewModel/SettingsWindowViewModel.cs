@@ -5,7 +5,6 @@ using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
-using ZimLabs.CoreLib.Extensions;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel

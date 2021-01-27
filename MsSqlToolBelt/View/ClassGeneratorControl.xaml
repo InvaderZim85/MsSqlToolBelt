@@ -9,15 +9,267 @@
     xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
-    D:DesignHeight="450"
-    D:DesignWidth="800"
+    D:DesignHeight="600"
+    D:DesignWidth="850"
     Mah:DialogParticipation.Register="{Binding}"
     Mc:Ignorable="D">
     <UserControl.DataContext>
         <ViewModel:ClassGeneratorControlViewModel />
     </UserControl.DataContext>
 
-    <Border Style="{StaticResource BorderStyle}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Tables  -->
+        <Border Grid.Column="0" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Content="{Binding TableHeader}"
+                    FontWeight="Bold" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid
+                    Grid.Row="2"
+                    Margin="3"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding TableList}"
+                    SelectedItem="{Binding SelectedTable}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Name" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBox
+                    Grid.Row="3"
+                    Margin="3"
+                    Mah:TextBoxHelper.Watermark="Filter..."
+                    Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <Separator Grid.Row="4" />
+
+                <Button
+                    Grid.Row="5"
+                    Width="60"
+                    Margin="3"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ReloadCommand}"
+                    Content="Reload" />
+
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="1" />
+
+        <!--  Columns  -->
+        <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Content="{Binding ColumnHeader}"
+                    FontWeight="Bold" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid Grid.Row="2" ItemsSource="{Binding Columns}">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Column}"
+                            Header="Name"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Alias}"
+                            Header="Alias" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Separator Grid.Row="3" />
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal">
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding SetSelectionCommand}"
+                        CommandParameter="{x:Static DataObjects:SelectionType.All}"
+                        Content="Select all"
+                        ToolTip="Checks all entries" />
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding SetSelectionCommand}"
+                        CommandParameter="{x:Static DataObjects:SelectionType.None}"
+                        Content="Select none"
+                        ToolTip="Uncheck all entries" />
+                    <Button
+                        Width="80"
+                        Margin="3"
+                        Command="{Binding ClearAliasCommand}"
+                        Content="Clear"
+                        ToolTip="Clears the alias values" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="3" />
+
+        <!--  Editor  -->
+        <Border Grid.Column="4" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBox
+                        Width="200"
+                        Margin="3"
+                        Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
+                        Text="{Binding ClassName}" />
+                    <CheckBox
+                        Margin="3"
+                        Content="With backing field"
+                        IsChecked="{Binding CreateBackingField}" />
+                </StackPanel>
+
+                <Button
+                    Grid.Row="0"
+                    Margin="3"
+                    HorizontalAlignment="Right"
+                    Command="{Binding GenerateCommand}"
+                    Content="Generate" />
+
+                <Separator Grid.Row="1" />
+
+                <Label
+                    Grid.Row="2"
+                    HorizontalAlignment="Left"
+                    Content="C# class" />
+
+                <Separator Grid.Row="3" />
+
+                <Avalonedit:TextEditor
+                    Name="_codeEditor"
+                    Grid.Row="4"
+                    Margin="3"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    FontFamily="Hack,Consolas"
+                    FontSize="12"
+                    IsReadOnly="True"
+                    ShowLineNumbers="True" />
+
+                <Separator Grid.Row="5" />
+
+                <StackPanel
+                    Grid.Row="6"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding ClearCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        Content="Clear" />
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding CopyCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        Content="Copy" />
+                </StackPanel>
+
+                <Separator Grid.Row="7" />
+
+                <Label
+                    Grid.Row="8"
+                    HorizontalAlignment="Left"
+                    Content="Sql query" />
+
+                <Separator Grid.Row="9" />
+
+                <Avalonedit:TextEditor
+                    Name="_sqlEditor"
+                    Grid.Row="10"
+                    Margin="3"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    FontFamily="Hack,Consolas"
+                    FontSize="12"
+                    IsReadOnly="True"
+                    ShowLineNumbers="True" />
+
+                <Separator Grid.Row="11" />
+
+                <StackPanel
+                    Grid.Row="12"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding ClearCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        Content="Clear" />
+                    <Button
+                        Width="50"
+                        Margin="3"
+                        Command="{Binding CopyCommand}"
+                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        Content="Copy" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+
+    <!--<Border Style="{StaticResource BorderStyle}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -26,7 +278,9 @@
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
-            <!--  Table list  -->
+    -->
+    <!--  Table list  -->
+    <!--
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -65,7 +319,9 @@
                 </TextBox>
             </Grid>
 
-            <!--  Columns  -->
+    -->
+    <!--  Columns  -->
+    <!--
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -126,7 +382,9 @@
                 Width="3"
                 HorizontalAlignment="Stretch" />
 
-            <!--  Editor  -->
+    -->
+    <!--  Editor  -->
+    <!--
             <Grid Grid.Column="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -229,5 +487,5 @@
             </Grid>
         </Grid>
 
-    </Border>
+    </Border>-->
 </UserControl>

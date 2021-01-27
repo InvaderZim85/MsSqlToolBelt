@@ -13,6 +13,7 @@
     Mah:DialogParticipation.Register="{Binding}"
     Mc:Ignorable="D"
     Loaded="SettingsWindow_OnLoaded"
+    TitleCharacterCasing="Normal"
     WindowStartupLocation="CenterOwner">
     <Window.DataContext>
         <ViewModel:SettingsWindowViewModel />

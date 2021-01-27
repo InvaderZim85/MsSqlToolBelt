@@ -15,11 +15,11 @@ namespace MsSqlToolBelt.DataObjects
         /// <summary>
         /// Gets or sets the list with the server
         /// </summary>
-        public List<string> ServerList { get; set; } = new List<string>();
+        public List<string> ServerList { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the list with tables that should be ignored by the class generator
         /// </summary>
-        public List<TableIgnoreEntry> TableIgnoreList { get; set; } = new List<TableIgnoreEntry>();
+        public List<TableIgnoreEntry> TableIgnoreList { get; set; } = new();
     }
 }

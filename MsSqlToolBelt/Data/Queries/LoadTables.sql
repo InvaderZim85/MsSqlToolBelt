@@ -1,8 +1,8 @@
 ﻿/*
     Author:        A. Pouwels
-    Changed by:    /
+    Changed by:    A. Pouwels
     Creation date: 2020-06-22
-    Change date:   /
+    Change date:   2021-01-27
     Description:   Loads all available tables
     Used by:       MsSqlToolBelt
 */
@@ -32,7 +32,8 @@ FROM
 SELECT
     c.TABLE_NAME AS [Table],
     c.COLUMN_NAME AS [Column],
-    c.DATA_TYPE AS [DataType]
+    c.DATA_TYPE AS [DataType],
+    c.ORDINAL_POSITION AS [ColumnPosition]
 FROM
     INFORMATION_SCHEMA.COLUMNS AS c
 

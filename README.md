@@ -1,6 +1,15 @@
 # MsSqlToolBelt
 
 **Content**
+<!-- TOC -->
+
+- [General](#general)
+- [Usage](#usage)
+    - [Search](#search)
+    - [Table types](#table-types)
+    - [Class generator](#class-generator)
+
+<!-- /TOC -->
 
 
 ## General
@@ -12,11 +21,18 @@ When you've started the program enter the name / path of the desired SQL server 
 Now you can start you search or discover the available table types.
 
 ### Search
-![search](images/search.png)
+![search](images/01.png)
 
 Enter a search string and hit enter or the *Search* button. After that, you will see all matching entries.
 
+The Button *Export* exports the definition of all selected entries.
+
 ### Table types
-![table types](images/tabletypes.png)
+![table types](images/02.png)
 
 This tab shows all available *Table Types*. You can export the types 
+
+### Class generator
+![class generator](images/03.png)
+
+This tab shows all available *Tables* to generate a C# class of it.

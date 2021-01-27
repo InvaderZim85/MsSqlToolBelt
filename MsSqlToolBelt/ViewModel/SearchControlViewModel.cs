@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,6 +49,25 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="MatchWholeWord"/>
+        /// </summary>
+        private bool _matchWholeWord;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the whole word should match
+        /// </summary>
+        public bool MatchWholeWord
+        {
+            get => _matchWholeWord;
+            set => SetField(ref _matchWholeWord, value);
+        }
+
+        /// <summary>
+        /// Contains the original result list
+        /// </summary>
+        private List<SearchResult> _originResult;
+
+        /// <summary>
         /// Backing field for <see cref="Result"/>
         /// </summary>
         private ObservableCollection<SearchResult> _result;
@@ -58,7 +78,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<SearchResult> Result
         {
             get => _result;
-            set => SetField(ref _result, value);
+            private set => SetField(ref _result, value);
         }
 
         /// <summary>
@@ -77,6 +97,38 @@ namespace MsSqlToolBelt.ViewModel
                 SetField(ref _selectedResult, value);
                 _sqlQuery = value?.Definition ?? "";
                 _setSqlText(value?.Definition ?? "");
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="TypeList"/>
+        /// </summary>
+        private ObservableCollection<string> _typeList;
+
+        /// <summary>
+        /// Gets or sets the list with the types
+        /// </summary>
+        public ObservableCollection<string> TypeList
+        {
+            get => _typeList;
+            set => SetField(ref _typeList, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedType"/>
+        /// </summary>
+        private string _selectedType;
+
+        /// <summary>
+        /// Gets or sets the selected type
+        /// </summary>
+        public string SelectedType
+        {
+            get => _selectedType;
+            set
+            {
+                if (SetField(ref _selectedType, value) && !string.IsNullOrEmpty(value))
+                    FilterResultList();
             }
         }
 
@@ -105,7 +157,7 @@ namespace MsSqlToolBelt.ViewModel
         public string ResultInfo
         {
             get => _resultInfo;
-            set => SetField(ref _resultInfo, value);
+            private set => SetField(ref _resultInfo, value);
         }
 
         /// <summary>
@@ -171,18 +223,18 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await Task.Run(() => _repo.Search(Search));
+                _originResult = await Task.Run(() => _repo.Search(Search, MatchWholeWord));
 
-                ResultInfo =
-                    $"Result - Total: {result.Count} - Procedures: {result.Count(c => c.Type.Equals("Procedure"))} " +
-                    $"- Tables / Views: {result.Count(c => c.Type.Equals("Table"))}" +
-                    $"- Jobs: {result.Count(c => c.Type.Equals("Job"))}";
+                var typeList = new List<string> {"All"};
+                typeList.AddRange(_originResult.Select(s => s.Type).Distinct());
+                TypeList = new ObservableCollection<string>(typeList);
+                SelectedType = typeList.FirstOrDefault(f => f.Equals("All"));
 
-                Result = new ObservableCollection<SearchResult>(result.OrderByDescending(o => o.Type).ThenBy(t => t.Name));
+                FilterResultList();
             }
             catch (Exception ex)
             {
-                await ShowMessage("Error", $"An error has occured: {ex.Message}");
+                await ShowError(ex);
                 ResultInfo = "Result - Error";
             }
             finally
@@ -190,6 +242,23 @@ namespace MsSqlToolBelt.ViewModel
                 SearchEnabled = true;
                 await controller.CloseAsync();
             }
+        }
+
+        /// <summary>
+        /// Filters the result list
+        /// </summary>
+        private void FilterResultList()
+        {
+            var result = SelectedType.Equals("All")
+                ? _originResult
+                : _originResult.Where(w => w.Type.Equals(SelectedType)).ToList();
+
+            var info = result.GroupBy(g => g.Type).Select(s => new {Type = s.Key, Count = s.Count()})
+                .Select(s => $"{s.Type}: {s.Count}");
+
+            ResultInfo = $"Result - Total: {result.Count} // {string.Join("//", info)}";
+
+            Result = new ObservableCollection<SearchResult>(result.OrderByDescending(o => o.Type).ThenBy(t => t.Name));
         }
 
         /// <summary>

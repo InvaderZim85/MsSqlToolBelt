@@ -49,5 +49,10 @@ namespace MsSqlToolBelt.DataObjects
             get => _alias;
             set => SetField(ref _alias, value);
         }
+
+        /// <summary>
+        /// Gets or sets the ordinal column position
+        /// </summary>
+        public int ColumnPosition { get; set; }
     }
 }

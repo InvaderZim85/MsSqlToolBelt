@@ -34,7 +34,7 @@ namespace MsSqlToolBelt.ViewModel
         public string InfoText
         {
             get => _infoText;
-            set => SetField(ref _infoText, value);
+            private set => SetField(ref _infoText, value);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TextValueItem> ExportTypeList
         {
             get => _exportTypeList;
-            set => SetField(ref _exportTypeList, value);
+            private set => SetField(ref _exportTypeList, value);
         }
 
         /// <summary>
@@ -119,9 +119,9 @@ namespace MsSqlToolBelt.ViewModel
         {
             var tmpList = new List<TextValueItem>
             {
-                new TextValueItem(1, "CSV"),
-                new TextValueItem(2, "JSON"),
-                new TextValueItem(3, "Markdown")
+                new(1, "CSV"),
+                new(2, "JSON"),
+                new(3, "Markdown")
             };
 
             ExportTypeList = new ObservableCollection<TextValueItem>(tmpList);
@@ -199,7 +199,7 @@ namespace MsSqlToolBelt.ViewModel
             catch (Exception ex)
             {
                 await ShowMessage("Error",
-                    $"An error has occured while exporting the data: {ex.Message}");
+                    $"An error has occurred while exporting the data: {ex.Message}");
             }
             finally
             {

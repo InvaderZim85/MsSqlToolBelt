@@ -13,7 +13,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The instance of the mah apps dialog coordinator
         /// </summary>
-        private IDialogCoordinator _dialogCoordinator;
+        private readonly IDialogCoordinator _dialogCoordinator;
 
         /// <summary>
         /// Creates a new instance of the <see cref="ViewModelBase"/>
@@ -62,7 +62,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <returns>The awaitable task</returns>
         protected async Task ShowError(Exception ex)
         {
-            await _dialogCoordinator.ShowMessageAsync(this, "Error", $"An error has occured: {ex.Message}");
+            await _dialogCoordinator.ShowMessageAsync(this, "Error", $"An error has occurred: {ex.Message}");
         }
 
         /// <summary>

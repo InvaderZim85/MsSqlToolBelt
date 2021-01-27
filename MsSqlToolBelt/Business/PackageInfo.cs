@@ -2,9 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using ZimLabs.CoreLib;
-using ZimLabs.CoreLib.Extensions;
-using ZimLabs.CoreLib.NuGet;
+using MsSqlToolBelt.DataObjects;
 
 namespace MsSqlToolBelt.Business
 {
@@ -19,7 +17,7 @@ namespace MsSqlToolBelt.Business
         /// <returns>The list with the reference data</returns>
         public static List<ReferenceEntry> GetPackageInformation()
         {
-            var packageFile = Path.Combine(Core.GetBaseFolder(), "packages.config");
+            var packageFile = Path.Combine(Helper.GetBaseFolder(), "packages.config");
             if (!File.Exists(packageFile))
                 return new List<ReferenceEntry>();
 
