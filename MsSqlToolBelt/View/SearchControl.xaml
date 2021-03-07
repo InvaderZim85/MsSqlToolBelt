@@ -2,19 +2,24 @@
     x:Class="MsSqlToolBelt.View.SearchControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
-    xmlns:D="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Local="clr-namespace:MsSqlToolBelt.View"
-    xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
-    D:DesignHeight="450"
-    D:DesignWidth="800"
-    Mah:DialogParticipation.Register="{Binding}"
-    Mc:Ignorable="D">
+    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mah:DialogParticipation.Register="{Binding}"
+    mc:Ignorable="d">
     <UserControl.DataContext>
-        <ViewModel:SearchControlViewModel />
+        <viewModel:SearchControlViewModel />
     </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -47,7 +52,7 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     Margin="3"
-                    Mah:TextBoxHelper.Watermark="Search..."
+                    mah:TextBoxHelper.Watermark="Search..."
                     IsEnabled="{Binding SearchEnabled}"
                     Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
@@ -97,7 +102,7 @@
                 </StackPanel>
 
                 <DataGrid
-                    Name="_resultGrid"
+                    Name="ResultGrid"
                     Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
@@ -156,7 +161,10 @@
             Height="3"
             HorizontalAlignment="Stretch" />
 
-        <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+        <Border
+            Grid.Row="2"
+            Style="{StaticResource BorderStyle}"
+            Visibility="{Binding ShowDefinition, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -171,8 +179,8 @@
                     HorizontalAlignment="Left"
                     Content="Preview" />
                 <Separator Grid.Row="1" Margin="3" />
-                <Avalonedit:TextEditor
-                    Name="_sqlEditor"
+                <avalonedit:TextEditor
+                    Name="SqlEditor"
                     Grid.Row="2"
                     BorderBrush="Black"
                     BorderThickness="1"
@@ -190,6 +198,75 @@
                     HorizontalAlignment="Right"
                     Command="{Binding CopyCommand}"
                     Content="Copy" />
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Style="{StaticResource BorderStyle}"
+            Visibility="{Binding ShowTable, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Content="Columns" />
+                <Separator Grid.Row="1" Margin="3" />
+
+                <DataGrid
+                    Grid.Row="2"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding TableColumns}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding ColumnPosition}"
+                            Header="Column pos." />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Column}"
+                            Header="Column" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding DataType}"
+                            Header="Type" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding MaxLength}"
+                            Header="Max. length">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Margin" Value="3" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding PrecisionView}"
+                            Header="Precision">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Margin" Value="3" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding NullableView}"
+                            Header="Nullable" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsPrimaryKey}"
+                            Header="Primary key" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Border>
     </Grid>

@@ -9,6 +9,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
+using Serilog;
+using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
@@ -198,8 +200,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowMessage("Error",
-                    $"An error has occurred while exporting the data: {ex.Message}");
+                await ShowError(ex);
             }
             finally
             {
@@ -287,13 +288,8 @@ namespace MsSqlToolBelt.ViewModel
             foreach (var type in _tableTypes)
             {
                 sb.AppendLine($"## {type.Name}");
-                sb.AppendLine("| Column | Data type | Size | Null able |");
-                sb.AppendLine("|--------|-----------|------|-----------|");
-
-                foreach (var column in type.Columns)
-                {
-                    sb.AppendLine($"| {column.Name} | {column.DataType} | {column.Size} | {column.Nullable} |");
-                }
+                var content = TableCreator.CreateTable(type.Columns, OutputType.Markdown);
+                sb.AppendLine(content);
 
                 // Add one empty line add the end
                 sb.AppendLine();
@@ -307,7 +303,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         /// <param name="name">The name of the type</param>
         /// <returns>The link</returns>
-        private string CreateLink(string name)
+        private static string CreateLink(string name)
         {
             // Step 1: All to lower
             name = name.ToLower();

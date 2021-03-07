@@ -21,15 +21,17 @@ namespace MsSqlToolBelt.Business
         /// Generates the code
         /// </summary>
         /// <param name="table">The selected table</param>
+        /// <param name="modifier">The modifier of the class</param>
+        /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
         /// <param name="className">The name of the desired class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static (string ClassCode, string SqlStatement) Generate(Table table, string className, bool backingField)
+        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField)
         {
             if (table == null)
                 throw new ArgumentNullException(nameof(table));
 
-            var classCode = GenerateClass(table.Columns, string.IsNullOrEmpty(className) ? table.Name : className, backingField);
+            var classCode = GenerateClass(table.Columns, modifier, markAsSealed, string.IsNullOrEmpty(className) ? table.Name : className, backingField);
 
             var sql = GenerateSqlQuery(table);
 
@@ -40,14 +42,16 @@ namespace MsSqlToolBelt.Business
         /// Generates the code of the CSharp class
         /// </summary>
         /// <param name="columns">The list with the columns</param>
+        /// <param name="modifier">The modifier of the class</param>
+        /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
         /// <param name="className">The name of the class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
         /// <returns>The CSharp code</returns>
-        private static string GenerateClass(List<TableColumn> columns, string className, bool backingField)
+        private static string GenerateClass(List<TableColumn> columns, string modifier, bool markAsSealed, string className, bool backingField)
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"public class {className.FirstCharToUpper()}");
+            sb.AppendLine($"{modifier} {(markAsSealed ? "sealed " : "")}class {className.FirstCharToUpper()}");
             sb.AppendLine("{");
 
             var count = 1;
@@ -123,6 +127,11 @@ namespace MsSqlToolBelt.Business
         /// <returns>The c# data type</returns>
         private static string GetDataType(string sqlType)
         {
+            var type = Helper.DataTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(sqlType));
+            if (type != null)
+                return type.CSharpType;
+
+            // Fall back
             return sqlType.ToLower() switch
             {
                 "bigint" => "double",
@@ -131,8 +140,8 @@ namespace MsSqlToolBelt.Business
                 "decimal" => "decimal",
                 "numeric" => "decimal",
                 "int" => "int",
-                "tinyint" => "int",
-                "smallint" => "int",
+                "tinyint" => "byte",
+                "smallint" => "short",
                 "bit" => "bool",
                 "nvarchar" => "string",
                 "char" => "string",
@@ -143,6 +152,7 @@ namespace MsSqlToolBelt.Business
                 "date" => "DateTime",
                 "datetime" => "DateTime",
                 "datetime2" => "DateTime",
+                "smalldatetime" => "DateTime",
                 "uniqueidentifier" => "GUID",
                 _ => sqlType
             };

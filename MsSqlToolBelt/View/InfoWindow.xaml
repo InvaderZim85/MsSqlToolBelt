@@ -1,22 +1,24 @@
-﻿<Mah:MetroWindow
+﻿<mah:MetroWindow
     x:Class="MsSqlToolBelt.View.InfoWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:D="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Local="clr-namespace:MsSqlToolBelt.View"
-    xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
     Title="Info"
     Width="800"
     Height="450"
-    Mah:DialogParticipation.Register="{Binding}"
-    Mc:Ignorable="D"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
     Loaded="InfoWindow_OnLoaded"
     TitleCharacterCasing="Normal"
-    WindowStartupLocation="CenterOwner">
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
     <Window.DataContext>
-        <ViewModel:InfoWindowViewModel />
+        <viewModel:InfoWindowViewModel />
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
@@ -97,4 +99,4 @@
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
-</Mah:MetroWindow>
+</mah:MetroWindow>

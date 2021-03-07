@@ -7,6 +7,7 @@ using System.Windows.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.View;
+using Serilog;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 

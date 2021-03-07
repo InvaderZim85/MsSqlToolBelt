@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.View;
+using Serilog;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 using Application = System.Windows.Application;
@@ -47,7 +48,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<string> ServerList
         {
             get => _serverList;
-            set => SetField(ref _serverList, value);
+            private set => SetField(ref _serverList, value);
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<string> Databases
         {
             get => _databases;
-            set => SetField(ref _databases, value);
+            private set => SetField(ref _databases, value);
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace MsSqlToolBelt.ViewModel
         public string Connection
         {
             get => _connection;
-            set => SetField(ref _connection, value);
+            private set => SetField(ref _connection, value);
         }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace MsSqlToolBelt.ViewModel
         public string Header
         {
             get => _header;
-            set => SetField(ref _header, value);
+            private set => SetField(ref _header, value);
         }
 
         /// <summary>
@@ -167,12 +168,28 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="BuildInfo"/>
+        /// </summary>
+        private string _buildInfo;
+
+        /// <summary>
+        /// Gets or sets the build information
+        /// </summary>
+        public string BuildInfo
+        {
+            get => _buildInfo;
+            set => SetField(ref _buildInfo, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setConnector">The action to set the connector of the user controls</param>
         /// <param name="loadData">The action to load the data</param>
         public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls)
         {
+            Helper.InitLogger();
+
             _setConnector = setConnector;
             _loadData = loadData;
             _clearControls = clearControls;
@@ -180,6 +197,8 @@ namespace MsSqlToolBelt.ViewModel
             LoadServerList();
 
             Header = $"MsSqlToolBelt - V{Assembly.GetExecutingAssembly().GetName().Version}";
+            Log.Information("{version} started.", Header);
+            BuildInfo = Helper.GetBuildData();
         }
 
         /// <summary>
@@ -213,6 +232,15 @@ namespace MsSqlToolBelt.ViewModel
         });
 
         /// <summary>
+        /// The command to show the data type window
+        /// </summary>
+        public ICommand DataTypeCommand => new DelegateCommand(() =>
+        {
+            var typeWindow = new DataTypeWindow {Owner = Application.Current.MainWindow};
+            typeWindow.ShowDialog();
+        });
+
+        /// <summary>
         /// Loads the server list and adds them to the property
         /// </summary>
         private void LoadServerList()
@@ -237,6 +265,7 @@ namespace MsSqlToolBelt.ViewModel
                 _repo = new Repo(SelectedServer);
                 ServerConnected = true;
                 Connection = $"Connected. Server: {SelectedServer}";
+                Log.Information("Connect to server '{server}'", SelectedServer);
 
                 Databases = new ObservableCollection<string>(_repo.LoadDatabases());
                 SelectedDatabase = Databases.FirstOrDefault();
@@ -246,7 +275,7 @@ namespace MsSqlToolBelt.ViewModel
             catch (Exception ex)
             {
                 Connection = "Connection error.";
-                await ShowMessage("Error", $"An error has occured: {ex.Message}");
+                await ShowError(ex);
                 ServerConnected = false;
                 Connected = false;
             }
@@ -265,13 +294,14 @@ namespace MsSqlToolBelt.ViewModel
                 _repo.SwitchDatabase(SelectedDatabase);
                 Connected = true;
                 Connection = $"Connected. Server: {SelectedServer} - Database: {SelectedDatabase}";
+                Log.Information("Connect to database '{database}'", SelectedDatabase);
 
                 _setConnector(_repo.Connector);
             }
             catch (Exception ex)
             {
                 Connection = "Connection error.";
-                await ShowMessage("Error", $"An error has occured: {ex.Message}");
+                await ShowError(ex);
                 Connected = false;
             }
         }
@@ -282,14 +312,6 @@ namespace MsSqlToolBelt.ViewModel
         private void SaveServer()
         {
             Helper.SaveServer(SelectedServer);
-        }
-
-        /// <summary>
-        /// Shows the info window
-        /// </summary>
-        private void ShowInfo()
-        {
-            
         }
     }
 }

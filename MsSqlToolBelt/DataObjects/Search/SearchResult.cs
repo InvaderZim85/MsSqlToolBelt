@@ -1,4 +1,6 @@
-﻿using ZimLabs.WpfBase;
+﻿using System.Collections.Generic;
+using System.Windows.Documents;
+using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.DataObjects.Search
 {
@@ -70,5 +72,15 @@ namespace MsSqlToolBelt.DataObjects.Search
             get => _export;
             set => SetField(ref _export, value);
         }
+
+        /// <summary>
+        /// Gets the value which indicates if the result represents a table
+        /// </summary>
+        public bool IsTable => Type.Equals("Table");
+
+        /// <summary>
+        /// Gets or sets the list of table columns
+        /// </summary>
+        public List<TableColumn> Columns { get; set; } = new();
     }
 }

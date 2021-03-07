@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
+using Serilog;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
@@ -32,6 +34,7 @@ namespace MsSqlToolBelt.ViewModel
         protected async Task ShowMessage(string title, string message)
         {
             await _dialogCoordinator.ShowMessageAsync(this, title, message);
+            Log.Information("{title} - {message}", title, message);
         }
 
         /// <summary>
@@ -59,10 +62,12 @@ namespace MsSqlToolBelt.ViewModel
         /// Shows an error message
         /// </summary>
         /// <param name="ex">The exception which was thrown</param>
+        /// <param name="caller">The caller of the method (auto filled)</param>
         /// <returns>The awaitable task</returns>
-        protected async Task ShowError(Exception ex)
+        protected async Task ShowError(Exception ex, [CallerMemberName] string caller = "")
         {
             await _dialogCoordinator.ShowMessageAsync(this, "Error", $"An error has occurred: {ex.Message}");
+            Log.Error(ex, "An error has occurred in method '{method}'", caller);
         }
 
         /// <summary>

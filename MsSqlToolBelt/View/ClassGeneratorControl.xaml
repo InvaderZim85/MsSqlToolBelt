@@ -2,19 +2,19 @@
     x:Class="MsSqlToolBelt.View.ClassGeneratorControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
-    xmlns:D="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:DataObjects="clr-namespace:MsSqlToolBelt.DataObjects"
-    xmlns:Local="clr-namespace:MsSqlToolBelt.View"
-    xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
-    D:DesignHeight="600"
-    D:DesignWidth="850"
-    Mah:DialogParticipation.Register="{Binding}"
-    Mc:Ignorable="D">
+    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dataObjects="clr-namespace:MsSqlToolBelt.DataObjects"
+    xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    d:DesignHeight="600"
+    d:DesignWidth="1200"
+    mah:DialogParticipation.Register="{Binding}"
+    mc:Ignorable="d">
     <UserControl.DataContext>
-        <ViewModel:ClassGeneratorControlViewModel />
+        <viewModel:ClassGeneratorControlViewModel />
     </UserControl.DataContext>
 
     <Grid>
@@ -63,7 +63,7 @@
                 <TextBox
                     Grid.Row="3"
                     Margin="3"
-                    Mah:TextBoxHelper.Watermark="Filter..."
+                    mah:TextBoxHelper.Watermark="Filter..."
                     Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
@@ -126,14 +126,14 @@
                         Width="80"
                         Margin="3"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static DataObjects:SelectionType.All}"
+                        CommandParameter="{x:Static dataObjects:SelectionType.All}"
                         Content="Select all"
                         ToolTip="Checks all entries" />
                     <Button
                         Width="80"
                         Margin="3"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static DataObjects:SelectionType.None}"
+                        CommandParameter="{x:Static dataObjects:SelectionType.None}"
                         Content="Select none"
                         ToolTip="Uncheck all entries" />
                     <Button
@@ -168,10 +168,20 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Label Content="Modifier:" />
+                    <ComboBox
+                        Width="150"
+                        Margin="3"
+                        ItemsSource="{Binding Modifier}"
+                        SelectedItem="{Binding SelectedModifier}" />
+                    <CheckBox
+                        Margin="3"
+                        Content="sealed class"
+                        IsChecked="{Binding MarkAsSealed}" />
                     <TextBox
                         Width="200"
                         Margin="3"
-                        Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
+                        mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
                         Text="{Binding ClassName}" />
                     <CheckBox
                         Margin="3"
@@ -195,8 +205,8 @@
 
                 <Separator Grid.Row="3" />
 
-                <Avalonedit:TextEditor
-                    Name="_codeEditor"
+                <avalonedit:TextEditor
+                    Name="CodeEditor"
                     Grid.Row="4"
                     Margin="3"
                     BorderBrush="Black"
@@ -216,13 +226,13 @@
                         Width="50"
                         Margin="3"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        CommandParameter="{x:Static dataObjects:CodeType.CSharp}"
                         Content="Clear" />
                     <Button
                         Width="50"
                         Margin="3"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
+                        CommandParameter="{x:Static dataObjects:CodeType.CSharp}"
                         Content="Copy" />
                 </StackPanel>
 
@@ -235,8 +245,8 @@
 
                 <Separator Grid.Row="9" />
 
-                <Avalonedit:TextEditor
-                    Name="_sqlEditor"
+                <avalonedit:TextEditor
+                    Name="SqlEditor"
                     Grid.Row="10"
                     Margin="3"
                     BorderBrush="Black"
@@ -256,13 +266,13 @@
                         Width="50"
                         Margin="3"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        CommandParameter="{x:Static dataObjects:CodeType.Sql}"
                         Content="Clear" />
                     <Button
                         Width="50"
                         Margin="3"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
+                        CommandParameter="{x:Static dataObjects:CodeType.Sql}"
                         Content="Copy" />
                 </StackPanel>
             </Grid>

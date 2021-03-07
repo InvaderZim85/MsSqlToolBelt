@@ -106,6 +106,43 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Gets the list with the class modifier
+        /// </summary>
+        public List<string> Modifier => new()
+        {
+            "public",
+            "internal"
+        };
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedModifier"/>
+        /// </summary>
+        private string _selectedModifier;
+
+        /// <summary>
+        /// Gets or sets the selected modifier
+        /// </summary>
+        public string SelectedModifier
+        {
+            get => _selectedModifier;
+            set => SetField(ref _selectedModifier, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="MarkAsSealed"/>
+        /// </summary>
+        private bool _markAsSealed;
+
+        /// <summary>
+        /// Gets or sets the value wich indicates if the class should be marked as sealed
+        /// </summary>
+        public bool MarkAsSealed
+        {
+            get => _markAsSealed;
+            set => SetField(ref _markAsSealed, value);
+        }
+
+        /// <summary>
         /// Backing field for <see cref="ClassName"/>
         /// </summary>
         private string _className;
@@ -244,6 +281,8 @@ namespace MsSqlToolBelt.ViewModel
             if (_dataLoaded)
                 return;
 
+            SelectedModifier = Modifier.FirstOrDefault();
+
             LoadTables();
 
             _dataLoaded = true;
@@ -289,7 +328,9 @@ namespace MsSqlToolBelt.ViewModel
                     return;
                 }
 
-                var (classCode, sqlStatement) = await Task.Run(() => ClassGenerator.Generate(SelectedTable, ClassName, CreateBackingField));
+                var (classCode, sqlStatement) = await Task.Run(() =>
+                    ClassGenerator.Generate(SelectedTable, SelectedModifier, MarkAsSealed, ClassName,
+                        CreateBackingField));
 
                 _setCode(classCode, CodeType.CSharp);
                 _setCode(sqlStatement, CodeType.Sql);

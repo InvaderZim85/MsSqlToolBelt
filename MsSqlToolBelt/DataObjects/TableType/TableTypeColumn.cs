@@ -1,4 +1,6 @@
-﻿namespace MsSqlToolBelt.DataObjects.TableType
+﻿using ZimLabs.TableCreator;
+
+namespace MsSqlToolBelt.DataObjects.TableType
 {
     /// <summary>
     /// Represents a column of a <see cref="TableType"/>
@@ -8,6 +10,7 @@
         /// <summary>
         /// Gets or sets the id of the table type
         /// </summary>
+        [Appearance(Ignore = true)]
         public int TableTypeId { get; set; }
 
         /// <summary>
@@ -33,6 +36,7 @@
         /// <summary>
         /// Gets or sets the id of the column (can be used for sorting!)
         /// </summary>
+        [Appearance(Ignore = true)]
         public int ColumnId { get; set; }
 
         /// <summary>

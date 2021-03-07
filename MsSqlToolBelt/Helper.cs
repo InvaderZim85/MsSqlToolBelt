@@ -12,6 +12,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace MsSqlToolBelt
 {
@@ -24,6 +25,42 @@ namespace MsSqlToolBelt
         /// Contains the path of the settings file
         /// </summary>
         private static readonly string SettingsFile = Path.Combine(GetBaseFolder(), "Settings.json");
+
+        /// <summary>
+        /// Contains the path of the file which contains the data types
+        /// </summary>
+        private static readonly string DataTypeFile = Path.Combine(GetBaseFolder(), "MsSqlToolBelt.DataTypes.json");
+
+        /// <summary>
+        /// Backing field for <see cref="DataTypes"/>
+        /// </summary>
+        private static List<DataType> _dataTypes;
+
+        /// <summary>
+        /// Gets the list with the data types
+        /// </summary>
+        public static List<DataType> DataTypes
+        {
+            get
+            {
+                _dataTypes ??= LoadDataTypes();
+                return _dataTypes;
+            }
+        }
+
+        /// <summary>
+        /// Init the logger
+        /// </summary>
+        public static void InitLogger()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File("MsSqlToolBelt_Log.log",
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} | {Level} | {Message:lj}{NewLine}{Exception}",
+                    rollingInterval: RollingInterval.Day,
+                    shared: true)
+                .CreateLogger();
+        }
 
         /// <summary>
         /// Init the avalon editor
@@ -40,18 +77,14 @@ namespace MsSqlToolBelt
         /// Loads the highlight definition for the avalon editor
         /// </summary>
         /// <returns>The definition</returns>
-        public static IHighlightingDefinition LoadSqlSchema(bool dark)
+        private static IHighlightingDefinition LoadSqlSchema(bool dark)
         {
             var fileName = dark ? "AvalonSqlSchema_Dark.xml" : "AvalonSqlSchema.xml";
             var file = Path.Combine(GetBaseFolder(), "SqlSchema", fileName);
 
-            using (var reader = File.Open(file, FileMode.Open))
-            {
-                using (var xmlReader = new XmlTextReader(reader))
-                {
-                    return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
-                }
-            }
+            using var reader = File.Open(file, FileMode.Open);
+            using var xmlReader = new XmlTextReader(reader);
+            return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
         }
 
         /// <summary>
@@ -82,6 +115,7 @@ namespace MsSqlToolBelt
             settings.ServerList.Add(server);
 
             SaveSettings(settings);
+            Log.Information("Server '{server}' add.", server);
         }
 
         /// <summary>
@@ -117,12 +151,54 @@ namespace MsSqlToolBelt
         }
 
         /// <summary>
+        /// Loads the list with the data types
+        /// </summary>
+        /// <returns>The list with the data types</returns>
+        private static List<DataType> LoadDataTypes()
+        {
+            if (string.IsNullOrEmpty(DataTypeFile))
+                return new List<DataType>();
+
+            try
+            {
+                var content = File.ReadAllText(DataTypeFile, Encoding.UTF8);
+
+                return JsonConvert.DeserializeObject<List<DataType>>(content);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error has occurred in method '{method}'", nameof(LoadDataTypes));
+                return new List<DataType>();
+            }
+        }
+
+        /// <summary>
         /// Gets the path of the base folder
         /// </summary>
         /// <returns>The path of the base folder</returns>
         public static string GetBaseFolder()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        /// <summary>
+        /// Gets the build date of the version
+        /// </summary>
+        /// <returns>The build date</returns>
+        public static string GetBuildData()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            if (version == null)
+                return "";
+
+            var year = 2000 + version.Major;
+            var buildDate = new DateTime(year, 1, 1);
+            buildDate = buildDate.AddDays(version.Minor - 1);
+            buildDate = buildDate.AddMinutes(version.Revision);
+            var build = version.Build;
+
+            return $"Build date: {buildDate:yyyy-MM-dd HH:mm} #{build + 1}";
         }
 
         #region Extensions

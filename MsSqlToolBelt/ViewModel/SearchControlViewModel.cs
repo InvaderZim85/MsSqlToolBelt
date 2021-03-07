@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
@@ -97,6 +98,27 @@ namespace MsSqlToolBelt.ViewModel
                 SetField(ref _selectedResult, value);
                 _sqlQuery = value?.Definition ?? "";
                 _setSqlText(value?.Definition ?? "");
+
+                if (value == null)
+                {
+                    ShowTable = false;
+                    ShowDefinition = true;
+                    TableColumns = new ObservableCollection<TableColumn>();
+                    return;
+                }
+
+                if (value.IsTable)
+                {
+                    ShowTable = true;
+                    ShowDefinition = false;
+                    TableColumns = new ObservableCollection<TableColumn>(value.Columns.OrderBy(o => o.ColumnPosition));
+                }
+                else
+                {
+                    ShowTable = false;
+                    ShowDefinition = true;
+                    TableColumns = new ObservableCollection<TableColumn>();
+                }
             }
         }
 
@@ -111,7 +133,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<string> TypeList
         {
             get => _typeList;
-            set => SetField(ref _typeList, value);
+            private set => SetField(ref _typeList, value);
         }
 
         /// <summary>
@@ -158,6 +180,48 @@ namespace MsSqlToolBelt.ViewModel
         {
             get => _resultInfo;
             private set => SetField(ref _resultInfo, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ShowTable"/>
+        /// </summary>
+        private bool _showTable;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the selected entry is a "table" and the columns should be shown
+        /// </summary>
+        public bool ShowTable
+        {
+            get => _showTable;
+            set => SetField(ref _showTable, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ShowDefinition"/>
+        /// </summary>
+        private bool _showDefinition = true;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the definition should be shown
+        /// </summary>
+        public bool ShowDefinition
+        {
+            get => _showDefinition;
+            set => SetField(ref _showDefinition, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="TableColumns"/>
+        /// </summary>
+        private ObservableCollection<TableColumn> _tableColumns = new();
+
+        /// <summary>
+        /// Gets or sets the columns of a table
+        /// </summary>
+        public ObservableCollection<TableColumn> TableColumns
+        {
+            get => _tableColumns;
+            private set => SetField(ref _tableColumns, value);
         }
 
         /// <summary>
@@ -256,7 +320,7 @@ namespace MsSqlToolBelt.ViewModel
             var info = result.GroupBy(g => g.Type).Select(s => new {Type = s.Key, Count = s.Count()})
                 .Select(s => $"{s.Type}: {s.Count}");
 
-            ResultInfo = $"Result - Total: {result.Count} // {string.Join("//", info)}";
+            ResultInfo = $"Result - Total: {result.Count} // {string.Join(" // ", info)}";
 
             Result = new ObservableCollection<SearchResult>(result.OrderByDescending(o => o.Type).ThenBy(t => t.Name));
         }
@@ -282,7 +346,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowMessage("Error", $"An error has occured: {ex.Message}");
+                await ShowError(ex);
             }
             finally
             {
@@ -293,7 +357,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Browses for an export directory
         /// </summary>
-        private string Browse()
+        private static string Browse()
         {
             var dialog = new CommonOpenFileDialog
             {
@@ -301,10 +365,7 @@ namespace MsSqlToolBelt.ViewModel
                 Title = "Select the export directory"
             };
 
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-                return "";
-
-            return dialog.FileName;
+            return dialog.ShowDialog() != CommonFileDialogResult.Ok ? "" : dialog.FileName;
         }
 
         /// <summary>

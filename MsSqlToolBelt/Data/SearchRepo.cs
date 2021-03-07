@@ -153,9 +153,8 @@ namespace MsSqlToolBelt.Data
 
             foreach (var entry in results.Where(w => w.Type == "Table"))
             {
-                var tmpColumns = columns.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
-
-                entry.Definition = CreateTableDefinition(tmpColumns);
+                entry.Definition = "";
+                entry.Columns = columns.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
             }
 
             results.Add(SearchJobs(searchString));
@@ -179,26 +178,53 @@ namespace MsSqlToolBelt.Data
         private List<TableColumn> LoadColumns(List<int> tables)
         {
             const string query =
-                @"SELECT 
-                    t.[name] AS [Table],
-                    c.[name] AS [Column],
-                    ty.[name] AS [DataType]
+                @"SELECT
+                    c.TABLE_NAME AS [Table],
+                    c.COLUMN_NAME AS [Column],
+                    c.DATA_TYPE AS [DataType],
+                    c.ORDINAL_POSITION AS ColumnPosition,
+                    c.IS_NULLABLE AS Nullable,
+                    COALESCE(c.CHARACTER_MAXIMUM_LENGTH, 0) AS [MaxLength],
+                    COALESCE(c.NUMERIC_PRECISION, c.DATETIME_PRECISION, 0) AS [Precision],
+                    COALESCE(c.NUMERIC_SCALE, 0) AS DecimalPlaceValue
                 FROM
-                    sys.columns c
+                    INFORMATION_SCHEMA.COLUMNS AS c
 
-                    INNER JOIN sys.tables t
-                    ON t.object_id = c.object_id
+                    INNER JOIN sys.tables AS t
+                    ON t.[name] = c.TABLE_NAME
+                    AND t.object_id IN @tables
 
-                    INNER JOIN sys.types ty
-                    ON ty.system_type_id = c.system_type_id
-                WHERE 
-                    c.object_id IN @tables
-                    AND ty.[name] <> 'sysname'";
+                    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
+                    ON tc.TABLE_NAME = c.TABLE_NAME;
 
-            return _connector.Connection.Query<TableColumn>(query, new
+                SELECT
+                    tc.TABLE_NAME AS [Table],
+                    ccu.COLUMN_NAME AS [Column]
+                FROM
+                    INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
+
+                    INNER JOIN sys.tables AS t
+                    ON t.[name] = tc.TABLE_NAME
+                    AND t.object_id IN @tables
+
+                    INNER JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE AS ccu
+                    ON ccu.TABLE_NAME = tc.TABLE_NAME;";
+
+            var result = _connector.Connection.QueryMultiple(query, new
             {
                 tables
-            }).ToList();
+            });
+
+            var columns = result.Read<TableColumn>().ToList();
+            var keyColumns = result.Read<KeyColumn>().ToList();
+
+            foreach (var column in columns)
+            {
+                column.IsPrimaryKey =
+                    keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
+            }
+
+            return columns;
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects;
+using Serilog;
 
 namespace MsSqlToolBelt.ViewModel
 {
@@ -37,8 +38,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowMessage("Error",
-                    $"An error has occurred while loading the reference information.\r\n\r\nMessage: {ex.Message}");
+                await ShowError(ex);
             }
         }
     }

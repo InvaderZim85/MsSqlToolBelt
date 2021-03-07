@@ -40,8 +40,8 @@
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
+    <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ControlzEx.5.0.0\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.2.0.78\lib\net461\Dapper.dll</HintPath>
@@ -50,7 +50,7 @@
       <HintPath>..\packages\AvalonEdit.6.0.1\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.2.4.3\lib\net47\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.2.4.4\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
@@ -72,6 +72,12 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.2.10.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.File.4.1.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -98,6 +104,9 @@
     <Reference Include="ZimLabs.Database.MsSql, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ZimLabs.Database.MsSql.1.1.0\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
     </Reference>
+    <Reference Include="ZimLabs.TableCreator, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZimLabs.TableCreator.1.1.1\lib\netstandard2.0\ZimLabs.TableCreator.dll</HintPath>
+    </Reference>
     <Reference Include="ZimLabs.WpfBase, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ZimLabs.WpfBase.0.1.3\lib\net472\ZimLabs.WpfBase.dll</HintPath>
     </Reference>
@@ -117,7 +126,9 @@
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
     <Compile Include="DataObjects\CodeType.cs" />
     <Compile Include="DataObjects\CustomEnums.cs" />
+    <Compile Include="DataObjects\DataType.cs" />
     <Compile Include="DataObjects\DescriptionValueAttribute.cs" />
+    <Compile Include="DataObjects\KeyColumn.cs" />
     <Compile Include="DataObjects\ReferenceEntry.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
     <Compile Include="DataObjects\SelectionType.cs" />
@@ -138,6 +149,7 @@
     <Compile Include="Data\TableTypeRepo.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
+    <Compile Include="ViewModel\DataTypeWindowViewModel.cs" />
     <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -147,6 +159,9 @@
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ClassGeneratorControl.xaml.cs">
       <DependentUpon>ClassGeneratorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DataTypeWindow.xaml.cs">
+      <DependentUpon>DataTypeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ExportTableTypeDialog.xaml.cs">
       <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
@@ -189,6 +204,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="MsSqlToolBelt.DataTypes.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -205,6 +223,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="View\ClassGeneratorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DataTypeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -250,7 +272,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if $(ConfigurationName) == Release (
-    $(SolutionDir)VersionChanger\VersionChanger.exe -p $(ProjectDir)Properties\AssemblyInfo.cs
+    $(SolutionDir)VersionChanger\VersionChanger.exe -p $(ProjectDir)Properties\AssemblyInfo.cs -t 1
 )</PreBuildEvent>
   </PropertyGroup>
 </Project>

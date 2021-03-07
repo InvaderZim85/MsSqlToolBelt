@@ -5,6 +5,7 @@ using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
+using Serilog;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
@@ -36,7 +37,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<string> ServerList
         {
             get => _serverList;
-            set => SetField(ref _serverList, value);
+            private set => SetField(ref _serverList, value);
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableIgnoreEntry> TableIgnoreList
         {
             get => _tableIgnoreList;
-            set => SetField(ref _tableIgnoreList, value);
+            private set => SetField(ref _tableIgnoreList, value);
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TextValueItem> FilterList
         {
             get => _filterList;
-            set => SetField(ref _filterList, value);
+            private set => SetField(ref _filterList, value);
         }
 
         /// <summary>
@@ -256,10 +257,9 @@ namespace MsSqlToolBelt.ViewModel
                 ServerList.Add(result);
                 SelectedServer = ServerList.FirstOrDefault(f => f.Equals(result));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await ShowMessage("Add server",
-                    "Can't connect to the desired server. Please check the entered path and try again.");
+                await ShowError(ex);
             }
             finally
             {

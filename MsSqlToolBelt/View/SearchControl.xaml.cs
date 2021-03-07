@@ -19,7 +19,7 @@ namespace MsSqlToolBelt.View
         public SearchControl()
         {
             InitializeComponent();
-            SearchPanel.Install(_sqlEditor);
+            SearchPanel.Install(SqlEditor);
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace MsSqlToolBelt.View
         /// <param name="text">The desired text</param>
         private void SetSqlText(string text)
         {
-            _sqlEditor.Text = text;
-            _sqlEditor.ScrollToHome();
+            SqlEditor.Text = text;
+            SqlEditor.ScrollToHome();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void SetSqlSchema()
         {
-            Helper.InitAvalonEditor(_sqlEditor);
+            Helper.InitAvalonEditor(SqlEditor);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!(_resultGrid.SelectedItem is SearchResult result))
+            if (!(ResultGrid.SelectedItem is SearchResult result))
                 return;
 
             Clipboard.SetText(result.Name);

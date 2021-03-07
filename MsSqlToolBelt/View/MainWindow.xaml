@@ -1,43 +1,51 @@
-﻿<Mah:MetroWindow
+﻿<mah:MetroWindow
     x:Class="MsSqlToolBelt.View.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:D="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:Local="clr-namespace:MsSqlToolBelt.View"
-    xmlns:Mah="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:Mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
     Title="{Binding Header}"
     Width="1024"
     Height="768"
-    Mah:DialogParticipation.Register="{Binding}"
-    Mc:Ignorable="D"
+    mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
+    Icon="../MsSqlToolBelt.ico"
     Loaded="MainWindow_OnLoaded"
     ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
     WindowStartupLocation="CenterScreen"
-    WindowState="Maximized">
+    WindowState="Maximized"
+    mc:Ignorable="d">
     <Window.DataContext>
-        <ViewModel:MainWindowViewModel />
+        <viewModel:MainWindowViewModel />
     </Window.DataContext>
 
-    <Mah:MetroWindow.RightWindowCommands>
-        <Mah:WindowCommands>
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
+                <iconPacks:PackIconPixelartIcons Kind="Code" />
+            </Button>
             <Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
-                <IconPacks:PackIconPixelartIcons Kind="InfoBox" />
+                <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
             </Button>
             <Button Command="{Binding SettingsCommand}" ToolTip="Shows the settings">
-                <IconPacks:PackIconPixelartIcons Kind="Sliders" />
+                <iconPacks:PackIconPixelartIcons Kind="Sliders" />
             </Button>
-        </Mah:WindowCommands>
-    </Mah:MetroWindow.RightWindowCommands>
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
 
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding Connection}" />
+            <StatusBarItem
+                Margin="0,0,15,0"
+                HorizontalAlignment="Right"
+                Content="{Binding BuildInfo}" />
         </StatusBar>
         <Grid>
             <Grid.RowDefinitions>
@@ -57,7 +65,7 @@
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="70" />
                     </Grid.ColumnDefinitions>
@@ -103,20 +111,20 @@
             </Border>
 
             <TabControl
-                Name="_tabControl"
+                Name="TabControl"
                 Grid.Row="1"
                 IsEnabled="{Binding Connected}"
                 SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}">
                 <TabItem Header="Search">
-                    <Local:SearchControl x:Name="_searchControl" />
+                    <local:SearchControl x:Name="SearchControl" />
                 </TabItem>
                 <TabItem Header="Table types">
-                    <Local:TableTypeControl x:Name="_tableTypeControl" />
+                    <local:TableTypeControl x:Name="TableTypeControl" />
                 </TabItem>
                 <TabItem Header="Class generator">
-                    <Local:ClassGeneratorControl x:Name="_classGeneratorControl" />
+                    <local:ClassGeneratorControl x:Name="ClassGeneratorControl" />
                 </TabItem>
             </TabControl>
         </Grid>
     </DockPanel>
-</Mah:MetroWindow>
+</mah:MetroWindow>

@@ -38,10 +38,10 @@ namespace MsSqlToolBelt.View
             switch (type)
             {
                 case CodeType.CSharp:
-                    _codeEditor.Text = text;
+                    CodeEditor.Text = text;
                     break;
                 case CodeType.Sql:
-                    _sqlEditor.Text = text;
+                    SqlEditor.Text = text;
                     break;
             }
         }
@@ -52,10 +52,10 @@ namespace MsSqlToolBelt.View
         private void SetSchema()
         {
             // Sql editor
-            Helper.InitAvalonEditor(_sqlEditor);
+            Helper.InitAvalonEditor(SqlEditor);
 
             // CSharp editor
-            Helper.InitAvalonEditor(_codeEditor);
+            Helper.InitAvalonEditor(CodeEditor);
         }
 
         /// <summary>

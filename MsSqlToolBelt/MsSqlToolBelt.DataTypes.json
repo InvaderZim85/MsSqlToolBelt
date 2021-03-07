@@ -1,0 +1,130 @@
+[
+    {
+        "SqlType": "BGINT",
+        "CSharpType": "Int64" 
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "BIT",
+        "CSharpType": "bool"
+    },
+    {
+        "SqlType": "CHAR",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "DATE",
+        "CSharpType": "DateTime"
+    },
+    {
+        "SqlType": "DATETIME",
+        "CSharpType": "DateTime"
+    },
+    {
+        "SqlType": "DATETIME2",
+        "CSharpType": "DateTime"
+    },
+    {
+        "SqlType": "DATETIMEOFFSET",
+        "CSharpType": "DateTimeOffset"
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal"
+    },
+    {
+        "SqlType": "VARBINARY",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "FLOAT",
+        "CSharpType": "double"
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "IMAGE",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "INT",
+        "CSharpType": "int"
+    },
+    {
+        "SqlType": "MONEY",
+        "CSharpType": "decimal"
+    },
+    {
+        "SqlType": "NCHAR",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "NTEXT",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal"
+    },
+    {
+        "SqlType": "NVARCHAR",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "REAL",
+        "CSharpType": "Single"
+    },
+    {
+        "SqlType": "ROWVERSION",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "SMALLDATETIME",
+        "CSharpType": "DateTime"
+    },
+    {
+        "SqlType": "SMALLINT",
+        "CSharpType": "short"
+    },
+    {
+        "SqlType": "SMALLMONEY",
+        "CSharpType": "decimal"
+    },
+    {
+        "SqlType": "SQL_VARIANT",
+        "CSharpType": "object"
+    },
+    {
+        "SqlType": "TEXT",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "TIME",
+        "CSharpType": "TimeSpan"
+    },
+    {
+        "SqlType": "TIMESTAMP",
+        "CSharpType": "byte[]"
+    },
+    {
+        "SqlType": "TINYINT",
+        "CSharpType": "byte"
+    },
+    {
+        "SqlType": "UNIQUEIDENTIFIER",
+        "CSharpType": "Guid"
+    },
+    {
+        "SqlType": "VARCHAR",
+        "CSharpType": "string"
+    },
+    {
+        "SqlType": "XML",
+        "CSharpType": "Xml"
+    }
+]
