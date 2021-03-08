@@ -198,7 +198,23 @@ namespace MsSqlToolBelt
             buildDate = buildDate.AddMinutes(version.Revision);
             var build = version.Build;
 
-            return $"Build date: {buildDate:yyyy-MM-dd HH:mm} #{build + 1}";
+            return $"Build date: {buildDate:yyyy-MM-dd HH:mm}; build nr. {build + 1}";
+        }
+
+        /// <summary>
+        /// Gets the full version name (application name, version number, build date)
+        /// </summary>
+        /// <returns>The full version name</returns>
+        public static string GetFullVersionName()
+        {
+            var buildDate = GetBuildData();
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var version = assembly.GetName().Version;
+
+            var name = assembly.GetName().Name;
+
+            return $"{name} // Version: {version} // {buildDate}";
         }
 
         #region Extensions

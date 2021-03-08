@@ -221,7 +221,7 @@
                 <DataGrid
                     Grid.Row="2"
                     IsReadOnly="True"
-                    ItemsSource="{Binding TableColumns}">
+                    ItemsSource="{Binding TableColumns, Mode=OneWay}">
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="Auto"
@@ -259,7 +259,7 @@
                         </DataGridTextColumn>
                         <DataGridCheckBoxColumn
                             Width="Auto"
-                            Binding="{Binding NullableView}"
+                            Binding="{Binding NullableView, Mode=OneWay}"
                             Header="Nullable" />
                         <DataGridCheckBoxColumn
                             Width="Auto"

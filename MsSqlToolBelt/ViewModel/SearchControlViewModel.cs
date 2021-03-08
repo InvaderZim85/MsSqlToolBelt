@@ -221,7 +221,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableColumn> TableColumns
         {
             get => _tableColumns;
-            private set => SetField(ref _tableColumns, value);
+            set => SetField(ref _tableColumns, value);
         }
 
         /// <summary>

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
+using MsSqlToolBelt.View;
+using Serilog;
 
 namespace MsSqlToolBelt
 {
@@ -13,5 +10,36 @@ namespace MsSqlToolBelt
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// Occurs when the app is starting
+        /// </summary>
+        /// <param name="sender">The application</param>
+        /// <param name="e">The event arguments</param>
+        private void App_OnStartup(object sender, StartupEventArgs e)
+        {
+            Helper.InitLogger();
+
+            try
+            {
+                Log.Information("Start application {name}", Helper.GetFullVersionName());
+
+                var application = new MainWindow();
+                application.Show();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "An error has occurred in the method '{method}'", nameof(App_OnStartup));
+            }
+        }
+
+        /// <summary>
+        /// Occurs when the app is closed
+        /// </summary>
+        /// <param name="sender">The application</param>
+        /// <param name="e">The event arguments</param>
+        private void App_OnExit(object sender, ExitEventArgs e)
+        {
+            Log.Information("Close application.");
+        }
     }
 }

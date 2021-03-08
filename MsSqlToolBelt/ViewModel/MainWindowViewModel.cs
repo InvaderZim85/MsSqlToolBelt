@@ -197,7 +197,6 @@ namespace MsSqlToolBelt.ViewModel
             LoadServerList();
 
             Header = $"MsSqlToolBelt - V{Assembly.GetExecutingAssembly().GetName().Version}";
-            Log.Information("{version} started.", Header);
             BuildInfo = Helper.GetBuildData();
         }
 
