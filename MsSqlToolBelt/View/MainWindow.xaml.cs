@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;

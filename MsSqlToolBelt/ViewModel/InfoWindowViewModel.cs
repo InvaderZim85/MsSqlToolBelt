@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects;
-using Serilog;
 
 namespace MsSqlToolBelt.ViewModel
 {

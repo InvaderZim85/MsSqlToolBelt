@@ -42,8 +42,11 @@
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding Connection}" />
+            <Separator />
+            <StatusBarItem Content="{Binding MemoryUsage}" />
             <StatusBarItem
                 Margin="0,0,15,0"
+                Padding="0"
                 HorizontalAlignment="Right"
                 Content="{Binding BuildInfo}" />
         </StatusBar>

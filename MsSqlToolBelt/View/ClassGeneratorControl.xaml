@@ -172,7 +172,7 @@
                     <ComboBox
                         Width="150"
                         Margin="3"
-                        ItemsSource="{Binding Modifier}"
+                        ItemsSource="{Binding Modifier, Mode=OneWay}"
                         SelectedItem="{Binding SelectedModifier}" />
                     <CheckBox
                         Margin="3"

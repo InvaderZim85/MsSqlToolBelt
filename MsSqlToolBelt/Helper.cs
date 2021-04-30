@@ -327,6 +327,23 @@ namespace MsSqlToolBelt
 
             return bool.TryParse(value, out var result) ? result : fallback;
         }
+
+        /// <summary>
+        /// Converts the specified size (bytes) into a readable format
+        /// </summary>
+        /// <param name="size">The size</param>
+        /// <returns>The readable format</returns>
+        public static string ConvertSize(this long size)
+        {
+            return size switch
+            {
+                < 1024 => $"{size} Bytes",
+                >= 1024 when size < Math.Pow(1024, 2) => $"{size / 1024:N2} KB",
+                _ when size >= Math.Pow(1024, 2) && size < Math.Pow(1024, 3) => $"{size / Math.Pow(1024, 2):N2} MB",
+                _ when size >= Math.Pow(1024, 3) => $"{size / Math.Pow(1024, 3):N2} GB",
+                _ => size.ToString()
+            };
+        }
         #endregion
     }
 }

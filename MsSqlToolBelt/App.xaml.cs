@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using MsSqlToolBelt.View;
+using MsSqlToolBelt.ViewModel;
 using Serilog;
 
 namespace MsSqlToolBelt
@@ -10,6 +11,11 @@ namespace MsSqlToolBelt
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// THe instance of the main window
+        /// </summary>
+        private MainWindow _application;
+
         /// <summary>
         /// Occurs when the app is starting
         /// </summary>
@@ -23,8 +29,8 @@ namespace MsSqlToolBelt
             {
                 Log.Information("Start application {name}", Helper.GetFullVersionName());
 
-                var application = new MainWindow();
-                application.Show();
+                _application = new MainWindow();
+                _application.Show();
             }
             catch (Exception ex)
             {
@@ -39,7 +45,11 @@ namespace MsSqlToolBelt
         /// <param name="e">The event arguments</param>
         private void App_OnExit(object sender, ExitEventArgs e)
         {
+            if (_application.DataContext is MainWindowViewModel viewModel)
+                viewModel.StopTimer();
+
             Log.Information("Close application.");
+            Log.CloseAndFlush();
         }
     }
 }

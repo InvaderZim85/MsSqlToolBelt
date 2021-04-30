@@ -9,7 +9,6 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
-using Serilog;
 using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 

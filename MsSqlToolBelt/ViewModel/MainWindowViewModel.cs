@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Timers;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.View;
@@ -38,9 +40,19 @@ namespace MsSqlToolBelt.ViewModel
         private Repo _repo;
 
         /// <summary>
+        /// Contains the timer for the memory usage
+        /// </summary>
+        private Timer _memoryTimer;
+
+        /// <summary>
+        /// Contains the maximal memory usage
+        /// </summary>
+        private long _maxMemoryUsage;
+
+        /// <summary>
         /// Backing field for <see cref="ServerList"/>
         /// </summary>
-        private ObservableCollection<string> _serverList = new ObservableCollection<string>();
+        private ObservableCollection<string> _serverList = new();
 
         /// <summary>
         /// Gets or sets the list with the last 10 servers
@@ -178,7 +190,21 @@ namespace MsSqlToolBelt.ViewModel
         public string BuildInfo
         {
             get => _buildInfo;
-            set => SetField(ref _buildInfo, value);
+            private set => SetField(ref _buildInfo, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="MemoryUsage"/>
+        /// </summary>
+        private string _memoryUsage;
+
+        /// <summary>
+        /// Gets or sets the memory usage
+        /// </summary>
+        public string MemoryUsage
+        {
+            get => _memoryUsage;
+            private set => SetField(ref _memoryUsage, value);
         }
 
         /// <summary>
@@ -198,6 +224,17 @@ namespace MsSqlToolBelt.ViewModel
 
             Header = $"MsSqlToolBelt - V{Assembly.GetExecutingAssembly().GetName().Version}";
             BuildInfo = Helper.GetBuildData();
+
+            _memoryTimer = new Timer(1000);
+            _memoryTimer.Elapsed += (_, _) =>
+            {
+                var memUsage = Process.GetCurrentProcess().PrivateMemorySize64;
+                MemoryUsage = $"Memory usage: {memUsage.ConvertSize()}";
+
+                if (memUsage > _maxMemoryUsage)
+                    _maxMemoryUsage = memUsage;
+            };
+            _memoryTimer.Start();
         }
 
         /// <summary>
@@ -311,6 +348,17 @@ namespace MsSqlToolBelt.ViewModel
         private void SaveServer()
         {
             Helper.SaveServer(SelectedServer);
+        }
+
+        /// <summary>
+        /// Stops the memory timer
+        /// </summary>
+        public void StopTimer()
+        {
+            _memoryTimer?.Dispose();
+
+            // Log the max. memory usage
+            Log.Information($"Maximal memory usage: {_maxMemoryUsage.ConvertSize()} ({_maxMemoryUsage:N0} bytes)");
         }
     }
 }

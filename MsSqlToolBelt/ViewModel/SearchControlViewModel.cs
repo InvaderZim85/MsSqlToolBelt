@@ -221,7 +221,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<TableColumn> TableColumns
         {
             get => _tableColumns;
-            set => SetField(ref _tableColumns, value);
+            private set => SetField(ref _tableColumns, value);
         }
 
         /// <summary>
@@ -282,6 +282,7 @@ namespace MsSqlToolBelt.ViewModel
         {
             if (string.IsNullOrEmpty(Search))
                 return;
+
             SearchEnabled = false;
             var controller = await ShowProgress("Search", "Please wait while searching...");
 
