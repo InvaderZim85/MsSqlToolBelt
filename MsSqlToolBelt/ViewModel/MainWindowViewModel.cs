@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.View;
 using Serilog;
 using ZimLabs.Database.MsSql;
@@ -48,6 +49,11 @@ namespace MsSqlToolBelt.ViewModel
         /// Contains the maximal memory usage
         /// </summary>
         private long _maxMemoryUsage;
+
+        /// <summary>
+        /// Contains the shipped arguments
+        /// </summary>
+        private Arguments _args;
 
         /// <summary>
         /// Backing field for <see cref="ServerList"/>
@@ -212,9 +218,11 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         /// <param name="setConnector">The action to set the connector of the user controls</param>
         /// <param name="loadData">The action to load the data</param>
+        /// <param name="clearControls">The action to clear the commands</param>
         public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls)
         {
             Helper.InitLogger();
+
 
             _setConnector = setConnector;
             _loadData = loadData;
@@ -235,6 +243,33 @@ namespace MsSqlToolBelt.ViewModel
                     _maxMemoryUsage = memUsage;
             };
             _memoryTimer.Start();
+        }
+
+        /// <summary>
+        /// Runs an auto connect if the user provides some specified parameters
+        /// </summary>
+        /// <param name="args">The arguments</param>
+        public void AutoConnect(Arguments args)
+        {
+            if (args == null)
+                return;
+
+            Log.Information($"Perform auto connect. Parameters: {args}");
+
+            // Select the server and connect
+            SelectedServer = ServerList.FirstOrDefault(f => f.EqualsIgnoreCase(args.Server)) ?? args.Server;
+            Connect();
+
+            if (Databases == null || !Databases.Any())
+                return;
+
+            // Select the database and connect
+            var database = Databases.FirstOrDefault(f => f.EqualsIgnoreCase(args.Database));
+            if (string.IsNullOrEmpty(database))
+                return;
+
+            SelectedDatabase = database;
+            SwitchDatabase();
         }
 
         /// <summary>

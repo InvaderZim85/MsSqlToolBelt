@@ -40,6 +40,9 @@
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.5.0.0\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
@@ -123,6 +126,7 @@
     <Compile Include="Business\ClassGenerator.cs" />
     <Compile Include="Business\ExportHelper.cs" />
     <Compile Include="Business\PackageInfo.cs" />
+    <Compile Include="DataObjects\Arguments.cs" />
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
     <Compile Include="DataObjects\CodeType.cs" />
     <Compile Include="DataObjects\CustomEnums.cs" />

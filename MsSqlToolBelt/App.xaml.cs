@@ -29,7 +29,7 @@ namespace MsSqlToolBelt
             {
                 Log.Information("Start application {name}", Helper.GetFullVersionName());
 
-                _application = new MainWindow();
+                _application = new MainWindow(e.Args);
                 _application.Show();
             }
             catch (Exception ex)

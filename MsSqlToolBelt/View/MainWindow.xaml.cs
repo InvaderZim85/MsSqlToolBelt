@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using CommandLine;
 using MahApps.Metro.Controls;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
 
@@ -11,11 +14,18 @@ namespace MsSqlToolBelt.View
     public partial class MainWindow : MetroWindow
     {
         /// <summary>
+        /// Contains the provided arguments
+        /// </summary>
+        private readonly string[] _args;
+
+        /// <summary>
         /// Creates a new instance of the <see cref="MainWindow"/>
         /// </summary>
-        public MainWindow()
+        public MainWindow(string[] args)
         {
             InitializeComponent();
+            
+            _args = args;
         }
 
         /// <summary>
@@ -68,6 +78,22 @@ namespace MsSqlToolBelt.View
             SearchControl.Clear();
             TableTypeControl.Clear();
             ClassGeneratorControl.Clear();
+        }
+
+        /// <summary>
+        /// Occurs when the content was rendered
+        /// </summary>
+        /// <param name="sender">The <see cref="MainWindow"/></param>
+        /// <param name="e">The event arguments</param>
+        private void MainWindow_OnContentRendered(object sender, EventArgs e)
+        {
+            if (_args == null)
+                return;
+
+            if (DataContext is not MainWindowViewModel viewModel)
+                return;
+
+            Parser.Default.ParseArguments<Arguments>(_args).WithParsed(a => viewModel.AutoConnect(a));
         }
     }
 }
