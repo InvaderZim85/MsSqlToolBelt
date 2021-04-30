@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Dapper;
+using MsSqlToolBelt.Data.Queries;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
 using ZimLabs.Database.MsSql;
@@ -61,100 +62,28 @@ namespace MsSqlToolBelt.Data
         {
             var searchString = $"%{value}%";
 
-            const string query =
-                @"DECLARE @result TABLE
-                (
-                    [Id] INT NOT NULL,
-                    [Name] NVARCHAR(200) NOT NULL,
-                    [Definition] NVARCHAR(MAX) NULL,
-                    [Type] NVARCHAR(50) NOT NULL
-                );
-
-                INSERT INTO @result
-                SELECT
-                    m.object_id,
-                    OBJECT_NAME(m.object_id) AS [Name],
-                    m.[definition] AS [Definition],
-                    CASE o.[type]
-                        WHEN 'AF' THEN 'Aggregate function'
-                        WHEN 'C' THEN 'Check constraint'
-                        WHEN 'D' THEN 'Default'
-                        WHEN 'F' THEN 'Foreign key constraint'
-                        WHEN 'FN' THEN 'Function'
-                        WHEN 'FS' THEN 'CLR scalar function'
-                        WHEN 'FT' THEN 'CLR table valued function'
-                        WHEN 'IF' THEN 'Inline table valued function'
-                        WHEN 'IT' THEN 'Internal table'
-                        WHEN 'P' THEN 'Procedure'
-                        WHEN 'PC' THEN 'CLR stored procedure'
-                        WHEN 'PG' THEN 'Plan guid'
-                        WHEN 'PK' THEN 'Primary key'
-                        WHEN 'R' THEN 'Rule'
-                        WHEN 'RF' THEN 'Replication filter procedure'
-                        WHEN 'S' THEN 'System base table'
-                        WHEN 'SN' THEN 'Synonym'
-                        WHEN 'SO' THEN 'Sequence object'
-                        WHEN 'U' THEN 'Table (user defined)'
-                        WHEN 'V' THEN 'View'
-                        WHEN 'EC' THEN 'Edge constraint'
-                        WHEN 'SQ' THEN 'Service queue'
-                        WHEN 'TA' THEN 'CLR DML Trigger'
-                        WHEN 'TF' THEN 'Table valued function'
-                        WHEN 'TR' THEN 'Trigger'
-                        WHEN 'TT' THEN 'Table type'
-                        WHEN 'UQ' THEN 'Unique constraint'
-                        WHEN 'X' THEN 'Extended stored procedure'
-                        ELSE o.[type]
-                    END AS [Type]
-                FROM
-                    sys.sql_modules m
-
-                    INNER JOIN sys.objects AS o
-                    ON o.object_id = m.object_id
-                WHERE
-                    m.[definition] LIKE @search
-
-                UNION
-
-                SELECT DISTINCT
-                    t.object_id,
-                    t.[name],
-                    '',
-                    'Table'
-                FROM
-                    sys.tables t
-
-                    INNER JOIN sys.columns c
-                    ON c.object_id = t.object_id
-                WHERE
-                    t.[Name] LIKE @search
-                    OR c.[name] LIKE @search;
-
-                SELECT
-                    r.Id,
-                    r.[Name],
-                    r.[Definition],
-                    r.[Type]
-                FROM
-                    @result r
-                WHERE
-                    r.[Name] NOT LIKE 'syncobj%'
-                    AND r.[Name] NOT LIKE '%_CT'
-                    AND r.[Name] NOT LIKE 'SYNC%'
-                ORDER BY
-                    r.[Type];";
-
-            var results = _connector.Connection.Query<SearchResult>(query, new
+            var multiResult = _connector.Connection.QueryMultiple(QueryManager.Search, new
             {
                 search = searchString
-            }).ToList();
+            });
 
-            var columns = LoadColumns(results.Where(w => w.Type == "Table").Select(s => s.Id).ToList());
+            var results = multiResult.Read<SearchResult>().ToList();
+            var columns = multiResult.Read<TableColumn>().ToList();
+            var keyColumns = multiResult.Read<KeyColumn>().ToList();
+
+            if (columns.Any() && keyColumns.Any())
+            {
+                foreach (var column in columns)
+                {
+                    column.IsPrimaryKey =
+                        keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
+                }
+            }
 
             foreach (var entry in results.Where(w => w.Type == "Table"))
             {
                 entry.Definition = "";
-                entry.Columns = columns.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
+                entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
             }
 
             results.Add(SearchJobs(searchString));
@@ -168,63 +97,6 @@ namespace MsSqlToolBelt.Data
             return results.Where(w =>
                 w != null &&
                 (regex.IsMatch(w.Name) || regex.IsMatch(w.Definition))).ToList();
-        }
-
-        /// <summary>
-        /// Loads the columns of the given tables
-        /// </summary>
-        /// <param name="tables">The list with the tables</param>
-        /// <returns>The list with the columns</returns>
-        private List<TableColumn> LoadColumns(List<int> tables)
-        {
-            const string query =
-                @"SELECT
-                    c.TABLE_NAME AS [Table],
-                    c.COLUMN_NAME AS [Column],
-                    c.DATA_TYPE AS [DataType],
-                    c.ORDINAL_POSITION AS ColumnPosition,
-                    c.IS_NULLABLE AS Nullable,
-                    COALESCE(c.CHARACTER_MAXIMUM_LENGTH, 0) AS [MaxLength],
-                    COALESCE(c.NUMERIC_PRECISION, c.DATETIME_PRECISION, 0) AS [Precision],
-                    COALESCE(c.NUMERIC_SCALE, 0) AS DecimalPlaceValue
-                FROM
-                    INFORMATION_SCHEMA.COLUMNS AS c
-
-                    INNER JOIN sys.tables AS t
-                    ON t.[name] = c.TABLE_NAME
-                    AND t.object_id IN @tables
-
-                    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
-                    ON tc.TABLE_NAME = c.TABLE_NAME;
-
-                SELECT
-                    tc.TABLE_NAME AS [Table],
-                    ccu.COLUMN_NAME AS [Column]
-                FROM
-                    INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
-
-                    INNER JOIN sys.tables AS t
-                    ON t.[name] = tc.TABLE_NAME
-                    AND t.object_id IN @tables
-
-                    INNER JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE AS ccu
-                    ON ccu.TABLE_NAME = tc.TABLE_NAME;";
-
-            var result = _connector.Connection.QueryMultiple(query, new
-            {
-                tables
-            });
-
-            var columns = result.Read<TableColumn>().ToList();
-            var keyColumns = result.Read<KeyColumn>().ToList();
-
-            foreach (var column in columns)
-            {
-                column.IsPrimaryKey =
-                    keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
-            }
-
-            return columns;
         }
 
         /// <summary>

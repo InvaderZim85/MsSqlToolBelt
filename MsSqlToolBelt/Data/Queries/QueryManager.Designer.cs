@@ -63,28 +63,33 @@ namespace MsSqlToolBelt.Data.Queries {
         /// <summary>
         ///   Looks up a localized string similar to /*
         ///    Author:        A. Pouwels
-        ///    Changed by:    /
+        ///    Changed by:    A. Pouwels
         ///    Creation date: 2020-06-22
-        ///    Change date:   /
+        ///    Change date:   2021-01-27
         ///    Description:   Loads all available tables
         ///    Used by:       MsSqlToolBelt
         ///*/
         ///
         ///DECLARE @tables TABLE
         ///(
-        ///    [Name] sysname NOT NULL
+        ///    [Name] sysname NOT NULL,
+        ///    [Schema] sysname NOT NULL
         ///);
         ///
         ///INSERT INTO @tables
         ///SELECT 
-        ///    t.TABLE_NAME
+        ///    t.TABLE_NAME,
+        ///    t.TABLE_SCHEMA
         ///FROM
         ///    INFORMATION_SCHEMA.TABLES AS t
-        ///WHERE
-        ///    t.TABLE_NAME NOT LIKE &apos;syncobj%&apos;
-        ///    AND t.TABLE_NAME NOT LIKE &apos;cdc_%&apos;
-        ///    AND t.TABLE_NAME NOT LIKE &apos;MSpeer%&apos;
-        ///    AND t.TABLE_NAME NOT LIKE &apos;MSpub%&apos;        /// [rest of string was truncated]&quot;;.
+        ///ORDER BY 
+        ///    t.TABLE_NAME;
+        ///
+        ///-- Return the tables
+        ///SELECT
+        ///    t.[Name],
+        ///    t.[Schema]
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string LoadTables {
             get {
@@ -95,12 +100,13 @@ namespace MsSqlToolBelt.Data.Queries {
         /// <summary>
         ///   Looks up a localized string similar to /*
         ///    Author:        A. Pouwels
-        ///    Changed by:    /
+        ///    Changed by:    A. Pouwels
         ///    Creation date: 2020-06-17
-        ///    Change date:   /
+        ///    Change date:   2021-01-27
         ///    Description:   Loads all available table types
         ///*/
         ///
+        ///-- Load all available table types
         ///SELECT 
         ///    tt.type_table_object_id AS Id,
         ///    tt.[name]
@@ -109,17 +115,45 @@ namespace MsSqlToolBelt.Data.Queries {
         ///WHERE
         ///    tt.is_user_defined = 1;
         ///
+        ///-- Load the columns of the table types
         ///SELECT
         ///    tt.type_table_object_id AS TableTypeId,
         ///    c.[name] AS [Name],
         ///    st.[name] AS Datatype,
         ///    CASE
-        ///        WHEN st.[name] IN (&apos;numeric&apos;, &apos;decimal&apos;) THEN
-        ///            &apos;(&apos; + CONVERT(VARCHAR(5), c.[p [rest of string was truncated]&quot;;.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string LoadTableTypes {
             get {
                 return ResourceManager.GetString("LoadTableTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DECLARE @result TABLE
+        ///(
+        ///    [Id] INT NOT NULL,
+        ///    [Name] NVARCHAR(200) NOT NULL,
+        ///    [Definition] NVARCHAR(MAX) NULL,
+        ///    [Type] NVARCHAR(50) NOT NULL
+        ///);
+        ///
+        ///INSERT INTO @result
+        ///SELECT
+        ///    m.object_id,
+        ///    OBJECT_NAME(m.object_id) AS [Name],
+        ///    m.[definition] AS [Definition],
+        ///    CASE o.[type]
+        ///        WHEN &apos;AF&apos; THEN &apos;Aggregate function&apos;
+        ///        WHEN &apos;C&apos; THEN &apos;Check constraint&apos;
+        ///        WHEN &apos;D&apos; THEN &apos;Default&apos;
+        ///        WHEN &apos;F&apos; THEN &apos;Foreign key constraint&apos;
+        ///        WHEN &apos;FN&apos; THEN &apos;Function&apos;
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
             }
         }
     }

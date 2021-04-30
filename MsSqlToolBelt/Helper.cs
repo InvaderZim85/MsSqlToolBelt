@@ -55,7 +55,7 @@ namespace MsSqlToolBelt
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File("MsSqlToolBelt_Log.log",
+                .WriteTo.File("logs/MsSqlToolBelt_Log.log",
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} | {Level} | {Message:lj}{NewLine}{Exception}",
                     rollingInterval: RollingInterval.Day,
                     shared: true)

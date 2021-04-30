@@ -269,6 +269,9 @@
   <ItemGroup>
     <None Include="Data\Queries\LoadTables.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Queries\Search.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if $(ConfigurationName) == Release (
