@@ -20,6 +20,7 @@ namespace MsSqlToolBelt.ViewModel
     /// </summary>
     internal sealed class MainWindowViewModel : ViewModelBase
     {
+        #region Actions
         /// <summary>
         /// The action to set the connector of the user controls
         /// </summary>
@@ -36,6 +37,13 @@ namespace MsSqlToolBelt.ViewModel
         private Action _clearControls;
 
         /// <summary>
+        /// The action to initialize the specified fly out
+        /// </summary>
+        private Action<FlyOutType> _initFlyOut;
+        #endregion
+
+
+        /// <summary>
         /// The instance for the interaction with the database
         /// </summary>
         private Repo _repo;
@@ -50,11 +58,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private long _maxMemoryUsage;
 
-        /// <summary>
-        /// Contains the shipped arguments
-        /// </summary>
-        private Arguments _args;
-
+        #region Properties for the view
         /// <summary>
         /// Backing field for <see cref="ServerList"/>
         /// </summary>
@@ -214,19 +218,50 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="SettingsOpen"/>
+        /// </summary>
+        private bool _settingsOpen;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the settings fly out is open
+        /// </summary>
+        public bool SettingsOpen
+        {
+            get => _settingsOpen;
+            set
+            {
+                SetField(ref _settingsOpen, value);
+
+                switch (value)
+                {
+                    case true:
+                        _initFlyOut(FlyOutType.Settings);
+                        break;
+                    case false:
+                        LoadServerList();
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setConnector">The action to set the connector of the user controls</param>
         /// <param name="loadData">The action to load the data</param>
         /// <param name="clearControls">The action to clear the commands</param>
-        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls)
+        /// <param name="initFlyOut">The action to initialize the specified fly out</param>
+        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls, Action<FlyOutType> initFlyOut)
         {
             Helper.InitLogger();
-
 
             _setConnector = setConnector;
             _loadData = loadData;
             _clearControls = clearControls;
+            _initFlyOut = initFlyOut;
 
             LoadServerList();
 
@@ -296,10 +331,10 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         public ICommand SettingsCommand => new DelegateCommand(() =>
         {
-            var settingsWindow = new SettingsWindow {Owner = Application.Current.MainWindow};
-            settingsWindow.ShowDialog();
+            //var settingsWindow = new SettingsWindow {Owner = Application.Current.MainWindow};
+            //settingsWindow.ShowDialog();
 
-            LoadServerList();
+            SettingsOpen = !SettingsOpen;
         });
 
         /// <summary>

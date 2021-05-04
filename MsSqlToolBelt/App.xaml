@@ -45,6 +45,14 @@
                 <Setter Property="ShowsPreview" Value="True" />
                 <Setter Property="Background" Value="Transparent" />
             </Style>
+
+            <Style x:Key="Headline" TargetType="{x:Type Label}">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontStyle" Value="Italic" />
+                <Setter Property="Foreground" Value="Gray" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

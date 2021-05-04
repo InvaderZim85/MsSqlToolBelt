@@ -47,7 +47,7 @@ namespace MsSqlToolBelt.View
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainWindowViewModel viewModel)
-                viewModel.InitViewModel(SetConnector, LoadData, ClearControl);
+                viewModel.InitViewModel(SetConnector, LoadData, ClearControl, InitFlyOut);
 
             SearchControl.InitControl();
             ClassGeneratorControl.InitControl();
@@ -78,6 +78,16 @@ namespace MsSqlToolBelt.View
             SearchControl.Clear();
             TableTypeControl.Clear();
             ClassGeneratorControl.Clear();
+        }
+
+        /// <summary>
+        /// Init the fly out
+        /// </summary>
+        /// <param name="type">The type of the fly out</param>
+        private void InitFlyOut(FlyOutType type)
+        {
+            if (type == FlyOutType.Settings)
+                _settingsControl.InitControl();
         }
 
         /// <summary>

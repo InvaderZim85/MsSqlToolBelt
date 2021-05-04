@@ -26,6 +26,7 @@
         <viewModel:MainWindowViewModel />
     </Window.DataContext>
 
+    <!--  Right window commands  -->
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
             <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
@@ -40,6 +41,20 @@
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
+    <!--  Fly outs  -->
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout
+                Width="600"
+                Header="Settings"
+                IsOpen="{Binding SettingsOpen}"
+                Position="Right">
+                <local:SettingsControl x:Name="_settingsControl" />
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+
+    <!--  Main  -->
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding Connection}" />

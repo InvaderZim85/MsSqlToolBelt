@@ -132,6 +132,7 @@
     <Compile Include="DataObjects\CustomEnums.cs" />
     <Compile Include="DataObjects\DataType.cs" />
     <Compile Include="DataObjects\DescriptionValueAttribute.cs" />
+    <Compile Include="DataObjects\FlyOutType.cs" />
     <Compile Include="DataObjects\KeyColumn.cs" />
     <Compile Include="DataObjects\ReferenceEntry.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
@@ -158,7 +159,7 @@
     <Compile Include="ViewModel\InfoWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
-    <Compile Include="ViewModel\SettingsWindowViewModel.cs" />
+    <Compile Include="ViewModel\SettingsControlViewModel.cs" />
     <Compile Include="ViewModel\TableTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ClassGeneratorControl.xaml.cs">
@@ -179,8 +180,8 @@
     <Compile Include="View\SearchControl.xaml.cs">
       <DependentUpon>SearchControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    <Compile Include="View\SettingsControl.xaml.cs">
+      <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\TableTypeControl.xaml.cs">
       <DependentUpon>TableTypeControl.xaml</DependentUpon>
@@ -250,7 +251,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\SettingsWindow.xaml">
+    <Page Include="View\SettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
