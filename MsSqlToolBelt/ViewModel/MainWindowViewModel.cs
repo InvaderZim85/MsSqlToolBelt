@@ -244,6 +244,26 @@ namespace MsSqlToolBelt.ViewModel
             }
         }
 
+        /// <summary>
+        /// Backing field for <see cref="DataTypeOpen"/>
+        /// </summary>
+        private bool _dataTypeOpen;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the data type fly out is open
+        /// </summary>
+        public bool DataTypeOpen
+        {
+            get => _dataTypeOpen;
+            set
+            {
+                SetField(ref _dataTypeOpen, value);
+
+                if (value)
+                    _initFlyOut(FlyOutType.DataTypes);
+            }
+        }
+
         #endregion
 
 
@@ -342,8 +362,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         public ICommand DataTypeCommand => new DelegateCommand(() =>
         {
-            var typeWindow = new DataTypeWindow {Owner = Application.Current.MainWindow};
-            typeWindow.ShowDialog();
+            DataTypeOpen = !DataTypeOpen;
         });
 
         /// <summary>

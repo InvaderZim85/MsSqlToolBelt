@@ -86,8 +86,15 @@ namespace MsSqlToolBelt.View
         /// <param name="type">The type of the fly out</param>
         private void InitFlyOut(FlyOutType type)
         {
-            if (type == FlyOutType.Settings)
-                _settingsControl.InitControl();
+            switch (type)
+            {
+                case FlyOutType.Settings:
+                    _settingsControl.InitControl();
+                    break;
+                case FlyOutType.DataTypes:
+                    _dataTypeControl.InitControl();
+                    break;
+            }
         }
 
         /// <summary>

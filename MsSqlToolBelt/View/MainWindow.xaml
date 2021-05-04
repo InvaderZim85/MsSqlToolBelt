@@ -51,6 +51,14 @@
                 Position="Right">
                 <local:SettingsControl x:Name="_settingsControl" />
             </mah:Flyout>
+
+            <mah:Flyout
+                Width="400"
+                Header="Data types"
+                IsOpen="{Binding DataTypeOpen}"
+                Position="Right">
+                <local:DataTypeControl x:Name="_dataTypeControl" />
+            </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
 

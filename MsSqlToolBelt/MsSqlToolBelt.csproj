@@ -154,7 +154,7 @@
     <Compile Include="Data\TableTypeRepo.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
-    <Compile Include="ViewModel\DataTypeWindowViewModel.cs" />
+    <Compile Include="ViewModel\DataTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -165,8 +165,8 @@
     <Compile Include="View\ClassGeneratorControl.xaml.cs">
       <DependentUpon>ClassGeneratorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\DataTypeWindow.xaml.cs">
-      <DependentUpon>DataTypeWindow.xaml</DependentUpon>
+    <Compile Include="View\DataTypeControl.xaml.cs">
+      <DependentUpon>DataTypeControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ExportTableTypeDialog.xaml.cs">
       <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
@@ -231,7 +231,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\DataTypeWindow.xaml">
+    <Page Include="View\DataTypeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
