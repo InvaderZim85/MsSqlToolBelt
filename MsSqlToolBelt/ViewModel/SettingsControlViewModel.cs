@@ -9,7 +9,10 @@ using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
 {
-    internal sealed class SettingsWindowViewModel : ViewModelBase
+    /// <summary>
+    /// Provides the logic for the <see cref="View.SettingsControl"/>
+    /// </summary>
+    internal sealed class SettingsControlViewModel : ViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="ServerListCount"/>
@@ -172,8 +175,6 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void LoadSettings()
         {
-            var controller = await ShowProgress("Please wait", "Please wait while loading the settings...");
-
             try
             {
                 var settings = Helper.LoadSettings();
@@ -193,10 +194,6 @@ namespace MsSqlToolBelt.ViewModel
             catch (Exception ex)
             {
                 await ShowError(ex);
-            }
-            finally
-            {
-                await controller.CloseAsync();
             }
         }
 
@@ -292,7 +289,7 @@ namespace MsSqlToolBelt.ViewModel
 
             var newEntry = new TableIgnoreEntry
             {
-                FilterType = (CustomEnums.FilterType) SelectedFilter.Id,
+                FilterType = (CustomEnums.FilterType)SelectedFilter.Id,
                 Value = FilterValue
             };
 

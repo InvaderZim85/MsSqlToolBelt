@@ -93,12 +93,10 @@
             Orientation="Horizontal">
             <Button
                 Width="60"
-                Margin="3"
                 Click="ButtonBase_OnClick"
                 Content="Close" />
             <Button
                 Width="60"
-                Margin="3"
                 Command="{Binding ExportCommand}"
                 Content="Export"
                 IsEnabled="{Binding ExportButtonEnabled}" />

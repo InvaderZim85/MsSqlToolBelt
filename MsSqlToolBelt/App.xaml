@@ -39,11 +39,31 @@
                 <Setter Property="Margin" Value="3" />
             </Style>
 
-            <Style TargetType="{x:Type GridSplitter}">
+            <Style x:Key="VerticalSplitter" TargetType="{x:Type GridSplitter}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
-                <Setter Property="Width" Value="2" />
+                <Setter Property="Width" Value="3" />
                 <Setter Property="ShowsPreview" Value="True" />
                 <Setter Property="Background" Value="Transparent" />
+            </Style>
+
+            <Style x:Key="HorizontalSplitter" TargetType="{x:Type GridSplitter}">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="Height" Value="3" />
+                <Setter Property="ShowsPreview" Value="True" />
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+
+
+            <Style x:Key="Headline" TargetType="{x:Type Label}">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontStyle" Value="Italic" />
+                <Setter Property="Foreground" Value="Gray" />
+            </Style>
+
+            <Style BasedOn="{StaticResource MahApps.Styles.Button}" TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="3" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

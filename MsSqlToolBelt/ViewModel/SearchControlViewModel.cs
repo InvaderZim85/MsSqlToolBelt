@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
 using ZimLabs.Database.MsSql;
+using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
@@ -276,6 +278,21 @@ namespace MsSqlToolBelt.ViewModel
         public ICommand DeselectAllCommand => new DelegateCommand(() => SetSelection(false));
 
         /// <summary>
+        /// The command to save the table definition as table
+        /// </summary>
+        public ICommand SaveAsTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Default));
+
+        /// <summary>
+        /// The command to save the table definition as markdown table
+        /// </summary>
+        public ICommand SaveAsMdTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Markdown));
+
+        /// <summary>
+        /// The command to save the table definition as csv table
+        /// </summary>
+        public ICommand SaveAsCsvTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Csv));
+
+        /// <summary>
         /// Performs the search for the given value
         /// </summary>
         private async void PerformSearch()
@@ -367,6 +384,47 @@ namespace MsSqlToolBelt.ViewModel
             };
 
             return dialog.ShowDialog() != CommonFileDialogResult.Ok ? "" : dialog.FileName;
+        }
+
+        /// <summary>
+        /// Saves the table information as table
+        /// </summary>
+        private void SaveAsTable(OutputType outputType)
+        {
+            if (SelectedResult == null)
+                return;
+
+            var filter = new CommonFileDialogFilter("Text file", "*.txt");
+            var defaultExtension = "txt";
+            var title = "Saves as ASCII styled table (text file)";
+
+            switch (outputType)
+            {
+                case OutputType.Csv:
+                    filter = new CommonFileDialogFilter("CSV file", "*.csv");
+                    defaultExtension = "csv";
+                    title = "Save as CSV file";
+                    break;
+                case OutputType.Markdown:
+                    filter = new CommonFileDialogFilter("Markdown file", "*.md");
+                    defaultExtension = "md";
+                    title = "Save as markdown table";
+                    break;
+            }
+
+            var dialog = new CommonSaveFileDialog
+            {
+                Title = title,
+                Filters = {filter},
+                DefaultExtension = defaultExtension,
+                DefaultFileName = $"{SelectedResult.Name}Table"
+            };
+
+            // TableColumns
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            TableColumns.SaveTable(dialog.FileName, Encoding.UTF8, outputType);
         }
 
         /// <summary>

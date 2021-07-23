@@ -1,4 +1,4 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿namespace MsSqlToolBelt.DataObjects.Types
 {
     /// <summary>
     /// Provides the different selection types

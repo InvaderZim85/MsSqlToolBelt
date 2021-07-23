@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
 
@@ -63,7 +64,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         public void InitControl()
         {
-            if (!(DataContext is ClassGeneratorControlViewModel viewModel))
+            if (DataContext is not ClassGeneratorControlViewModel viewModel)
                 return;
 
             viewModel.InitViewModel(SetCode);

@@ -3,6 +3,7 @@ using System.Windows;
 using CommandLine;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
 
@@ -47,7 +48,7 @@ namespace MsSqlToolBelt.View
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is MainWindowViewModel viewModel)
-                viewModel.InitViewModel(SetConnector, LoadData, ClearControl);
+                viewModel.InitViewModel(SetConnector, LoadData, ClearControl, InitFlyOut);
 
             SearchControl.InitControl();
             ClassGeneratorControl.InitControl();
@@ -78,6 +79,26 @@ namespace MsSqlToolBelt.View
             SearchControl.Clear();
             TableTypeControl.Clear();
             ClassGeneratorControl.Clear();
+        }
+
+        /// <summary>
+        /// Init the fly out
+        /// </summary>
+        /// <param name="type">The type of the fly out</param>
+        private void InitFlyOut(FlyOutType type)
+        {
+            switch (type)
+            {
+                case FlyOutType.Settings:
+                    _settingsControl.InitControl();
+                    break;
+                case FlyOutType.DataTypes:
+                    _dataTypeControl.InitControl();
+                    break;
+                case FlyOutType.Info:
+                    _infoControl.InitControl();
+                    break;
+            }
         }
 
         /// <summary>

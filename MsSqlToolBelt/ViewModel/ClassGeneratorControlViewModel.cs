@@ -9,6 +9,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
+using MsSqlToolBelt.DataObjects.Types;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 

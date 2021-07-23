@@ -1,4 +1,4 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿namespace MsSqlToolBelt.DataObjects.Types
 {
     /// <summary>
     /// Represents the supported data types

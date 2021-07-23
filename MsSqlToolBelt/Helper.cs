@@ -11,6 +11,7 @@ using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Types;
 using Newtonsoft.Json;
 using Serilog;
 

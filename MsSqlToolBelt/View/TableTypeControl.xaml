@@ -62,15 +62,22 @@
                 <Button
                     Grid.Row="4"
                     Width="60"
-                    Margin="3"
                     HorizontalAlignment="Left"
                     Command="{Binding ReloadCommand}"
                     Content="Reload" />
 
+                <Button
+                    Grid.Row="4"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ExportCommand}"
+                    Content="Export" />
+
             </Grid>
         </Border>
 
-        <GridSplitter Grid.Column="1" />
+
+        <GridSplitter Grid.Column="1" Style="{StaticResource VerticalSplitter}" />
 
         <!--  Information  -->
         <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
@@ -79,8 +86,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label
@@ -118,16 +123,6 @@
                             Header="Key" />
                     </DataGrid.Columns>
                 </DataGrid>
-
-                <Separator Grid.Row="3" />
-
-                <Button
-                    Grid.Row="4"
-                    Width="60"
-                    Margin="3"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ExportCommand}"
-                    Content="Export" />
             </Grid>
         </Border>
     </Grid>
