@@ -29,11 +29,11 @@
     <!--  Right window commands  -->
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
-                <iconPacks:PackIconPixelartIcons Kind="Code" />
-            </Button>
             <Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
                 <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
+            </Button>
+            <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
+                <iconPacks:PackIconPixelartIcons Kind="Code" />
             </Button>
             <Button Command="{Binding SettingsCommand}" ToolTip="Shows the settings">
                 <iconPacks:PackIconPixelartIcons Kind="Sliders" />
@@ -53,11 +53,19 @@
             </mah:Flyout>
 
             <mah:Flyout
-                Width="400"
+                Width="600"
                 Header="Data types"
                 IsOpen="{Binding DataTypeOpen}"
                 Position="Right">
                 <local:DataTypeControl x:Name="_dataTypeControl" />
+            </mah:Flyout>
+
+            <mah:Flyout
+                Width="600"
+                Header="Info"
+                IsOpen="{Binding InfoOpen}"
+                Position="Right">
+                <local:InfoControl x:Name="_infoControl" />
             </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
@@ -93,7 +101,7 @@
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="290" />
                         <ColumnDefinition Width="70" />
                     </Grid.ColumnDefinitions>
 
@@ -112,7 +120,6 @@
                     <Button
                         Grid.Row="0"
                         Grid.Column="2"
-                        Margin="3"
                         Command="{Binding ConnectCommand}"
                         Content="Connect" />
 
@@ -130,7 +137,6 @@
                     <Button
                         Grid.Row="1"
                         Grid.Column="2"
-                        Margin="3"
                         Command="{Binding SwitchCommand}"
                         Content="Select"
                         IsEnabled="{Binding ServerConnected}" />

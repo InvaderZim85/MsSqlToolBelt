@@ -44,16 +44,16 @@
       <HintPath>..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
     </Reference>
     <Reference Include="ControlzEx, Version=5.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.5.0.0\lib\net462\ControlzEx.dll</HintPath>
+      <HintPath>..\packages\ControlzEx.5.0.1\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
     <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.2.0.90\lib\net461\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.1.20, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <HintPath>..\packages\AvalonEdit.6.1.1\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.1.2.30, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.6.1.2.30\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.2.4.5\lib\net47\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.2.4.7\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
@@ -79,8 +79,8 @@
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.10.0\lib\net46\Serilog.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.Sinks.File.4.1.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
+    <Reference Include="Serilog.Sinks.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.File.5.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -104,11 +104,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ZimLabs.Database.MsSql, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZimLabs.Database.MsSql.1.2.0\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
+    <Reference Include="ZimLabs.Database.MsSql, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZimLabs.Database.MsSql.1.2.1\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
     </Reference>
-    <Reference Include="ZimLabs.TableCreator, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZimLabs.TableCreator.1.1.1\lib\netstandard2.0\ZimLabs.TableCreator.dll</HintPath>
+    <Reference Include="ZimLabs.TableCreator, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZimLabs.TableCreator.1.2.0\lib\netstandard2.0\ZimLabs.TableCreator.dll</HintPath>
     </Reference>
     <Reference Include="ZimLabs.WpfBase, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ZimLabs.WpfBase.0.1.3\lib\net472\ZimLabs.WpfBase.dll</HintPath>
@@ -128,15 +128,15 @@
     <Compile Include="Business\PackageInfo.cs" />
     <Compile Include="DataObjects\Arguments.cs" />
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
-    <Compile Include="DataObjects\CodeType.cs" />
+    <Compile Include="DataObjects\Types\CodeType.cs" />
     <Compile Include="DataObjects\CustomEnums.cs" />
-    <Compile Include="DataObjects\DataType.cs" />
+    <Compile Include="DataObjects\Types\DataType.cs" />
     <Compile Include="DataObjects\DescriptionValueAttribute.cs" />
-    <Compile Include="DataObjects\FlyOutType.cs" />
+    <Compile Include="DataObjects\Types\FlyOutType.cs" />
     <Compile Include="DataObjects\KeyColumn.cs" />
     <Compile Include="DataObjects\ReferenceEntry.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
-    <Compile Include="DataObjects\SelectionType.cs" />
+    <Compile Include="DataObjects\Types\SelectionType.cs" />
     <Compile Include="DataObjects\Settings.cs" />
     <Compile Include="DataObjects\TableColumn.cs" />
     <Compile Include="DataObjects\TableIgnoreEntry.cs" />
@@ -156,7 +156,7 @@
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
     <Compile Include="ViewModel\DataTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
-    <Compile Include="ViewModel\InfoWindowViewModel.cs" />
+    <Compile Include="ViewModel\InfoControlViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
     <Compile Include="ViewModel\SettingsControlViewModel.cs" />
@@ -171,8 +171,8 @@
     <Compile Include="View\ExportTableTypeDialog.xaml.cs">
       <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\InfoWindow.xaml.cs">
-      <DependentUpon>InfoWindow.xaml</DependentUpon>
+    <Compile Include="View\InfoControl.xaml.cs">
+      <DependentUpon>InfoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -239,7 +239,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\InfoWindow.xaml">
+    <Page Include="View\InfoControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -277,6 +277,7 @@
   <ItemGroup>
     <None Include="Data\Queries\Search.sql" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if $(ConfigurationName) == Release (

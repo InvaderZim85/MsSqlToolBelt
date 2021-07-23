@@ -287,7 +287,7 @@ namespace MsSqlToolBelt.ViewModel
             foreach (var type in _tableTypes)
             {
                 sb.AppendLine($"## {type.Name}");
-                var content = TableCreator.CreateTable(type.Columns, OutputType.Markdown);
+                var content = type.Columns.CreateTable(OutputType.Markdown);
                 sb.AppendLine(content);
 
                 // Add one empty line add the end

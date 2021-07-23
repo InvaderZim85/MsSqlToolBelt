@@ -6,9 +6,9 @@ using MsSqlToolBelt.DataObjects;
 namespace MsSqlToolBelt.ViewModel
 {
     /// <summary>
-    /// Provides the logic of the info window
+    /// Provides the logic for the <see cref="View.InfoControl"/>
     /// </summary>
-    internal sealed class InfoWindowViewModel : ViewModelBase
+    internal sealed class InfoControlViewModel : ViewModelBase
     {
         /// <summary>
         /// Backing field for <see cref="ReferenceList"/>
@@ -27,7 +27,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Loads and shows the data
         /// </summary>
-        public async void Load()
+        public async void InitViewModel()
         {
             try
             {

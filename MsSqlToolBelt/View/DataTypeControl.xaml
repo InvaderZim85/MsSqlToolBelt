@@ -12,37 +12,56 @@
     <UserControl.DataContext>
         <ViewModel:DataTypeControlViewModel />
     </UserControl.DataContext>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Border Style="{StaticResource BorderStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <DataGrid
-            Grid.Row="0"
-            IsReadOnly="True"
-            ItemsSource="{Binding TypeList}">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding SqlType}"
-                    Header="SQL type" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding CSharpType}"
-                    Header="C# type" />
-            </DataGrid.Columns>
-        </DataGrid>
+            <DataGrid
+                Grid.Row="0"
+                IsReadOnly="True"
+                ItemsSource="{Binding TypeList}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding SqlType}"
+                        Header="SQL type" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding CSharpType}"
+                        Header="C# type" />
+                </DataGrid.Columns>
+            </DataGrid>
 
-        <Separator Grid.Row="1" />
+            <Separator Grid.Row="1" />
 
-        <Button
-            Grid.Row="2"
-            Width="100"
-            Margin="3"
-            HorizontalAlignment="Right"
-            Command="{Binding ExportCommand}"
-            Content="Export as CSV" />
-    </Grid>
+            <StackPanel
+                Grid.Row="2"
+                FlowDirection="RightToLeft"
+                Orientation="Horizontal">
+                <Button
+                    Width="100"
+                    Margin="3"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ExportTextCommand}"
+                    Content="Export as text" />
+                <Button
+                    Width="100"
+                    Margin="3"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ExportMdCommand}"
+                    Content="Export as MD" />
+                <Button
+                    Width="100"
+                    Margin="3"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ExportCsvCommand}"
+                    Content="Export as CSV" />
+            </StackPanel>
+
+        </Grid>
+    </Border>
 </UserControl>

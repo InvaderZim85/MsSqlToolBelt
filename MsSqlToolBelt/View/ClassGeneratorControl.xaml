@@ -9,6 +9,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    xmlns:Types="clr-namespace:MsSqlToolBelt.DataObjects.Types"
     d:DesignHeight="600"
     d:DesignWidth="1200"
     mah:DialogParticipation.Register="{Binding}"
@@ -75,7 +76,6 @@
                 <Button
                     Grid.Row="5"
                     Width="60"
-                    Margin="3"
                     HorizontalAlignment="Left"
                     Command="{Binding ReloadCommand}"
                     Content="Reload" />
@@ -83,7 +83,7 @@
             </Grid>
         </Border>
 
-        <GridSplitter Grid.Column="1" />
+        <GridSplitter Grid.Column="1" Style="{StaticResource VerticalSplitter}" />
 
         <!--  Columns  -->
         <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
@@ -124,21 +124,18 @@
                 <StackPanel Grid.Row="4" Orientation="Horizontal">
                     <Button
                         Width="80"
-                        Margin="3"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static dataObjects:SelectionType.All}"
+                        CommandParameter="{x:Static Types:SelectionType.All}"
                         Content="Select all"
                         ToolTip="Checks all entries" />
                     <Button
                         Width="80"
-                        Margin="3"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static dataObjects:SelectionType.None}"
+                        CommandParameter="{x:Static Types:SelectionType.None}"
                         Content="Select none"
                         ToolTip="Uncheck all entries" />
                     <Button
                         Width="80"
-                        Margin="3"
                         Command="{Binding ClearAliasCommand}"
                         Content="Clear"
                         ToolTip="Clears the alias values" />
@@ -146,7 +143,7 @@
             </Grid>
         </Border>
 
-        <GridSplitter Grid.Column="3" />
+        <GridSplitter Grid.Column="3" Style="{StaticResource VerticalSplitter}" />
 
         <!--  Editor  -->
         <Border Grid.Column="4" Style="{StaticResource BorderStyle}">
@@ -191,7 +188,6 @@
 
                 <Button
                     Grid.Row="0"
-                    Margin="3"
                     HorizontalAlignment="Right"
                     Command="{Binding GenerateCommand}"
                     Content="Generate" />
@@ -224,15 +220,13 @@
                     Orientation="Horizontal">
                     <Button
                         Width="50"
-                        Margin="3"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static dataObjects:CodeType.CSharp}"
+                        CommandParameter="{x:Static Types:CodeType.CSharp}"
                         Content="Clear" />
                     <Button
                         Width="50"
-                        Margin="3"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static dataObjects:CodeType.CSharp}"
+                        CommandParameter="{x:Static Types:CodeType.CSharp}"
                         Content="Copy" />
                 </StackPanel>
 
@@ -264,238 +258,16 @@
                     Orientation="Horizontal">
                     <Button
                         Width="50"
-                        Margin="3"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static dataObjects:CodeType.Sql}"
+                        CommandParameter="{x:Static Types:CodeType.Sql}"
                         Content="Clear" />
                     <Button
                         Width="50"
-                        Margin="3"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static dataObjects:CodeType.Sql}"
+                        CommandParameter="{x:Static Types:CodeType.Sql}"
                         Content="Copy" />
                 </StackPanel>
             </Grid>
         </Border>
     </Grid>
-
-    <!--<Border Style="{StaticResource BorderStyle}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="1.5*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="2*" />
-            </Grid.ColumnDefinitions>
-
-    -->
-    <!--  Table list  -->
-    <!--
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Label
-                    Grid.Row="0"
-                    HorizontalAlignment="Left"
-                    Content="{Binding TableHeader}"
-                    FontWeight="Bold" />
-
-                <DataGrid
-                    Grid.Row="1"
-                    Margin="3"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding TableList}"
-                    SelectedItem="{Binding SelectedTable}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Name}"
-                            Header="Name" />
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <TextBox
-                    Grid.Row="2"
-                    Margin="3"
-                    Mah:TextBoxHelper.Watermark="Search..."
-                    Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}">
-                    <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
-                    </TextBox.InputBindings>
-                </TextBox>
-            </Grid>
-
-    -->
-    <!--  Columns  -->
-    <!--
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Label
-                    Grid.Row="0"
-                    HorizontalAlignment="Left"
-                    Content="{Binding ColumnHeader}"
-                    FontWeight="Bold" />
-
-                <DataGrid
-                    Grid.Row="1"
-                    Margin="3"
-                    ItemsSource="{Binding Columns}">
-                    <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Column}"
-                            Header="Name"
-                            IsReadOnly="True" />
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Alias}"
-                            Header="Alias" />
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <Button
-                        Width="80"
-                        Margin="3"
-                        Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static DataObjects:SelectionType.All}"
-                        Content="Select all"
-                        ToolTip="Checks all entries" />
-                    <Button
-                        Width="80"
-                        Margin="3"
-                        Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static DataObjects:SelectionType.None}"
-                        Content="Select none"
-                        ToolTip="Uncheck all entries" />
-                    <Button
-                        Width="80"
-                        Margin="3"
-                        Command="{Binding ClearAliasCommand}"
-                        Content="Clear"
-                        ToolTip="Clears the alias values" />
-                </StackPanel>
-            </Grid>
-
-            <GridSplitter
-                Grid.Column="2"
-                Width="3"
-                HorizontalAlignment="Stretch" />
-
-    -->
-    <!--  Editor  -->
-    <!--
-            <Grid Grid.Column="3">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBox
-                        Width="200"
-                        Margin="3"
-                        Mah:TextBoxHelper.Watermark="Class name (only for the c# class)"
-                        Text="{Binding ClassName}" />
-                    <CheckBox
-                        Margin="3"
-                        Content="With backing field"
-                        IsChecked="{Binding CreateBackingField}" />
-                </StackPanel>
-
-                <Button
-                    Grid.Row="0"
-                    Margin="3"
-                    HorizontalAlignment="Right"
-                    Command="{Binding GenerateCommand}"
-                    Content="Generate" />
-
-                <Label
-                    Grid.Row="1"
-                    HorizontalAlignment="Left"
-                    Content="C# class" />
-
-
-                <Avalonedit:TextEditor
-                    Name="_codeEditor"
-                    Grid.Row="2"
-                    Margin="3"
-                    BorderBrush="Black"
-                    BorderThickness="1"
-                    FontFamily="Hack,Consolas"
-                    FontSize="12"
-                    IsReadOnly="True"
-                    ShowLineNumbers="True" />
-
-                <StackPanel
-                    Grid.Row="3"
-                    FlowDirection="RightToLeft"
-                    Orientation="Horizontal">
-                    <Button
-                        Width="50"
-                        Margin="3"
-                        Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
-                        Content="Clear" />
-                    <Button
-                        Width="50"
-                        Margin="3"
-                        Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.CSharp}"
-                        Content="Copy" />
-                </StackPanel>
-
-                <Label
-                    Grid.Row="4"
-                    HorizontalAlignment="Left"
-                    Content="Sql query" />
-
-
-                <Avalonedit:TextEditor
-                    Name="_sqlEditor"
-                    Grid.Row="5"
-                    Margin="3"
-                    BorderBrush="Black"
-                    BorderThickness="1"
-                    FontFamily="Hack,Consolas"
-                    FontSize="12"
-                    IsReadOnly="True"
-                    ShowLineNumbers="True" />
-
-                <StackPanel
-                    Grid.Row="6"
-                    FlowDirection="RightToLeft"
-                    Orientation="Horizontal">
-                    <Button
-                        Width="50"
-                        Margin="3"
-                        Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
-                        Content="Clear" />
-                    <Button
-                        Width="50"
-                        Margin="3"
-                        Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static DataObjects:CodeType.Sql}"
-                        Content="Copy" />
-                </StackPanel>
-            </Grid>
-        </Grid>
-
-    </Border>-->
 </UserControl>

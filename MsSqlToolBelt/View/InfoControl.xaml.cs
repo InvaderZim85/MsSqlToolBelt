@@ -1,31 +1,30 @@
 ﻿using System.Diagnostics;
-using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Navigation;
-using MahApps.Metro.Controls;
 using MsSqlToolBelt.ViewModel;
 
 namespace MsSqlToolBelt.View
 {
     /// <summary>
-    /// Interaction logic for InfoWindow.xaml
+    /// Interaction logic for InfoControl.xaml
     /// </summary>
-    public partial class InfoWindow : MetroWindow
+    public partial class InfoControl : UserControl
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="InfoWindow"/>
+        /// Creates a new instance of the <see cref="InfoControl"/>
         /// </summary>
-        public InfoWindow()
+        public InfoControl()
         {
             InitializeComponent();
         }
 
         /// <summary>
-        /// Occurs when the window was loaded
+        /// Init the control
         /// </summary>
-        private void InfoWindow_OnLoaded(object sender, RoutedEventArgs e)
+        public void InitControl()
         {
-            if (DataContext is InfoWindowViewModel viewModel)
-                viewModel.Load();
+            if (DataContext is InfoControlViewModel viewModel)
+                viewModel.InitViewModel();
         }
 
         /// <summary>

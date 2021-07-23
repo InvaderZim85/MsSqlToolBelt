@@ -7,6 +7,7 @@ using System.Timers;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.View;
 using Serilog;
 using ZimLabs.Database.MsSql;
@@ -264,6 +265,25 @@ namespace MsSqlToolBelt.ViewModel
             }
         }
 
+        /// <summary>
+        /// Backing field for <see cref="InfoOpen"/>
+        /// </summary>
+        private bool _infoOpen;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the info fly out is open
+        /// </summary>
+        public bool InfoOpen
+        {
+            get => _infoOpen;
+            set
+            {
+                SetField(ref _infoOpen, value);
+                if (value)
+                    _initFlyOut(FlyOutType.Info);
+            }
+        }
+
         #endregion
 
 
@@ -342,8 +362,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         public ICommand InfoCommand => new DelegateCommand(() =>
         {
-            var infoWindow = new InfoWindow { Owner = Application.Current.MainWindow };
-            infoWindow.ShowDialog();
+            InfoOpen = !InfoOpen;
         });
 
         /// <summary>
@@ -351,9 +370,6 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         public ICommand SettingsCommand => new DelegateCommand(() =>
         {
-            //var settingsWindow = new SettingsWindow {Owner = Application.Current.MainWindow};
-            //settingsWindow.ShowDialog();
-
             SettingsOpen = !SettingsOpen;
         });
 

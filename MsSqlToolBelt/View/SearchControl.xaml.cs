@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ICSharpCode.AvalonEdit.Search;
@@ -19,7 +22,7 @@ namespace MsSqlToolBelt.View
         public SearchControl()
         {
             InitializeComponent();
-            SearchPanel.Install(SqlEditor);
+            SearchPanel.Install(_sqlEditor);
         }
 
         /// <summary>
@@ -38,8 +41,8 @@ namespace MsSqlToolBelt.View
         /// <param name="text">The desired text</param>
         private void SetSqlText(string text)
         {
-            SqlEditor.Text = text;
-            SqlEditor.ScrollToHome();
+            _sqlEditor.Text = text;
+            _sqlEditor.ScrollToHome();
         }
 
         /// <summary>
@@ -47,7 +50,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void SetSqlSchema()
         {
-            Helper.InitAvalonEditor(SqlEditor);
+            Helper.InitAvalonEditor(_sqlEditor);
         }
 
         /// <summary>
@@ -55,7 +58,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         public void InitControl()
         {
-            if (!(DataContext is SearchControlViewModel viewModel))
+            if (DataContext is not SearchControlViewModel viewModel)
                 return;
 
             viewModel.InitViewModel(SetSqlText);
@@ -67,10 +70,20 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!(ResultGrid.SelectedItem is SearchResult result))
+            var items = new List<SearchResult>();
+
+            foreach (var item in _resultGrid.SelectedItems)
+            {
+                if (item is not SearchResult result)
+                    continue;
+
+                items.Add(result);
+            }
+
+            if (!items.Any())
                 return;
 
-            Clipboard.SetText(result.Name);
+            Clipboard.SetText(string.Join(Environment.NewLine, items.Select(s => s.Name).Distinct().OrderBy(o => o)));
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿namespace MsSqlToolBelt.DataObjects.Types
 {
     /// <summary>
     /// Provides the different fly out types
@@ -13,6 +13,11 @@
         /// <summary>
         /// The data type fly out
         /// </summary>
-        DataTypes
+        DataTypes,
+
+        /// <summary>
+        /// The info fly out
+        /// </summary>
+        Info
     }
 }

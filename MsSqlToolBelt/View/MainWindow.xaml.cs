@@ -3,6 +3,7 @@ using System.Windows;
 using CommandLine;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
 
@@ -93,6 +94,9 @@ namespace MsSqlToolBelt.View
                     break;
                 case FlyOutType.DataTypes:
                     _dataTypeControl.InitControl();
+                    break;
+                case FlyOutType.Info:
+                    _infoControl.InitControl();
                     break;
             }
         }

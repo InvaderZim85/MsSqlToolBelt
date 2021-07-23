@@ -23,7 +23,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="5" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -62,7 +62,6 @@
                 <Button
                     Grid.Row="0"
                     Grid.Column="2"
-                    Margin="3"
                     Command="{Binding SearchCommand}"
                     Content="Search"
                     IsEnabled="{Binding SearchEnabled}" />
@@ -102,7 +101,7 @@
                 </StackPanel>
 
                 <DataGrid
-                    Name="ResultGrid"
+                    Name="_resultGrid"
                     Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
@@ -138,28 +137,22 @@
                     Orientation="Horizontal">
                     <Button
                         Width="80"
-                        Margin="3"
                         Command="{Binding SelectAllCommand}"
                         Content="Select all" />
                     <Button
                         Width="80"
-                        Margin="3"
                         Command="{Binding DeselectAllCommand}"
                         Content="Deselect all" />
                 </StackPanel>
                 <Button
                     Grid.Row="5"
                     Grid.Column="2"
-                    Margin="3"
                     Command="{Binding ExportCommand}"
                     Content="Export" />
             </Grid>
         </Border>
 
-        <GridSplitter
-            Grid.Row="1"
-            Height="3"
-            HorizontalAlignment="Stretch" />
+        <GridSplitter Grid.Row="1" Style="{StaticResource HorizontalSplitter}" />
 
         <Border
             Grid.Row="2"
@@ -180,7 +173,7 @@
                     Content="Preview" />
                 <Separator Grid.Row="1" Margin="3" />
                 <avalonedit:TextEditor
-                    Name="SqlEditor"
+                    Name="_sqlEditor"
                     Grid.Row="2"
                     BorderBrush="Black"
                     BorderThickness="1"
@@ -194,7 +187,6 @@
                 <Button
                     Grid.Row="4"
                     Width="64"
-                    Margin="3"
                     HorizontalAlignment="Right"
                     Command="{Binding CopyCommand}"
                     Content="Copy" />
@@ -210,6 +202,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label
@@ -267,6 +261,19 @@
                             Header="Primary key" />
                     </DataGrid.Columns>
                 </DataGrid>
+
+                <Separator Grid.Row="3" Margin="3" />
+
+                <StackPanel
+                    Grid.Row="4"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button Command="{Binding SaveAsTableCommand}" Content="Save as text table" />
+
+                    <Button Command="{Binding SaveAsMdTableCommand}" Content="Save as MD table" />
+
+                    <Button Command="{Binding SaveAsCsvTableCommand}" Content="Save as CSV table" />
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

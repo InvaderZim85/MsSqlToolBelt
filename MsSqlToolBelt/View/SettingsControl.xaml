@@ -63,23 +63,22 @@
                     Content="Server list"
                     Style="{StaticResource Headline}" />
 
-                <ListView
+                <DataGrid
                     Grid.Row="3"
                     Grid.RowSpan="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="3"
+                    IsReadOnly="True"
                     ItemsSource="{Binding ServerList}"
                     SelectedItem="{Binding SelectedServer}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn
-                                Width="300"
-                                DisplayMemberBinding="{Binding}"
-                                Header="Filter" />
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding}"
+                            Header="Server" />
+                    </DataGrid.Columns>
+                </DataGrid>
 
                 <StackPanel
                     Grid.Row="5"
@@ -88,12 +87,10 @@
                     Orientation="Horizontal">
                     <Button
                         Width="90"
-                        Margin="3"
                         Command="{Binding DeleteServerCommand}"
                         Content="Delete server" />
                     <Button
                         Width="90"
-                        Margin="3"
                         Command="{Binding AddServerCommand}"
                         Content="Add server" />
                 </StackPanel>
@@ -123,26 +120,25 @@
                     Content="Ignore list"
                     Style="{StaticResource Headline}" />
 
-                <ListView
+                <DataGrid
                     Grid.Row="1"
                     Grid.RowSpan="2"
                     Grid.Column="1"
                     Margin="3"
+                    IsReadOnly="True"
                     ItemsSource="{Binding TableIgnoreList}"
                     SelectedItem="{Binding SelectedIgnoreEntry}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn
-                                Width="100"
-                                DisplayMemberBinding="{Binding FilterTypeView}"
-                                Header="Filter" />
-                            <GridViewColumn
-                                Width="200"
-                                DisplayMemberBinding="{Binding Value}"
-                                Header="Value" />
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="100"
+                            Binding="{Binding FilterTypeView}"
+                            Header="Filter" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Value}"
+                            Header="Value" />
+                    </DataGrid.Columns>
+                </DataGrid>
 
                 <StackPanel
                     Grid.Row="3"
@@ -168,12 +164,10 @@
                     Orientation="Horizontal">
                     <Button
                         Width="90"
-                        Margin="3"
                         Command="{Binding DeleteFilterCommand}"
                         Content="Delete filter" />
                     <Button
                         Width="90"
-                        Margin="3"
                         Command="{Binding AddFilterCommand}"
                         Content="Add filter" />
                 </StackPanel>
@@ -183,7 +177,6 @@
         <Button
             Grid.Row="2"
             Width="90"
-            Margin="3"
             HorizontalAlignment="Right"
             Command="{Binding SaveSettingsCommand}"
             Content="Save" />
