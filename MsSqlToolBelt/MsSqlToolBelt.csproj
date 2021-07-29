@@ -128,12 +128,13 @@
     <Compile Include="Business\PackageInfo.cs" />
     <Compile Include="DataObjects\Arguments.cs" />
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
+    <Compile Include="DataObjects\Search\TableIndex.cs" />
     <Compile Include="DataObjects\Types\CodeType.cs" />
     <Compile Include="DataObjects\CustomEnums.cs" />
     <Compile Include="DataObjects\Types\DataType.cs" />
     <Compile Include="DataObjects\DescriptionValueAttribute.cs" />
     <Compile Include="DataObjects\Types\FlyOutType.cs" />
-    <Compile Include="DataObjects\KeyColumn.cs" />
+    <Compile Include="DataObjects\Search\KeyColumn.cs" />
     <Compile Include="DataObjects\ReferenceEntry.cs" />
     <Compile Include="DataObjects\Search\SearchResult.cs" />
     <Compile Include="DataObjects\Types\SelectionType.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
     <Compile Include="ViewModel\SettingsControlViewModel.cs" />
+    <Compile Include="ViewModel\TableIndexWindowViewModel.cs" />
     <Compile Include="ViewModel\TableTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ClassGeneratorControl.xaml.cs">
@@ -182,6 +184,9 @@
     </Compile>
     <Compile Include="View\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TableIndexWindow.xaml.cs">
+      <DependentUpon>TableIndexWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\TableTypeControl.xaml.cs">
       <DependentUpon>TableTypeControl.xaml</DependentUpon>
@@ -252,6 +257,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\SettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TableIndexWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

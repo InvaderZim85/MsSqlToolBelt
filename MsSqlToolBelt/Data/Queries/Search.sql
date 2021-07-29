@@ -1,4 +1,6 @@
-﻿DECLARE @result TABLE
+﻿--DECLARE @search NVARCHAR(50) = '%tab_Product_VendorVariant%';
+
+DECLARE @result TABLE
 (
     [Id] INT NOT NULL,
     [Name] NVARCHAR(200) NOT NULL,
@@ -80,15 +82,45 @@ WHERE
 ORDER BY
     r.[Type];
 
+-- Table column information
+DECLARE @tableResult TABLE
+(
+    [Table] SYSNAME NOT NULL,
+    [Column] SYSNAME NOT NULL,
+    [DataType] NVARCHAR(128) NULL,
+    ColumnPosition INT NULL,
+    Nullable VARCHAR(3) NULL,
+    [MaxLength] INT NOT NULL,
+    [Precision] INT NOT NULL,
+    DecimalPlaceValue INT NOT NULL,
+    DefaultValue NVARCHAR(50) NULL,
+    IsReplicated BIT NOT NULL DEFAULT (0)
+);
+
+INSERT INTO @tableResult
+(
+    [Table],
+    [Column],
+    DataType,
+    ColumnPosition,
+    Nullable,
+    [MaxLength],
+    [Precision],
+    DecimalPlaceValue,
+    DefaultValue,
+    IsReplicated
+)
 SELECT DISTINCT
     c.TABLE_NAME AS [Table],
     c.COLUMN_NAME AS [Column],
-    c.DATA_TYPE AS [DataType],
+    c.DATA_TYPE AS DataType,
     c.ORDINAL_POSITION AS ColumnPosition,
     c.IS_NULLABLE AS Nullable,
     COALESCE(c.CHARACTER_MAXIMUM_LENGTH, 0) AS [MaxLength],
     COALESCE(c.NUMERIC_PRECISION, c.DATETIME_PRECISION, 0) AS [Precision],
-    COALESCE(c.NUMERIC_SCALE, 0) AS DecimalPlaceValue
+    COALESCE(c.NUMERIC_SCALE, 0) AS DecimalPlaceValue,
+    '',
+    0
 FROM
     INFORMATION_SCHEMA.COLUMNS AS c
 
@@ -99,6 +131,34 @@ FROM
     LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
     ON tc.TABLE_NAME = c.TABLE_NAME;
 
+-- Replication / default information
+UPDATE
+    tr
+SET
+    tr.IsReplicated = c.is_replicated,
+    tr.DefaultValue = REPLACE(REPLACE(ISNULL(OBJECT_DEFINITION(c.default_object_id), 'NULL'), '(', ''), ')', '') -- Remove the brackets
+FROM
+    @tableResult AS tr
+
+    INNER JOIN sys.columns AS c
+    ON c.object_id = OBJECT_ID(tr.[Table])
+    AND c.[name] = tr.[Column];
+
+SELECT
+    [Table],
+    [Column],
+    DataType,
+    ColumnPosition,
+    Nullable,
+    [MaxLength],
+    [Precision],
+    DecimalPlaceValue,
+    ISNULL(DefaultValue, 'NULL') AS DefaultValue,
+    IsReplicated
+FROM
+    @tableResult;
+
+-- Primary key information
 SELECT DISTINCT
     tc.TABLE_NAME AS [Table],
     ccu.COLUMN_NAME AS [Column]
@@ -111,3 +171,19 @@ FROM
 
     LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE AS ccu
     ON ccu.TABLE_NAME = tc.TABLE_NAME;
+
+-- Index
+SELECT
+    i.[name] AS [Name],
+    r.[Name] AS [Table],
+    COL_NAME(ic.object_id, ic.column_id) AS [Column]
+FROM
+    sys.indexes AS i
+
+    INNER JOIN sys.index_columns AS ic
+    ON ic.object_id = i.object_id
+    AND ic.index_id = i.index_id
+
+    INNER JOIN @result AS r
+    ON OBJECT_ID(r.[Name]) = i.object_id
+    AND r.[Type] = 'Table'

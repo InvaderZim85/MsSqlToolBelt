@@ -119,7 +119,7 @@
                         <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Export}" />
                         <DataGridTextColumn
                             Width="*"
-                            Binding="{Binding Name}"
+                            Binding="{Binding NameView}"
                             Header="Name"
                             IsReadOnly="True" />
                         <DataGridTextColumn
@@ -143,6 +143,13 @@
                         Width="80"
                         Command="{Binding DeselectAllCommand}"
                         Content="Deselect all" />
+
+                    <Separator />
+
+                    <Button
+                        Command="{Binding ShowTableIndicesCommand}"
+                        Content="Show indices"
+                        IsEnabled="{Binding ShowIndices}" />
                 </StackPanel>
                 <Button
                     Grid.Row="5"
@@ -255,10 +262,22 @@
                             Width="Auto"
                             Binding="{Binding NullableView, Mode=OneWay}"
                             Header="Nullable" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding DefaultValue}"
+                            Header="Default" />
                         <DataGridCheckBoxColumn
                             Width="Auto"
                             Binding="{Binding IsPrimaryKey}"
                             Header="Primary key" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding UsedInIndex}"
+                            Header="Used in index" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsReplicated}"
+                            Header="Replicated" />
                     </DataGrid.Columns>
                 </DataGrid>
 

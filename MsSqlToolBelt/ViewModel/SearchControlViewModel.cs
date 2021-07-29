@@ -11,6 +11,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.View;
 using ZimLabs.Database.MsSql;
 using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
@@ -103,6 +104,7 @@ namespace MsSqlToolBelt.ViewModel
 
                 if (value == null)
                 {
+                    ShowIndices = false;
                     ShowTable = false;
                     ShowDefinition = true;
                     TableColumns = new ObservableCollection<TableColumn>();
@@ -111,12 +113,14 @@ namespace MsSqlToolBelt.ViewModel
 
                 if (value.IsTable)
                 {
+                    ShowIndices = value.Indices.Any();
                     ShowTable = true;
                     ShowDefinition = false;
                     TableColumns = new ObservableCollection<TableColumn>(value.Columns.OrderBy(o => o.ColumnPosition));
                 }
                 else
                 {
+                    ShowIndices = false;
                     ShowTable = false;
                     ShowDefinition = true;
                     TableColumns = new ObservableCollection<TableColumn>();
@@ -213,6 +217,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="ShowIndices"/>
+        /// </summary>
+        private bool _showIndices;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the "show indices" button should be active
+        /// </summary>
+        public bool ShowIndices
+        {
+            get => _showIndices;
+            set => SetField(ref _showIndices, value);
+        }
+
+        /// <summary>
         /// Backing field for <see cref="TableColumns"/>
         /// </summary>
         private ObservableCollection<TableColumn> _tableColumns = new();
@@ -293,6 +311,11 @@ namespace MsSqlToolBelt.ViewModel
         public ICommand SaveAsCsvTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Csv));
 
         /// <summary>
+        /// The command to show the list with the table indices
+        /// </summary>
+        public ICommand ShowTableIndicesCommand => new DelegateCommand(ShowTableIndices);
+
+        /// <summary>
         /// Performs the search for the given value
         /// </summary>
         private async void PerformSearch()
@@ -301,7 +324,7 @@ namespace MsSqlToolBelt.ViewModel
                 return;
 
             SearchEnabled = false;
-            var controller = await ShowProgress("Search", "Please wait while searching...");
+            var controller = await ShowProgress("Search", $"Please wait while searching for '{Search}'...");
 
             try
             {
@@ -450,6 +473,18 @@ namespace MsSqlToolBelt.ViewModel
             Result = new ObservableCollection<SearchResult>();
             SelectedResult = null;
             _setSqlText("");
+        }
+
+        /// <summary>
+        /// Shows the list with the table indices
+        /// </summary>
+        private void ShowTableIndices()
+        {
+            if (SelectedResult == null || !SelectedResult.Indices.Any())
+                return;
+
+            var dialog = new TableIndexWindow(SelectedResult.Indices) {Owner = Application.Current.MainWindow};
+            dialog.Show();
         }
     }
 }

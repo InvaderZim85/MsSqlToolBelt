@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.DataObjects.Search
@@ -17,6 +18,16 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// Gets or sets the name of the procedure / table
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets the name of the procedure / table (only needed for the view)
+        /// </summary>
+        public string NameView =>
+            IsTable 
+                ? Columns.Any(a => a.IsReplicated) 
+                    ? $"{Name} (marked for replication)" 
+                    : Name 
+                : Name;
 
         /// <summary>
         /// Gets or sets the definition of the search result
@@ -81,5 +92,10 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// Gets or sets the list of table columns
         /// </summary>
         public List<TableColumn> Columns { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets the list with the indices
+        /// </summary>
+        public List<TableIndex> Indices { get; set; } = new();
     }
 }

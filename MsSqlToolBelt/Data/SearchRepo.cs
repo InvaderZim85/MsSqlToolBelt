@@ -70,6 +70,7 @@ namespace MsSqlToolBelt.Data
             var results = multiResult.Read<SearchResult>().ToList();
             var columns = multiResult.Read<TableColumn>().ToList();
             var keyColumns = multiResult.Read<KeyColumn>().ToList();
+            var indices = multiResult.Read<TableIndex>().ToList();
 
             if (columns.Any() && keyColumns.Any())
             {
@@ -84,6 +85,33 @@ namespace MsSqlToolBelt.Data
             {
                 entry.Definition = "";
                 entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
+
+                // Combine the indices for the table and add the result to the search result
+                var tableIndices = indices.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
+
+                if (!tableIndices.Any())
+                    continue;
+
+                var indexNames = tableIndices.Select(s => s.Name).Distinct();
+
+                foreach (var index in indexNames.OrderBy(o => o))
+                {
+                    var indexColumns = tableIndices.Where(w => w.Name.Equals(index)).Select(s => s.Column).ToList();
+                    entry.Indices.Add(new TableIndex
+                    {
+                        Name = index,
+                        Table = entry.Name,
+                        Column = string.Join(", ", indexColumns.OrderBy(o => o))
+                    });
+
+                    foreach (var entryColumn in indexColumns
+                        .Select(indexColumn =>
+                            entry.Columns.FirstOrDefault(f => f.Column.EqualsIgnoreCase(indexColumn)))
+                        .Where(entryColumn => entryColumn != null))
+                    {
+                        entryColumn.UsedInIndex = true;
+                    }
+                }
             }
 
             results.Add(SearchJobs(searchString));
@@ -235,55 +263,6 @@ namespace MsSqlToolBelt.Data
             job.Definition = sb.ToString();
 
             return job;
-        }
-
-        /// <summary>
-        /// Creates the column information for a table
-        /// </summary>
-        /// <param name="columns">The list with the columns</param>
-        /// <returns>The table "definition"</returns>
-        private string CreateTableDefinition(List<TableColumn> columns)
-        {
-            var tableName = columns.FirstOrDefault()?.Table;
-
-            if (string.IsNullOrEmpty(tableName))
-                return "-- Columns missing";
-
-            var sb = new StringBuilder();
-            sb.AppendLine("/*");
-            sb.AppendLine($" * Columns of '{tableName}'");
-
-            var longestColumnName = columns.Max(m => m.Column.Length);
-            if (longestColumnName < 6)
-                longestColumnName = 6;
-
-            var longestType = columns.Max(m => m.DataType.Length);
-            if (longestType < 4)
-                longestType = 4;
-
-            PrintHorizontalLine();
-            sb.AppendLine($" * | Nr | {"Column".PadRight(longestColumnName)} | {"Type".PadRight(longestType)} |");
-            PrintHorizontalLine();
-
-            var count = 1;
-            foreach (var column in columns)
-            {
-                //sb.AppendLine($" * {count++} - {column.Column} ({column.DataType})");
-                sb.AppendLine(
-                    $" * | {count++,2} | {column.Column.PadRight(longestColumnName)} | {column.DataType.PadRight(longestType)} |");
-            }
-            PrintHorizontalLine();
-            sb.AppendLine(" *");
-            sb.AppendLine(" * For more information of the table execute the following command:");
-            sb.AppendLine("*/");
-            sb.AppendLine($"EXEC sys.sp_help @objname = N'{tableName}'");
-
-            void PrintHorizontalLine()
-            {
-                sb.AppendLine($" * +----+-{"-".PadRight(longestColumnName, '-')}-+-{"-".PadRight(longestType, '-')}-+");
-            }
-
-            return sb.ToString();
         }
 
         /// <summary>

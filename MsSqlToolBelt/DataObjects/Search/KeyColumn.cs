@@ -1,4 +1,4 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿namespace MsSqlToolBelt.DataObjects.Search
 {
     /// <summary>
     /// Provides the table and the column name of a key column

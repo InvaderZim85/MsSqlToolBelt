@@ -100,5 +100,20 @@ namespace MsSqlToolBelt.DataObjects
         /// Gets or sets the value which indicates if the column is a part of / or is the primary key
         /// </summary>
         public bool IsPrimaryKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the column is marked for the replication
+        /// </summary>
+        public bool IsReplicated { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default value of the column
+        /// </summary>
+        public string DefaultValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the column is used in an index
+        /// </summary>
+        public bool UsedInIndex { get; set; }
     }
 }
