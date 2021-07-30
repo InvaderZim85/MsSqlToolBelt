@@ -5,5 +5,11 @@
     <Setting Name="ServerList" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="BaseColor" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Dark</Value>
+    </Setting>
+    <Setting Name="ColorTheme" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Emerald</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

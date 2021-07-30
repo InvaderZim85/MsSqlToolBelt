@@ -24,5 +24,14 @@ namespace MsSqlToolBelt.View
             if (DataContext is SettingsControlViewModel viewModel)
                 viewModel.InitViewModel();
         }
+
+        /// <summary>
+        /// Sets the theme to the saved values
+        /// </summary>
+        public void SetThemeDefault()
+        {
+            if (DataContext is SettingsControlViewModel viewModel)
+                viewModel.ChangeTheme(true);
+        }
     }
 }

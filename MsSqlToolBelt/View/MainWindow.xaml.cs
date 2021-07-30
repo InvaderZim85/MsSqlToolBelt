@@ -116,5 +116,15 @@ namespace MsSqlToolBelt.View
 
             Parser.Default.ParseArguments<Arguments>(_args).WithParsed(a => viewModel.AutoConnect(a));
         }
+
+        /// <summary>
+        /// Occurs when the fly out was closed
+        /// </summary>
+        /// <param name="sender">The settings fly out</param>
+        /// <param name="e">The event arguments</param>
+        private void Flyout_OnClosingFinished(object sender, RoutedEventArgs e)
+        {
+            _settingsControl?.SetThemeDefault();
+        }
     }
 }

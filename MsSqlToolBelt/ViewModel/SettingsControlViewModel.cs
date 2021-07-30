@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
@@ -14,6 +16,75 @@ namespace MsSqlToolBelt.ViewModel
     /// </summary>
     internal sealed class SettingsControlViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Contains the value which indicates if the control was initialized
+        /// </summary>
+        private bool _init = true;
+
+        /// <summary>
+        /// Backing field for <see cref="BaseColorList"/>
+        /// </summary>
+        private ObservableCollection<string> _baseColorList;
+
+        /// <summary>
+        /// Gets or sets the list with the base colors
+        /// </summary>
+        public ObservableCollection<string> BaseColorList
+        {
+            get => _baseColorList;
+            set => SetField(ref _baseColorList, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedBaseColor"/>
+        /// </summary>
+        private string _selectedBaseColor;
+
+        /// <summary>
+        /// Gets or sets the selected base color (light / dark)
+        /// </summary>
+        public string SelectedBaseColor
+        {
+            get => _selectedBaseColor;
+            set
+            {
+                if (SetField(ref _selectedBaseColor, value))
+                    ChangeTheme();
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ColorThemeList"/>
+        /// </summary>
+        private ObservableCollection<string> _colorThemeList;
+
+        /// <summary>
+        /// Gets or sets the list with the color themes
+        /// </summary>
+        public ObservableCollection<string> ColorThemeList
+        {
+            get => _colorThemeList;
+            set => SetField(ref _colorThemeList, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedColorTheme"/>
+        /// </summary>
+        private string _selectedColorTheme;
+
+        /// <summary>
+        /// Gets or sets the selected color theme
+        /// </summary>
+        public string SelectedColorTheme
+        {
+            get => _selectedColorTheme;
+            set
+            {
+                if (SetField(ref _selectedColorTheme, value))
+                    ChangeTheme();
+            }
+        }
+
         /// <summary>
         /// Backing field for <see cref="ServerListCount"/>
         /// </summary>
@@ -190,6 +261,14 @@ namespace MsSqlToolBelt.ViewModel
                     ServerList = new ObservableCollection<string>(settings.ServerList);
                     TableIgnoreList = new ObservableCollection<TableIgnoreEntry>(settings.TableIgnoreList);
                 }
+
+                BaseColorList = new ObservableCollection<string>(ThemeManager.Current.BaseColors);
+                ColorThemeList = new ObservableCollection<string>(ThemeManager.Current.ColorSchemes);
+
+                SelectedBaseColor = Properties.Settings.Default.BaseColor;
+                SelectedColorTheme = Properties.Settings.Default.ColorTheme;
+
+                _init = false;
             }
             catch (Exception ex)
             {
@@ -206,6 +285,15 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
+                if (!string.IsNullOrEmpty(SelectedBaseColor))
+                    Properties.Settings.Default.BaseColor = SelectedBaseColor;
+
+                if (!string.IsNullOrEmpty(SelectedColorTheme))
+                    Properties.Settings.Default.ColorTheme = SelectedColorTheme;
+
+                Properties.Settings.Default.Save();
+
+
                 var settings = new Settings
                 {
                     ServerListCount = ServerListCount,
@@ -320,6 +408,29 @@ namespace MsSqlToolBelt.ViewModel
 
             TableIgnoreList.Remove(SelectedIgnoreEntry);
             SelectedIgnoreEntry = null;
+        }
+
+        /// <summary>
+        /// Changes the current theme
+        /// </summary>
+        /// <param name="toDefault">Sets the default color</param>
+        public void ChangeTheme(bool toDefault = false)
+        {
+            if (_init)
+                return;
+
+            var baseColor = toDefault
+                ? Properties.Settings.Default.BaseColor
+                : string.IsNullOrEmpty(SelectedBaseColor)
+                    ? Properties.Settings.Default.BaseColor
+                    : SelectedBaseColor;
+            var colorTheme = toDefault
+                ? Properties.Settings.Default.ColorTheme
+                : string.IsNullOrEmpty(SelectedColorTheme)
+                    ? Properties.Settings.Default.ColorTheme
+                    : SelectedColorTheme;
+
+            ThemeManager.Current.ChangeTheme(Application.Current, baseColor, colorTheme);
         }
     }
 }

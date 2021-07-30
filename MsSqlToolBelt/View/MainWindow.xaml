@@ -46,6 +46,7 @@
         <mah:FlyoutsControl>
             <mah:Flyout
                 Width="600"
+                ClosingFinished="Flyout_OnClosingFinished"
                 Header="Settings"
                 IsOpen="{Binding SettingsOpen}"
                 Position="Right">
