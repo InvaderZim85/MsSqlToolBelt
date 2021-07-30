@@ -58,36 +58,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <param name="outputType">The desired output type</param>
         private void ExportAs(OutputType outputType)
         {
-            var filter = new CommonFileDialogFilter("Text file", "*.txt");
-            var defaultExtension = "txt";
-            var title = "Saves as ASCII styled table (text file)";
-
-            switch (outputType)
-            {
-                case OutputType.Csv:
-                    filter = new CommonFileDialogFilter("CSV file", "*.csv");
-                    defaultExtension = "csv";
-                    title = "Save as CSV file";
-                    break;
-                case OutputType.Markdown:
-                    filter = new CommonFileDialogFilter("Markdown file", "*.md");
-                    defaultExtension = "md";
-                    title = "Save as markdown table";
-                    break;
-            }
-
-            var dialog = new CommonSaveFileDialog
-            {
-                Title = title,
-                DefaultFileName = "DataTypes",
-                DefaultExtension = defaultExtension,
-                Filters = {filter}
-            };
-
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-                return;
-
-            TypeList.SaveTable(dialog.FileName, Encoding.UTF8, outputType);
+            TypeList.Export("DataTypes", outputType);
         }
     }
 }

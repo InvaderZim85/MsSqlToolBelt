@@ -430,7 +430,7 @@ namespace MsSqlToolBelt.ViewModel
                     ? Properties.Settings.Default.ColorTheme
                     : SelectedColorTheme;
 
-            ThemeManager.Current.ChangeTheme(Application.Current, baseColor, colorTheme);
+            Helper.SetColorTheme(baseColor, colorTheme);
         }
     }
 }

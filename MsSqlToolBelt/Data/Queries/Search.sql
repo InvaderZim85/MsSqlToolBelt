@@ -1,4 +1,4 @@
-﻿--DECLARE @search NVARCHAR(50) = '%tab_Product_VendorVariant%';
+﻿-- DECLARE @search NVARCHAR(50) = '%Author%';
 
 DECLARE @result TABLE
 (
@@ -54,6 +54,7 @@ WHERE
 
 UNION
 
+-- Add the tables
 SELECT DISTINCT
     t.object_id,
     t.[name],
@@ -68,13 +69,19 @@ WHERE
     t.[Name] LIKE @search
     OR c.[name] LIKE @search;
 
+-- Return the result
 SELECT
     r.Id,
     r.[Name],
     r.[Definition],
-    r.[Type]
+    r.[Type],
+    o.create_date AS CreationDateTime,
+    o.modify_date AS ModifiedDateTime
 FROM
     @result r
+
+    INNER JOIN sys.objects AS o
+    ON o.object_id = r.Id
 WHERE
     r.[Name] NOT LIKE 'syncobj%'
     AND r.[Name] NOT LIKE '%_CT'
