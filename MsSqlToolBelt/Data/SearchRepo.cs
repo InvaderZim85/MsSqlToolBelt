@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Dapper;
 using MsSqlToolBelt.Data.Queries;
 using MsSqlToolBelt.DataObjects;
@@ -58,19 +59,26 @@ namespace MsSqlToolBelt.Data
         /// <param name="value">The value to search for</param>
         /// <param name="matchWholeWord">true to match only the whole word, otherwise false</param>
         /// <returns>The result</returns>
-        public List<SearchResult> Search(string value, bool matchWholeWord)
+        public async Task<List<SearchResult>> SearchAsync(string value, bool matchWholeWord)
         {
             var searchString = $"%{value}%";
 
-            var multiResult = _connector.Connection.QueryMultiple(QueryManager.Search, new
+            static async Task<List<T>> ReadResult<T>(SqlMapper.GridReader reader)
+            {
+                var result = await reader.ReadAsync<T>();
+
+                return result.ToList();
+            }
+
+            var multiResult = await _connector.Connection.QueryMultipleAsync(QueryManager.Search, new
             {
                 search = searchString
             });
 
-            var results = multiResult.Read<SearchResult>().ToList();
-            var columns = multiResult.Read<TableColumn>().ToList();
-            var keyColumns = multiResult.Read<KeyColumn>().ToList();
-            var indices = multiResult.Read<TableIndex>().ToList();
+            var searchResults = await ReadResult<SearchResult>(multiResult);
+            var columns = await ReadResult<TableColumn>(multiResult);
+            var keyColumns = await ReadResult<KeyColumn>(multiResult);
+            var indices = await ReadResult<TableIndex>(multiResult);
 
             if (columns.Any() && keyColumns.Any())
             {
@@ -81,7 +89,7 @@ namespace MsSqlToolBelt.Data
                 }
             }
 
-            foreach (var entry in results.Where(w => w.Type == "Table"))
+            foreach (var entry in searchResults.Where(w => w.Type == "Table"))
             {
                 entry.Definition = "";
                 entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
@@ -114,15 +122,15 @@ namespace MsSqlToolBelt.Data
                 }
             }
 
-            results.Add(SearchJobs(searchString));
-            results.AddRange(SearchJobSteps(searchString));
+            searchResults.Add(SearchJobs(searchString));
+            searchResults.AddRange(SearchJobSteps(searchString));
 
             if (!matchWholeWord) 
-                return results.Where(w => w != null).ToList();
+                return searchResults.Where(w => w != null).ToList();
 
             var regex = new Regex($@"(^|\s|\.){value}(\s|$)");
 
-            return results.Where(w =>
+            return searchResults.Where(w =>
                 w != null &&
                 (regex.IsMatch(w.Name) || regex.IsMatch(w.Definition))).ToList();
         }

@@ -328,7 +328,7 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                _originResult = await Task.Run(() => _repo.Search(Search, MatchWholeWord));
+                _originResult = await _repo.SearchAsync(Search, MatchWholeWord);
 
                 var typeList = new List<string> {"All"};
                 typeList.AddRange(_originResult.Select(s => s.Type).Distinct());

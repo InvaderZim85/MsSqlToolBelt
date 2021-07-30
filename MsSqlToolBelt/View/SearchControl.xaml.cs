@@ -49,10 +49,9 @@ namespace MsSqlToolBelt.View
         /// <summary>
         /// Sets the sql schema of the editor window
         /// </summary>
-        /// <param name="dark">true to use the dark schema, false to use the light schema</param>
-        private void SetSqlSchema(bool dark)
+        private void SetSqlSchema()
         {
-            Helper.InitAvalonEditor(_sqlEditor, dark);
+            Helper.InitAvalonEditor(_sqlEditor);
         }
 
         /// <summary>
@@ -64,11 +63,11 @@ namespace MsSqlToolBelt.View
                 return;
 
             viewModel.InitViewModel(SetSqlText);
-            SetSqlSchema(Properties.Settings.Default.BaseColor.Equals("Dark"));
+            SetSqlSchema();
 
-            ThemeManager.Current.ThemeChanged += delegate (object sender, ThemeChangedEventArgs args)
+            ThemeManager.Current.ThemeChanged += delegate
             {
-                SetSqlSchema(args.NewTheme.BaseColorScheme.Equals("Dark"));
+                SetSqlSchema();
             };
         }
 

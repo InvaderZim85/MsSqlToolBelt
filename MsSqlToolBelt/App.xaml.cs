@@ -12,9 +12,14 @@ namespace MsSqlToolBelt
     public partial class App : Application
     {
         /// <summary>
-        /// THe instance of the main window
+        /// The instance of the main window
         /// </summary>
         private MainWindow _application;
+
+        /// <summary>
+        /// Contains the startup time
+        /// </summary>
+        private DateTime _startUp;
 
         /// <summary>
         /// Occurs when the app is starting
@@ -23,6 +28,7 @@ namespace MsSqlToolBelt
         /// <param name="e">The event arguments</param>
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
+            _startUp = DateTime.Now;
             Helper.InitLogger();
 
             try
@@ -31,6 +37,9 @@ namespace MsSqlToolBelt
 
                 _application = new MainWindow(e.Args);
                 _application.Show();
+
+                // Set the color theme
+                Helper.SetColorTheme();
             }
             catch (Exception ex)
             {
@@ -48,7 +57,8 @@ namespace MsSqlToolBelt
             if (_application.DataContext is MainWindowViewModel viewModel)
                 viewModel.StopTimer();
 
-            Log.Information("Close application.");
+            var duration = DateTime.Now - _startUp;
+            Log.Information("Close application after {duration}", duration);
             Log.CloseAndFlush();
         }
     }

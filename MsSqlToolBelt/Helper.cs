@@ -2,9 +2,11 @@
 using System.IO;
 using System.Linq;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Media;
 using System.Xml;
 using ControlzEx.Theming;
@@ -65,12 +67,28 @@ namespace MsSqlToolBelt
         }
 
         /// <summary>
+        /// Sets the color theme of the application
+        /// </summary>
+        /// <param name="baseColor">The name of the base color (optional, if empty, the saved base color will be used)</param>
+        /// <param name="colorTheme">The name of the color theme (optional, if empty, the saved color theme will be used)</param>
+        public static void SetColorTheme(string baseColor = "", string colorTheme = "")
+        {
+            if (string.IsNullOrEmpty(baseColor))
+                baseColor = Properties.Settings.Default.BaseColor;
+
+            if (string.IsNullOrEmpty(colorTheme))
+                colorTheme = Properties.Settings.Default.ColorTheme;
+
+            ThemeManager.Current.ChangeTheme(Application.Current, baseColor, colorTheme);
+        }
+
+        /// <summary>
         /// Init the avalon editor
         /// </summary>
         /// <param name="editor">The desired editor</param>
-        /// <param name="dark">true to set the dark schema, false to set the light schema</param>
-        public static void InitAvalonEditor(TextEditor editor, bool dark)
+        public static void InitAvalonEditor(TextEditor editor)
         {
+            var dark = Properties.Settings.Default.BaseColor.Equals("Dark");
             editor.Options.HighlightCurrentLine = true;
             editor.SyntaxHighlighting = LoadSqlSchema(dark);
             editor.Foreground = new SolidColorBrush(dark ? Colors.White : Colors.Black);
@@ -218,6 +236,16 @@ namespace MsSqlToolBelt
             var name = assembly.GetName().Name;
 
             return $"{name} // Version: {version} // {buildDate}";
+        }
+
+        /// <summary>
+        /// Opens the explorer and selects the specified file
+        /// </summary>
+        /// <param name="path">The path of the file</param>
+        public static void ShowInExplorer(string path)
+        {
+            var arguments = $"/select, \"{path}\"";
+            Process.Start("explorer.exe", arguments);
         }
 
         #region Extensions

@@ -326,7 +326,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <param name="args">The arguments</param>
         public void AutoConnect(Arguments args)
         {
-            if (args == null)
+            if (args == null || string.IsNullOrEmpty(args.Server) && string.IsNullOrEmpty(args.Database))
                 return;
 
             Log.Information($"Perform auto connect. Parameters: {args}");

@@ -53,10 +53,10 @@ namespace MsSqlToolBelt.View
         private void SetSchema()
         {
             // Sql editor
-            Helper.InitAvalonEditor(SqlEditor, Properties.Settings.Default.BaseColor.Equals("Dark"));
+            Helper.InitAvalonEditor(SqlEditor);
 
             // CSharp editor
-            Helper.InitAvalonEditor(CodeEditor, Properties.Settings.Default.BaseColor.Equals("Dark"));
+            Helper.InitAvalonEditor(CodeEditor);
         }
 
         /// <summary>
