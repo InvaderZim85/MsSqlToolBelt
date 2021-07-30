@@ -170,6 +170,7 @@
     <Compile Include="Data\TableTypeRepo.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
+    <Compile Include="ViewModel\DataExport.cs" />
     <Compile Include="ViewModel\DataTypeControlViewModel.cs" />
     <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoControlViewModel.cs" />

@@ -95,40 +95,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private void SaveAsTable(OutputType outputType)
         {
-            if (TableIndices == null)
-                return;
-
-            var filter = new CommonFileDialogFilter("Text file", "*.txt");
-            var defaultExtension = "txt";
-            var title = "Saves as ASCII styled table (text file)";
-
-            switch (outputType)
-            {
-                case OutputType.Csv:
-                    filter = new CommonFileDialogFilter("CSV file", "*.csv");
-                    defaultExtension = "csv";
-                    title = "Save as CSV file";
-                    break;
-                case OutputType.Markdown:
-                    filter = new CommonFileDialogFilter("Markdown file", "*.md");
-                    defaultExtension = "md";
-                    title = "Save as markdown table";
-                    break;
-            }
-
-            var dialog = new CommonSaveFileDialog
-            {
-                Title = title,
-                Filters = { filter },
-                DefaultExtension = defaultExtension,
-                DefaultFileName = $"{_tableName}_Indices"
-            };
-
-            // TableColumns
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-                return;
-
-            TableIndices.SaveTable(dialog.FileName, Encoding.UTF8, outputType);
+            TableIndices.Export($"{_tableName}_Indices", outputType);
         }
     }
 }

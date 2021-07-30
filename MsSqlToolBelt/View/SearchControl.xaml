@@ -118,9 +118,24 @@
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Export}" />
                         <DataGridTextColumn
-                            Width="*"
+                            Width="1.5*"
                             Binding="{Binding NameView}"
                             Header="Name"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Info}"
+                            Header="Info"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Width="125"
+                            Binding="{Binding CreationDateTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                            Header="Creation"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Width="125"
+                            Binding="{Binding ModifiedDateTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
+                            Header="Modified"
                             IsReadOnly="True" />
                         <DataGridTextColumn
                             Width="100"

@@ -305,7 +305,7 @@ namespace MsSqlToolBelt.ViewModel
 
             LoadServerList();
 
-            Header = $"MsSqlToolBelt - V{Assembly.GetExecutingAssembly().GetName().Version}";
+            Header = $"MsSqlToolBelt - v{Assembly.GetExecutingAssembly().GetName().Version}";
             BuildInfo = Helper.GetBuildData();
 
             _memoryTimer = new Timer(1000);

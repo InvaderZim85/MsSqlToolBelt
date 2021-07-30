@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ZimLabs.WpfBase;
 
@@ -22,12 +23,15 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// <summary>
         /// Gets the name of the procedure / table (only needed for the view)
         /// </summary>
-        public string NameView =>
-            IsTable 
-                ? Columns.Any(a => a.IsReplicated) 
-                    ? $"{Name} (marked for replication)" 
-                    : Name 
-                : Name;
+        public string NameView
+        {
+            get
+            {
+                Info = IsTable && Columns.Any(a => a.IsReplicated) ? "Marked for replication" : "";
+
+                return Name;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the definition of the search result
@@ -82,6 +86,21 @@ namespace MsSqlToolBelt.DataObjects.Search
             get => _export;
             set => SetField(ref _export, value);
         }
+
+        /// <summary>
+        /// Gets or sets the info of the entry
+        /// </summary>
+        public string Info { get; set; }
+
+        /// <summary>
+        /// Gets or sets the creation date / time
+        /// </summary>
+        public DateTime CreationDateTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the modification date / time
+        /// </summary>
+        public DateTime ModifiedDateTime { get; set; }
 
         /// <summary>
         /// Gets the value which indicates if the result represents a table
