@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.ViewModel;
@@ -48,9 +49,10 @@ namespace MsSqlToolBelt.View
         /// <summary>
         /// Sets the sql schema of the editor window
         /// </summary>
-        private void SetSqlSchema()
+        /// <param name="dark">true to use the dark schema, false to use the light schema</param>
+        private void SetSqlSchema(bool dark)
         {
-            Helper.InitAvalonEditor(_sqlEditor);
+            Helper.InitAvalonEditor(_sqlEditor, dark);
         }
 
         /// <summary>
@@ -62,7 +64,12 @@ namespace MsSqlToolBelt.View
                 return;
 
             viewModel.InitViewModel(SetSqlText);
-            SetSqlSchema();
+            SetSqlSchema(Properties.Settings.Default.BaseColor.Equals("Dark"));
+
+            ThemeManager.Current.ThemeChanged += delegate (object sender, ThemeChangedEventArgs args)
+            {
+                SetSqlSchema(args.NewTheme.BaseColorScheme.Equals("Dark"));
+            };
         }
 
         /// <summary>

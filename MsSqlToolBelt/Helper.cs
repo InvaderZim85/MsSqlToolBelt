@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Media;
 using System.Xml;
+using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
@@ -67,11 +68,12 @@ namespace MsSqlToolBelt
         /// Init the avalon editor
         /// </summary>
         /// <param name="editor">The desired editor</param>
-        public static void InitAvalonEditor(TextEditor editor)
+        /// <param name="dark">true to set the dark schema, false to set the light schema</param>
+        public static void InitAvalonEditor(TextEditor editor, bool dark)
         {
             editor.Options.HighlightCurrentLine = true;
-            editor.SyntaxHighlighting = LoadSqlSchema(true);
-            editor.Foreground = new SolidColorBrush(Colors.White);
+            editor.SyntaxHighlighting = LoadSqlSchema(dark);
+            editor.Foreground = new SolidColorBrush(dark ? Colors.White : Colors.Black);
         }
 
         /// <summary>
