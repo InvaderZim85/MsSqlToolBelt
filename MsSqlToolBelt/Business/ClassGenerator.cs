@@ -25,13 +25,14 @@ namespace MsSqlToolBelt.Business
         /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
         /// <param name="className">The name of the desired class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
+        /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField)
+        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass)
         {
             if (table == null)
                 throw new ArgumentNullException(nameof(table));
 
-            var classCode = GenerateClass(table.Columns, modifier, markAsSealed, string.IsNullOrEmpty(className) ? table.Name : className, backingField);
+            var classCode = GenerateClass(table, modifier, markAsSealed, className, backingField, efClass);
 
             var sql = GenerateSqlQuery(table);
 
@@ -41,22 +42,28 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Generates the code of the CSharp class
         /// </summary>
-        /// <param name="columns">The list with the columns</param>
+        /// <param name="table">The table with the needed information</param>
         /// <param name="modifier">The modifier of the class</param>
         /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
         /// <param name="className">The name of the class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
+        /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
         /// <returns>The CSharp code</returns>
-        private static string GenerateClass(List<TableColumn> columns, string modifier, bool markAsSealed, string className, bool backingField)
+        private static string GenerateClass(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass)
         {
             var sb = new StringBuilder();
 
+            if (string.IsNullOrEmpty(className))
+                className = table.Name;
+
+            if (efClass)
+                sb.AppendLine($"[Table(\"{table.Name}\")]");
             sb.AppendLine($"{modifier} {(markAsSealed ? "sealed " : "")}class {className.FirstCharToUpper()}");
             sb.AppendLine("{");
 
             var count = 1;
-            var columnCount = columns.Count(c => c.Use);
-            foreach (var column in columns.Where(w => w.Use))
+            var columnCount = table.Columns.Count(c => c.Use);
+            foreach (var column in table.Columns.Where(w => w.Use))
             {
                 var fieldName = string.IsNullOrEmpty(column.Alias) ? column.Column.Replace(" ", "") : column.Alias;
                 if (fieldName.IsNumeric())
@@ -69,6 +76,9 @@ namespace MsSqlToolBelt.Business
                     var field = $"_{fieldName.FirstCharToLower()}";
 
                     sb.AppendLine($"{Tab}private {dataType} {field};");
+                    if (efClass && !string.IsNullOrEmpty(column.Alias))
+                        sb.AppendLine($"{Tab}[Column(\"{column.Column}\")]");
+
                     sb.AppendLine($"{Tab}public {dataType} {fieldName}");
                     sb.AppendLine($"{Tab}{{");
                     sb.AppendLine($"{Tab}{Tab}get => {field};");
@@ -77,6 +87,8 @@ namespace MsSqlToolBelt.Business
                 }
                 else
                 {
+                    if (efClass && !string.IsNullOrEmpty(column.Alias))
+                        sb.AppendLine($"{Tab}[Column(\"{column.Column}\")]");
                     sb.AppendLine($"{Tab}public {dataType} {fieldName} {{ get; set; }}");
                 }
 

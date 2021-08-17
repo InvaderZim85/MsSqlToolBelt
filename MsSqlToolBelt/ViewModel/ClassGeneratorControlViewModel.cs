@@ -172,6 +172,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="EfClass"/>
+        /// </summary>
+        private bool _efClass;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if an entity framework class should be created
+        /// </summary>
+        public bool EfClass
+        {
+            get => _efClass;
+            set => SetField(ref _efClass, value);
+        }
+
+        /// <summary>
         /// Backing field for <see cref="TableHeader"/>
         /// </summary>
         private string _tableHeader = "Tables";
@@ -331,7 +345,7 @@ namespace MsSqlToolBelt.ViewModel
 
                 var (classCode, sqlStatement) = await Task.Run(() =>
                     ClassGenerator.Generate(SelectedTable, SelectedModifier, MarkAsSealed, ClassName,
-                        CreateBackingField));
+                        CreateBackingField, EfClass));
 
                 _setCode(classCode, CodeType.CSharp);
                 _setCode(sqlStatement, CodeType.Sql);
