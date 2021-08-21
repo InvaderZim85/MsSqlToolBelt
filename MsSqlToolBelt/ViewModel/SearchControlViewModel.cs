@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -245,12 +244,71 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="SaveAsTypes"/>
+        /// </summary>
+        private ObservableCollection<TextValueItem> _saveAsTypes;
+
+        /// <summary>
+        /// Gets or sets the list with the save types
+        /// </summary>
+        public ObservableCollection<TextValueItem> SaveAsTypes
+        {
+            get => _saveAsTypes;
+            private set => SetField(ref _saveAsTypes, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedSaveType"/>
+        /// </summary>
+        private TextValueItem _selectedSaveType;
+
+        /// <summary>
+        /// Gets or sets the selected save type
+        /// </summary>
+        public TextValueItem SelectedSaveType
+        {
+            get => _selectedSaveType;
+            set => SetField(ref _selectedSaveType, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SaveAsTypes"/>
+        /// </summary>
+        private ObservableCollection<TextValueItem> _copyAsTypes;
+
+        /// <summary>
+        /// Gets or sets the list with the save types
+        /// </summary>
+        public ObservableCollection<TextValueItem> CopyAsTypes
+        {
+            get => _copyAsTypes;
+            set => SetField(ref _copyAsTypes, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedCopyType"/>
+        /// </summary>
+        private TextValueItem _selectedCopyType;
+
+        /// <summary>
+        /// Gets or sets the selected copy type
+        /// </summary>
+        public TextValueItem SelectedCopyType
+        {
+            get => _selectedCopyType;
+            set => SetField(ref _selectedCopyType, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setSqlText">The method to set the sql text</param>
         public void InitViewModel(Action<string> setSqlText)
         {
             _setSqlText = setSqlText;
+
+            SaveAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Save as"));
+            CopyAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Copy as"));
         }
 
         /// <summary>
@@ -298,17 +356,12 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The command to save the table definition as table
         /// </summary>
-        public ICommand SaveAsTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Default));
+        public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
-        /// The command to save the table definition as markdown table
+        /// The command to copy the table to the clipboard
         /// </summary>
-        public ICommand SaveAsMdTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Markdown));
-
-        /// <summary>
-        /// The command to save the table definition as csv table
-        /// </summary>
-        public ICommand SaveAsCsvTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Csv));
+        public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
 
         /// <summary>
         /// The command to show the list with the table indices
@@ -412,12 +465,27 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Saves the table information as table
         /// </summary>
-        private void SaveAsTable(OutputType outputType)
+        private void SaveAs()
         {
-            if (SelectedResult == null)
+            if (SelectedSaveType is null)
                 return;
 
-            TableColumns.Export($"{SelectedResult.Name}Table", outputType);
+            var type = (OutputType)SelectedSaveType.Id;
+
+            TableColumns.Export($"{SelectedResult.Name}Table", type);
+        }
+
+        /// <summary>
+        /// Copies the table to the clipboard
+        /// </summary>
+        private void CopyAs()
+        {
+            if (SelectedCopyType is null)
+                return;
+
+            var type = (OutputType)SelectedCopyType.Id;
+
+            Clipboard.SetText(TableColumns.CreateTable(type));
         }
 
         /// <summary>
