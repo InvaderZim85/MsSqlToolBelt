@@ -1,9 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.IO;
-using System.Text;
 using System.Windows.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
@@ -35,30 +31,42 @@ namespace MsSqlToolBelt.ViewModel
         public void InitViewModel()
         {
             TypeList = new ObservableCollection<DataType>(Helper.DataTypes);
+
+            InitSaveCopyTypes();
         }
 
         /// <summary>
-        /// The command to export the data type list as a text file
+        /// The command to copy the table to the clipboard
         /// </summary>
-        public ICommand ExportTextCommand => new DelegateCommand(() => ExportAs(OutputType.Default));
+        public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
 
         /// <summary>
-        /// The command to export the data type list as a CSV file
+        /// The command to save the table definition as table
         /// </summary>
-        public ICommand ExportCsvCommand => new DelegateCommand(() => ExportAs(OutputType.Csv));
+        public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
-        /// The command to export the data type list as a markdown file
+        /// Copies the table to the clipboard
         /// </summary>
-        public ICommand ExportMdCommand => new DelegateCommand(() => ExportAs(OutputType.Markdown));
-
-        /// <summary>
-        /// Exports the data type list as a csv file
-        /// </summary>
-        /// <param name="outputType">The desired output type</param>
-        private void ExportAs(OutputType outputType)
+        private void CopyAs()
         {
-            TypeList.Export("DataTypes", outputType);
+            if (SelectedCopyType is null)
+                return;
+
+            var type = (OutputType)SelectedCopyType.Id;
+
+            CopyValues(type, TypeList);
+        }
+
+        /// <summary>
+        /// Saves the table information as table
+        /// </summary>
+        private void SaveAs()
+        {
+            if (SelectedSaveType is null)
+                return;
+
+            SaveValues((OutputType)SelectedSaveType.Id, TypeList, "DataTypes");
         }
     }
 }

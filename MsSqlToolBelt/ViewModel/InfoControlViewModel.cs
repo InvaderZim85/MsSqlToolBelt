@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text;
 using System.Windows.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects;
 using ZimLabs.TableCreator;
@@ -45,24 +43,19 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
-        /// The command to export the data type list as a text file
-        /// </summary>
-        public ICommand ExportTextCommand => new DelegateCommand(() => ExportAs(OutputType.Default));
-
-        /// <summary>
-        /// The command to export the data type list as a CSV file
-        /// </summary>
-        public ICommand ExportCsvCommand => new DelegateCommand(() => ExportAs(OutputType.Csv));
-
-        /// <summary>
-        /// The command to export the data type list as a markdown file
-        /// </summary>
-        public ICommand ExportMdCommand => new DelegateCommand(() => ExportAs(OutputType.Markdown));
-
-        /// <summary>
         /// The command to open the log directory
         /// </summary>
         public ICommand OpenLogDirCommand => new DelegateCommand(OpenLogDirectory);
+
+        /// <summary>
+        /// The command to copy the table to the clipboard
+        /// </summary>
+        public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
+
+        /// <summary>
+        /// The command to save the table definition as table
+        /// </summary>
+        public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
         /// Loads and shows the data
@@ -76,20 +69,13 @@ namespace MsSqlToolBelt.ViewModel
                 ReferenceList = new ObservableCollection<ReferenceEntry>(referenceList);
 
                 LogDir = Path.Combine(Helper.GetBaseFolder(), "logs");
+
+                InitSaveCopyTypes();
             }
             catch (Exception ex)
             {
                 await ShowError(ex);
             }
-        }
-
-        /// <summary>
-        /// Exports the data type list as a csv file
-        /// </summary>
-        /// <param name="outputType">The desired output type</param>
-        private void ExportAs(OutputType outputType)
-        {
-            ReferenceList.Export("NugetPackages", outputType);
         }
 
         /// <summary>
@@ -101,6 +87,30 @@ namespace MsSqlToolBelt.ViewModel
                 return;
 
             Helper.ShowInExplorer(LogDir);
+        }
+
+        /// <summary>
+        /// Copies the table to the clipboard
+        /// </summary>
+        private void CopyAs()
+        {
+            if (SelectedCopyType is null)
+                return;
+
+            var type = (OutputType)SelectedCopyType.Id;
+
+            CopyValues(type, ReferenceList);
+        }
+
+        /// <summary>
+        /// Saves the table information as table
+        /// </summary>
+        private void SaveAs()
+        {
+            if (SelectedSaveType is null)
+                return;
+
+            SaveValues((OutputType)SelectedSaveType.Id, ReferenceList, "NugetPackages");
         }
     }
 }

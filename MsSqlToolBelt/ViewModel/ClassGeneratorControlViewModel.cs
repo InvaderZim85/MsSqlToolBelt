@@ -228,6 +228,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="AddSummary"/>
+        /// </summary>
+        private bool _addSummary;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the user want's to add a summary
+        /// </summary>
+        public bool AddSummary
+        {
+            get => _addSummary;
+            set => SetField(ref _addSummary, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setCode">The method to set the code</param>
@@ -312,9 +326,9 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await Task.Run(() => _repo.LoadTables().OrderBy(o => o.Name).ToList());
+                var result = await _repo.LoadTables();
 
-                _originTableList = result;
+                _originTableList = result.OrderBy(o => o.Name).ToList();
 
                 FilterList();
             }
@@ -345,7 +359,7 @@ namespace MsSqlToolBelt.ViewModel
 
                 var (classCode, sqlStatement) = await Task.Run(() =>
                     ClassGenerator.Generate(SelectedTable, SelectedModifier, MarkAsSealed, ClassName,
-                        CreateBackingField, EfClass));
+                        CreateBackingField, EfClass, AddSummary));
 
                 _setCode(classCode, CodeType.CSharp);
                 _setCode(sqlStatement, CodeType.Sql);

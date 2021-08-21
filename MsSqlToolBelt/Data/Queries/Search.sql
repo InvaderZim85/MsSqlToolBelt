@@ -166,18 +166,45 @@ FROM
     @tableResult;
 
 -- Primary key information
-SELECT DISTINCT
-    tc.TABLE_NAME AS [Table],
-    ccu.COLUMN_NAME AS [Column]
+DECLARE @pkValues TABLE
+(
+    [Database] SYSNAME NOT NULL,
+    [Schema] SYSNAME NOT NULL,
+    [Table] SYSNAME NOT NULL,
+    [Column] SYSNAME NOT NULL,
+    [KeySeq] SMALLINT NOT NULL,
+    [PkName] SYSNAME NOT NULL
+);
+
+-- Cursor to get the information of all pk keys
+DECLARE @tableName SYSNAME;
+
+DECLARE TableCursor CURSOR FOR
+SELECT
+    r.[Name]
 FROM
-    INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc
+    @result AS r;
 
-    INNER JOIN @result AS r
-    ON r.[Name] = tc.TABLE_NAME
-    AND r.[Type] = 'Table'
+OPEN TableCursor;
 
-    LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE AS ccu
-    ON ccu.TABLE_NAME = tc.TABLE_NAME;
+FETCH NEXT FROM TableCursor INTO @tableName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    INSERT INTO @pkValues
+    EXEC sp_pkeys @table_name = @tableName;
+    FETCH NEXT FROM TableCursor INTO @tableName;
+END;
+
+-- House keeping
+CLOSE TableCursor;
+DEALLOCATE TableCursor;
+
+SELECT
+    [Table],
+    [Column]
+FROM
+    @pkValues;
 
 -- Index
 SELECT
@@ -193,4 +220,4 @@ FROM
 
     INNER JOIN @result AS r
     ON OBJECT_ID(r.[Name]) = i.object_id
-    AND r.[Type] = 'Table'
+    AND r.[Type] = 'Table';

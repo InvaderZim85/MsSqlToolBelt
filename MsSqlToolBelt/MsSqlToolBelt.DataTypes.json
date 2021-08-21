@@ -1,7 +1,7 @@
 [
     {
         "SqlType": "BGINT",
-        "CSharpType": "Int64" 
+        "CSharpType": "long" 
     },
     {
         "SqlType": "BINARY",
@@ -94,6 +94,10 @@
     {
         "SqlType": "SMALLMONEY",
         "CSharpType": "decimal"
+    },
+    {
+        "SqlType": "SYSNAME",
+        "CSharpType": "string" 
     },
     {
         "SqlType": "SQL_VARIANT",

@@ -244,59 +244,31 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
-        /// Backing field for <see cref="SaveAsTypes"/>
+        /// Backing field for <see cref="SelectedSaveAsTypeSearchResult"/>
         /// </summary>
-        private ObservableCollection<TextValueItem> _saveAsTypes;
+        private TextValueItem _selectedSaveAsTypeSearchResult;
 
         /// <summary>
-        /// Gets or sets the list with the save types
+        /// Gets or sets the selected save as type for the export of the search result
         /// </summary>
-        public ObservableCollection<TextValueItem> SaveAsTypes
+        public TextValueItem SelectedSaveAsTypeSearchResult
         {
-            get => _saveAsTypes;
-            private set => SetField(ref _saveAsTypes, value);
+            get => _selectedSaveAsTypeSearchResult;
+            set => SetField(ref _selectedSaveAsTypeSearchResult, value);
         }
 
         /// <summary>
-        /// Backing field for <see cref="SelectedSaveType"/>
+        /// Backing field for <see cref="SelectedCopyAsTypeSearchResult"/>
         /// </summary>
-        private TextValueItem _selectedSaveType;
+        private TextValueItem _selectedCopyAsTypeSearchResult;
 
         /// <summary>
-        /// Gets or sets the selected save type
+        /// Gets or sets the selected copy as type for the export of the search result
         /// </summary>
-        public TextValueItem SelectedSaveType
+        public TextValueItem SelectedCopyAsTypeSearchResult
         {
-            get => _selectedSaveType;
-            set => SetField(ref _selectedSaveType, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="SaveAsTypes"/>
-        /// </summary>
-        private ObservableCollection<TextValueItem> _copyAsTypes;
-
-        /// <summary>
-        /// Gets or sets the list with the save types
-        /// </summary>
-        public ObservableCollection<TextValueItem> CopyAsTypes
-        {
-            get => _copyAsTypes;
-            set => SetField(ref _copyAsTypes, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="SelectedCopyType"/>
-        /// </summary>
-        private TextValueItem _selectedCopyType;
-
-        /// <summary>
-        /// Gets or sets the selected copy type
-        /// </summary>
-        public TextValueItem SelectedCopyType
-        {
-            get => _selectedCopyType;
-            set => SetField(ref _selectedCopyType, value);
+            get => _selectedCopyAsTypeSearchResult;
+            set => SetField(ref _selectedCopyAsTypeSearchResult, value);
         }
 
         /// <summary>
@@ -307,8 +279,7 @@ namespace MsSqlToolBelt.ViewModel
         {
             _setSqlText = setSqlText;
 
-            SaveAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Save as"));
-            CopyAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Copy as"));
+            InitSaveCopyTypes();
         }
 
         /// <summary>
@@ -359,9 +330,19 @@ namespace MsSqlToolBelt.ViewModel
         public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
+        /// The command to save the search result as table
+        /// </summary>
+        public ICommand SaveAsResultCommand => new DelegateCommand(SaveAsSearchResult);
+
+        /// <summary>
         /// The command to copy the table to the clipboard
         /// </summary>
         public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
+
+        /// <summary>
+        /// The command to copy the search result to the clipboard
+        /// </summary>
+        public ICommand CopyAsResultCommand => new DelegateCommand(CopyAsSearchResult);
 
         /// <summary>
         /// The command to show the list with the table indices
@@ -470,9 +451,19 @@ namespace MsSqlToolBelt.ViewModel
             if (SelectedSaveType is null)
                 return;
 
-            var type = (OutputType)SelectedSaveType.Id;
+            SaveValues((OutputType) SelectedSaveType.Id, TableColumns, $"{SelectedResult.Name}Table");
+        }
 
-            TableColumns.Export($"{SelectedResult.Name}Table", type);
+        /// <summary>
+        /// Saves the search result as formatted string
+        /// </summary>
+        private void SaveAsSearchResult()
+        {
+            if (_selectedSaveAsTypeSearchResult is null)
+                return;
+
+            SaveValues((OutputType) SelectedSaveAsTypeSearchResult.Id, Result.Where(w => w.Export),
+                $"SearchResult_{Search.Replace(" ", "")}");
         }
 
         /// <summary>
@@ -485,7 +476,18 @@ namespace MsSqlToolBelt.ViewModel
 
             var type = (OutputType)SelectedCopyType.Id;
 
-            Clipboard.SetText(TableColumns.CreateTable(type));
+            CopyValues(type, TableColumns);
+        }
+
+        /// <summary>
+        /// Copies the search result as formatted string to the clipboard
+        /// </summary>
+        private void CopyAsSearchResult()
+        {
+            if (SelectedCopyAsTypeSearchResult is null)
+                return;
+
+            CopyValues((OutputType)SelectedCopyAsTypeSearchResult.Id, Result.Where(w => w.Export));
         }
 
         /// <summary>

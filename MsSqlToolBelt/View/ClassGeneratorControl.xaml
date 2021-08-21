@@ -94,6 +94,8 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label
@@ -116,12 +118,30 @@
                             Width="*"
                             Binding="{Binding Alias}"
                             Header="Alias" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsPrimaryKey}"
+                            Header="PK"
+                            IsReadOnly="True" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding NullableView, Mode=OneWay}"
+                            Header="Nullable"
+                            IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <Separator Grid.Row="3" />
 
-                <StackPanel Grid.Row="4" Orientation="Horizontal">
+                <TextBlock
+                    Grid.Row="4"
+                    Margin="3"
+                    xml:space="preserve"
+                    TextWrapping="Wrap"><Bold>NOTE for EF:</Bold> If you have a table with multiple columns for the PK you have to override the <Italic>OnModelCreating</Italic> method in your context class! For more information see here: <Hyperlink NavigateUri="https://docs.microsoft.com/en-us/ef/core/modeling/keys?tabs=data-annotations" RequestNavigate="Hyperlink_OnRequestNavigate">https://docs.microsoft.com/en-us/ef/core/modeling/keys</Hyperlink></TextBlock>
+
+                <Separator Grid.Row="5" />
+
+                <StackPanel Grid.Row="6" Orientation="Horizontal">
                     <Button
                         Width="80"
                         Command="{Binding SetSelectionCommand}"
@@ -193,6 +213,10 @@
                         Margin="5,3,5,3"
                         Content="With backing field"
                         IsChecked="{Binding CreateBackingField}" />
+                    <CheckBox
+                        Margin="5,3,5,3"
+                        Content="Add summary"
+                        IsChecked="{Binding AddSummary}" />
                 </StackPanel>
 
                 <Button

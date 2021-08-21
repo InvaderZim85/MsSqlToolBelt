@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
 
 namespace MsSqlToolBelt.Business
@@ -26,13 +24,14 @@ namespace MsSqlToolBelt.Business
         /// <param name="className">The name of the desired class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
         /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
+        /// <param name="addSummary">true to add an empty summary to the class, otherwise false</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass)
+        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass, bool addSummary)
         {
             if (table == null)
                 throw new ArgumentNullException(nameof(table));
 
-            var classCode = GenerateClass(table, modifier, markAsSealed, className, backingField, efClass);
+            var classCode = GenerateClass(table, modifier, markAsSealed, className, backingField, efClass, addSummary);
 
             var sql = GenerateSqlQuery(table);
 
@@ -48,22 +47,44 @@ namespace MsSqlToolBelt.Business
         /// <param name="className">The name of the class</param>
         /// <param name="backingField">true to create a backing field, otherwise false</param>
         /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
+        /// <param name="addSummary">true to add an empty summary to the class, otherwise false</param>
         /// <returns>The CSharp code</returns>
-        private static string GenerateClass(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass)
+        private static string GenerateClass(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass, bool addSummary)
         {
             var sb = new StringBuilder();
+
+            void AddSummary(string message, bool withTab = true)
+            {
+                var spacer = withTab ? Tab : "";
+                sb.AppendLine($"{spacer}/// <summary>");
+                sb.AppendLine($"{spacer}/// {message}");
+                sb.AppendLine($"{spacer}/// </summary>");
+            }
+
+            void AddPropertyAttributes(bool isPrimaryKey, string alias)
+            {
+                if (isPrimaryKey)
+                    sb.AppendLine($"{Tab}[Key]");
+
+                if (!string.IsNullOrEmpty(alias))
+                    sb.AppendLine($"{Tab}[Column(\"{alias}\")]");
+            }
 
             if (string.IsNullOrEmpty(className))
                 className = table.Name;
 
+            // Add summary / ef attributes
+            if (addSummary)
+                AddSummary("TODO", false);
             if (efClass)
                 sb.AppendLine($"[Table(\"{table.Name}\")]");
+
             sb.AppendLine($"{modifier} {(markAsSealed ? "sealed " : "")}class {className.FirstCharToUpper()}");
             sb.AppendLine("{");
 
             var count = 1;
             var columnCount = table.Columns.Count(c => c.Use);
-            foreach (var column in table.Columns.Where(w => w.Use))
+            foreach (var column in table.Columns.OrderBy(o => o.ColumnPosition).Where(w => w.Use))
             {
                 var fieldName = string.IsNullOrEmpty(column.Alias) ? column.Column.Replace(" ", "") : column.Alias;
                 if (fieldName.IsNumeric())
@@ -72,23 +93,34 @@ namespace MsSqlToolBelt.Business
                 var dataType = GetDataType(column.DataType);
                 if (backingField)
                 {
-                    
                     var field = $"_{fieldName.FirstCharToLower()}";
 
+                    if (addSummary)
+                        AddSummary($"Backing field for <see cref=\"{fieldName}\"/>");
+
                     sb.AppendLine($"{Tab}private {dataType} {field};");
-                    if (efClass && !string.IsNullOrEmpty(column.Alias))
-                        sb.AppendLine($"{Tab}[Column(\"{column.Column}\")]");
+
+                    // Add summary / ef attributes
+                    if (addSummary)
+                        AddSummary("TODO");
+                    if (efClass)
+                        AddPropertyAttributes(column.IsPrimaryKey, column.Alias);
 
                     sb.AppendLine($"{Tab}public {dataType} {fieldName}");
                     sb.AppendLine($"{Tab}{{");
                     sb.AppendLine($"{Tab}{Tab}get => {field};");
                     sb.AppendLine($"{Tab}{Tab}set => {field} = value;");
                     sb.AppendLine($"{Tab}}}");
+                    sb.AppendLine(); // Line break
                 }
                 else
                 {
-                    if (efClass && !string.IsNullOrEmpty(column.Alias))
-                        sb.AppendLine($"{Tab}[Column(\"{column.Column}\")]");
+                    // Add summary / ef attributes
+                    if (addSummary)
+                        AddSummary("TODO");
+                    if (efClass)
+                        AddPropertyAttributes(column.IsPrimaryKey, column.Alias);
+
                     sb.AppendLine($"{Tab}public {dataType} {fieldName} {{ get; set; }}");
                 }
 
@@ -117,7 +149,7 @@ namespace MsSqlToolBelt.Business
 
             var count = 1;
             var columnCount = table.Columns.Count(w => w.Use);
-            foreach (var column in table.Columns.Where(w => w.Use))
+            foreach (var column in table.Columns.OrderBy(o => o.ColumnPosition).Where(w => w.Use))
             {
                 var comma = count++ == columnCount ? "" : ",";
 

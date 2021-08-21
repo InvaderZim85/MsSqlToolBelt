@@ -63,19 +63,14 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// The command to copy the table to the clipboard
+        /// </summary>
+        public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
+
+        /// <summary>
         /// The command to save the table definition as table
         /// </summary>
-        public ICommand SaveAsTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Default));
-
-        /// <summary>
-        /// The command to save the table definition as markdown table
-        /// </summary>
-        public ICommand SaveAsMdTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Markdown));
-
-        /// <summary>
-        /// The command to save the table definition as csv table
-        /// </summary>
-        public ICommand SaveAsCsvTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Csv));
+        public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
         /// Init the view model
@@ -88,14 +83,32 @@ namespace MsSqlToolBelt.ViewModel
             TableIndices = new ObservableCollection<TableIndex>(tableIndices);
             Info =
                 $"Table '{_tableName}' contains {(TableIndices.Count > 1 ? $"{tableIndices.Count} indices" : "one index")}";
+
+            InitSaveCopyTypes();
+        }
+
+        /// <summary>
+        /// Copies the table to the clipboard
+        /// </summary>
+        private void CopyAs()
+        {
+            if (SelectedCopyType is null)
+                return;
+
+            var type = (OutputType)SelectedCopyType.Id;
+
+            CopyValues(type, TableIndices);
         }
 
         /// <summary>
         /// Saves the table information as table
         /// </summary>
-        private void SaveAsTable(OutputType outputType)
+        private void SaveAs()
         {
-            TableIndices.Export($"{_tableName}_Indices", outputType);
+            if (SelectedSaveType is null)
+                return;
+
+            SaveValues((OutputType)SelectedSaveType.Id, TableIndices, $"{_tableName}_Indices");
         }
     }
 }

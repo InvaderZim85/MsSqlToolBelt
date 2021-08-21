@@ -180,6 +180,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>QueryManager.resx</DependentUpon>
     </Compile>
+    <Compile Include="Data\QueryHelper.cs" />
     <Compile Include="Data\Repo.cs" />
     <Compile Include="Data\SearchRepo.cs" />
     <Compile Include="Data\TableTypeRepo.cs" />
@@ -187,7 +188,6 @@
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
     <Compile Include="ViewModel\DataExport.cs" />
     <Compile Include="ViewModel\DataTypeControlViewModel.cs" />
-    <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoControlViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
@@ -200,9 +200,6 @@
     </Compile>
     <Compile Include="View\DataTypeControl.xaml.cs">
       <DependentUpon>DataTypeControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\ExportTableTypeDialog.xaml.cs">
-      <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\InfoControl.xaml.cs">
       <DependentUpon>InfoControl.xaml</DependentUpon>
@@ -271,10 +268,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DataTypeControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\ExportTableTypeDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
