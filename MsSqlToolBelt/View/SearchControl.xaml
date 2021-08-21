@@ -41,7 +41,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="145" />
+                    <ColumnDefinition Width="145" />
                 </Grid.ColumnDefinitions>
 
                 <Label
@@ -51,6 +52,7 @@
                 <TextBox
                     Grid.Row="0"
                     Grid.Column="1"
+                    Grid.ColumnSpan="2"
                     Margin="3"
                     mah:TextBoxHelper.Watermark="Search..."
                     IsEnabled="{Binding SearchEnabled}"
@@ -61,7 +63,7 @@
                 </TextBox>
                 <Button
                     Grid.Row="0"
-                    Grid.Column="2"
+                    Grid.Column="3"
                     Command="{Binding SearchCommand}"
                     Content="Search"
                     IsEnabled="{Binding SearchEnabled}" />
@@ -76,7 +78,7 @@
                 <Separator
                     Grid.Row="2"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     Margin="3" />
 
                 <Label
@@ -89,12 +91,12 @@
                 <StackPanel
                     Grid.Row="3"
                     Grid.Column="1"
-                    Grid.ColumnSpan="2"
+                    Grid.ColumnSpan="3"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
                     <Label Content="Type:" />
                     <ComboBox
-                        Width="100"
+                        Width="145"
                         Margin="3"
                         ItemsSource="{Binding TypeList}"
                         SelectedItem="{Binding SelectedType}" />
@@ -104,7 +106,7 @@
                     Name="_resultGrid"
                     Grid.Row="4"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     Margin="3"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False"
@@ -119,7 +121,7 @@
                         <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Export}" />
                         <DataGridTextColumn
                             Width="1.5*"
-                            Binding="{Binding NameView}"
+                            Binding="{Binding Name}"
                             Header="Name"
                             IsReadOnly="True" />
                         <DataGridTextColumn
@@ -166,11 +168,32 @@
                         Content="Show indices"
                         IsEnabled="{Binding ShowIndices}" />
                 </StackPanel>
-                <Button
+                <!--<Button
                     Grid.Row="5"
                     Grid.Column="2"
                     Command="{Binding ExportCommand}"
-                    Content="Export" />
+                    Content="Export" />-->
+
+                <mah:SplitButton
+                    Grid.Row="5"
+                    Grid.Column="2"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding CopyAsResultCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding CopyAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedCopyAsTypeSearchResult, UpdateSourceTrigger=PropertyChanged}" />
+                <mah:SplitButton
+                    Grid.Row="5"
+                    Grid.Column="3"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding SaveAsResultCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding SaveAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedSaveAsTypeSearchResult, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </Border>
 
@@ -228,14 +251,28 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="145" />
+                    <ColumnDefinition Width="145" />
+                </Grid.ColumnDefinitions>
+
                 <Label
                     Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
                     HorizontalAlignment="Left"
                     Content="Columns" />
-                <Separator Grid.Row="1" Margin="3" />
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Margin="3" />
 
                 <DataGrid
                     Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
                     IsReadOnly="True"
                     ItemsSource="{Binding TableColumns, Mode=OneWay}">
                     <DataGrid.Columns>
@@ -296,18 +333,32 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <Separator Grid.Row="3" Margin="3" />
+                <Separator
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Margin="3" />
 
-                <StackPanel
+                <mah:SplitButton
                     Grid.Row="4"
-                    FlowDirection="RightToLeft"
-                    Orientation="Horizontal">
-                    <Button Command="{Binding SaveAsTableCommand}" Content="Save as text table" />
-
-                    <Button Command="{Binding SaveAsMdTableCommand}" Content="Save as MD table" />
-
-                    <Button Command="{Binding SaveAsCsvTableCommand}" Content="Save as CSV table" />
-                </StackPanel>
+                    Grid.Column="1"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding CopyAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding CopyAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedCopyType, UpdateSourceTrigger=PropertyChanged}" />
+                <mah:SplitButton
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding SaveAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding SaveAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedSaveType, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </Border>
     </Grid>

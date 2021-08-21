@@ -21,6 +21,7 @@ namespace MsSqlToolBelt.DataObjects.TableType
         /// <summary>
         /// Gets or sets the data type of the column
         /// </summary>
+        [Appearance(Name = "Type")]
         public string DataType { get; set; }
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace MsSqlToolBelt.DataObjects.TableType
         /// <summary>
         /// Gets or sets the value which indicates if the column is uses as a key
         /// </summary>
+        [Appearance(Name = "Primary key")]
         public bool IsPrimaryKey { get; set; }
     }
 }

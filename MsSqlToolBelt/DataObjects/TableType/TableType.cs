@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.TableType
 {
@@ -10,6 +11,7 @@ namespace MsSqlToolBelt.DataObjects.TableType
         /// <summary>
         /// Gets or sets the table object id
         /// </summary>
+        [Appearance(Ignore = true)]
         public int Id { get; set; }
 
         /// <summary>
@@ -20,6 +22,13 @@ namespace MsSqlToolBelt.DataObjects.TableType
         /// <summary>
         /// Gets or sets the list with the columns
         /// </summary>
+        [Appearance(Ignore = true)]
         public List<TableTypeColumn> Columns { get; set; }
+
+        /// <summary>
+        /// Gets the column count
+        /// </summary>
+        [Appearance(Name = "Columns")]
+        public int ColumnCount => Columns?.Count ?? 0;
     }
 }

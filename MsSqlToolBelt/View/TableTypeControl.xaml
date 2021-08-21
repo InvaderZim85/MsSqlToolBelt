@@ -32,16 +32,28 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="145" />
+                    <ColumnDefinition Width="145" />
+                </Grid.ColumnDefinitions>
+
                 <Label
                     Grid.Row="0"
+                    Grid.Column="0"
                     HorizontalAlignment="Left"
                     Content="{Binding TableHeader}"
                     FontWeight="Bold" />
 
-                <Separator Grid.Row="1" />
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3" />
 
                 <DataGrid
                     Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
                     IsReadOnly="True"
                     ItemsSource="{Binding TableTypes}"
                     SelectedItem="{Binding SelectedTableType}">
@@ -57,22 +69,39 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <Separator Grid.Row="3" />
+                <Separator
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3" />
 
                 <Button
                     Grid.Row="4"
+                    Grid.Column="0"
                     Width="60"
                     HorizontalAlignment="Left"
                     Command="{Binding ReloadCommand}"
                     Content="Reload" />
 
-                <Button
+                <mah:SplitButton
                     Grid.Row="4"
-                    Width="60"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ExportCommand}"
-                    Content="Export" />
-
+                    Grid.Column="1"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding CopyAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding CopyAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedCopyType, UpdateSourceTrigger=PropertyChanged}" />
+                <mah:SplitButton
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    Margin="3"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding SaveAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding SaveAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedSaveType, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </Border>
 
@@ -86,6 +115,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label
@@ -123,6 +154,35 @@
                             Header="Key" />
                     </DataGrid.Columns>
                 </DataGrid>
+
+                <Separator Grid.Row="3" />
+
+                <Grid Grid.Row="4" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="145" />
+                        <ColumnDefinition Width="145" />
+                    </Grid.ColumnDefinitions>
+
+                    <mah:SplitButton
+                        Grid.Column="1"
+                        Margin="3"
+                        HorizontalContentAlignment="Left"
+                        Command="{Binding CopyAsTableCommand}"
+                        DisplayMemberPath="Text"
+                        ItemsSource="{Binding CopyAsTypes}"
+                        SelectedIndex="1"
+                        SelectedItem="{Binding SelectedCopyTypeTable, UpdateSourceTrigger=PropertyChanged}" />
+                    <mah:SplitButton
+                        Grid.Column="2"
+                        Margin="3"
+                        HorizontalContentAlignment="Left"
+                        Command="{Binding SaveAsTableCommand}"
+                        DisplayMemberPath="Text"
+                        ItemsSource="{Binding SaveAsTypes}"
+                        SelectedIndex="1"
+                        SelectedItem="{Binding SelectedSaveTypeTable, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
             </Grid>
         </Border>
     </Grid>

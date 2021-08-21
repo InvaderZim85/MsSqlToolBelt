@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Dapper;
+using System.Threading.Tasks;
 using MsSqlToolBelt.Data.Queries;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
 using ZimLabs.Database.MsSql;
 
@@ -32,57 +30,12 @@ namespace MsSqlToolBelt.Data
         /// Loads all tables with its columns
         /// </summary>
         /// <returns>The list with the tables</returns>
-        public List<Table> LoadTables()
+        public async Task<List<Table>> LoadTables()
         {
-            var result = _connector.Connection.QueryMultiple(QueryManager.LoadTables);
+            var tables = await _connector.Connection.ExtractMultiSearchTableResult(QueryManager.LoadTables);
 
-            var tables = result.Read<Table>().ToList();
-            var columns = result.Read<TableColumn>().ToList();
-
-            foreach (var table in tables)
-            {
-                table.Columns = columns.Where(w => w.Table.Equals(table.Name)).ToList();
-            }
-
-            ClearTableList(tables);
-            return tables;
-        }
-
-        /// <summary>
-        /// Removes all tables which should be ignored
-        /// </summary>
-        /// <param name="tableList">The list with the tables</param>
-        private void ClearTableList(List<Table> tableList)
-        {
-            var settings = Helper.LoadSettings();
-            if (!settings.TableIgnoreList.Any())
-                return;
-
-            var removeList = new List<Table>();
-
-            foreach (var ignoreEntry in settings.TableIgnoreList)
-            {
-                switch (ignoreEntry.FilterType)
-                {
-                    case CustomEnums.FilterType.Equals:
-                        removeList.AddRange(tableList.Where(w => w.Name.EqualsIgnoreCase(ignoreEntry.Value)));
-                        break;
-                    case CustomEnums.FilterType.Contains:
-                        removeList.AddRange(tableList.Where(w => w.Name.ContainsIgnoreCase(ignoreEntry.Value)));
-                        break;
-                    case CustomEnums.FilterType.StartsWith:
-                        removeList.AddRange(tableList.Where(w => w.Name.StartsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
-                        break;
-                    case CustomEnums.FilterType.EndsWith:
-                        removeList.AddRange(tableList.Where(w => w.Name.EndsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
-                        break;
-                }
-            }
-
-            foreach (var entry in removeList)
-            {
-                tableList.Remove(entry);
-            }
+            var result = tables.Select(s => (Table) s).ToList();
+            return QueryHelper.ClearTableList(result);
         }
     }
 }

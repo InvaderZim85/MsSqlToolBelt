@@ -172,6 +172,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="EfClass"/>
+        /// </summary>
+        private bool _efClass;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if an entity framework class should be created
+        /// </summary>
+        public bool EfClass
+        {
+            get => _efClass;
+            set => SetField(ref _efClass, value);
+        }
+
+        /// <summary>
         /// Backing field for <see cref="TableHeader"/>
         /// </summary>
         private string _tableHeader = "Tables";
@@ -211,6 +225,20 @@ namespace MsSqlToolBelt.ViewModel
         {
             get => _tableFilter;
             set => SetField(ref _tableFilter, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="AddSummary"/>
+        /// </summary>
+        private bool _addSummary;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the user want's to add a summary
+        /// </summary>
+        public bool AddSummary
+        {
+            get => _addSummary;
+            set => SetField(ref _addSummary, value);
         }
 
         /// <summary>
@@ -298,9 +326,9 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await Task.Run(() => _repo.LoadTables().OrderBy(o => o.Name).ToList());
+                var result = await _repo.LoadTables();
 
-                _originTableList = result;
+                _originTableList = result.OrderBy(o => o.Name).ToList();
 
                 FilterList();
             }
@@ -331,7 +359,7 @@ namespace MsSqlToolBelt.ViewModel
 
                 var (classCode, sqlStatement) = await Task.Run(() =>
                     ClassGenerator.Generate(SelectedTable, SelectedModifier, MarkAsSealed, ClassName,
-                        CreateBackingField));
+                        CreateBackingField, EfClass, AddSummary));
 
                 _setCode(classCode, CodeType.CSharp);
                 _setCode(sqlStatement, CodeType.Sql);

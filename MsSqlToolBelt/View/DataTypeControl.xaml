@@ -5,6 +5,7 @@
     xmlns:ViewModel="clr-namespace:MsSqlToolBelt.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -37,30 +38,32 @@
             </DataGrid>
 
             <Separator Grid.Row="1" />
+            <Grid Grid.Row="2" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="145" />
+                    <ColumnDefinition Width="145" />
+                </Grid.ColumnDefinitions>
 
-            <StackPanel
-                Grid.Row="2"
-                FlowDirection="RightToLeft"
-                Orientation="Horizontal">
-                <Button
-                    Width="100"
+                <mah:SplitButton
+                    Grid.Column="1"
                     Margin="3"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ExportTextCommand}"
-                    Content="Export as text" />
-                <Button
-                    Width="100"
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding CopyAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding CopyAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedCopyType, UpdateSourceTrigger=PropertyChanged}" />
+                <mah:SplitButton
+                    Grid.Column="2"
                     Margin="3"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ExportMdCommand}"
-                    Content="Export as MD" />
-                <Button
-                    Width="100"
-                    Margin="3"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ExportCsvCommand}"
-                    Content="Export as CSV" />
-            </StackPanel>
+                    HorizontalContentAlignment="Left"
+                    Command="{Binding SaveAsCommand}"
+                    DisplayMemberPath="Text"
+                    ItemsSource="{Binding SaveAsTypes}"
+                    SelectedIndex="1"
+                    SelectedItem="{Binding SelectedSaveType, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
 
         </Grid>
     </Border>

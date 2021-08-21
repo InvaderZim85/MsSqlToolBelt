@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -245,12 +244,42 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="SelectedSaveAsTypeSearchResult"/>
+        /// </summary>
+        private TextValueItem _selectedSaveAsTypeSearchResult;
+
+        /// <summary>
+        /// Gets or sets the selected save as type for the export of the search result
+        /// </summary>
+        public TextValueItem SelectedSaveAsTypeSearchResult
+        {
+            get => _selectedSaveAsTypeSearchResult;
+            set => SetField(ref _selectedSaveAsTypeSearchResult, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedCopyAsTypeSearchResult"/>
+        /// </summary>
+        private TextValueItem _selectedCopyAsTypeSearchResult;
+
+        /// <summary>
+        /// Gets or sets the selected copy as type for the export of the search result
+        /// </summary>
+        public TextValueItem SelectedCopyAsTypeSearchResult
+        {
+            get => _selectedCopyAsTypeSearchResult;
+            set => SetField(ref _selectedCopyAsTypeSearchResult, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setSqlText">The method to set the sql text</param>
         public void InitViewModel(Action<string> setSqlText)
         {
             _setSqlText = setSqlText;
+
+            InitSaveCopyTypes();
         }
 
         /// <summary>
@@ -298,17 +327,22 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The command to save the table definition as table
         /// </summary>
-        public ICommand SaveAsTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Default));
+        public ICommand SaveAsCommand => new DelegateCommand(SaveAs);
 
         /// <summary>
-        /// The command to save the table definition as markdown table
+        /// The command to save the search result as table
         /// </summary>
-        public ICommand SaveAsMdTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Markdown));
+        public ICommand SaveAsResultCommand => new DelegateCommand(SaveAsSearchResult);
 
         /// <summary>
-        /// The command to save the table definition as csv table
+        /// The command to copy the table to the clipboard
         /// </summary>
-        public ICommand SaveAsCsvTableCommand => new DelegateCommand(() => SaveAsTable(OutputType.Csv));
+        public ICommand CopyAsCommand => new DelegateCommand(CopyAs);
+
+        /// <summary>
+        /// The command to copy the search result to the clipboard
+        /// </summary>
+        public ICommand CopyAsResultCommand => new DelegateCommand(CopyAsSearchResult);
 
         /// <summary>
         /// The command to show the list with the table indices
@@ -412,12 +446,48 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Saves the table information as table
         /// </summary>
-        private void SaveAsTable(OutputType outputType)
+        private void SaveAs()
         {
-            if (SelectedResult == null)
+            if (SelectedSaveType is null)
                 return;
 
-            TableColumns.Export($"{SelectedResult.Name}Table", outputType);
+            SaveValues((OutputType) SelectedSaveType.Id, TableColumns, $"{SelectedResult.Name}Table");
+        }
+
+        /// <summary>
+        /// Saves the search result as formatted string
+        /// </summary>
+        private void SaveAsSearchResult()
+        {
+            if (_selectedSaveAsTypeSearchResult is null)
+                return;
+
+            SaveValues((OutputType) SelectedSaveAsTypeSearchResult.Id, Result.Where(w => w.Export),
+                $"SearchResult_{Search.Replace(" ", "")}");
+        }
+
+        /// <summary>
+        /// Copies the table to the clipboard
+        /// </summary>
+        private void CopyAs()
+        {
+            if (SelectedCopyType is null)
+                return;
+
+            var type = (OutputType)SelectedCopyType.Id;
+
+            CopyValues(type, TableColumns);
+        }
+
+        /// <summary>
+        /// Copies the search result as formatted string to the clipboard
+        /// </summary>
+        private void CopyAsSearchResult()
+        {
+            if (SelectedCopyAsTypeSearchResult is null)
+                return;
+
+            CopyValues((OutputType)SelectedCopyAsTypeSearchResult.Id, Result.Where(w => w.Export));
         }
 
         /// <summary>

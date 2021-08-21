@@ -63,64 +63,72 @@ namespace MsSqlToolBelt.Data
         {
             var searchString = $"%{value}%";
 
-            static async Task<List<T>> ReadResult<T>(SqlMapper.GridReader reader)
-            {
-                var result = await reader.ReadAsync<T>();
-
-                return result.ToList();
-            }
-
-            var multiResult = await _connector.Connection.QueryMultipleAsync(QueryManager.Search, new
+            var searchResults = await _connector.Connection.ExtractMultiSearchTableResult(QueryManager.Search, new
             {
                 search = searchString
             });
 
-            var searchResults = await ReadResult<SearchResult>(multiResult);
-            var columns = await ReadResult<TableColumn>(multiResult);
-            var keyColumns = await ReadResult<KeyColumn>(multiResult);
-            var indices = await ReadResult<TableIndex>(multiResult);
+            //static async Task<List<T>> ReadResult<T>(SqlMapper.GridReader reader)
+            //{
+            //    var result = await reader.ReadAsync<T>();
 
-            if (columns.Any() && keyColumns.Any())
-            {
-                foreach (var column in columns)
-                {
-                    column.IsPrimaryKey =
-                        keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
-                }
-            }
+            //    return result.ToList();
+            //}
 
-            foreach (var entry in searchResults.Where(w => w.Type == "Table"))
-            {
-                entry.Definition = "";
-                entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
+            //var multiResult = await _connector.Connection.QueryMultipleAsync(QueryManager.Search, new
+            //{
+            //    search = searchString
+            //});
 
-                // Combine the indices for the table and add the result to the search result
-                var tableIndices = indices.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
+            //var searchResults = await ReadResult<SearchResult>(multiResult);
+            //var columns = await ReadResult<TableColumn>(multiResult);
+            //var keyColumns = await ReadResult<KeyColumn>(multiResult);
+            //var indices = await ReadResult<TableIndex>(multiResult);
 
-                if (!tableIndices.Any())
-                    continue;
+            //if (columns.Any() && keyColumns.Any())
+            //{
+            //    foreach (var column in columns)
+            //    {
+            //        column.IsPrimaryKey =
+            //            keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
+            //    }
+            //}
 
-                var indexNames = tableIndices.Select(s => s.Name).Distinct();
+            //foreach (var entry in searchResults.Where(w => w.Type == "Table"))
+            //{
+            //    entry.Definition = "";
+            //    entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
 
-                foreach (var index in indexNames.OrderBy(o => o))
-                {
-                    var indexColumns = tableIndices.Where(w => w.Name.Equals(index)).Select(s => s.Column).ToList();
-                    entry.Indices.Add(new TableIndex
-                    {
-                        Name = index,
-                        Table = entry.Name,
-                        Column = string.Join(", ", indexColumns.OrderBy(o => o))
-                    });
+            //    // Combine the indices for the table and add the result to the search result
+            //    var tableIndices = indices.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
 
-                    foreach (var entryColumn in indexColumns
-                        .Select(indexColumn =>
-                            entry.Columns.FirstOrDefault(f => f.Column.EqualsIgnoreCase(indexColumn)))
-                        .Where(entryColumn => entryColumn != null))
-                    {
-                        entryColumn.UsedInIndex = true;
-                    }
-                }
-            }
+            //    if (!tableIndices.Any())
+            //        continue;
+
+            //    var indexNames = tableIndices.Select(s => s.Name).Distinct();
+
+            //    foreach (var index in indexNames.OrderBy(o => o))
+            //    {
+            //        var indexColumns = tableIndices.Where(w => w.Name.Equals(index)).Select(s => s.Column).ToList();
+            //        entry.Indices.Add(new TableIndex
+            //        {
+            //            Name = index,
+            //            Table = entry.Name,
+            //            Column = string.Join(", ", indexColumns.OrderBy(o => o))
+            //        });
+
+            //        foreach (var entryColumn in indexColumns
+            //            .Select(indexColumn =>
+            //                entry.Columns.FirstOrDefault(f => f.Column.EqualsIgnoreCase(indexColumn)))
+            //            .Where(entryColumn => entryColumn != null))
+            //        {
+            //            entryColumn.UsedInIndex = true;
+            //        }
+            //    }
+            //}
+
+            // Clean the search result and remove all not needed tables
+            QueryHelper.ClearTableList(searchResults);
 
             searchResults.Add(SearchJobs(searchString));
             searchResults.AddRange(SearchJobSteps(searchString));
@@ -312,7 +320,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="definition">The job definition</param>
         /// <returns>The list with the data</returns>
-        private List<string> CreateJobDefinition(string definition)
+        private static IEnumerable<string> CreateJobDefinition(string definition)
         {
             const int maxLength = 60;
             definition = definition.Replace("\r\n", " "); // Remove the line breaks
@@ -348,9 +356,9 @@ namespace MsSqlToolBelt.Data
         /// <param name="nextStepId">The id of the next step</param>
         /// <param name="maxLength">The max length of the result</param>
         /// <returns>The description of the action</returns>
-        private string GetAction(int id, int nextStepId, int maxLength = 0)
+        private static string GetAction(int id, int nextStepId, int maxLength = 0)
         {
-            string result = id switch
+            var result = id switch
             {
                 1 => "Quit with success",
                 2 => "Quit with failure",

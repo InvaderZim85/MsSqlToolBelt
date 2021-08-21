@@ -56,23 +56,31 @@
 
         <Separator Grid.Row="3" />
 
-        <StackPanel
-            Grid.Row="4"
-            FlowDirection="RightToLeft"
-            Orientation="Horizontal">
+        <Grid Grid.Row="4" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="145" />
+                <ColumnDefinition Width="145" />
+            </Grid.ColumnDefinitions>
 
-            <Button
-                Width="65"
-                Click="ButtonClose_Click"
-                Content="Close" />
-
-            <Separator />
-
-            <Button Command="{Binding SaveAsTableCommand}" Content="Save as text table" />
-
-            <Button Command="{Binding SaveAsMdTableCommand}" Content="Save as MD table" />
-
-            <Button Command="{Binding SaveAsCsvTableCommand}" Content="Save as CSV table" />
-        </StackPanel>
+            <mah:SplitButton
+                Grid.Column="1"
+                Margin="3"
+                HorizontalContentAlignment="Left"
+                Command="{Binding CopyAsCommand}"
+                DisplayMemberPath="Text"
+                ItemsSource="{Binding CopyAsTypes}"
+                SelectedIndex="1"
+                SelectedItem="{Binding SelectedCopyType, UpdateSourceTrigger=PropertyChanged}" />
+            <mah:SplitButton
+                Grid.Column="2"
+                Margin="3"
+                HorizontalContentAlignment="Left"
+                Command="{Binding SaveAsCommand}"
+                DisplayMemberPath="Text"
+                ItemsSource="{Binding SaveAsTypes}"
+                SelectedIndex="1"
+                SelectedItem="{Binding SelectedSaveType, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
     </Grid>
 </mah:MetroWindow>

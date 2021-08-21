@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.Diagnostics;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
@@ -87,6 +89,14 @@ namespace MsSqlToolBelt.View
         {
             if (DataContext is ClassGeneratorControlViewModel viewModel)
                 viewModel.Clear();
+        }
+
+        /// <summary>
+        /// Occurs when the user hits the link
+        /// </summary>
+        private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(e.Uri.ToString());
         }
     }
 }

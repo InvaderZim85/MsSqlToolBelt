@@ -119,6 +119,21 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="ZimLabs.Database.MsSql, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ZimLabs.Database.MsSql.1.2.1\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
     </Reference>
@@ -165,6 +180,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>QueryManager.resx</DependentUpon>
     </Compile>
+    <Compile Include="Data\QueryHelper.cs" />
     <Compile Include="Data\Repo.cs" />
     <Compile Include="Data\SearchRepo.cs" />
     <Compile Include="Data\TableTypeRepo.cs" />
@@ -172,7 +188,6 @@
     <Compile Include="ViewModel\ClassGeneratorControlViewModel.cs" />
     <Compile Include="ViewModel\DataExport.cs" />
     <Compile Include="ViewModel\DataTypeControlViewModel.cs" />
-    <Compile Include="ViewModel\ExportTableTypeViewModel.cs" />
     <Compile Include="ViewModel\InfoControlViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\SearchControlViewModel.cs" />
@@ -185,9 +200,6 @@
     </Compile>
     <Compile Include="View\DataTypeControl.xaml.cs">
       <DependentUpon>DataTypeControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\ExportTableTypeDialog.xaml.cs">
-      <DependentUpon>ExportTableTypeDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\InfoControl.xaml.cs">
       <DependentUpon>InfoControl.xaml</DependentUpon>
@@ -256,10 +268,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DataTypeControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\ExportTableTypeDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

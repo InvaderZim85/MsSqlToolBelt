@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.DataObjects.Search
@@ -13,6 +13,7 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// <summary>
         /// Gets or sets the id of the object
         /// </summary>
+        [Appearance(Ignore = true)]
         public int Id { get; set; }
 
         /// <summary>
@@ -21,21 +22,14 @@ namespace MsSqlToolBelt.DataObjects.Search
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets the name of the procedure / table (only needed for the view)
+        /// Gets or sets the name of the schema
         /// </summary>
-        public string NameView
-        {
-            get
-            {
-                Info = IsTable && Columns.Any(a => a.IsReplicated) ? "Marked for replication" : "";
-
-                return Name;
-            }
-        }
+        public string Schema { get; set; }
 
         /// <summary>
         /// Gets or sets the definition of the search result
         /// </summary>
+        [Appearance(Ignore = true)]
         public string Definition { get; set; }
 
         /// <summary>
@@ -46,31 +40,37 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// <summary>
         /// Gets or sets the step id (only for job steps)
         /// </summary>
+        [Appearance(Name = "Job step id")]
         public int StepId { get; set; }
 
         /// <summary>
         /// Gets or sets the step name (only for job steps)
         /// </summary>
+        [Appearance(Name = "Job step")]
         public string StepName { get; set; }
 
         /// <summary>
         /// Gets or sets the id of the success action (only for job steps)
         /// </summary>
+        [Appearance(Name = "Job step success action")]
         public int SuccessAction { get; set; }
 
         /// <summary>
         /// Gets or sets the id of the next step in case of success
         /// </summary>
+        [Appearance(Ignore = true)]
         public int SuccessStepId { get; set; }
 
         /// <summary>
         /// Gets or sets the id of the fail action (only for job steps)
         /// </summary>
+        [Appearance(Name = "Job step fail action")]
         public int FailAction { get; set; }
 
         /// <summary>
         /// Gets or sets the id of the next step in case of failure
         /// </summary>
+        [Appearance(Ignore = true)]
         public int FailStepId { get; set; }
 
         /// <summary>
@@ -81,6 +81,8 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// <summary>
         /// Gets or sets the value which indicates if the entry should be exported
         /// </summary>
+        [Appearance(Ignore = true)]
+
         public bool Export
         {
             get => _export;
@@ -105,16 +107,19 @@ namespace MsSqlToolBelt.DataObjects.Search
         /// <summary>
         /// Gets the value which indicates if the result represents a table
         /// </summary>
+        [Appearance(Ignore = true)]
         public bool IsTable => Type.Equals("Table");
 
         /// <summary>
         /// Gets or sets the list of table columns
         /// </summary>
+        [Appearance(Ignore = true)]
         public List<TableColumn> Columns { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the list with the indices
         /// </summary>
+        [Appearance(Ignore = true)]
         public List<TableIndex> Indices { get; set; } = new();
     }
 }

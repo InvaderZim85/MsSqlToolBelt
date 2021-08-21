@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using MsSqlToolBelt.DataObjects;
 using Serilog;
+using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 
 namespace MsSqlToolBelt.ViewModel
@@ -18,11 +24,79 @@ namespace MsSqlToolBelt.ViewModel
         private readonly IDialogCoordinator _dialogCoordinator;
 
         /// <summary>
+        /// Backing field for <see cref="SaveAsTypes"/>
+        /// </summary>
+        private ObservableCollection<TextValueItem> _saveAsTypes;
+
+        /// <summary>
+        /// Gets or sets the list with the save types
+        /// </summary>
+        public ObservableCollection<TextValueItem> SaveAsTypes
+        {
+            get => _saveAsTypes;
+            private set => SetField(ref _saveAsTypes, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedSaveType"/>
+        /// </summary>
+        private TextValueItem _selectedSaveType;
+
+        /// <summary>
+        /// Gets or sets the selected save type
+        /// </summary>
+        public TextValueItem SelectedSaveType
+        {
+            get => _selectedSaveType;
+            set => SetField(ref _selectedSaveType, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SaveAsTypes"/>
+        /// </summary>
+        private ObservableCollection<TextValueItem> _copyAsTypes;
+
+        /// <summary>
+        /// Gets or sets the list with the save types
+        /// </summary>
+        public ObservableCollection<TextValueItem> CopyAsTypes
+        {
+            get => _copyAsTypes;
+            private set => SetField(ref _copyAsTypes, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedCopyType"/>
+        /// </summary>
+        private TextValueItem _selectedCopyType;
+
+        /// <summary>
+        /// Gets or sets the selected copy type
+        /// </summary>
+        public TextValueItem SelectedCopyType
+        {
+            get => _selectedCopyType;
+            set => SetField(ref _selectedCopyType, value);
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="ViewModelBase"/>
         /// </summary>
         protected ViewModelBase()
         {
             _dialogCoordinator = DialogCoordinator.Instance;
+        }
+
+        /// <summary>
+        /// Init the save / copy types
+        /// </summary>
+        protected void InitSaveCopyTypes()
+        {
+            SaveAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Save as"));
+            CopyAsTypes = new ObservableCollection<TextValueItem>(CustomEnums.GetValueList<OutputType>("Copy as"));
+
+            SelectedCopyType = CopyAsTypes.FirstOrDefault(f => f.Id == (int) OutputType.Markdown);
+            SelectedSaveType = SaveAsTypes.FirstOrDefault(f => f.Id == (int) OutputType.Markdown);
         }
 
         /// <summary>
@@ -97,6 +171,30 @@ namespace MsSqlToolBelt.ViewModel
             var result = await _dialogCoordinator.ShowInputAsync(this, title, message);
 
             return result;
+        }
+
+
+        /// <summary>
+        /// Copies the values as formatted string into the clipboard
+        /// </summary>
+        /// <typeparam name="T">The type of the values</typeparam>
+        /// <param name="type">The output type</param>
+        /// <param name="values">The list with the values</param>
+        protected static void CopyValues<T>(OutputType type, IEnumerable<T> values) where T : class
+        {
+            Clipboard.SetText(values.CreateTable(type));
+        }
+
+        /// <summary>
+        /// Saves the values as formatted string into a file
+        /// </summary>
+        /// <typeparam name="T">The type of the values</typeparam>
+        /// <param name="type">The output type</param>
+        /// <param name="values">The list with the values</param>
+        /// <param name="name">The file name</param>
+        protected static void SaveValues<T>(OutputType type, IEnumerable<T> values, string name) where T : class
+        {
+            values.Export(name, type);
         }
     }
 }
