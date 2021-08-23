@@ -160,9 +160,7 @@
                         Width="80"
                         Command="{Binding DeselectAllCommand}"
                         Content="Deselect all" />
-
-                    <Separator />
-
+                    <Button Command="{Binding ExportCommand}" Content="Export definition" />
                     <Button
                         Command="{Binding ShowTableIndicesCommand}"
                         Content="Show indices"
