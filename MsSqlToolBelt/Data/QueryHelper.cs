@@ -34,7 +34,8 @@ namespace MsSqlToolBelt.Data
             var mainResult = await multiResult.ReadResultAsync<SearchResult>();
             var columns = await multiResult.ReadResultAsync<TableColumn>();
             var keyColumns = await multiResult.ReadResultAsync<KeyColumn>();
-            var indices = await multiResult.ReadResultAsync<TableIndex>();
+            var tmpIndices = await multiResult.ReadResultAsync<TableIndex>();
+            var indices = tmpIndices.Where(w => !string.IsNullOrWhiteSpace(w.Name)).ToList();
 
             if (columns.Any() && keyColumns.Any())
             {
@@ -56,7 +57,7 @@ namespace MsSqlToolBelt.Data
                 if (!tableIndices.Any())
                     continue;
 
-                var indexNames = tableIndices.Select(s => s.Name).Distinct();
+                var indexNames = tableIndices.Select(s => s.Name).Where(w => !string.IsNullOrWhiteSpace(w)).Distinct();
 
                 foreach (var index in indexNames.OrderBy(o => o))
                 {
