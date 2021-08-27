@@ -27,5 +27,10 @@ namespace MsSqlToolBelt.DataObjects.Types
         /// </summary>
         [Appearance(Name = "C# Type")]
         public string CSharpType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the C# is null able or not
+        /// </summary>
+        public bool IsNullable { get; set; }
     }
 }

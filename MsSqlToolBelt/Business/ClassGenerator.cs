@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
 
 namespace MsSqlToolBelt.Business
@@ -61,13 +62,13 @@ namespace MsSqlToolBelt.Business
                 sb.AppendLine($"{spacer}/// </summary>");
             }
 
-            void AddPropertyAttributes(bool isPrimaryKey, string alias)
+            void AddPropertyAttributes(bool isPrimaryKey, string columnName)
             {
                 if (isPrimaryKey)
                     sb.AppendLine($"{Tab}[Key]");
 
-                if (!string.IsNullOrEmpty(alias))
-                    sb.AppendLine($"{Tab}[Column(\"{alias}\")]");
+                if (!string.IsNullOrEmpty(columnName))
+                    sb.AppendLine($"{Tab}[Column(\"{columnName}\")]");
             }
 
             if (string.IsNullOrEmpty(className))
@@ -90,7 +91,7 @@ namespace MsSqlToolBelt.Business
                 if (fieldName.IsNumeric())
                     fieldName = $"Column{fieldName}";
 
-                var dataType = GetDataType(column.DataType);
+                var dataType = GetDataType(column);
                 if (backingField)
                 {
                     var field = $"_{fieldName.FirstCharToLower()}";
@@ -104,7 +105,7 @@ namespace MsSqlToolBelt.Business
                     if (addSummary)
                         AddSummary("TODO");
                     if (efClass)
-                        AddPropertyAttributes(column.IsPrimaryKey, column.Alias);
+                        AddPropertyAttributes(column.IsPrimaryKey, column.Column);
 
                     sb.AppendLine($"{Tab}public {dataType} {fieldName}");
                     sb.AppendLine($"{Tab}{{");
@@ -119,7 +120,7 @@ namespace MsSqlToolBelt.Business
                     if (addSummary)
                         AddSummary("TODO");
                     if (efClass)
-                        AddPropertyAttributes(column.IsPrimaryKey, column.Alias);
+                        AddPropertyAttributes(column.IsPrimaryKey, column.Column);
 
                     sb.AppendLine($"{Tab}public {dataType} {fieldName} {{ get; set; }}");
                 }
@@ -167,16 +168,21 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Gets the corresponding c# data type of the sql type
         /// </summary>
-        /// <param name="sqlType">The sql data type</param>
+        /// <param name="column">The column</param>
         /// <returns>The c# data type</returns>
-        private static string GetDataType(string sqlType)
+        private static string GetDataType(TableColumn column)
         {
-            var type = Helper.DataTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(sqlType));
+            var type = Helper.DataTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(column.DataType));
             if (type != null)
+            {
+                // If the column is nullable but the type not, add a question mark
+                if (column.NullableView && !type.IsNullable)
+                    return $"{type.CSharpType}?";
                 return type.CSharpType;
+            }
 
             // Fall back
-            return sqlType.ToLower() switch
+            return column.DataType.ToLower() switch
             {
                 "bigint" => "double",
                 "smallmoney" => "decimal",
@@ -198,7 +204,7 @@ namespace MsSqlToolBelt.Business
                 "datetime2" => "DateTime",
                 "smalldatetime" => "DateTime",
                 "uniqueidentifier" => "GUID",
-                _ => sqlType
+                _ => column.DataType
             };
         }
     }
