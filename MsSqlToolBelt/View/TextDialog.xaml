@@ -1,0 +1,68 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.View.TextDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.View"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
+    Title="TextDialog"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Icon="../MsSqlToolBelt.ico"
+    Loaded="TextDialog_OnLoaded"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Window.DataContext>
+        <viewModel:TextDialogViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label
+            Grid.Row="0"
+            Content="{Binding Caption}"
+            Style="{StaticResource Headline}" />
+
+        <Separator Grid.Row="1" />
+
+        <avalonedit:TextEditor
+            Name="CodeEditor"
+            Grid.Row="2"
+            Margin="3"
+            BorderBrush="Black"
+            BorderThickness="1"
+            FontFamily="Hack,Consolas"
+            FontSize="12"
+            ShowLineNumbers="True" />
+
+        <Separator Grid.Row="3" />
+
+        <Button
+            Grid.Row="4"
+            Width="50"
+            HorizontalAlignment="Left"
+            Command="{Binding CopyCommand}"
+            Content="Copy" />
+
+        <Button
+            Grid.Row="4"
+            Width="50"
+            HorizontalAlignment="Right"
+            Click="ButtonBase_OnClick"
+            Content="Close" />
+    </Grid>
+</mah:MetroWindow>

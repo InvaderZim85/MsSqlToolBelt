@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
 using MsSqlToolBelt.DataObjects.Types;
+using MsSqlToolBelt.View;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 
@@ -31,14 +31,9 @@ namespace MsSqlToolBelt.ViewModel
         private bool _dataLoaded;
 
         /// <summary>
-        /// Contains the sql statement
+        /// Contains the class generator result
         /// </summary>
-        private string _sqlText;
-
-        /// <summary>
-        /// Contains the csharp code
-        /// </summary>
-        private string _csharpCode;
+        private ClassGenResult _classGenResult;
 
         /// <summary>
         /// The method to set the code (sql, csharp)
@@ -242,6 +237,20 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Backing field for <see cref="ShowEfKeyCode"/>
+        /// </summary>
+        private bool _showEfKeyCode;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the ef key code should be shown
+        /// </summary>
+        public bool ShowEfKeyCode
+        {
+            get => _showEfKeyCode;
+            set => SetField(ref _showEfKeyCode, value);
+        }
+
+        /// <summary>
         /// Init the view model
         /// </summary>
         /// <param name="setCode">The method to set the code</param>
@@ -287,6 +296,16 @@ namespace MsSqlToolBelt.ViewModel
         {
             _dataLoaded = false;
             LoadData();
+        });
+
+        /// <summary>
+        /// The command to show the ef key code
+        /// </summary>
+        public ICommand ShowEfKeyCodeCommand => new DelegateCommand(() =>
+        {
+            var dialog = new TextDialog("Class generator", "Code to configure multiple columns as key",
+                _classGenResult.CodeEfKey);
+            dialog.ShowDialog();
         });
 
         /// <summary>
@@ -357,15 +376,22 @@ namespace MsSqlToolBelt.ViewModel
                     return;
                 }
 
-                var (classCode, sqlStatement) = await Task.Run(() =>
-                    ClassGenerator.Generate(SelectedTable, SelectedModifier, MarkAsSealed, ClassName,
-                        CreateBackingField, EfClass, AddSummary));
+                _classGenResult = await Task.Run(() =>
+                    ClassGenerator.Generate(new ClassGenSettingsDto
+                    {
+                        Table = SelectedTable,
+                        Modifier = SelectedModifier,
+                        MarkAsSealed = MarkAsSealed,
+                        ClassName = ClassName,
+                        BackingField = CreateBackingField,
+                        EfClass = EfClass,
+                        AddSummary = AddSummary
+                    }));
 
-                _setCode(classCode, CodeType.CSharp);
-                _setCode(sqlStatement, CodeType.Sql);
+                _setCode(_classGenResult.Code, CodeType.CSharp);
+                _setCode(_classGenResult.Sql, CodeType.Sql);
 
-                _csharpCode = classCode;
-                _sqlText = sqlStatement;
+                ShowEfKeyCode = !string.IsNullOrEmpty(_classGenResult.CodeEfKey);
             }
             catch (Exception ex)
             {
@@ -433,7 +459,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <param name="type">The desired type</param>
         private void Copy(CodeType type)
         {
-            Clipboard.SetText(type == CodeType.CSharp ? _csharpCode : _sqlText);
+            CopyToClipboard(type == CodeType.CSharp ? _classGenResult.Code : _classGenResult.Sql);
         }
 
         /// <summary>

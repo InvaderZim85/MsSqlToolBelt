@@ -248,9 +248,17 @@
                     FontFamily="Hack,Consolas"
                     FontSize="12"
                     IsReadOnly="True"
-                    ShowLineNumbers="True" />
+                    ShowLineNumbers="True"
+                    SyntaxHighlighting="C#" />
 
                 <Separator Grid.Row="6" />
+
+                <Button
+                    Grid.Row="7"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ShowEfKeyCodeCommand}"
+                    Content="Show EF key code"
+                    IsEnabled="{Binding ShowEfKeyCode}" />
 
                 <StackPanel
                     Grid.Row="7"
@@ -286,7 +294,8 @@
                     FontFamily="Hack,Consolas"
                     FontSize="12"
                     IsReadOnly="True"
-                    ShowLineNumbers="True" />
+                    ShowLineNumbers="True"
+                    SyntaxHighlighting="sql" />
 
                 <Separator Grid.Row="12" />
 

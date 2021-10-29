@@ -7,6 +7,7 @@ using System.Windows.Input;
 using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
 
@@ -51,7 +52,7 @@ namespace MsSqlToolBelt.View
         /// </summary>
         private void SetSqlSchema()
         {
-            Helper.InitAvalonEditor(_sqlEditor);
+            Helper.InitAvalonEditor(_sqlEditor, CodeType.Sql);
         }
 
         /// <summary>

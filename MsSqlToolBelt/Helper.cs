@@ -10,13 +10,15 @@ using System.Windows;
 using System.Windows.Media;
 using System.Xml;
 using ControlzEx.Theming;
+using HL.HighlightingTheme;
+using HL.Manager;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using Newtonsoft.Json;
 using Serilog;
+using HighlightingLoader = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader;
 
 namespace MsSqlToolBelt
 {
@@ -86,26 +88,43 @@ namespace MsSqlToolBelt
         /// Init the avalon editor
         /// </summary>
         /// <param name="editor">The desired editor</param>
-        public static void InitAvalonEditor(TextEditor editor)
+        /// <param name="type">The type of the schema</param>
+        public static void InitAvalonEditor(TextEditor editor, CodeType type)
         {
             var dark = Properties.Settings.Default.BaseColor.Equals("Dark");
             editor.Options.HighlightCurrentLine = true;
-            editor.SyntaxHighlighting = LoadSqlSchema(dark);
+            editor.SyntaxHighlighting = LoadSqlSchema(dark, type);
             editor.Foreground = new SolidColorBrush(dark ? Colors.White : Colors.Black);
         }
 
         /// <summary>
         /// Loads the highlight definition for the avalon editor
         /// </summary>
+        /// <param name="dark">true to load the dark schema, otherwise false</param>
+        /// <param name="type">The type of the schema</param>
         /// <returns>The definition</returns>
-        private static IHighlightingDefinition LoadSqlSchema(bool dark)
+        private static IHighlightingDefinition LoadSqlSchema(bool dark, CodeType type)
         {
-            var fileName = dark ? "AvalonSqlSchema_Dark.xml" : "AvalonSqlSchema.xml";
-            var file = Path.Combine(GetBaseFolder(), "SqlSchema", fileName);
+            //var fileName = type == CodeType.CSharp
+            //    ? dark 
+            //        ? "AvalonCSharpSchema_Dark.xml"
+            //        : "AvalonCSharpSchema.xml"
+            //    : dark
+            //        ? "AvalonSqlSchema_Dark.xml"
+            //        : "AvalonSqlSchema.xml";
+
+            var fileName = dark ? "Dark.xshtd" : "Light.xshtd";
+
+            var file = Path.Combine(GetBaseFolder(), "Themes", fileName);
 
             using var reader = File.Open(file, FileMode.Open);
             using var xmlReader = new XmlTextReader(reader);
-            return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
+
+            //HL.Manager.HighlightingLoader.Load(xmlReader)
+
+            //return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
+            var syntaxDefinition = new HL.Xshtd.XshtdSyntaxDefinition();
+            return HL.Manager.HighlightingLoader.Load(xmlReader, syntaxDefinition);
         }
 
         /// <summary>

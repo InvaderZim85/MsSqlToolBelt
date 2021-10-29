@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
@@ -55,10 +54,10 @@ namespace MsSqlToolBelt.View
         private void SetSchema()
         {
             // Sql editor
-            Helper.InitAvalonEditor(SqlEditor);
+            Helper.InitAvalonEditor(SqlEditor, CodeType.Sql);
 
             // CSharp editor
-            Helper.InitAvalonEditor(CodeEditor);
+            Helper.InitAvalonEditor(CodeEditor, CodeType.CSharp);
         }
 
         /// <summary>
