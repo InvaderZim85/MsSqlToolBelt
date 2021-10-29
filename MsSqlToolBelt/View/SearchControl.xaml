@@ -103,7 +103,7 @@
                 </StackPanel>
 
                 <DataGrid
-                    Name="_resultGrid"
+                    Name="ResultGrid"
                     Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="4"
@@ -216,7 +216,7 @@
                     Content="Preview" />
                 <Separator Grid.Row="1" Margin="3" />
                 <avalonedit:TextEditor
-                    Name="_sqlEditor"
+                    Name="SqlEditor"
                     Grid.Row="2"
                     BorderBrush="Black"
                     BorderThickness="1"

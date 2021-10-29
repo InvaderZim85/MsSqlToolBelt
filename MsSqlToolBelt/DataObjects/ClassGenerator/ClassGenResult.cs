@@ -21,16 +21,23 @@
         public string CodeEfKey { get; }
 
         /// <summary>
+        /// Gets the optional code for the ef key
+        /// </summary>
+        public string CodeEfKeyOption { get; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="ClassGenResult"/>
         /// </summary>
         /// <param name="code">The c# code</param>
         /// <param name="sql">The sql statement</param>
         /// <param name="codeEfKey">The c# code for the ef key</param>
-        public ClassGenResult(string code, string sql, string codeEfKey)
+        /// <param name="codeEfKeyOption">The optional c# code for the ef key</param>
+        public ClassGenResult(string code, string sql, string codeEfKey, string codeEfKeyOption)
         {
             Code = code;
             Sql = sql;
             CodeEfKey = codeEfKey;
+            CodeEfKeyOption = codeEfKeyOption;
         }
     }
 }

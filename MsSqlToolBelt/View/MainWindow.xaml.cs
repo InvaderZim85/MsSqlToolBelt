@@ -90,13 +90,13 @@ namespace MsSqlToolBelt.View
             switch (type)
             {
                 case FlyOutType.Settings:
-                    _settingsControl.InitControl();
+                    SettingsControl.InitControl();
                     break;
                 case FlyOutType.DataTypes:
-                    _dataTypeControl.InitControl();
+                    DataTypeControl.InitControl();
                     break;
                 case FlyOutType.Info:
-                    _infoControl.InitControl();
+                    InfoControl.InitControl();
                     break;
             }
         }
@@ -124,7 +124,7 @@ namespace MsSqlToolBelt.View
         /// <param name="e">The event arguments</param>
         private void Flyout_OnClosingFinished(object sender, RoutedEventArgs e)
         {
-            _settingsControl?.SetThemeDefault();
+            SettingsControl?.SetThemeDefault();
         }
     }
 }

@@ -24,7 +24,6 @@
                 <Setter Property="Margin" Value="3" />
                 <Setter Property="BorderBrush" Value="LightGray" />
                 <Setter Property="BorderThickness" Value="1" />
-                <!--<Setter Property="CornerRadius" Value="2" />-->
             </Style>
 
             <Style BasedOn="{StaticResource MahApps.Styles.DataGrid}" TargetType="{x:Type DataGrid}">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using ZimLabs.WpfBase;
 
@@ -17,6 +18,16 @@ namespace MsSqlToolBelt.ViewModel
         private Func<string> _getEditorText;
 
         /// <summary>
+        /// Sets the text of the editor
+        /// </summary>
+        private Action<string> _setEditorText;
+
+        /// <summary>
+        /// The settings of the dialog
+        /// </summary>
+        private TextDialogSettings _settings;
+
+        /// <summary>
         /// Backing field for <see cref="Caption"/>
         /// </summary>
         private string _caption;
@@ -27,7 +38,53 @@ namespace MsSqlToolBelt.ViewModel
         public string Caption
         {
             get => _caption;
-            set => SetField(ref _caption, value);
+            private set => SetField(ref _caption, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="CheckboxText"/>
+        /// </summary>
+        private string _checkboxText;
+
+        /// <summary>
+        /// Gets or sets the text of the checkbox
+        /// </summary>
+        public string CheckboxText
+        {
+            get => _checkboxText;
+            set => SetField(ref _checkboxText, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="OptionVisibility"/>
+        /// </summary>
+        private Visibility _optionVisibility = Visibility.Hidden;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the option check box should be shown
+        /// </summary>
+        public Visibility OptionVisibility
+        {
+            get => _optionVisibility;
+            set => SetField(ref _optionVisibility, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ShowOption"/>
+        /// </summary>
+        private bool _showOption;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the optional text should be shown
+        /// </summary>
+        public bool ShowOption
+        {
+            get => _showOption;
+            set
+            {
+                if (SetField(ref _showOption, value))
+                    _setEditorText(value ? _settings.TextOption : _settings.Text);
+            }
         }
 
         /// <summary>
@@ -38,12 +95,20 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Init the view model
         /// </summary>
-        /// <param name="caption">The caption which should be shown</param>
-        /// <param name="getEditorText">Function to get the text of the editor control</param>
-        public void InitViewModel(string caption, Func<string> getEditorText)
+        /// <param name="settings">The settings</param>
+        /// <param name="getEditorText">The function to get the text of the editor</param>
+        /// <param name="setEditorText">The action to set the text of the editor</param>
+        public void InitViewModel(TextDialogSettings settings, Func<string> getEditorText, Action<string> setEditorText)
         {
-            Caption = caption;
+            _settings = settings;
+
+            Caption = settings.Caption;
+            OptionVisibility = settings.ShowOption ? Visibility.Visible : Visibility.Hidden;
             _getEditorText = getEditorText;
+            _setEditorText = setEditorText;
+            CheckboxText = settings.CheckboxText;
+
+            _setEditorText(_settings.Text);
         }
 
         /// <summary>

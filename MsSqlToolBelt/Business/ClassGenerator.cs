@@ -30,9 +30,9 @@ namespace MsSqlToolBelt.Business
 
             var sql = GenerateSqlQuery(settings.Table);
 
-            var efKeyCode = settings.EfClass ? CreateEfKeyCode(settings) : "";
+            var (efKeyCode, efKeyCodeOption) = settings.EfClass ? CreateEfKeyCode(settings) : ("", "");
 
-            return new ClassGenResult(classCode, sql, efKeyCode);
+            return new ClassGenResult(classCode, sql, efKeyCode, efKeyCodeOption);
         }
 
         /// <summary>
@@ -233,14 +233,14 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="settings">The settings</param>
         /// <returns>The c# code</returns>
-        private static string CreateEfKeyCode(ClassGenSettingsDto settings)
+        private static (string code, string optionalCode) CreateEfKeyCode(ClassGenSettingsDto settings)
         {
             if (settings?.Table == null)
-                return "";
+                return ("", "");
 
             var keyColumns = settings.Table.Columns.Where(w => w.IsPrimaryKey).OrderBy(o => o.ColumnPosition).ToList();
             if (!keyColumns.Any())
-                return "";
+                return ("", "");
 
             var columns = keyColumns.Select(s => GetPropertyName(s, "c")).ToList();
 
@@ -251,7 +251,11 @@ namespace MsSqlToolBelt.Business
                 .AppendLine($"{Tab}{Tab}.HasKey(c => new {{ {string.Join(", ", columns)} }});")
                 .AppendLine("}");
 
-            return sb.ToString();
+            var sbOption = new StringBuilder()
+                .AppendLine($"modelBuilder.Entity<{settings.ClassName}>()")
+                .AppendLine($"{Tab}.HasKey(c => new {{ {string.Join(", ", columns)} }});");
+
+            return (sb.ToString(), sbOption.ToString());
         }
     }
 }

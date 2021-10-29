@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<SyntaxDefinition name="C#" extensions=".cs" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+<SyntaxDefinition name="C#" extensions=".cs"
+    xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
   <!-- This is a variant of the AvalonEdit C# highlighting that has several constructs disabled.
 	 The disabled constructs (e.g. contextual keywords) are highlighted using the CSharpLanguage.HighlightingTokenWriter instead.
 	-->
@@ -16,7 +17,7 @@
   <Color name="NumberLiteral" foreground="#FFb5cea8" exampleText="3.1415f"/>
   <Color name="ThisOrBaseReference" foreground="#FF3a6a9b" exampleText="this.Do(); base.Do();"/>
   <Color name="NullOrValueKeywords" foreground="#FF559CD6" exampleText="if (value == null)"/>
-  <Color name="Keywords" foreground="#FFd8a0df" exampleText="if (a) {} else {}"/>
+  <Color name="Keywords" foreground="#FF569CD6" exampleText="if (a) {} else {}"/>
   <Color name="GotoKeywords" foreground="#FFd8a0df" exampleText="continue; return null;"/>
   <Color name="QueryKeywords" foreground="#FFd8a0df" exampleText="var a = from x in y select z;"/>
   <Color name="ExceptionKeywords" foreground="#FFd8a0df" exampleText="try {} catch {} finally {}"/>
@@ -147,5 +148,119 @@
       )
       ([eE][+-]?[0-9]+)? # optional exponent
     </Rule>
+
+    <!--<Rule color="AttributeKeywords">
+      ^(\s*)\[.+\]
+    </Rule>-->
+
+    <Keywords color="Keywords">
+      <Word>abstract</Word>
+      <Word>as</Word>
+      <Word>base</Word>
+      <Word>bool</Word>
+      <Word>break</Word>
+      <Word>byte</Word>
+      <Word>case</Word>
+      <Word>catch</Word>
+      <Word>char</Word>
+      <Word>checked</Word>
+      <Word>class</Word>
+      <Word>const</Word>
+      <Word>continue</Word>
+      <Word>decimal</Word>
+      <Word>default</Word>
+      <Word>delegate</Word>
+      <Word>do</Word>
+      <Word>double</Word>
+      <Word>else</Word>
+      <Word>enum</Word>
+      <Word>event</Word>
+      <Word>explicit</Word>
+      <Word>extern</Word>
+      <Word>false</Word>
+      <Word>finally</Word>
+      <Word>fixed</Word>
+      <Word>float</Word>
+      <Word>for</Word>
+      <Word>foreach</Word>
+      <Word>goto</Word>
+      <Word>if</Word>
+      <Word>implicit</Word>
+      <Word>in</Word>
+      <Word>int</Word>
+      <Word>interface</Word>
+      <Word>internal</Word>
+      <Word>is</Word>
+      <Word>lock</Word>
+      <Word>long</Word>
+      <Word>namespace</Word>
+      <Word>new</Word>
+      <Word>null</Word>
+      <Word>object</Word>
+      <Word>operator</Word>
+      <Word>out</Word>
+      <Word>override</Word>
+      <Word>params</Word>
+      <Word>private</Word>
+      <Word>protected</Word>
+      <Word>public</Word>
+      <Word>readonly</Word>
+      <Word>ref</Word>
+      <Word>return</Word>
+      <Word>sbyte</Word>
+      <Word>sealed</Word>
+      <Word>short</Word>
+      <Word>sizeof</Word>
+      <Word>stackalloc</Word>
+      <Word>static</Word>
+      <Word>string</Word>
+      <Word>struct</Word>
+      <Word>switch</Word>
+      <Word>this</Word>
+      <Word>throw</Word>
+      <Word>true</Word>
+      <Word>try</Word>
+      <Word>typeof</Word>
+      <Word>uint</Word>
+      <Word>ulong</Word>
+      <Word>unchecked</Word>
+      <Word>unsafe</Word>
+      <Word>ushort</Word>
+      <Word>using</Word>
+      <Word>var</Word>
+      <Word>virtual</Word>
+      <Word>void</Word>
+      <Word>volatile</Word>
+      <Word>while</Word>
+      <Word>add</Word>
+      <Word>alias</Word>
+      <Word>async</Word>
+      <Word>await</Word>
+      <Word>dynamic</Word>
+      <Word>get</Word>
+      <Word>global</Word>
+      <Word>nameof</Word>
+      <Word>partial</Word>
+      <Word>remove</Word>
+      <Word>set</Word>
+      <Word>value</Word>
+      <Word>when</Word>
+      <Word>where</Word>
+      <Word>yield</Word>
+      <Word>ascending</Word>
+      <Word>by</Word>
+      <Word>descending</Word>
+      <Word>equals</Word>
+      <Word>from</Word>
+      <Word>group</Word>
+      <Word>in</Word>
+      <Word>into</Word>
+      <Word>join</Word>
+      <Word>let</Word>
+      <Word>on</Word>
+      <Word>orderby</Word>
+      <Word>select</Word>
+      <Word>where</Word>
+    </Keywords>
   </RuleSet>
 </SyntaxDefinition>

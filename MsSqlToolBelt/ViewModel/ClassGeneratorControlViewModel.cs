@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
@@ -303,8 +304,19 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         public ICommand ShowEfKeyCodeCommand => new DelegateCommand(() =>
         {
-            var dialog = new TextDialog("Class generator", "Code to configure multiple columns as key",
-                _classGenResult.CodeEfKey);
+            var dialog = new TextDialog(new TextDialogSettings
+            {
+                Title = "Class generator",
+                Caption = "Code to configure multiple columns as key",
+                CheckboxText = "Without method",
+                ShowOption = true,
+                Text = _classGenResult.CodeEfKey,
+                TextOption = _classGenResult.CodeEfKeyOption
+            })
+            {
+                Owner = Application.Current.MainWindow
+            };
+
             dialog.ShowDialog();
         });
 
@@ -366,16 +378,34 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void GenerateCode()
         {
+            // Check if the class name starts with a number
+            bool ClassNameStartsWithNumber()
+            {
+                if (string.IsNullOrWhiteSpace(ClassName))
+                    return false;
+
+                var firstChar = ClassName[0].ToString();
+                return int.TryParse(firstChar, out _);
+            }
+
+            if (string.IsNullOrWhiteSpace(ClassName) || ClassNameStartsWithNumber())
+            {
+                await ShowMessage("Class generator",
+                    "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+                return;
+            }
+
+            // Check if a column is selected
+            if (Columns.All(a => !a.Use))
+            {
+                await ShowMessage("Class generator", "You have to select at least one column to generate a class.");
+                return;
+            }
+
             var controller = await ShowProgress("Please wait", "Please wait while generating the class...");
 
             try
             {
-                if (Columns.All(a => !a.Use))
-                {
-                    await ShowMessage("Class generator", "You have to select at least one column to generate a class.");
-                    return;
-                }
-
                 _classGenResult = await Task.Run(() =>
                     ClassGenerator.Generate(new ClassGenSettingsDto
                     {

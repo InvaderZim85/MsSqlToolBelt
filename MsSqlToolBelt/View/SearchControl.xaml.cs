@@ -24,7 +24,7 @@ namespace MsSqlToolBelt.View
         public SearchControl()
         {
             InitializeComponent();
-            SearchPanel.Install(_sqlEditor);
+            SearchPanel.Install(SqlEditor);
         }
 
         /// <summary>
@@ -43,16 +43,16 @@ namespace MsSqlToolBelt.View
         /// <param name="text">The desired text</param>
         private void SetSqlText(string text)
         {
-            _sqlEditor.Text = text;
-            _sqlEditor.ScrollToHome();
+            SqlEditor.Text = text;
+            SqlEditor.ScrollToHome();
         }
 
         /// <summary>
         /// Sets the sql schema of the editor window
         /// </summary>
-        private void SetSqlSchema()
+        private void SetTheme()
         {
-            Helper.InitAvalonEditor(_sqlEditor, CodeType.Sql);
+            Helper.InitAvalonEditor(SqlEditor, CodeType.Sql);
         }
 
         /// <summary>
@@ -64,12 +64,9 @@ namespace MsSqlToolBelt.View
                 return;
 
             viewModel.InitViewModel(SetSqlText);
-            SetSqlSchema();
+            SetTheme();
 
-            ThemeManager.Current.ThemeChanged += delegate
-            {
-                SetSqlSchema();
-            };
+            Helper.AddAction("SetTheme", SetTheme);
         }
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace MsSqlToolBelt.View
         {
             var items = new List<SearchResult>();
 
-            foreach (var item in _resultGrid.SelectedItems)
+            foreach (var item in ResultGrid.SelectedItems)
             {
                 if (item is not SearchResult result)
                     continue;

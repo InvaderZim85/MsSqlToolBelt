@@ -10,15 +10,13 @@ using System.Windows;
 using System.Windows.Media;
 using System.Xml;
 using ControlzEx.Theming;
-using HL.HighlightingTheme;
-using HL.Manager;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using Newtonsoft.Json;
 using Serilog;
-using HighlightingLoader = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader;
 
 namespace MsSqlToolBelt
 {
@@ -82,6 +80,8 @@ namespace MsSqlToolBelt
                 colorTheme = Properties.Settings.Default.ColorTheme;
 
             ThemeManager.Current.ChangeTheme(Application.Current, baseColor, colorTheme);
+
+            ExecuteAction("SetTheme");
         }
 
         /// <summary>
@@ -105,26 +105,20 @@ namespace MsSqlToolBelt
         /// <returns>The definition</returns>
         private static IHighlightingDefinition LoadSqlSchema(bool dark, CodeType type)
         {
-            //var fileName = type == CodeType.CSharp
-            //    ? dark 
-            //        ? "AvalonCSharpSchema_Dark.xml"
-            //        : "AvalonCSharpSchema.xml"
-            //    : dark
-            //        ? "AvalonSqlSchema_Dark.xml"
-            //        : "AvalonSqlSchema.xml";
-
-            var fileName = dark ? "Dark.xshtd" : "Light.xshtd";
+            var fileName = type == CodeType.CSharp
+                ? dark
+                    ? "AvalonCSharpSchema_Dark.xml"
+                    : "AvalonCSharpSchema.xml"
+                : dark
+                    ? "AvalonSqlSchema_Dark.xml"
+                    : "AvalonSqlSchema.xml";
 
             var file = Path.Combine(GetBaseFolder(), "Themes", fileName);
 
             using var reader = File.Open(file, FileMode.Open);
             using var xmlReader = new XmlTextReader(reader);
 
-            //HL.Manager.HighlightingLoader.Load(xmlReader)
-
-            //return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
-            var syntaxDefinition = new HL.Xshtd.XshtdSyntaxDefinition();
-            return HL.Manager.HighlightingLoader.Load(xmlReader, syntaxDefinition);
+            return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
         }
 
         /// <summary>
@@ -263,7 +257,7 @@ namespace MsSqlToolBelt
         /// <param name="path">The path of the file</param>
         public static void ShowInExplorer(string path)
         {
-            var arguments = $"/select, \"{path}\"";
+            var arguments = Path.HasExtension(path) ? $"/n, /e, /select, \"{path}\"" : $"/n, /e, \"{path}\"";
             Process.Start("explorer.exe", arguments);
         }
 
@@ -393,6 +387,71 @@ namespace MsSqlToolBelt
                 _ when size >= Math.Pow(1024, 3) => $"{size / Math.Pow(1024, 3):N2} GB",
                 _ => size.ToString()
             };
+        }
+        #endregion
+
+        #region Mediator
+
+        /// <summary>
+        /// The list with the actions which should be executed when the specified key is selected
+        /// </summary>
+        private static readonly SortedList<string, List<Action>> Actions = new();
+
+        /// <summary>
+        /// Adds an action
+        /// </summary>
+        /// <param name="key">The key of the action</param>
+        /// <param name="action">The action which should be executed</param>
+        public static void AddAction(string key, Action action)
+        {
+            if (Actions.ContainsKey(key))
+            {
+                Actions[key].Add(action);
+            }
+            else
+            {
+                Actions.Add(key, new List<Action>
+                {
+                    action
+                });
+            }
+        }
+
+        /// <summary>
+        /// Executes the action which of the desired key
+        /// </summary>
+        /// <param name="key">The key of the action</param>
+        public static void ExecuteAction(string key)
+        {
+            if (!Actions.ContainsKey(key))
+                return;
+
+            var actions = Actions[key];
+            foreach (var action in actions)
+            {
+                // Execute the action
+                action();
+            }
+        }
+
+        /// <summary>
+        /// Removes all actions with the specified key
+        /// </summary>
+        /// <param name="key">The key of the action</param>
+        public static void RemoveAction(string key)
+        {
+            if (Actions.ContainsKey(key))
+            {
+                Actions.Remove(key);
+            }
+        }
+
+        /// <summary>
+        /// Removes all actions
+        /// </summary>
+        public static void RemoveAllActions()
+        {
+            Actions.Clear();
         }
         #endregion
     }

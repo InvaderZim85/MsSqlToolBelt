@@ -37,6 +37,14 @@
             Content="{Binding Caption}"
             Style="{StaticResource Headline}" />
 
+        <CheckBox
+            Grid.Row="0"
+            Margin="3"
+            HorizontalAlignment="Right"
+            Content="{Binding CheckboxText}"
+            IsChecked="{Binding ShowOption}"
+            Visibility="{Binding OptionVisibility}" />
+
         <Separator Grid.Row="1" />
 
         <avalonedit:TextEditor

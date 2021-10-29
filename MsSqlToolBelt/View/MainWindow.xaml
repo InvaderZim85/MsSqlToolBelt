@@ -50,7 +50,7 @@
                 Header="Settings"
                 IsOpen="{Binding SettingsOpen}"
                 Position="Right">
-                <local:SettingsControl x:Name="_settingsControl" />
+                <local:SettingsControl x:Name="SettingsControl" />
             </mah:Flyout>
 
             <mah:Flyout
@@ -58,7 +58,7 @@
                 Header="Data types"
                 IsOpen="{Binding DataTypeOpen}"
                 Position="Right">
-                <local:DataTypeControl x:Name="_dataTypeControl" />
+                <local:DataTypeControl x:Name="DataTypeControl" />
             </mah:Flyout>
 
             <mah:Flyout
@@ -66,7 +66,7 @@
                 Header="Info"
                 IsOpen="{Binding InfoOpen}"
                 Position="Right">
-                <local:InfoControl x:Name="_infoControl" />
+                <local:InfoControl x:Name="InfoControl" />
             </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>

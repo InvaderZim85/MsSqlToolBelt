@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using MahApps.Metro.Controls;
+using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 
@@ -11,28 +12,20 @@ namespace MsSqlToolBelt.View
     public partial class TextDialog : MetroWindow
     {
         /// <summary>
-        /// Contains the caption
+        /// Contains the settings of the dialog
         /// </summary>
-        private readonly string _caption;
-
-        /// <summary>
-        /// The code which should be shown
-        /// </summary>
-        private readonly string _code;
+        private readonly TextDialogSettings _settings;
 
         /// <summary>
         /// Creates a new instance of the <see cref="TextDialog"/>
         /// </summary>
-        /// <param name="title">The title of the window</param>
-        /// <param name="caption">The caption which should be shown above the code editor</param>
-        /// <param name="code">The code which should be shown</param>
-        public TextDialog(string title, string caption, string code)
+        /// <param name="settings">The options of the dialog</param>
+        public TextDialog(TextDialogSettings settings)
         {
             InitializeComponent();
 
-            _caption = caption;
-            Title = title;
-            _code = code;
+            _settings = settings;
+            Title = settings.Title;
         }
 
         /// <summary>
@@ -45,9 +38,18 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
+        /// Sets the text of the editor
+        /// </summary>
+        /// <param name="text">The text which should be shown</param>
+        private void SetEditorText(string text)
+        {
+            CodeEditor.Text = text;
+        }
+
+        /// <summary>
         /// Sets the schema of the editor controls
         /// </summary>
-        private void SetSchema()
+        private void SetTheme()
         {
             // CSharp editor
             Helper.InitAvalonEditor(CodeEditor, CodeType.CSharp);
@@ -61,11 +63,13 @@ namespace MsSqlToolBelt.View
         private void TextDialog_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is TextDialogViewModel viewModel)
-                viewModel.InitViewModel(_caption, GetEditorText);
+                viewModel.InitViewModel(_settings, GetEditorText, SetEditorText);
 
-            CodeEditor.Text = _code;
+            CodeEditor.Text = _settings.Text;
 
-            SetSchema();
+            SetTheme();
+
+            Helper.AddAction("SetTheme", SetTheme);
         }
 
         /// <summary>

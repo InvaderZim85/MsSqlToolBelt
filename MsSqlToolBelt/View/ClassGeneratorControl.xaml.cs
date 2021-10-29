@@ -49,9 +49,9 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
-        /// Sets the schema of the editor controls
+        /// Sets the theme of the editor controls
         /// </summary>
-        private void SetSchema()
+        private void SetTheme()
         {
             // Sql editor
             Helper.InitAvalonEditor(SqlEditor, CodeType.Sql);
@@ -69,7 +69,9 @@ namespace MsSqlToolBelt.View
                 return;
 
             viewModel.InitViewModel(SetCode);
-            SetSchema();
+            SetTheme();
+
+            Helper.AddAction("SetTheme", SetTheme);
         }
 
         /// <summary>
