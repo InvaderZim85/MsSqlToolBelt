@@ -68,13 +68,13 @@
       <HintPath>..\packages\AvalonEdit.6.1.2.30\lib\net45\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.2.4.7\lib\net47\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.2.4.9\lib\net47\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.11.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks.PixelartIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.8.0\lib\net47\MahApps.Metro.IconPacks.PixelartIcons.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.IconPacks.PixelartIcons.4.11.0\lib\net47\MahApps.Metro.IconPacks.PixelartIcons.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAPICodePack-Core.1.1.0.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
@@ -86,7 +86,7 @@
       <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.37\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -101,8 +101,8 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SqlClient, Version=4.6.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SqlClient.4.8.2\lib\net461\System.Data.SqlClient.dll</HintPath>
+    <Reference Include="System.Data.SqlClient, Version=4.6.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SqlClient.4.8.3\lib\net461\System.Data.SqlClient.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -134,8 +134,8 @@
     <Reference Include="Xceed.Wpf.Toolkit, Version=4.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.4.1.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
-    <Reference Include="ZimLabs.Database.MsSql, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZimLabs.Database.MsSql.1.2.1\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
+    <Reference Include="ZimLabs.Database.MsSql, Version=1.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZimLabs.Database.MsSql.1.2.2\lib\netstandard2.0\ZimLabs.Database.MsSql.dll</HintPath>
     </Reference>
     <Reference Include="ZimLabs.TableCreator, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ZimLabs.TableCreator.1.2.0\lib\netstandard2.0\ZimLabs.TableCreator.dll</HintPath>
@@ -157,8 +157,11 @@
     <Compile Include="Business\ExportHelper.cs" />
     <Compile Include="Business\PackageInfo.cs" />
     <Compile Include="DataObjects\Arguments.cs" />
+    <Compile Include="DataObjects\ClassGenerator\ClassGenResult.cs" />
+    <Compile Include="DataObjects\ClassGenerator\ClassGenSettingsDto.cs" />
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
     <Compile Include="DataObjects\Search\TableIndex.cs" />
+    <Compile Include="DataObjects\TextDialogSettings.cs" />
     <Compile Include="DataObjects\Types\CodeType.cs" />
     <Compile Include="DataObjects\CustomEnums.cs" />
     <Compile Include="DataObjects\Types\DataType.cs" />
@@ -194,6 +197,7 @@
     <Compile Include="ViewModel\SettingsControlViewModel.cs" />
     <Compile Include="ViewModel\TableIndexWindowViewModel.cs" />
     <Compile Include="ViewModel\TableTypeControlViewModel.cs" />
+    <Compile Include="ViewModel\TextDialogViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ClassGeneratorControl.xaml.cs">
       <DependentUpon>ClassGeneratorControl.xaml</DependentUpon>
@@ -218,6 +222,9 @@
     </Compile>
     <Compile Include="View\TableTypeControl.xaml.cs">
       <DependentUpon>TableTypeControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TextDialog.xaml.cs">
+      <DependentUpon>TextDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -295,12 +302,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\TextDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SqlSchema\AvalonSqlSchema.xml">
+    <None Include="Themes\AvalonSqlSchema.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="SqlSchema\AvalonSqlSchema_Dark.xml">
+    <None Include="Themes\AvalonSqlSchema_Dark.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -325,6 +336,17 @@
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Themes\AvalonCSharpSchema.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Themes\AvalonCSharpSchema_Dark.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if $(ConfigurationName) == Release (

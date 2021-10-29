@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects
 {
@@ -67,23 +66,6 @@ namespace MsSqlToolBelt.DataObjects
         /// <returns>The list with the types</returns>
         public static List<TextValueItem> GetFilterTypeList()
         {
-            //var result = new List<TextValueItem>();
-
-            //foreach (FilterType value in Enum.GetValues(typeof(FilterType)))
-            //{
-            //    var attribute = value.GetAttribute<DescriptionValueAttribute>();
-
-            //    if (attribute == null)
-            //        result.Add(new TextValueItem((int)value, value.ToString()));
-            //    else
-            //        result.Add(new TextValueItem((int)value, attribute.ValueText)
-            //        {
-            //            AdditionalText = attribute.Description
-            //        });
-            //}
-
-            //return result;
-
             return GetValueList<FilterType>();
         }
 

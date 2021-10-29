@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.ViewModel;
 using ZimLabs.Database.MsSql;
@@ -50,15 +49,15 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
-        /// Sets the schema of the editor controls
+        /// Sets the theme of the editor controls
         /// </summary>
-        private void SetSchema()
+        private void SetTheme()
         {
             // Sql editor
-            Helper.InitAvalonEditor(SqlEditor);
+            Helper.InitAvalonEditor(SqlEditor, CodeType.Sql);
 
             // CSharp editor
-            Helper.InitAvalonEditor(CodeEditor);
+            Helper.InitAvalonEditor(CodeEditor, CodeType.CSharp);
         }
 
         /// <summary>
@@ -70,7 +69,9 @@ namespace MsSqlToolBelt.View
                 return;
 
             viewModel.InitViewModel(SetCode);
-            SetSchema();
+            SetTheme();
+
+            Helper.AddAction("SetTheme", SetTheme);
         }
 
         /// <summary>

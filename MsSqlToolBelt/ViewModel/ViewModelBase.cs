@@ -186,6 +186,15 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Copies the given content to the clipboard
+        /// </summary>
+        /// <param name="content">The content which should be copied</param>
+        protected static void CopyToClipboard(string content)
+        {
+            Clipboard.SetText(content);
+        }
+
+        /// <summary>
         /// Saves the values as formatted string into a file
         /// </summary>
         /// <typeparam name="T">The type of the values</typeparam>

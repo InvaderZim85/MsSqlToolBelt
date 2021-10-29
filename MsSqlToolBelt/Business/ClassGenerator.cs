@@ -19,110 +19,131 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Generates the code
         /// </summary>
-        /// <param name="table">The selected table</param>
-        /// <param name="modifier">The modifier of the class</param>
-        /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
-        /// <param name="className">The name of the desired class</param>
-        /// <param name="backingField">true to create a backing field, otherwise false</param>
-        /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
-        /// <param name="addSummary">true to add an empty summary to the class, otherwise false</param>
+        /// <param name="settings">The settings for the class generator</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static (string ClassCode, string SqlStatement) Generate(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass, bool addSummary)
+        public static ClassGenResult Generate(ClassGenSettingsDto settings)
         {
-            if (table == null)
-                throw new ArgumentNullException(nameof(table));
+            if (settings?.Table == null)
+                throw new ArgumentNullException(nameof(settings));
 
-            var classCode = GenerateClass(table, modifier, markAsSealed, className, backingField, efClass, addSummary);
+            var classCode = GenerateClass(settings);
 
-            var sql = GenerateSqlQuery(table);
+            var sql = GenerateSqlQuery(settings.Table);
 
-            return (classCode, sql);
+            var (efKeyCode, efKeyCodeOption) = settings.EfClass ? CreateEfKeyCode(settings) : ("", "");
+
+            return new ClassGenResult(classCode, sql, efKeyCode, efKeyCodeOption);
+        }
+
+        /// <summary>
+        /// Gets the name of the property which should be created
+        /// </summary>
+        /// <param name="column">The column</param>
+        /// <param name="colPrefix">A value which will be added with a dot as prefix</param>
+        /// <returns>The property name</returns>
+        private static string GetPropertyName(TableColumn column, string colPrefix = "")
+        {
+            if (column == null)
+                return "";
+
+            var propName = string.IsNullOrEmpty(column.Alias) ? column.Column.Replace(" ", "") : column.Alias;
+            // If the name is numeric, add "Column" to prevent errors, because a variable must not start with a number
+            if (propName.IsNumeric())
+                propName = $"Column{propName}";
+
+            return string.IsNullOrEmpty(colPrefix) ? propName : $"{colPrefix}.{propName}";
         }
 
         /// <summary>
         /// Generates the code of the CSharp class
         /// </summary>
-        /// <param name="table">The table with the needed information</param>
-        /// <param name="modifier">The modifier of the class</param>
-        /// <param name="markAsSealed">true to mark as sealed, otherwise false</param>
-        /// <param name="className">The name of the class</param>
-        /// <param name="backingField">true to create a backing field, otherwise false</param>
-        /// <param name="efClass">true to add the Entity Framework attributes, otherwise false</param>
-        /// <param name="addSummary">true to add an empty summary to the class, otherwise false</param>
+        /// <param name="settings">The settings for the class generator</param>
         /// <returns>The CSharp code</returns>
-        private static string GenerateClass(Table table, string modifier, bool markAsSealed, string className, bool backingField, bool efClass, bool addSummary)
+        private static string GenerateClass(ClassGenSettingsDto settings)
         {
             var sb = new StringBuilder();
 
             void AddSummary(string message, bool withTab = true)
             {
                 var spacer = withTab ? Tab : "";
-                sb.AppendLine($"{spacer}/// <summary>");
-                sb.AppendLine($"{spacer}/// {message}");
-                sb.AppendLine($"{spacer}/// </summary>");
+                sb.AppendLine($"{spacer}/// <summary>")
+                    .AppendLine($"{spacer}/// {message}")
+                    .AppendLine($"{spacer}/// </summary>");
             }
 
-            void AddPropertyAttributes(bool isPrimaryKey, string columnName)
+            void AddPropertyAttributes(TableColumn column)
             {
-                if (isPrimaryKey)
+                if (column.IsPrimaryKey)
                     sb.AppendLine($"{Tab}[Key]");
 
-                if (!string.IsNullOrEmpty(columnName))
-                    sb.AppendLine($"{Tab}[Column(\"{columnName}\")]");
+                if (!string.IsNullOrEmpty(column.Column))
+                    sb.AppendLine($"{Tab}[Column(\"{column.Column}\"){AddTypeInfo(column)}]");
             }
 
-            if (string.IsNullOrEmpty(className))
-                className = table.Name;
+            // Adds a type change if any is needed (for example the db type is Date)
+            string AddTypeInfo(TableColumn column)
+            {
+                return column == null
+                    ? ""
+                    : column.DataType.EqualsIgnoreCase("date")
+                        ? ", DataType(DataType.Date)"
+                        : "";
+            }
+
+            var className = string.IsNullOrEmpty(settings.ClassName) ? settings.Table.Name : settings.ClassName;
 
             // Add summary / ef attributes
-            if (addSummary)
+            if (settings.AddSummary)
                 AddSummary("TODO", false);
-            if (efClass)
-                sb.AppendLine($"[Table(\"{table.Name}\")]");
+            if (settings.EfClass)
+                sb.AppendLine($"[Table(\"{settings.Table.Name}\", Schema = \"{settings.Table.Schema}\")]");
 
-            sb.AppendLine($"{modifier} {(markAsSealed ? "sealed " : "")}class {className.FirstCharToUpper()}");
-            sb.AppendLine("{");
+            sb.AppendLine($"{settings.Modifier} {(settings.MarkAsSealed ? "sealed " : "")}class {className.FirstCharToUpper()}")
+                .AppendLine("{");
 
             var count = 1;
-            var columnCount = table.Columns.Count(c => c.Use);
-            foreach (var column in table.Columns.OrderBy(o => o.ColumnPosition).Where(w => w.Use))
+            var columnCount = settings.Table.Columns.Count(c => c.Use);
+            foreach (var column in settings.Table.Columns.OrderBy(o => o.ColumnPosition).Where(w => w.Use))
             {
-                var fieldName = string.IsNullOrEmpty(column.Alias) ? column.Column.Replace(" ", "") : column.Alias;
-                if (fieldName.IsNumeric())
-                    fieldName = $"Column{fieldName}";
+                // Get the name for the property
+                var propName = GetPropertyName(column);
+                if (string.IsNullOrEmpty(propName))
+                    continue; // Skip the rest if the property name is empty
 
+                // Get the type of the column
                 var dataType = GetDataType(column);
-                if (backingField)
+
+                // Check if a backing field should be created
+                if (settings.BackingField)
                 {
-                    var field = $"_{fieldName.FirstCharToLower()}";
+                    var field = $"_{propName.FirstCharToLower()}";
 
-                    if (addSummary)
-                        AddSummary($"Backing field for <see cref=\"{fieldName}\"/>");
+                    if (settings.AddSummary)
+                        AddSummary($"Backing field for <see cref=\"{propName}\"/>");
 
-                    sb.AppendLine($"{Tab}private {dataType} {field};");
+                    sb.AppendLine($"{Tab}private {dataType} {field};").AppendLine();
 
                     // Add summary / ef attributes
-                    if (addSummary)
-                        AddSummary("TODO");
-                    if (efClass)
-                        AddPropertyAttributes(column.IsPrimaryKey, column.Column);
+                    if (settings.AddSummary)
+                        AddSummary("Gets or sets TODO");
+                    if (settings.EfClass)
+                        AddPropertyAttributes(column);
 
-                    sb.AppendLine($"{Tab}public {dataType} {fieldName}");
-                    sb.AppendLine($"{Tab}{{");
-                    sb.AppendLine($"{Tab}{Tab}get => {field};");
-                    sb.AppendLine($"{Tab}{Tab}set => {field} = value;");
-                    sb.AppendLine($"{Tab}}}");
-                    sb.AppendLine(); // Line break
+                    sb.AppendLine($"{Tab}public {dataType} {propName}")
+                        .AppendLine($"{Tab}{{")
+                        .AppendLine($"{Tab}{Tab}get => {field};")
+                        .AppendLine($"{Tab}{Tab}set => {field} = value;")
+                        .AppendLine($"{Tab}}}");
                 }
                 else
                 {
                     // Add summary / ef attributes
-                    if (addSummary)
+                    if (settings.AddSummary)
                         AddSummary("TODO");
-                    if (efClass)
-                        AddPropertyAttributes(column.IsPrimaryKey, column.Column);
+                    if (settings.EfClass)
+                        AddPropertyAttributes(column);
 
-                    sb.AppendLine($"{Tab}public {dataType} {fieldName} {{ get; set; }}");
+                    sb.AppendLine($"{Tab}public {dataType} {propName} {{ get; set; }}");
                 }
 
                 // Add only a space when there are columns left
@@ -159,8 +180,7 @@ namespace MsSqlToolBelt.Business
                     : $"{Tab}[{column.Column}] AS [{column.Alias}]{comma}");
             }
 
-            sb.AppendLine("FROM");
-            sb.AppendLine($"{Tab}[{table.Schema}].[{table.Name}]");
+            sb.AppendLine("FROM").AppendLine($"{Tab}[{table.Schema}].[{table.Name}]");
 
             return sb.ToString();
         }
@@ -206,6 +226,36 @@ namespace MsSqlToolBelt.Business
                 "uniqueidentifier" => "GUID",
                 _ => column.DataType
             };
+        }
+
+        /// <summary>
+        /// Creates the code which is needed to create multiple key columns
+        /// </summary>
+        /// <param name="settings">The settings</param>
+        /// <returns>The c# code</returns>
+        private static (string code, string optionalCode) CreateEfKeyCode(ClassGenSettingsDto settings)
+        {
+            if (settings?.Table == null)
+                return ("", "");
+
+            var keyColumns = settings.Table.Columns.Where(w => w.IsPrimaryKey).OrderBy(o => o.ColumnPosition).ToList();
+            if (!keyColumns.Any())
+                return ("", "");
+
+            var columns = keyColumns.Select(s => GetPropertyName(s, "c")).ToList();
+
+            var sb = new StringBuilder()
+                .AppendLine("protected override void OnModelCreating(ModelBuilder modelBuilder)")
+                .AppendLine("{")
+                .AppendLine($"{Tab}modelBuilder.Entity<{settings.ClassName}>()")
+                .AppendLine($"{Tab}{Tab}.HasKey(c => new {{ {string.Join(", ", columns)} }});")
+                .AppendLine("}");
+
+            var sbOption = new StringBuilder()
+                .AppendLine($"modelBuilder.Entity<{settings.ClassName}>()")
+                .AppendLine($"{Tab}.HasKey(c => new {{ {string.Join(", ", columns)} }});");
+
+            return (sb.ToString(), sbOption.ToString());
         }
     }
 }

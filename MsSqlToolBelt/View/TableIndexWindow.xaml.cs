@@ -28,16 +28,6 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
-        /// Occurs when the user hits the close button
-        /// </summary>
-        /// <param name="sender">The close button</param>
-        /// <param name="e">The event arguments</param>
-        private void ButtonClose_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        /// <summary>
         /// Occurs when the window was loaded
         /// </summary>
         /// <param name="sender">The <see cref="TableIndexWindow"/></param>

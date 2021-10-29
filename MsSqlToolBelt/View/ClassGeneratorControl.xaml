@@ -2,13 +2,13 @@
     x:Class="MsSqlToolBelt.View.ClassGeneratorControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Types="clr-namespace:MsSqlToolBelt.DataObjects.Types"
     xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dataObjects="clr-namespace:MsSqlToolBelt.DataObjects"
     xmlns:local="clr-namespace:MsSqlToolBelt.View"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:types="clr-namespace:MsSqlToolBelt.DataObjects.Types"
     xmlns:viewModel="clr-namespace:MsSqlToolBelt.ViewModel"
     d:DesignHeight="600"
     d:DesignWidth="1920"
@@ -150,13 +150,13 @@
                     <Button
                         Width="80"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static Types:SelectionType.All}"
+                        CommandParameter="{x:Static types:SelectionType.All}"
                         Content="Select all"
                         ToolTip="Checks all entries" />
                     <Button
                         Width="80"
                         Command="{Binding SetSelectionCommand}"
-                        CommandParameter="{x:Static Types:SelectionType.None}"
+                        CommandParameter="{x:Static types:SelectionType.None}"
                         Content="Select none"
                         ToolTip="Uncheck all entries" />
                     <Button
@@ -248,9 +248,17 @@
                     FontFamily="Hack,Consolas"
                     FontSize="12"
                     IsReadOnly="True"
-                    ShowLineNumbers="True" />
+                    ShowLineNumbers="True"
+                    SyntaxHighlighting="C#" />
 
                 <Separator Grid.Row="6" />
+
+                <Button
+                    Grid.Row="7"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ShowEfKeyCodeCommand}"
+                    Content="Show EF key code"
+                    IsEnabled="{Binding ShowEfKeyCode}" />
 
                 <StackPanel
                     Grid.Row="7"
@@ -259,12 +267,12 @@
                     <Button
                         Width="50"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static Types:CodeType.CSharp}"
+                        CommandParameter="{x:Static types:CodeType.CSharp}"
                         Content="Clear" />
                     <Button
                         Width="50"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static Types:CodeType.CSharp}"
+                        CommandParameter="{x:Static types:CodeType.CSharp}"
                         Content="Copy" />
                 </StackPanel>
 
@@ -286,7 +294,8 @@
                     FontFamily="Hack,Consolas"
                     FontSize="12"
                     IsReadOnly="True"
-                    ShowLineNumbers="True" />
+                    ShowLineNumbers="True"
+                    SyntaxHighlighting="sql" />
 
                 <Separator Grid.Row="12" />
 
@@ -297,12 +306,12 @@
                     <Button
                         Width="50"
                         Command="{Binding ClearCommand}"
-                        CommandParameter="{x:Static Types:CodeType.Sql}"
+                        CommandParameter="{x:Static types:CodeType.Sql}"
                         Content="Clear" />
                     <Button
                         Width="50"
                         Command="{Binding CopyCommand}"
-                        CommandParameter="{x:Static Types:CodeType.Sql}"
+                        CommandParameter="{x:Static types:CodeType.Sql}"
                         Content="Copy" />
                 </StackPanel>
             </Grid>
