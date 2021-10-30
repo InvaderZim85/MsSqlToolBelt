@@ -29,6 +29,10 @@
     <!--  Right window commands  -->
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
+            <Button
+                Command="{Binding ShowUpdateInfoCommand}"
+                Content="Update available!"
+                Visibility="{Binding UpdateButtonVisible}" />
             <Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
                 <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
             </Button>
@@ -109,7 +113,8 @@
                     <Label
                         Grid.Row="0"
                         Grid.Column="0"
-                        Content="Server:" />
+                        Content="Server:"
+                        Visibility="Visible" />
                     <ComboBox
                         Grid.Row="0"
                         Grid.Column="1"

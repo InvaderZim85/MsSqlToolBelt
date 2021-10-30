@@ -3,16 +3,20 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using System.Windows.Input;
+using Microsoft.VisualStudio.Threading;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
+using MsSqlToolBelt.DataObjects.Github;
 using MsSqlToolBelt.DataObjects.Types;
 using MsSqlToolBelt.View;
 using Serilog;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
-using Application = System.Windows.Application;
 
 namespace MsSqlToolBelt.ViewModel
 {
@@ -43,7 +47,6 @@ namespace MsSqlToolBelt.ViewModel
         private Action<FlyOutType> _initFlyOut;
         #endregion
 
-
         /// <summary>
         /// The instance for the interaction with the database
         /// </summary>
@@ -58,6 +61,11 @@ namespace MsSqlToolBelt.ViewModel
         /// Contains the maximal memory usage
         /// </summary>
         private long _maxMemoryUsage;
+
+        /// <summary>
+        /// Contains the info of the latest release
+        /// </summary>
+        private ReleaseInfo _releaseInfo;
 
         #region Properties for the view
         /// <summary>
@@ -284,8 +292,21 @@ namespace MsSqlToolBelt.ViewModel
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Backing field for <see cref="UpdateButtonVisible"/>
+        /// </summary>
+        private Visibility _updateButtonVisible = Visibility.Hidden;
 
+        /// <summary>
+        /// Gets or sets the value which indicates if the update menu is visible
+        /// </summary>
+        public Visibility UpdateButtonVisible
+        {
+            get => _updateButtonVisible;
+            set => SetField(ref _updateButtonVisible, value);
+        }
+
+        #endregion
 
         /// <summary>
         /// Init the view model
@@ -297,6 +318,9 @@ namespace MsSqlToolBelt.ViewModel
         public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls, Action<FlyOutType> initFlyOut)
         {
             Helper.InitLogger();
+
+            // Start the update check
+            CheckUpdate();
 
             _setConnector = setConnector;
             _loadData = loadData;
@@ -382,6 +406,18 @@ namespace MsSqlToolBelt.ViewModel
         });
 
         /// <summary>
+        /// The command to show the update window
+        /// </summary>
+        public ICommand ShowUpdateInfoCommand => new DelegateCommand(() =>
+        {
+            if (_releaseInfo == null)
+                return;
+
+            var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
+            dialog.ShowDialog();
+        });
+
+        /// <summary>
         /// Loads the server list and adds them to the property
         /// </summary>
         private void LoadServerList()
@@ -464,6 +500,27 @@ namespace MsSqlToolBelt.ViewModel
 
             // Log the max. memory usage
             Log.Information($"Maximal memory usage: {_maxMemoryUsage.ConvertSize()} ({_maxMemoryUsage:N0} bytes)");
+        }
+
+        /// <summary>
+        /// Checks if a new version is available
+        /// </summary>
+        private void CheckUpdate()
+        {
+            // The "Forget()" method is used to let the async task run without waiting.
+            // More information: https://docs.microsoft.com/en-us/answers/questions/186037/taskrun-without-wait.html
+            // To use "Forget" you need the following nuget package: https://www.nuget.org/packages/Microsoft.VisualStudio.Threading/
+            UpdateHelper.LoadReleaseInfo(SetReleaseInfo).Forget();
+        }
+
+        /// <summary>
+        /// Sets the release info and shows the update button
+        /// </summary>
+        /// <param name="releaseInfo">The release info</param>
+        private void SetReleaseInfo(ReleaseInfo releaseInfo)
+        {
+            _releaseInfo = releaseInfo;
+            UpdateButtonVisible = releaseInfo != null ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

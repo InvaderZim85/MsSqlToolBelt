@@ -13,6 +13,7 @@ using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using Markdig;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
 using Newtonsoft.Json;
@@ -259,6 +260,32 @@ namespace MsSqlToolBelt
         {
             var arguments = Path.HasExtension(path) ? $"/n, /e, /select, \"{path}\"" : $"/n, /e, \"{path}\"";
             Process.Start("explorer.exe", arguments);
+        }
+
+        /// <summary>
+        /// Converts a markdown formatted content into a html page with the usage of <see cref="Markdown"/>
+        /// </summary>
+        /// <param name="markdown">The markdown formatted content</param>
+        /// <returns>The html page</returns>
+        public static string MarkdownToHtml(string markdown)
+        {
+            if (string.IsNullOrWhiteSpace(markdown))
+                return "";
+
+            var dark = Properties.Settings.Default.BaseColor.Equals("Dark");
+            var background = dark ? "#0D1117" : "#C9D1D9";
+            var foreground = dark ? "#C9D1D9" : "#0D1117";
+
+            var htmlContent = Markdown.ToHtml(markdown);
+
+            var sb = new StringBuilder()
+                .AppendLine("<html>")
+                .AppendLine($"<body style='font-family:Segoe UI;background-color:{background};color:{foreground}'>")
+                .Append(htmlContent)
+                .AppendLine("</body>")
+                .AppendLine("</html>");
+
+            return sb.ToString();
         }
 
         #region Extensions
