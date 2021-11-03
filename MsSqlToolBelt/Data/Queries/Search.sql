@@ -100,7 +100,7 @@ DECLARE @tableResult TABLE
     [MaxLength] INT NOT NULL,
     [Precision] INT NOT NULL,
     DecimalPlaceValue INT NOT NULL,
-    DefaultValue NVARCHAR(50) NULL,
+    DefaultValue NVARCHAR(250) NULL,
     IsReplicated BIT NOT NULL DEFAULT (0)
 );
 
