@@ -1,4 +1,8 @@
-﻿namespace MsSqlToolBelt.DataObjects
+﻿using System;
+using System.Threading.Tasks;
+using MsSqlToolBelt.DataObjects.Types;
+
+namespace MsSqlToolBelt.DataObjects
 {
     /// <summary>
     /// Provides the settings for the text dialog
@@ -21,7 +25,7 @@
         public string Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the text which should be shown then the "option" is true
+        /// Gets or sets the text which should be shown when the "option" is true
         /// </summary>
         public string TextOption { get; set; }
 
@@ -34,5 +38,20 @@
         /// Gets or sets the text of the check box
         /// </summary>
         public string CheckboxText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the code type
+        /// </summary>
+        public CodeType CodeType { get; set; } = CodeType.None;
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the validate button should be shown
+        /// </summary>
+        public bool ShowValidateButton { get; set; }
+
+        /// <summary>
+        /// Gets or sets the function wich validates the input
+        /// </summary>
+        public Func<string, Task<(bool valid, string message)>> ValidationFunc;
     }
 }

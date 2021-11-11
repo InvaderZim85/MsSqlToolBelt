@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
@@ -32,7 +31,7 @@ namespace MsSqlToolBelt.ViewModel
         public ObservableCollection<string> BaseColorList
         {
             get => _baseColorList;
-            set => SetField(ref _baseColorList, value);
+            private set => SetField(ref _baseColorList, value);
         }
 
         /// <summary>
@@ -248,25 +247,26 @@ namespace MsSqlToolBelt.ViewModel
         {
             try
             {
+                BaseColorList = new ObservableCollection<string>(ThemeManager.Current.BaseColors);
+                ColorThemeList = new ObservableCollection<string>(ThemeManager.Current.ColorSchemes);
+
                 var settings = Helper.LoadSettings();
                 if (settings == null)
                 {
                     ServerListCount = 10;
                     ServerList = new ObservableCollection<string>();
                     TableIgnoreList = new ObservableCollection<TableIgnoreEntry>();
+                    SelectedBaseColor = Properties.Settings.Default.BaseColor;
+                    SelectedColorTheme = Properties.Settings.Default.ColorTheme;
                 }
                 else
                 {
                     ServerListCount = settings.ServerListCount;
                     ServerList = new ObservableCollection<string>(settings.ServerList);
                     TableIgnoreList = new ObservableCollection<TableIgnoreEntry>(settings.TableIgnoreList);
+                    SelectedBaseColor = string.IsNullOrEmpty(settings.ThemeBaseColor) ? Properties.Settings.Default.BaseColor : settings.ThemeBaseColor;
+                    SelectedColorTheme = string.IsNullOrEmpty(settings.ThemeColor) ? Properties.Settings.Default.ColorTheme : settings.ThemeColor;
                 }
-
-                BaseColorList = new ObservableCollection<string>(ThemeManager.Current.BaseColors);
-                ColorThemeList = new ObservableCollection<string>(ThemeManager.Current.ColorSchemes);
-
-                SelectedBaseColor = Properties.Settings.Default.BaseColor;
-                SelectedColorTheme = Properties.Settings.Default.ColorTheme;
 
                 _init = false;
             }
@@ -285,20 +285,13 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                if (!string.IsNullOrEmpty(SelectedBaseColor))
-                    Properties.Settings.Default.BaseColor = SelectedBaseColor;
-
-                if (!string.IsNullOrEmpty(SelectedColorTheme))
-                    Properties.Settings.Default.ColorTheme = SelectedColorTheme;
-
-                Properties.Settings.Default.Save();
-
-
                 var settings = new Settings
                 {
                     ServerListCount = ServerListCount,
                     ServerList = ServerList.ToList(),
-                    TableIgnoreList = TableIgnoreList.ToList()
+                    TableIgnoreList = TableIgnoreList.ToList(),
+                    ThemeColor = SelectedColorTheme,
+                    ThemeBaseColor = SelectedBaseColor
                 };
 
                 if (!Helper.SaveSettings(settings))

@@ -3,7 +3,7 @@
     /// <summary>
     /// The different code types
     /// </summary>
-    internal enum CodeType
+    public enum CodeType
     {
         /// <summary>
         /// Shows / creates the sql code
@@ -13,6 +13,11 @@
         /// <summary>
         /// Shows / creates the csharp code
         /// </summary>
-        CSharp
+        CSharp,
+
+        /// <summary>
+        /// Nothing is selected
+        /// </summary>
+        None
     }
 }

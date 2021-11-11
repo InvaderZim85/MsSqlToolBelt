@@ -39,5 +39,10 @@
         /// Gets or sets the value which indicates if a summary should be added
         /// </summary>
         public bool AddSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SQL query on the basis of which the class is to be generated
+        /// </summary>
+        public string SqlQuery { get; set; }
     }
 }

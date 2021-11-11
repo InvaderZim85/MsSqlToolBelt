@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
+using Serilog;
 
 namespace MsSqlToolBelt.Business
 {
@@ -36,6 +40,23 @@ namespace MsSqlToolBelt.Business
         }
 
         /// <summary>
+        /// Generates the code from a sql query
+        /// </summary>
+        /// <param name="repo">The instance for the interaction with the database</param>
+        /// <param name="settings">The settings for the class generator</param>
+        /// <returns>The CSharp code and the sql statement</returns>
+        public static async Task<ClassGenResult> GenerateFromQueryAsync(GeneratorRepo repo, ClassGenSettingsDto settings)
+        {
+            await GenerateClassFromQuery(repo, settings);
+            var classCode = GenerateClass(settings);
+
+            var (efKeyCode, efKeyCodeOption) = settings.EfClass ? CreateEfKeyCode(settings) : ("", "");
+
+            return new ClassGenResult(classCode, settings.SqlQuery, efKeyCode, efKeyCodeOption);
+        }
+
+        #region Default class generator
+        /// <summary>
         /// Gets the name of the property which should be created
         /// </summary>
         /// <param name="column">The column</param>
@@ -62,6 +83,29 @@ namespace MsSqlToolBelt.Business
         private static string GenerateClass(ClassGenSettingsDto settings)
         {
             var sb = new StringBuilder();
+
+            if (settings.Table.UniqueError)
+            {
+                sb.AppendLine("/*")
+                    .AppendLine(" NOTE - Unique property names")
+                    .AppendLine(" ----------------------------")
+                    .AppendLine(" In your SQL query are several columns with the same name.")
+                    .AppendLine(" Since this is not possible in C#, please adjust the column names")
+                    .AppendLine(" and run the process again.")
+                    .AppendLine("*/")
+                    .AppendLine();
+            }
+
+            if (!string.IsNullOrWhiteSpace(settings.SqlQuery) && settings.EfClass)
+            {
+                sb.AppendLine("/*")
+                    .AppendLine(" NOTE - DB Context class (EF)")
+                    .AppendLine(" ----------------------------")
+                    .AppendLine(" The class was generated based on metadata. ")
+                    .AppendLine(" Therefore, the value of the column attribute may not be correct.")
+                    .AppendLine("*/")
+                    .AppendLine();
+            }
 
             void AddSummary(string message, bool withTab = true)
             {
@@ -257,5 +301,39 @@ namespace MsSqlToolBelt.Business
 
             return (sb.ToString(), sbOption.ToString());
         }
+        #endregion
+
+        #region Query class generator
+
+        /// <summary>
+        /// Generates the class code from the specified query
+        /// </summary>
+        /// <param name="repo">The instance for the interaction with the database</param>
+        /// <param name="settings">The settings with the query</param>
+        /// <returns>The class code</returns>
+        private static async Task GenerateClassFromQuery(GeneratorRepo repo, ClassGenSettingsDto settings)
+        {
+            var result = await repo.ExecuteQueryAsync(settings.SqlQuery);
+
+            // Check if there are columns with the same name
+            var uniqueError = result.GroupBy(g => g.ColumnName).Select(s => new
+            {
+                Count = s.Count()
+            }).Any(a => a.Count > 1);
+
+            settings.Table = new Table
+            {
+                Name = settings.ClassName,
+                Columns = result.OrderBy(o => o.ColumnOrdinal).Select(s => new TableColumn
+                {
+                    ColumnPosition = s.ColumnOrdinal,
+                    Column = s.ColumnName,
+                    DataType = Helper.GetTypeAlias(s.DateType)
+                }).ToList(),
+                UniqueError = uniqueError
+            };
+        }
+
+        #endregion
     }
 }

@@ -31,6 +31,12 @@ namespace MsSqlToolBelt.DataObjects.ClassGenerator
         public List<TableIndex> Indices { get; set; } = new();
 
         /// <summary>
+        /// Gets or sets the value which indicates if there are columns with the same name
+        /// </summary>
+        [Appearance(Ignore = true)]
+        public bool UniqueError { get; set; }
+
+        /// <summary>
         /// Converts the given <see cref="SearchResult"/> into a <see cref="Table"/>
         /// </summary>
         /// <param name="result">The search result entry</param>

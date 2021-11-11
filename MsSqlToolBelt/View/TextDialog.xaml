@@ -23,6 +23,10 @@
         <viewModel:TextDialogViewModel />
     </Window.DataContext>
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -43,7 +47,7 @@
             HorizontalAlignment="Right"
             Content="{Binding CheckboxText}"
             IsChecked="{Binding ShowOption}"
-            Visibility="{Binding OptionVisibility}" />
+            Visibility="{Binding OptionCheckBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
         <Separator Grid.Row="1" />
 
@@ -55,22 +59,40 @@
             BorderThickness="1"
             FontFamily="Hack,Consolas"
             FontSize="12"
-            ShowLineNumbers="True" />
+            ShowLineNumbers="True"
+            TextChanged="CodeEditor_OnTextChanged" />
 
         <Separator Grid.Row="3" />
 
         <Button
             Grid.Row="4"
-            Width="50"
+            Width="75"
             HorizontalAlignment="Left"
             Command="{Binding CopyCommand}"
             Content="Copy" />
 
+        <Label
+            Grid.Row="4"
+            Margin="80,3,3,3"
+            HorizontalAlignment="Left"
+            Content="NOTE: Code not validated!"
+            Foreground="Red"
+            Visibility="{Binding ShowValidationInfo, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
         <Button
             Grid.Row="4"
-            Width="50"
+            Width="75"
+            Margin="3,3,80,3"
             HorizontalAlignment="Right"
-            Click="ButtonBase_OnClick"
+            Command="{Binding ValidateCommand}"
+            Content="Validate"
+            Visibility="{Binding ValidateButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <Button
+            Grid.Row="4"
+            Width="75"
+            HorizontalAlignment="Right"
+            Command="{Binding CloseCommand}"
             Content="Close" />
     </Grid>
 </mah:MetroWindow>

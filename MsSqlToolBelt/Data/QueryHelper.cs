@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.SqlServer.Management.SqlParser.Parser;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
 using MsSqlToolBelt.DataObjects.Search;
@@ -171,6 +172,27 @@ namespace MsSqlToolBelt.Data
             {
                 searchResult.Remove(entry);
             }
+        }
+
+        /// <summary>
+        /// Validates the specified sql query
+        /// </summary>
+        /// <param name="sqlQuery">The sql query</param>
+        /// <returns>The validation result</returns>
+        public static async Task<(bool valid, string message)> ValidateSql(string sqlQuery)
+        {
+            if (string.IsNullOrEmpty(sqlQuery))
+                return (false, "");
+
+            var result = await Task.Run(() => Parser.Parse(sqlQuery));
+            
+            var message = result.Errors.Any()
+                ? string.Join(Environment.NewLine,
+                    result.Errors.Select(s =>
+                        $"{s.Message} (Line {s.Start.LineNumber}, Column {s.Start.ColumnNumber})"))
+                : "";
+
+            return (!result.Errors.Any(), message);
         }
     }
 }

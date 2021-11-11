@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Types;
@@ -15,6 +16,12 @@ namespace MsSqlToolBelt.View
         /// Contains the settings of the dialog
         /// </summary>
         private readonly TextDialogSettings _settings;
+
+        /// <summary>
+        /// Gets the inserted code (when the code is not valid, this value will be an empty string)
+        /// </summary>
+        public string Code =>
+            DataContext is TextDialogViewModel { CodeValid: true } ? CodeEditor.Text : "";
 
         /// <summary>
         /// Creates a new instance of the <see cref="TextDialog"/>
@@ -52,7 +59,16 @@ namespace MsSqlToolBelt.View
         private void SetTheme()
         {
             // CSharp editor
-            Helper.InitAvalonEditor(CodeEditor, CodeType.CSharp);
+            if (_settings.CodeType != CodeType.None)
+                Helper.InitAvalonEditor(CodeEditor, _settings.CodeType);
+        }
+
+        /// <summary>
+        /// Closes the window
+        /// </summary>
+        private void CloseWindow()
+        {
+            Close();
         }
 
         /// <summary>
@@ -63,7 +79,7 @@ namespace MsSqlToolBelt.View
         private void TextDialog_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is TextDialogViewModel viewModel)
-                viewModel.InitViewModel(_settings, GetEditorText, SetEditorText);
+                viewModel.InitViewModel(_settings, GetEditorText, SetEditorText, CloseWindow);
 
             CodeEditor.Text = _settings.Text;
 
@@ -73,13 +89,14 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
-        /// Occurs when the user hits the close button
+        /// Occurs when the user changes the code
         /// </summary>
-        /// <param name="sender">The close button</param>
+        /// <param name="sender">The <see cref="CodeEditor"/></param>
         /// <param name="e">The event arguments</param>
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void CodeEditor_OnTextChanged(object sender, EventArgs e)
         {
-            Close();
+            if (DataContext is TextDialogViewModel viewModel)
+                viewModel.CodeValid = false;
         }
     }
 }

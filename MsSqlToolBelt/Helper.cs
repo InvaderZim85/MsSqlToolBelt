@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System;
+using System.CodeDom;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -35,6 +36,29 @@ namespace MsSqlToolBelt
         /// Contains the path of the file which contains the data types
         /// </summary>
         private static readonly string DataTypeFile = Path.Combine(GetBaseFolder(), "MsSqlToolBelt.DataTypes.json");
+
+        /// <summary>
+        /// Contains the list with the different types
+        /// </summary>
+        private static Dictionary<Type, string> _typeDict = new()
+        {
+            { typeof(bool), "bool" },
+            { typeof(byte), "byte" },
+            { typeof(char), "char" },
+            { typeof(decimal), "decimal" },
+            { typeof(double), "double" },
+            { typeof(float), "float" },
+            { typeof(int), "int" },
+            { typeof(long), "long" },
+            { typeof(object), "object" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(short), "short" },
+            { typeof(string), "string" },
+            { typeof(uint), "uint" },
+            { typeof(ulong), "ulong" },
+            // Yes, this is an odd one.  Technically it's a type though.
+            { typeof(void), "void" }
+        };
 
         /// <summary>
         /// Backing field for <see cref="DataTypes"/>
@@ -74,11 +98,16 @@ namespace MsSqlToolBelt
         /// <param name="colorTheme">The name of the color theme (optional, if empty, the saved color theme will be used)</param>
         public static void SetColorTheme(string baseColor = "", string colorTheme = "")
         {
+            var settings = LoadSettings();
             if (string.IsNullOrEmpty(baseColor))
-                baseColor = Properties.Settings.Default.BaseColor;
+                baseColor = settings == null || string.IsNullOrEmpty(settings.ThemeBaseColor)
+                    ? Properties.Settings.Default.BaseColor
+                    : settings.ThemeBaseColor;
 
             if (string.IsNullOrEmpty(colorTheme))
-                colorTheme = Properties.Settings.Default.ColorTheme;
+                colorTheme = settings == null || string.IsNullOrEmpty(settings.ThemeColor)
+                    ? Properties.Settings.Default.ColorTheme
+                    : settings.ThemeColor;
 
             ThemeManager.Current.ChangeTheme(Application.Current, baseColor, colorTheme);
 
@@ -414,6 +443,18 @@ namespace MsSqlToolBelt
                 _ when size >= Math.Pow(1024, 3) => $"{size / Math.Pow(1024, 3):N2} GB",
                 _ => size.ToString()
             };
+        }
+
+        /// <summary>
+        /// Gets the type of the specified value
+        /// </summary>
+        /// <param name="typeName">The type name</param>
+        /// <returns>The C# alias. If the type is not known or the type is null, the original type name will be returned</returns>
+        public static string GetTypeAlias(string typeName)
+        {
+            var type = Type.GetType(typeName);
+
+            return type != null ? _typeDict.TryGetValue(type, out var value) ? value : type.Name : typeName;
         }
         #endregion
 
