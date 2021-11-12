@@ -111,7 +111,10 @@ namespace MsSqlToolBelt.Data
                 WHERE
                     j.[name] LIKE @value";
 
-            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query);
+            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query, new
+            {
+                value
+            });
 
             return CreateJobDescription(tmpResult);
         }
@@ -147,7 +150,10 @@ namespace MsSqlToolBelt.Data
                 WHERE
                     js.command LIKE @value";
 
-            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query, new { value });
+            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query, new
+            {
+                value
+            });
 
             foreach (var entry in tmpResult)
             {
@@ -166,7 +172,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="jobData">The job data</param>
         /// <returns>The result data</returns>
-        private SearchResult CreateJobDescription(List<SearchResult> jobData)
+        private static SearchResult CreateJobDescription(IReadOnlyCollection<SearchResult> jobData)
         {
             // Get the first entry
             var job = jobData?.FirstOrDefault();
@@ -225,7 +231,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="jobData">The job data</param>
         /// <returns>The beautified description</returns>
-        private string CreateJobDescriptionForStep(SearchResult jobData)
+        private static string CreateJobDescriptionForStep(SearchResult jobData)
         {
             if (string.IsNullOrEmpty(jobData.Definition))
                 return "";
