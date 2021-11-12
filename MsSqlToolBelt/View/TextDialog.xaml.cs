@@ -81,8 +81,6 @@ namespace MsSqlToolBelt.View
             if (DataContext is TextDialogViewModel viewModel)
                 viewModel.InitViewModel(_settings, GetEditorText, SetEditorText, CloseWindow);
 
-            CodeEditor.Text = _settings.Text;
-
             SetTheme();
 
             Helper.AddAction("SetTheme", SetTheme);

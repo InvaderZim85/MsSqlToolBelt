@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.DataObjects;
@@ -173,8 +172,7 @@ namespace MsSqlToolBelt.ViewModel
             ValidateButtonVisible = settings.ShowValidateButton && settings.ValidationFunc != null;
             _setEditorText(_settings.Text);
 
-            // The code is always valid when the validation button is hidden
-            CodeValid = !settings.ShowValidateButton;
+            CodeValid = true;
         }
 
         /// <summary>
@@ -199,7 +197,7 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(text))
                 return;
 
-            var dialog = await ShowProgress("Please wait", "Please wait while validating the code...");
+            var dialog = await ShowProgress("Please wait", "Please wait while validating the query...");
 
             try
             {
@@ -208,12 +206,15 @@ namespace MsSqlToolBelt.ViewModel
                 if (valid)
                 {
                     CodeValid = true;
-                    await ShowMessage("Validation", "Inserted code is valid.");
+                    await ShowMessage("Validation", "Inserted SQL query is valid." +
+                                                    "\r\n\r\nNote: Even if the SQL query has been validated successfully, " +
+                                                    "it may not be possible to execute the query if, for example, " +
+                                                    "a column or table does not exist or is misspelled.");
                 }
                 else
                 {
                     CodeValid = false;
-                    await ShowMessage("Validation", $"The inserted code is not valid:\r\n{message}");
+                    await ShowMessage("Validation", $"The inserted SQL query is not valid:\r\n{message}");
                 }
             }
             catch (Exception ex)
@@ -238,7 +239,8 @@ namespace MsSqlToolBelt.ViewModel
                 _closeWindow();
 
             var result = await ShowQuestion("Validation",
-                "The code has been changed and needs to be validated again. If you close the window anyway, the generation of the class will be aborted.\r\n\r\nClose the window anyway?",
+                "The code has been changed and needs to be validated again. If you close the window anyway, the generation of the class will be aborted." +
+                "\r\n\r\nClose the window anyway?",
                 "Yes", "No");
 
             if (result == MessageDialogResult.Affirmative)

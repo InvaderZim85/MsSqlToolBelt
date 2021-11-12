@@ -406,24 +406,15 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Changes the current theme
         /// </summary>
-        /// <param name="toDefault">Sets the default color</param>
-        public void ChangeTheme(bool toDefault = false)
+        public void ChangeTheme()
         {
             if (_init)
                 return;
 
-            var baseColor = toDefault
-                ? Properties.Settings.Default.BaseColor
-                : string.IsNullOrEmpty(SelectedBaseColor)
-                    ? Properties.Settings.Default.BaseColor
-                    : SelectedBaseColor;
-            var colorTheme = toDefault
-                ? Properties.Settings.Default.ColorTheme
-                : string.IsNullOrEmpty(SelectedColorTheme)
-                    ? Properties.Settings.Default.ColorTheme
-                    : SelectedColorTheme;
+            if (string.IsNullOrEmpty(SelectedBaseColor) || string.IsNullOrEmpty(SelectedColorTheme))
+                return;
 
-            Helper.SetColorTheme(baseColor, colorTheme);
+            Helper.SetColorTheme(SelectedBaseColor, SelectedColorTheme);
         }
     }
 }

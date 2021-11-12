@@ -124,7 +124,7 @@ namespace MsSqlToolBelt.View
         /// <param name="e">The event arguments</param>
         private void Flyout_OnClosingFinished(object sender, RoutedEventArgs e)
         {
-            SettingsControl?.SetThemeDefault();
+            Helper.SetColorTheme();
         }
     }
 }

@@ -40,7 +40,7 @@ namespace MsSqlToolBelt
         /// <summary>
         /// Contains the list with the different types
         /// </summary>
-        private static Dictionary<Type, string> _typeDict = new()
+        private static readonly Dictionary<Type, string> _typeDict = new()
         {
             { typeof(bool), "bool" },
             { typeof(byte), "byte" },

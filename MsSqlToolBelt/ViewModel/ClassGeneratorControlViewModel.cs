@@ -263,12 +263,12 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The command to generate the code
         /// </summary>
-        public ICommand GenerateCommand => new DelegateCommand(() => GenerateCode(false));
+        public ICommand GenerateCommand => new DelegateCommand(GenerateCode);
 
         /// <summary>
         /// The command to show the query input dialog
         /// </summary>
-        public ICommand GenerateFromQueryCommand => new DelegateCommand(() => GenerateCode(true));
+        public ICommand GenerateFromQueryCommand => new DelegateCommand(GenerateCodeFromQuery);
 
         /// <summary>
         /// The command to clear the code
@@ -380,10 +380,10 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
-        /// Generates the class
+        /// Checks if the inserted class name is valid
         /// </summary>
-        /// <param name="fromQuery">true to generate the class from a query</param>
-        private async void GenerateCode(bool fromQuery)
+        /// <returns>true when the class name is valid</returns>
+        private bool ClassNameValid()
         {
             // Check if the class name starts with a number
             bool ClassNameStartsWithNumber()
@@ -395,7 +395,15 @@ namespace MsSqlToolBelt.ViewModel
                 return int.TryParse(firstChar, out _);
             }
 
-            if (string.IsNullOrWhiteSpace(ClassName) || ClassNameStartsWithNumber())
+            return !string.IsNullOrWhiteSpace(ClassName) && !ClassNameStartsWithNumber();
+        }
+
+        /// <summary>
+        /// Generates the class
+        /// </summary>
+        private async void GenerateCode()
+        {
+            if (!ClassNameValid())
             {
                 await ShowMessage("Class generator",
                     "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
@@ -403,7 +411,7 @@ namespace MsSqlToolBelt.ViewModel
             }
 
             // Check if a column is selected
-            if (!fromQuery && Columns.All(a => !a.Use))
+            if (Columns.All(a => !a.Use))
             {
                 await ShowMessage("Class generator", "You have to select at least one column to generate a class.");
                 return;
@@ -413,19 +421,17 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                _classGenResult = fromQuery
-                    ? await GenerateCodeFromQuery()
-                    : await Task.Run(() =>
-                        ClassGenerator.Generate(new ClassGenSettingsDto
-                        {
-                            Table = SelectedTable,
-                            Modifier = SelectedModifier,
-                            MarkAsSealed = MarkAsSealed,
-                            ClassName = ClassName,
-                            BackingField = CreateBackingField,
-                            EfClass = EfClass,
-                            AddSummary = AddSummary
-                        }));
+                _classGenResult = await Task.Run(() =>
+                    ClassGenerator.Generate(new ClassGenSettingsDto
+                    {
+                        Table = SelectedTable,
+                        Modifier = SelectedModifier,
+                        MarkAsSealed = MarkAsSealed,
+                        ClassName = ClassName,
+                        BackingField = CreateBackingField,
+                        EfClass = EfClass,
+                        AddSummary = AddSummary
+                    }));
 
                 if (_classGenResult == null)
                     return;
@@ -448,12 +454,19 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Generates a class from the inserted query
         /// </summary>
-        private async Task<ClassGenResult> GenerateCodeFromQuery()
+        private async void GenerateCodeFromQuery()
         {
+            if (!ClassNameValid())
+            {
+                await ShowMessage("Class generator",
+                    "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+                return;
+            }
+
             var dialog = new TextDialog(new TextDialogSettings
             {
                 Title = "SQL Query",
-                Caption = "Insert the SQL query to generate a class from it",
+                Caption = "Insert the SQL query to generate a class from it. Hint: Add a 'TOP (1)' to your query to reduce the load of the SQL server",
                 ShowOption = false,
                 ShowValidateButton = true,
                 ValidationFunc = QueryHelper.ValidateSql,
@@ -466,20 +479,40 @@ namespace MsSqlToolBelt.ViewModel
             dialog.ShowDialog();
 
             if (string.IsNullOrEmpty(dialog.Code))
-                return null;
+                return;
 
-            // Generate the code...
-            return await ClassGenerator.GenerateFromQueryAsync(_repo, new ClassGenSettingsDto
+            var controller = await ShowProgress("Please wait", "Please wait while generating the class...");
+
+            try
             {
-                Table = SelectedTable,
-                Modifier = SelectedModifier,
-                MarkAsSealed = MarkAsSealed,
-                ClassName = ClassName,
-                BackingField = CreateBackingField,
-                EfClass = EfClass,
-                AddSummary = AddSummary,
-                SqlQuery = dialog.Code
-            });
+                _classGenResult = await ClassGenerator.GenerateFromQueryAsync(_repo, new ClassGenSettingsDto
+                {
+                    Table = SelectedTable,
+                    Modifier = SelectedModifier,
+                    MarkAsSealed = MarkAsSealed,
+                    ClassName = ClassName,
+                    BackingField = CreateBackingField,
+                    EfClass = EfClass,
+                    AddSummary = AddSummary,
+                    SqlQuery = dialog.Code
+                });
+
+                if (_classGenResult == null)
+                    return;
+
+                _setCode(_classGenResult.Code, CodeType.CSharp);
+                _setCode(_classGenResult.Sql, CodeType.Sql);
+
+                ShowEfKeyCode = !string.IsNullOrEmpty(_classGenResult.CodeEfKey);
+            }
+            catch (Exception ex)
+            {
+                await ShowError(ex);
+            }
+            finally
+            {
+                await controller.CloseAsync();
+            }
         }
 
         /// <summary>

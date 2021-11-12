@@ -22,13 +22,27 @@ namespace MsSqlToolBelt.Data
         public const string TableTypeName = "Table";
 
         /// <summary>
+        /// Executes the specified query and returns the result as list
+        /// </summary>
+        /// <typeparam name="T">The type of the entries</typeparam>
+        /// <param name="connection">The current connection</param>
+        /// <param name="query">The query which should be executed</param>
+        /// <param name="parameter">The parameters (optional)</param>
+        /// <returns>The list with the data</returns>
+        public static async Task<List<T>> QueryListAsync<T>(this SqlConnection connection, string query, object parameter = null)
+        {
+            var result = await connection.QueryAsync<T>(query, parameter);
+            return result.ToList();
+        }
+
+        /// <summary>
         /// Extracts the result of the main search and the class generator query (both queries has the same result)
         /// </summary>
         /// <param name="connection">The current connection</param>
         /// <param name="query">The query</param>
         /// <param name="parameter">The parameters</param>
         /// <returns>The result</returns>
-        public static async Task<List<SearchResult>> ExtractMultiSearchTableResult(this SqlConnection connection, string query, object parameter = null)
+        public static async Task<List<SearchResult>> ExtractMultiSearchTableResultAsync(this SqlConnection connection, string query, object parameter = null)
         {
             var multiResult = await connection.QueryMultipleAsync(query, parameter);
 
@@ -89,7 +103,7 @@ namespace MsSqlToolBelt.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
         /// <returns></returns>
-        private static async Task<List<T>> ReadResultAsync<T>(this SqlMapper.GridReader reader)
+        public static async Task<List<T>> ReadResultAsync<T>(this SqlMapper.GridReader reader)
         {
             var result = await reader.ReadAsync<T>();
 
@@ -185,7 +199,7 @@ namespace MsSqlToolBelt.Data
                 return (false, "");
 
             var result = await Task.Run(() => Parser.Parse(sqlQuery));
-            
+
             var message = result.Errors.Any()
                 ? string.Join(Environment.NewLine,
                     result.Errors.Select(s =>

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
-using Serilog;
 
 namespace MsSqlToolBelt.Business
 {
@@ -328,7 +326,8 @@ namespace MsSqlToolBelt.Business
                 {
                     ColumnPosition = s.ColumnOrdinal,
                     Column = s.ColumnName,
-                    DataType = Helper.GetTypeAlias(s.DateType)
+                    DataType = Helper.GetTypeAlias(s.DateType),
+                    Nullable = s.IsNullable ? "YES" : "NO"
                 }).ToList(),
                 UniqueError = uniqueError
             };

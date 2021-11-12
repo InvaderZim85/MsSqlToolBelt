@@ -198,7 +198,7 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await Task.Run(() => _repo.LoadTableTypes());
+                var result = await _repo.LoadTableTypesAsync();
 
                 TableTypes = new ObservableCollection<TableType>(result.OrderBy(o => o.Name));
             }

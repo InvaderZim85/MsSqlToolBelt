@@ -19,5 +19,10 @@
         /// Gets or sets the column ordinal aka position of the column
         /// </summary>
         public int ColumnOrdinal { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value which indicates if the column is nullable
+        /// </summary>
+        public bool IsNullable { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dapper;
 using MsSqlToolBelt.Data.Queries;
@@ -36,7 +37,7 @@ namespace MsSqlToolBelt.Data
         /// <returns>The list with the tables</returns>
         public async Task<List<Table>> LoadTables()
         {
-            var tables = await _connector.Connection.ExtractMultiSearchTableResult(QueryManager.LoadTables);
+            var tables = await _connector.Connection.ExtractMultiSearchTableResultAsync(QueryManager.LoadTables);
 
             var result = tables.Select(s => (Table) s).ToList();
             return QueryHelper.ClearTableList(result);
@@ -60,7 +61,8 @@ namespace MsSqlToolBelt.Data
                 {
                     ColumnName = row["ColumnName"].ToString(),
                     DateType = row["DataType"].ToString(),
-                    ColumnOrdinal = (int)row["ColumnOrdinal"]
+                    ColumnOrdinal = (int)row["ColumnOrdinal"],
+                    IsNullable = (bool)row["AllowDBNull"]
                 }).ToList();
         }
     }

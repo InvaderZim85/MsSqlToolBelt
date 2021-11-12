@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
 using MsSqlToolBelt.Data.Queries;
 using MsSqlToolBelt.DataObjects.TableType;
@@ -27,16 +28,16 @@ namespace MsSqlToolBelt.Data
         /// Loads all available custom table types
         /// </summary>
         /// <returns>The list with the table types</returns>
-        public List<TableType> LoadTableTypes()
+        public async Task<List<TableType>> LoadTableTypesAsync()
         {
-            var reader = _connector.Connection.QueryMultiple(QueryManager.LoadTableTypes);
+            var reader = await _connector.Connection.QueryMultipleAsync(QueryManager.LoadTableTypes);
 
             if (reader == null)
                 return null;
 
-            var tables = reader.Read<TableType>().ToList();
-            var columns = reader.Read<TableTypeColumn>().ToList();
-            var keyColumns = reader.Read<KeyValuePair<int, int>>().ToList();
+            var tables = await reader.ReadResultAsync<TableType>();
+            var columns = await reader.ReadResultAsync<TableTypeColumn>();
+            var keyColumns = await reader.ReadResultAsync<KeyValuePair<int, int>>();
 
             foreach (var table in tables)
             {

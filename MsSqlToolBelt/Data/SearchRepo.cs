@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Dapper;
 using MsSqlToolBelt.Data.Queries;
-using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.Search;
 using ZimLabs.Database.MsSql;
 
@@ -63,75 +61,16 @@ namespace MsSqlToolBelt.Data
         {
             var searchString = $"%{value}%";
 
-            var searchResults = await _connector.Connection.ExtractMultiSearchTableResult(QueryManager.Search, new
+            var searchResults = await _connector.Connection.ExtractMultiSearchTableResultAsync(QueryManager.Search, new
             {
                 search = searchString
             });
 
-            //static async Task<List<T>> ReadResult<T>(SqlMapper.GridReader reader)
-            //{
-            //    var result = await reader.ReadAsync<T>();
-
-            //    return result.ToList();
-            //}
-
-            //var multiResult = await _connector.Connection.QueryMultipleAsync(QueryManager.Search, new
-            //{
-            //    search = searchString
-            //});
-
-            //var searchResults = await ReadResult<SearchResult>(multiResult);
-            //var columns = await ReadResult<TableColumn>(multiResult);
-            //var keyColumns = await ReadResult<KeyColumn>(multiResult);
-            //var indices = await ReadResult<TableIndex>(multiResult);
-
-            //if (columns.Any() && keyColumns.Any())
-            //{
-            //    foreach (var column in columns)
-            //    {
-            //        column.IsPrimaryKey =
-            //            keyColumns.Any(a => a.Table.Equals(column.Table) && a.Column.Equals(column.Column));
-            //    }
-            //}
-
-            //foreach (var entry in searchResults.Where(w => w.Type == "Table"))
-            //{
-            //    entry.Definition = "";
-            //    entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
-
-            //    // Combine the indices for the table and add the result to the search result
-            //    var tableIndices = indices.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
-
-            //    if (!tableIndices.Any())
-            //        continue;
-
-            //    var indexNames = tableIndices.Select(s => s.Name).Distinct();
-
-            //    foreach (var index in indexNames.OrderBy(o => o))
-            //    {
-            //        var indexColumns = tableIndices.Where(w => w.Name.Equals(index)).Select(s => s.Column).ToList();
-            //        entry.Indices.Add(new TableIndex
-            //        {
-            //            Name = index,
-            //            Table = entry.Name,
-            //            Column = string.Join(", ", indexColumns.OrderBy(o => o))
-            //        });
-
-            //        foreach (var entryColumn in indexColumns
-            //            .Select(indexColumn =>
-            //                entry.Columns.FirstOrDefault(f => f.Column.EqualsIgnoreCase(indexColumn)))
-            //            .Where(entryColumn => entryColumn != null))
-            //        {
-            //            entryColumn.UsedInIndex = true;
-            //        }
-            //    }
-            //}
-
             // Clean the search result and remove all not needed tables
             QueryHelper.ClearTableList(searchResults);
 
-            searchResults.Add(SearchJobs(searchString));
-            searchResults.AddRange(SearchJobSteps(searchString));
+            searchResults.Add(await SearchJobsAsync(searchString));
+            searchResults.AddRange(await SearchJobStepsAsync(searchString));
 
             if (!matchWholeWord) 
                 return searchResults.Where(w => w != null).ToList();
@@ -148,7 +87,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="value">The search value</param>
         /// <returns>The result</returns>
-        private SearchResult SearchJobs(string value)
+        private async Task<SearchResult> SearchJobsAsync(string value)
         {
             SwitchDatabaseForJobSearch(true);
 
@@ -172,7 +111,7 @@ namespace MsSqlToolBelt.Data
                 WHERE
                     j.[name] LIKE @value";
 
-            var tmpResult = _connector.Connection.Query<SearchResult>(query, new { value }).ToList();
+            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query);
 
             return CreateJobDescription(tmpResult);
         }
@@ -182,7 +121,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="value">The search value</param>
         /// <returns>The result</returns>
-        private List<SearchResult> SearchJobSteps(string value)
+        private async Task<List<SearchResult>> SearchJobStepsAsync(string value)
         {
             // Step 1: Switch to the MSDB database
             _connector.SwitchDatabase("msdb");
@@ -208,7 +147,7 @@ namespace MsSqlToolBelt.Data
                 WHERE
                     js.command LIKE @value";
 
-            var tmpResult = _connector.Connection.Query<SearchResult>(query, new { value }).ToList();
+            var tmpResult = await _connector.Connection.QueryListAsync<SearchResult>(query, new { value });
 
             foreach (var entry in tmpResult)
             {
