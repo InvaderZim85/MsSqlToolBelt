@@ -36,6 +36,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -53,7 +54,6 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     Grid.ColumnSpan="2"
-                    Margin="3"
                     mah:TextBoxHelper.Watermark="Search..."
                     IsEnabled="{Binding SearchEnabled}"
                     Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}">
@@ -147,8 +147,13 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <StackPanel
+                <Separator
                     Grid.Row="5"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="4" />
+
+                <StackPanel
+                    Grid.Row="6"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal">
@@ -166,14 +171,9 @@
                         Content="Show indices"
                         IsEnabled="{Binding ShowIndices}" />
                 </StackPanel>
-                <!--<Button
-                    Grid.Row="5"
-                    Grid.Column="2"
-                    Command="{Binding ExportCommand}"
-                    Content="Export" />-->
 
                 <mah:SplitButton
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Grid.Column="2"
                     Margin="3"
                     HorizontalContentAlignment="Left"
@@ -183,7 +183,7 @@
                     SelectedIndex="1"
                     SelectedItem="{Binding SelectedCopyAsTypeSearchResult, UpdateSourceTrigger=PropertyChanged}" />
                 <mah:SplitButton
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Grid.Column="3"
                     Margin="3"
                     HorizontalContentAlignment="Left"
@@ -229,7 +229,7 @@
 
                 <Button
                     Grid.Row="4"
-                    Width="64"
+                    Width="50"
                     HorizontalAlignment="Right"
                     Command="{Binding CopyCommand}"
                     Content="Copy" />

@@ -57,6 +57,9 @@ namespace MsSqlToolBelt
             if (_application.DataContext is MainWindowViewModel viewModel)
                 viewModel.StopTimer();
 
+            // Remove all actions
+            Helper.RemoveAllActions();
+
             var duration = DateTime.Now - _startUp;
             Log.Information("Close application after {duration}", duration);
             Log.CloseAndFlush();

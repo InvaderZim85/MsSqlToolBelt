@@ -163,6 +163,9 @@
                 <TabItem Header="Class generator">
                     <local:ClassGeneratorControl x:Name="ClassGeneratorControl" />
                 </TabItem>
+                <TabItem Header="Definition export">
+                    <local:DefinitionExportControl x:Name="DefinitionExportControl" />
+                </TabItem>
             </TabControl>
         </Grid>
     </DockPanel>

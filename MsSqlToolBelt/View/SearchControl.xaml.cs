@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ControlzEx.Theming;
 using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.Types;

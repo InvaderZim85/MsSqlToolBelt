@@ -38,6 +38,7 @@ namespace MsSqlToolBelt.View
             SearchControl.SetConnector(connector);
             TableTypeControl.SetConnector(connector);
             ClassGeneratorControl.SetConnector(connector);
+            DefinitionExportControl.SetConnector(connector);
 
             LoadData(TabControl.SelectedIndex);
         }
@@ -52,6 +53,7 @@ namespace MsSqlToolBelt.View
 
             SearchControl.InitControl();
             ClassGeneratorControl.InitControl();
+            // The "DefinitionExportControl" doesn't need an init process!
         }
 
         /// <summary>
@@ -79,6 +81,7 @@ namespace MsSqlToolBelt.View
             SearchControl.Clear();
             TableTypeControl.Clear();
             ClassGeneratorControl.Clear();
+            DefinitionExportControl.Clear();
         }
 
         /// <summary>

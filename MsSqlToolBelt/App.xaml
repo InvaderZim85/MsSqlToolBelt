@@ -64,6 +64,10 @@
             <Style BasedOn="{StaticResource MahApps.Styles.Button}" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="3" />
             </Style>
+
+            <Style BasedOn="{StaticResource MahApps.Styles.TextBox}" TargetType="{x:Type TextBox}">
+                <Setter Property="Margin" Value="3" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
