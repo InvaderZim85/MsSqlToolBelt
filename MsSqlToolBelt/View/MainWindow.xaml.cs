@@ -70,6 +70,9 @@ namespace MsSqlToolBelt.View
                 case 2:
                     ClassGeneratorControl.LoadData();
                     break;
+                case 3:
+                    DefinitionExportControl.LoadData();
+                    break;
             }
         }
 

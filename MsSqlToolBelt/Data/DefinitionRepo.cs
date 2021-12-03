@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MsSqlToolBelt.DataObjects.DefinitionExport;
 using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data
@@ -8,13 +8,8 @@ namespace MsSqlToolBelt.Data
     /// <summary>
     /// Provides the functions for the interaction with the object definitions
     /// </summary>
-    internal sealed class DefinitionRepo : IDisposable
+    internal sealed class DefinitionRepo
     {
-        /// <summary>
-        /// Contains the value which indicates if the class was already disposed
-        /// </summary>
-        private bool _disposed;
-
         /// <summary>
         /// The instance for the connection with the database
         /// </summary>
@@ -34,7 +29,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="objectName">The name of the object</param>
         /// <returns></returns>
-        public async Task<List<string>> LoadDefinition(string objectName)
+        public async Task<List<string>> LoadDefinitionAsync(string objectName)
         {
             const string query = "EXEC sp_helptext @objname = @procName";
             return await _connector.Connection.QueryListAsync<string>(query, new
@@ -44,14 +39,21 @@ namespace MsSqlToolBelt.Data
         }
 
         /// <summary>
-        /// Releases all resources used by the <see cref="DefinitionRepo"/>
+        /// Loads all available procedures
         /// </summary>
-        public void Dispose()
+        /// <returns>The list with the procedures</returns>
+        public async Task<List<DefinitionEntry>> LoadProceduresAsync()
         {
-            if (_disposed)
-                return;
+            const string query =
+                @"SELECT 
+                    SCHEMA_NAME(schema_id) AS [Schema],
+                    [name]
+                FROM 
+                    sys.objects
+                WHERE 
+                    type = 'P';";
 
-            _disposed = true;
+            return await _connector.Connection.QueryListAsync<DefinitionEntry>(query);
         }
     }
 }

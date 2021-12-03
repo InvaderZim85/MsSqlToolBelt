@@ -22,9 +22,9 @@ namespace MsSqlToolBelt.ViewModel
     internal sealed class ClassGeneratorControlViewModel : ViewModelBase
     {
         /// <summary>
-        /// The instance of the repo
+        /// The instance for the interaction with the class generator
         /// </summary>
-        private GeneratorRepo _repo;
+        private ClassGenerator _manager;
 
         /// <summary>
         /// Contains the value which indicates if the data was already loaded
@@ -332,7 +332,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <param name="connector">The connector</param>
         public void SetConnector(Connector connector)
         {
-            _repo = new GeneratorRepo(connector);
+            _manager = new ClassGenerator(connector);
 
             _dataLoaded = false;
 
@@ -363,7 +363,7 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                var result = await _repo.LoadTables();
+                var result = await _manager.LoadTables();
 
                 _originTableList = result.OrderBy(o => o.Name).ToList();
 
@@ -422,7 +422,7 @@ namespace MsSqlToolBelt.ViewModel
             try
             {
                 _classGenResult = await Task.Run(() =>
-                    ClassGenerator.Generate(new ClassGenSettingsDto
+                    _manager.Generate(new ClassGenSettingsDto
                     {
                         Table = SelectedTable,
                         Modifier = SelectedModifier,
@@ -485,7 +485,7 @@ namespace MsSqlToolBelt.ViewModel
 
             try
             {
-                _classGenResult = await ClassGenerator.GenerateFromQueryAsync(_repo, new ClassGenSettingsDto
+                _classGenResult = await _manager.GenerateFromQueryAsync(new ClassGenSettingsDto
                 {
                     Table = SelectedTable,
                     Modifier = SelectedModifier,

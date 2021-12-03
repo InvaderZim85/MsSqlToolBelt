@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -369,6 +368,14 @@ namespace MsSqlToolBelt.ViewModel
 
             SelectedDatabase = database;
             SwitchDatabase();
+        }
+
+        /// <summary>
+        /// Disposes the database connection and releases the resources
+        /// </summary>
+        public void DisposeConnection()
+        {
+            _repo?.Dispose();
         }
 
         /// <summary>

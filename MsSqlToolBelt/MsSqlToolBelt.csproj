@@ -212,6 +212,7 @@
     <Compile Include="DataObjects\ClassGenerator\ClassGenSettingsDto.cs" />
     <Compile Include="DataObjects\ClassGenerator\SchemaColumn.cs" />
     <Compile Include="DataObjects\ClassGenerator\Table.cs" />
+    <Compile Include="DataObjects\DefinitionExport\DefinitionEntry.cs" />
     <Compile Include="DataObjects\Github\Assets.cs" />
     <Compile Include="DataObjects\Github\ReleaseInfo.cs" />
     <Compile Include="DataObjects\Search\TableIndex.cs" />

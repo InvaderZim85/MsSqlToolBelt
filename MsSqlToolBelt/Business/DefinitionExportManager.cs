@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects.DefinitionExport;
 using Serilog;
 using ZimLabs.Database.MsSql;
 
@@ -40,12 +41,22 @@ namespace MsSqlToolBelt.Business
         }
 
         /// <summary>
+        /// Loads all available procedures
+        /// </summary>
+        /// <returns>The list with the procedures</returns>
+        public async Task<List<DefinitionEntry>> LoadProceduresAsync()
+        {
+            return await _repo.LoadProceduresAsync();
+        }
+
+        /// <summary>
         /// Exports the definition of the specified objects into the specified directory
         /// </summary>
         /// <param name="exportDirectory">The path of the export directory</param>
         /// <param name="objectList">The object list</param>
+        /// <param name="defList">The list with the definition entries</param>
         /// <returns>The awaitable task</returns>
-        public async Task ExportDefinitions(string exportDirectory, string objectList)
+        public async Task ExportDefinitions(string exportDirectory, string objectList, List<DefinitionEntry> defList)
         {
             if (string.IsNullOrWhiteSpace(exportDirectory))
                 throw new ArgumentNullException(nameof(exportDirectory));
@@ -54,27 +65,33 @@ namespace MsSqlToolBelt.Business
                 throw new DirectoryNotFoundException("The specified directory doesn't exist.");
 
             // If the object list is empty, skip any further action
-            if (string.IsNullOrWhiteSpace(objectList))
+            if (string.IsNullOrWhiteSpace(objectList) && !defList.Any(a => a.Export))
                 return;
 
+            // Combine the two lists
             var objectNames = GetObjectNames(objectList);
+            var tmpList = new List<string>(objectNames.Count + defList.Count(c => c.Export));
+            tmpList.AddRange(objectNames);
+            tmpList.AddRange(defList.Where(w => w.Export).Select(s => s.Name));
+            // Remove duplicated entries
+            tmpList = tmpList.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
             var loadCount = 0;
             var errorCount = 0;
-            foreach (var objectName in objectNames)
+            foreach (var entry in tmpList)
             {
-                WriteMessage($"Load definition of '{objectName}'");
+                WriteMessage($"Load definition of '{entry}'");
                 try
                 {
-                    var content = await _repo.LoadDefinition(objectName);
-                    ExportContent(exportDirectory, objectName, content);
+                    var content = await _repo.LoadDefinitionAsync(entry);
+                    ExportContent(exportDirectory, entry, content);
                     WriteMessage("Definition exported.");
                     loadCount++;
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning(ex, "Can't gather definition of object '{objectName}'", objectName);
-                    WriteMessage($"Can't load definition of '{objectName}'");
+                    Log.Warning(ex, "Can't gather definition of object '{objectName}'", entry);
+                    WriteMessage($"Can't load definition of '{entry}'");
                     errorCount++;
                 }
             }
@@ -87,10 +104,10 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="objectList">The user input</param>
         /// <returns>The list with the object names</returns>
-        private static IEnumerable<string> GetObjectNames(string objectList)
+        private static IReadOnlyCollection<string> GetObjectNames(string objectList)
         {
             var content = objectList.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
-            return content.Distinct(StringComparer.OrdinalIgnoreCase).ToList(); // Remove duplicates
+            return content.Distinct(StringComparer.OrdinalIgnoreCase).Select(s => s.Trim()).ToList(); // Remove duplicates
         }
 
         /// <summary>

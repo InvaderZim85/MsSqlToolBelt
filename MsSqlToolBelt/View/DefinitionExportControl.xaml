@@ -17,21 +17,15 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <!--  Export dir  -->
         <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -53,38 +47,155 @@
                     Command="{Binding BrowseCommand}"
                     Content="..." />
 
-                <Label
-                    Grid.Row="1"
+
+            </Grid>
+        </Border>
+
+        <!--  Object list  -->
+        <Border Grid.Row="1" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid
+                    Grid.Row="0"
                     Grid.Column="0"
-                    Content="Objects:" />
-                <TextBox
-                    Grid.Row="1"
-                    Grid.RowSpan="2"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    mah:TextBoxHelper.Watermark="Only one entry per line..."
-                    AcceptsReturn="True"
-                    HorizontalScrollBarVisibility="Visible"
-                    Text="{Binding ObjectList, UpdateSourceTrigger=PropertyChanged}"
-                    VerticalScrollBarVisibility="Visible" />
+                    Margin="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Content="Procedures"
+                        Style="{StaticResource Headline}" />
+
+                    <Separator Grid.Row="1" />
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding EntryList}">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn
+                                Width="Auto"
+                                Binding="{Binding Export}"
+                                Header="Export" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Name}"
+                                Header="Name"
+                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Separator Grid.Row="3" />
+
+                    <TextBox
+                        Grid.Row="4"
+                        Margin="3"
+                        mah:TextBoxHelper.Watermark="Filter..."
+                        Text="{Binding ListFilter, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+
+                    <Separator Grid.Row="5" />
+
+                    <StackPanel Grid.Row="6" Orientation="Horizontal">
+                        <Button
+                            Width="80"
+                            Command="{Binding SelectCommand}"
+                            Content="Select all" />
+                        <Button
+                            Width="80"
+                            Command="{Binding DeselectCommand}"
+                            Content="Deselect all" />
+                        <Button
+                            Width="80"
+                            Command="{Binding ReloadCommand}"
+                            Content="Reload" />
+                    </StackPanel>
+                </Grid>
 
                 <Separator
-                    Grid.Row="3"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                <!--  User input  -->
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Content="Custom list"
+                        Style="{StaticResource Headline}" />
+
+                    <Separator
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
+
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Objects:" />
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        mah:TextBoxHelper.Watermark="Only one entry per line..."
+                        AcceptsReturn="True"
+                        HorizontalScrollBarVisibility="Visible"
+                        Text="{Binding ObjectList, UpdateSourceTrigger=PropertyChanged}"
+                        VerticalScrollBarVisibility="Visible" />
+                </Grid>
+
+                <Separator
+                    Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="3" />
 
                 <Label
-                    Grid.Row="4"
-                    Grid.Column="1"
+                    Grid.Row="2"
+                    Grid.Column="0"
                     HorizontalAlignment="Left"
                     Content="Note: Currently only procedures are supported!"
                     Foreground="{DynamicResource MahApps.Brushes.Accent}" />
 
                 <Button
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    Width="109"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Width="90"
                     HorizontalAlignment="Right"
                     Command="{Binding ExportCommand}"
                     Content="Start export"
@@ -92,9 +203,10 @@
             </Grid>
         </Border>
 
-        <GridSplitter Grid.Row="1" Style="{StaticResource HorizontalSplitter}" />
+        <GridSplitter Grid.Row="2" Style="{StaticResource HorizontalSplitter}" />
 
-        <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+        <!--  Export / Info  -->
+        <Border Grid.Row="3" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

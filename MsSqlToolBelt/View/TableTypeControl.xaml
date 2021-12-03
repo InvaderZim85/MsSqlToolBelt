@@ -41,9 +41,8 @@
                 <Label
                     Grid.Row="0"
                     Grid.Column="0"
-                    HorizontalAlignment="Left"
                     Content="{Binding TableHeader}"
-                    FontWeight="Bold" />
+                    Style="{StaticResource Headline}" />
 
                 <Separator
                     Grid.Row="1"
@@ -121,9 +120,8 @@
 
                 <Label
                     Grid.Row="0"
-                    HorizontalAlignment="Left"
                     Content="{Binding ColumnHeader}"
-                    FontWeight="Bold" />
+                    Style="{StaticResource Headline}" />
 
                 <Separator Grid.Row="1" />
 

@@ -58,7 +58,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontStyle" Value="Italic" />
-                <Setter Property="Foreground" Value="Gray" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase}" />
             </Style>
 
             <Style BasedOn="{StaticResource MahApps.Styles.Button}" TargetType="{x:Type Button}">

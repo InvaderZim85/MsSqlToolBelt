@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects;
 using MsSqlToolBelt.DataObjects.ClassGenerator;
+using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Business
 {
     /// <summary>
     /// Provides the functions to create a class of a table
     /// </summary>
-    internal static class ClassGenerator
+    internal sealed class ClassGenerator
     {
         /// <summary>
         /// Contains the tab indent
@@ -19,11 +21,34 @@ namespace MsSqlToolBelt.Business
         private static readonly string Tab = new(' ', 4);
 
         /// <summary>
+        /// The instance for the interaction with the database
+        /// </summary>
+        private readonly GeneratorRepo _repo;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ClassGenerator"/>
+        /// </summary>
+        /// <param name="connector"></param>
+        public ClassGenerator(Connector connector)
+        {
+            _repo = new GeneratorRepo(connector);
+        }
+
+        /// <summary>
+        /// Loads all tables with its columns
+        /// </summary>
+        /// <returns>The list with the tables</returns>
+        public async Task<List<Table>> LoadTables()
+        {
+            return await _repo.LoadTables();
+        }
+
+        /// <summary>
         /// Generates the code
         /// </summary>
         /// <param name="settings">The settings for the class generator</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static ClassGenResult Generate(ClassGenSettingsDto settings)
+        public ClassGenResult Generate(ClassGenSettingsDto settings)
         {
             if (settings?.Table == null)
                 throw new ArgumentNullException(nameof(settings));
@@ -40,12 +65,11 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Generates the code from a sql query
         /// </summary>
-        /// <param name="repo">The instance for the interaction with the database</param>
         /// <param name="settings">The settings for the class generator</param>
         /// <returns>The CSharp code and the sql statement</returns>
-        public static async Task<ClassGenResult> GenerateFromQueryAsync(GeneratorRepo repo, ClassGenSettingsDto settings)
+        public async Task<ClassGenResult> GenerateFromQueryAsync(ClassGenSettingsDto settings)
         {
-            await GenerateClassFromQuery(repo, settings);
+            await GenerateClassFromQuery(settings);
             var classCode = GenerateClass(settings);
 
             var (efKeyCode, efKeyCodeOption) = settings.EfClass ? CreateEfKeyCode(settings) : ("", "");
@@ -60,7 +84,7 @@ namespace MsSqlToolBelt.Business
         /// <param name="column">The column</param>
         /// <param name="colPrefix">A value which will be added with a dot as prefix</param>
         /// <returns>The property name</returns>
-        private static string GetPropertyName(TableColumn column, string colPrefix = "")
+        private string GetPropertyName(TableColumn column, string colPrefix = "")
         {
             if (column == null)
                 return "";
@@ -78,7 +102,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="settings">The settings for the class generator</param>
         /// <returns>The CSharp code</returns>
-        private static string GenerateClass(ClassGenSettingsDto settings)
+        private string GenerateClass(ClassGenSettingsDto settings)
         {
             var sb = new StringBuilder();
 
@@ -205,7 +229,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="table">The table name</param>
         /// <returns></returns>
-        private static string GenerateSqlQuery(Table table)
+        private string GenerateSqlQuery(Table table)
         {
             var sb = new StringBuilder();
 
@@ -232,7 +256,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="column">The column</param>
         /// <returns>The c# data type</returns>
-        private static string GetDataType(TableColumn column)
+        private string GetDataType(TableColumn column)
         {
             var type = Helper.DataTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(column.DataType));
             if (type != null)
@@ -275,7 +299,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="settings">The settings</param>
         /// <returns>The c# code</returns>
-        private static (string code, string optionalCode) CreateEfKeyCode(ClassGenSettingsDto settings)
+        private (string code, string optionalCode) CreateEfKeyCode(ClassGenSettingsDto settings)
         {
             if (settings?.Table == null)
                 return ("", "");
@@ -306,12 +330,11 @@ namespace MsSqlToolBelt.Business
         /// <summary>
         /// Generates the class code from the specified query
         /// </summary>
-        /// <param name="repo">The instance for the interaction with the database</param>
         /// <param name="settings">The settings with the query</param>
         /// <returns>The class code</returns>
-        private static async Task GenerateClassFromQuery(GeneratorRepo repo, ClassGenSettingsDto settings)
+        private async Task GenerateClassFromQuery(ClassGenSettingsDto settings)
         {
-            var result = await repo.ExecuteQueryAsync(settings.SqlQuery);
+            var result = await _repo.ExecuteQueryAsync(settings.SqlQuery);
 
             // Check if there are columns with the same name
             var uniqueError = result.GroupBy(g => g.ColumnName).Select(s => new

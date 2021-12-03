@@ -37,13 +37,13 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label
                     Grid.Row="0"
-                    HorizontalAlignment="Left"
                     Content="{Binding TableHeader}"
-                    FontWeight="Bold" />
+                    Style="{StaticResource Headline}" />
 
                 <Separator Grid.Row="1" />
 
@@ -61,8 +61,10 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
+                <Separator Grid.Row="3" />
+
                 <TextBox
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Margin="3"
                     mah:TextBoxHelper.Watermark="Filter..."
                     Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}">
@@ -71,10 +73,10 @@
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <Separator Grid.Row="4" />
+                <Separator Grid.Row="5" />
 
                 <Button
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Width="60"
                     HorizontalAlignment="Left"
                     Command="{Binding ReloadCommand}"
@@ -100,9 +102,8 @@
 
                 <Label
                     Grid.Row="0"
-                    HorizontalAlignment="Left"
                     Content="{Binding ColumnHeader}"
-                    FontWeight="Bold" />
+                    Style="{StaticResource Headline}" />
 
                 <Separator Grid.Row="1" />
 
@@ -242,8 +243,8 @@
 
                 <Label
                     Grid.Row="3"
-                    HorizontalAlignment="Left"
-                    Content="C# class" />
+                    Content="C# class"
+                    Style="{StaticResource Headline}" />
 
                 <Separator Grid.Row="4" />
 
@@ -288,8 +289,8 @@
 
                 <Label
                     Grid.Row="9"
-                    HorizontalAlignment="Left"
-                    Content="Sql query" />
+                    Content="Sql query"
+                    Style="{StaticResource Headline}" />
 
                 <Separator Grid.Row="10" />
 

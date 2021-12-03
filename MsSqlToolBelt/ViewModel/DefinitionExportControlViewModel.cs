@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.DataObjects.DefinitionExport;
 using ZimLabs.Database.MsSql;
 using ZimLabs.WpfBase;
 
@@ -17,6 +21,11 @@ namespace MsSqlToolBelt.ViewModel
         /// The instance for the interaction with the definition data
         /// </summary>
         private DefinitionExportManager _manager;
+
+        /// <summary>
+        /// Contains the value which indicates if the data was already loaded
+        /// </summary>
+        private bool _dataLoaded;
 
         /// <summary>
         /// Backing field for <see cref="ExportDirectory"/>
@@ -46,7 +55,7 @@ namespace MsSqlToolBelt.ViewModel
             set
             {
                 SetField(ref _objectList, value);
-                ExportButtonEnabled = !string.IsNullOrWhiteSpace(value);
+                ExportButtonEnabled = !string.IsNullOrWhiteSpace(value) || EntryList != null && EntryList.Any();
             }
         }
 
@@ -76,6 +85,43 @@ namespace MsSqlToolBelt.ViewModel
         {
             get => _exportButtonEnabled;
             set => SetField(ref _exportButtonEnabled, value);
+        }
+
+        /// <summary>
+        /// Contains the list with the original entries (needed for the filter)
+        /// </summary>
+        private List<DefinitionEntry> _originalList;
+
+        /// <summary>
+        /// Backing field for <see cref="EntryList"/>
+        /// </summary>
+        private ObservableCollection<DefinitionEntry> _entryList;
+
+        /// <summary>
+        /// Gets or sets the list with the available entries
+        /// </summary>
+        public ObservableCollection<DefinitionEntry> EntryList
+        {
+            get => _entryList;
+            private set
+            {
+                SetField(ref _entryList, value);
+                ExportButtonEnabled = !string.IsNullOrWhiteSpace(ObjectList) || value != null && value.Any();
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="ListFilter"/>
+        /// </summary>
+        private string _listFilter;
+
+        /// <summary>
+        /// Gets or sets the filter string of the list
+        /// </summary>
+        public string ListFilter
+        {
+            get => _listFilter;
+            set => SetField(ref _listFilter, value);
         }
 
         /// <summary>
@@ -115,12 +161,88 @@ namespace MsSqlToolBelt.ViewModel
         public ICommand CopyCommand => new DelegateCommand(Copy);
 
         /// <summary>
+        /// The command to filter the list
+        /// </summary>
+        public ICommand FilterCommand => new DelegateCommand(FilterList);
+
+        /// <summary>
+        /// The command to set the export flag to true
+        /// </summary>
+        public ICommand SelectCommand => new DelegateCommand(() => SetSelection(true));
+
+        /// <summary>
+        /// The command to set the export flag to false
+        /// </summary>
+        public ICommand DeselectCommand => new DelegateCommand(() => SetSelection(false));
+
+        /// <summary>
+        /// The command to load the data
+        /// </summary>
+        public ICommand ReloadCommand => new DelegateCommand(LoadProcedures);
+
+        /// <summary>
         /// Sets the connector
         /// </summary>
         /// <param name="connector">The connector</param>
         public void SetConnector(Connector connector)
         {
             _manager = new DefinitionExportManager(connector);
+        }
+
+        /// <summary>
+        /// Loads the data
+        /// </summary>
+        public void LoadData()
+        {
+            if (_dataLoaded)
+                return;
+
+            LoadProcedures();
+
+            _dataLoaded = true;
+        }
+
+        /// <summary>
+        /// Loads the procedures and shows them
+        /// </summary>
+        private async void LoadProcedures()
+        {
+            var controller = await ShowProgress("Please wait", "Please wait while loading the procedures...");
+
+            try
+            {
+                var result = await _manager.LoadProceduresAsync();
+                if (!result.Any())
+                    return;
+
+                _originalList = result.OrderBy(o => o.Name).ToList();
+
+                FilterList();
+            }
+            catch (Exception ex)
+            {
+                await ShowError(ex);
+            }
+            finally
+            {
+                await controller.CloseAsync();
+            }
+        }
+
+        /// <summary>
+        /// Filters the list of entries according to the given filter
+        /// </summary>
+        private void FilterList()
+        {
+            if (_originalList == null)
+            {
+                EntryList = new ObservableCollection<DefinitionEntry>();
+                return;
+            }
+
+            EntryList = new ObservableCollection<DefinitionEntry>(string.IsNullOrWhiteSpace(ListFilter)
+                ? _originalList
+                : _originalList.Where(w => w.Name.ContainsIgnoreCase(ListFilter)));
         }
 
         /// <summary>
@@ -137,7 +259,7 @@ namespace MsSqlToolBelt.ViewModel
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(ObjectList))
+            if (string.IsNullOrWhiteSpace(ObjectList) && !EntryList.Any(a => a.Export))
                 return;
 
             var dialog = await ShowProgress("Please wait", "Please wait while exporting the definitions...");
@@ -154,7 +276,7 @@ namespace MsSqlToolBelt.ViewModel
                     dialog.SetMessage(msg);
                 };
 
-                await _manager.ExportDefinitions(ExportDirectory, ObjectList);
+                await _manager.ExportDefinitions(ExportDirectory, ObjectList, EntryList.ToList());
             }
             catch (Exception ex)
             {
@@ -186,6 +308,18 @@ namespace MsSqlToolBelt.ViewModel
         }
 
         /// <summary>
+        /// Sets the "export" flag of every entry
+        /// </summary>
+        /// <param name="select">true to set export to true, otherwise false</param>
+        private void SetSelection(bool select)
+        {
+            foreach (var entry in EntryList)
+            {
+                entry.Export = select;
+            }
+        }
+
+        /// <summary>
         /// Clears the content of the control
         /// </summary>
         public void Clear()
@@ -193,6 +327,10 @@ namespace MsSqlToolBelt.ViewModel
             ExportDirectory = "";
             ObjectList = "";
             ExportInfo = "";
+
+            // Reset the filter
+            ListFilter = "";
+            FilterList();
         }
     }
 }

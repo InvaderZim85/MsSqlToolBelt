@@ -55,7 +55,13 @@ namespace MsSqlToolBelt
         private void App_OnExit(object sender, ExitEventArgs e)
         {
             if (_application.DataContext is MainWindowViewModel viewModel)
+            {
+                // Stop the timer
                 viewModel.StopTimer();
+
+                // Kill the database connection
+                viewModel.DisposeConnection();
+            }
 
             // Remove all actions
             Helper.RemoveAllActions();

@@ -8,6 +8,9 @@ using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data
 {
+    /// <summary>
+    /// Provides the logic for the interaction with the table types
+    /// </summary>
     internal sealed class TableTypeRepo
     {
         /// <summary>

@@ -18,6 +18,15 @@ namespace MsSqlToolBelt.View
         }
 
         /// <summary>
+        /// Loads the data
+        /// </summary>
+        public void LoadData()
+        {
+            if (DataContext is DefinitionExportControlViewModel viewModel)
+                viewModel.LoadData();
+        }
+
+        /// <summary>
         /// Sets the connector of the view model
         /// </summary>
         /// <param name="connector">The instance of the connector</param>

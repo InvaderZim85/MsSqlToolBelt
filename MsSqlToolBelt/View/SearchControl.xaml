@@ -85,8 +85,8 @@
                     Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    HorizontalAlignment="Left"
-                    Content="{Binding ResultInfo}" />
+                    Content="{Binding ResultInfo}"
+                    Style="{StaticResource Headline}" />
 
                 <StackPanel
                     Grid.Row="3"
@@ -212,8 +212,8 @@
 
                 <Label
                     Grid.Row="0"
-                    HorizontalAlignment="Left"
-                    Content="Preview" />
+                    Content="Preview"
+                    Style="{StaticResource Headline}" />
                 <Separator Grid.Row="1" Margin="3" />
                 <avalonedit:TextEditor
                     Name="SqlEditor"

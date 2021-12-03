@@ -49,7 +49,7 @@ namespace MsSqlToolBelt.Data
         }
 
         /// <summary>
-        /// 
+        /// Releases all resources used by the <see cref="Repo"/>
         /// </summary>
         public void Dispose()
         {

@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using MahApps.Metro.Controls;
-using Markdig;
 using MsSqlToolBelt.DataObjects.Github;
 using MsSqlToolBelt.ViewModel;
 
