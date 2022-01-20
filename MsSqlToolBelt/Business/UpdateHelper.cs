@@ -31,7 +31,7 @@ namespace MsSqlToolBelt.Business
                 client.AddDefaultHeader("accept", "application/vnd.github.v3+json");
                 client.UseNewtonsoftJson();
 
-                var request = new RestRequest(Method.GET);
+                var request = new RestRequest();
 
                 var response = await client.GetAsync<ReleaseInfo>(request);
 

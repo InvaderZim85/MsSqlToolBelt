@@ -314,7 +314,8 @@ namespace MsSqlToolBelt.ViewModel
         /// <param name="loadData">The action to load the data</param>
         /// <param name="clearControls">The action to clear the commands</param>
         /// <param name="initFlyOut">The action to initialize the specified fly out</param>
-        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls, Action<FlyOutType> initFlyOut)
+        public void InitViewModel(Action<Connector> setConnector, Action<int> loadData, Action clearControls,
+            Action<FlyOutType> initFlyOut)
         {
             Helper.InitLogger();
 
@@ -328,7 +329,8 @@ namespace MsSqlToolBelt.ViewModel
 
             LoadServerList();
 
-            Header = $"MsSqlToolBelt - v{Assembly.GetExecutingAssembly().GetName().Version}";
+            SetHeader();
+            
             BuildInfo = Helper.GetBuildData();
 
             _memoryTimer = new Timer(1000);
@@ -341,6 +343,21 @@ namespace MsSqlToolBelt.ViewModel
                     _maxMemoryUsage = memUsage;
             };
             _memoryTimer.Start();
+        }
+
+        /// <summary>
+        /// Sets the header text
+        /// </summary>
+        private void SetHeader()
+        {
+            if (!string.IsNullOrEmpty(SelectedServer) && !string.IsNullOrEmpty(SelectedDatabase))
+            {
+                Header = $"MsSqlToolBelt - Server: {SelectedServer} | Database: {SelectedDatabase} - v{Assembly.GetExecutingAssembly().GetName().Version}";
+            }
+            else
+            {
+                Header = $"MsSqlToolBelt - v{Assembly.GetExecutingAssembly().GetName().Version}";
+            }
         }
 
         /// <summary>
@@ -481,6 +498,8 @@ namespace MsSqlToolBelt.ViewModel
                 Log.Information("Connect to database '{database}'", SelectedDatabase);
 
                 _setConnector(_repo.Connector);
+
+                SetHeader();
             }
             catch (Exception ex)
             {

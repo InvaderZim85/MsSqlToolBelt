@@ -138,7 +138,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// The command to copy the code
         /// </summary>
-        public ICommand CopyCommand => new RelayCommand<CodeType>(Copy);
+        public ICommand CopyCommand => new DelegateCommand(Copy);
 
         /// <summary>
         /// The command to validate the inserted text
@@ -178,8 +178,7 @@ namespace MsSqlToolBelt.ViewModel
         /// <summary>
         /// Copies the code
         /// </summary>
-        /// <param name="type">The desired type</param>
-        private void Copy(CodeType type)
+        private void Copy()
         {
             CopyToClipboard(_getEditorText());
         }

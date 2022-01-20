@@ -137,13 +137,16 @@ namespace MsSqlToolBelt.Business
                     .AppendLine($"{spacer}/// </summary>");
             }
 
-            void AddPropertyAttributes(TableColumn column)
+            void AddPropertyAttributes(TableColumn column, string propName)
             {
                 if (column.IsPrimaryKey)
                     sb.AppendLine($"{Tab}[Key]");
 
-                if (!string.IsNullOrEmpty(column.Column))
-                    sb.AppendLine($"{Tab}[Column(\"{column.Column}\"){AddTypeInfo(column)}]");
+                // The column name and the property name equals! So ignore the rest
+                if (column.Column.Equals(propName))
+                    return;
+
+                sb.AppendLine($"{Tab}[Column(\"{column.Column}\"){AddTypeInfo(column)}]");
             }
 
             // Adds a type change if any is needed (for example the db type is Date)
@@ -193,7 +196,7 @@ namespace MsSqlToolBelt.Business
                     if (settings.AddSummary)
                         AddSummary("Gets or sets TODO");
                     if (settings.EfClass)
-                        AddPropertyAttributes(column);
+                        AddPropertyAttributes(column, propName);
 
                     sb.AppendLine($"{Tab}public {dataType} {propName}")
                         .AppendLine($"{Tab}{{")
@@ -207,7 +210,7 @@ namespace MsSqlToolBelt.Business
                     if (settings.AddSummary)
                         AddSummary("TODO");
                     if (settings.EfClass)
-                        AddPropertyAttributes(column);
+                        AddPropertyAttributes(column, propName);
 
                     sb.AppendLine($"{Tab}public {dataType} {propName} {{ get; set; }}");
                 }
