@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using ZimLabs.TableCreator;
 using ZimLabs.WpfBase;
 
@@ -8,6 +9,7 @@ namespace MsSqlToolBelt.DataObjects.Search
     /// <summary>
     /// Represents a single search result
     /// </summary>
+    [DebuggerDisplay("{Name}")]
     internal sealed class SearchResult : ObservableObject
     {
         /// <summary>

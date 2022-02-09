@@ -82,10 +82,6 @@ FROM
 
     INNER JOIN sys.objects AS o
     ON o.object_id = r.Id
-WHERE
-    r.[Name] NOT LIKE 'syncobj%'
-    AND r.[Name] NOT LIKE '%_CT'
-    AND r.[Name] NOT LIKE 'SYNC%'
 ORDER BY
     r.[Type];
 
