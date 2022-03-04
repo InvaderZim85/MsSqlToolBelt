@@ -207,7 +207,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void LoadProcedures()
         {
-            var controller = await ShowProgress("Please wait", "Please wait while loading the procedures...");
+            var controller = await ShowProgressAsync("Please wait", "Please wait while loading the procedures...");
 
             try
             {
@@ -221,7 +221,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {
@@ -255,14 +255,14 @@ namespace MsSqlToolBelt.ViewModel
 
             if (!Directory.Exists(ExportDirectory))
             {
-                await ShowMessage("Error", $"The specified export directory ({ExportDirectory}) doesn't exist.");
+                await ShowMessageAsync("Error", $"The specified export directory ({ExportDirectory}) doesn't exist.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(ObjectList) && !EntryList.Any(a => a.Export))
                 return;
 
-            var dialog = await ShowProgress("Please wait", "Please wait while exporting the definitions...");
+            var dialog = await ShowProgressAsync("Please wait", "Please wait while exporting the definitions...");
 
             try
             {
@@ -276,11 +276,11 @@ namespace MsSqlToolBelt.ViewModel
                     dialog.SetMessage(msg);
                 };
 
-                await _manager.ExportDefinitions(ExportDirectory, ObjectList, EntryList.ToList());
+                await _manager.ExportDefinitionsAsync(ExportDirectory, ObjectList, EntryList.ToList());
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {

@@ -358,7 +358,7 @@ namespace MsSqlToolBelt.ViewModel
                 return;
 
             SearchEnabled = false;
-            var controller = await ShowProgress("Search", $"Please wait while searching for '{Search}'...");
+            var controller = await ShowProgressAsync("Search", $"Please wait while searching for '{Search}'...");
 
             try
             {
@@ -373,7 +373,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
                 ResultInfo = "Result - Error";
             }
             finally
@@ -413,7 +413,7 @@ namespace MsSqlToolBelt.ViewModel
                 return;
 
             var controller =
-                await ShowProgress("Export", "Please wait while exporting the data...");
+                await ShowProgressAsync("Export", "Please wait while exporting the data...");
 
             try
             {
@@ -421,7 +421,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {

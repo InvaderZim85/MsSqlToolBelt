@@ -23,7 +23,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="callback"></param>
         /// <returns>The awaitable task</returns>
-        public static async Task LoadReleaseInfo(Action<ReleaseInfo> callback)
+        public static async Task LoadReleaseInfoAsync(Action<ReleaseInfo> callback)
         {
             try
             {

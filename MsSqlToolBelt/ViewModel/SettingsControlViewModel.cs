@@ -272,7 +272,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
         }
 
@@ -281,7 +281,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void SaveSettings()
         {
-            var controller = await ShowProgress("Please wait", "Please wait while saving the settings...");
+            var controller = await ShowProgressAsync("Please wait", "Please wait while saving the settings...");
 
             try
             {
@@ -295,11 +295,11 @@ namespace MsSqlToolBelt.ViewModel
                 };
 
                 if (!Helper.SaveSettings(settings))
-                    await ShowMessage("Error", "Can't save the settings.");
+                    await ShowMessageAsync("Error", "Can't save the settings.");
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {
@@ -312,7 +312,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void AddServer()
         {
-            var result = await ShowInput("Add server", "Add the path of the new server");
+            var result = await ShowInputAsync("Add server", "Add the path of the new server");
 
             if (string.IsNullOrEmpty(result))
                 return;
@@ -336,7 +336,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {
@@ -352,7 +352,7 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(SelectedServer))
                 return;
 
-            if (await ShowQuestion("Delete server", $"Do you really want to remove the server '{SelectedServer}'?") !=
+            if (await ShowQuestionAsync("Delete server", $"Do you really want to remove the server '{SelectedServer}'?") !=
                 MessageDialogResult.Affirmative)
                 return;
 
@@ -394,7 +394,7 @@ namespace MsSqlToolBelt.ViewModel
             if (SelectedIgnoreEntry == null)
                 return;
 
-            if (await ShowQuestion("Remove filter",
+            if (await ShowQuestionAsync("Remove filter",
                     $"Do you really want to remove the filter '{SelectedIgnoreEntry}'?") !=
                 MessageDialogResult.Affirmative)
                 return;

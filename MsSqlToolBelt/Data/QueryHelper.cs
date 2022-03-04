@@ -65,6 +65,8 @@ namespace MsSqlToolBelt.Data
             {
                 entry.Definition = "";
                 entry.Columns = columns.Where(w => w.Table.Equals(entry.Name)).ToList();
+                if (entry.Columns.Any(a => a.IsReplicated))
+                    entry.Info = "Table marked for replication.";
 
                 // Combine the indices for the table and add the result to the search result
                 var tableIndices = indices.Where(w => w.Table.EqualsIgnoreCase(entry.Name)).ToList();
@@ -168,16 +170,16 @@ namespace MsSqlToolBelt.Data
                 switch (ignoreEntry.FilterType)
                 {
                     case CustomEnums.FilterType.Equals:
-                        removeList.AddRange(searchResult.Where(w => w.Type.Equals(TableTypeName) && w.Name.EqualsIgnoreCase(ignoreEntry.Value)));
+                        removeList.AddRange(searchResult.Where(w => w.Name.EqualsIgnoreCase(ignoreEntry.Value)));
                         break;
                     case CustomEnums.FilterType.Contains:
-                        removeList.AddRange(searchResult.Where(w => w.Type.Equals(TableTypeName) && w.Name.ContainsIgnoreCase(ignoreEntry.Value)));
+                        removeList.AddRange(searchResult.Where(w => w.Name.ContainsIgnoreCase(ignoreEntry.Value)));
                         break;
                     case CustomEnums.FilterType.StartsWith:
-                        removeList.AddRange(searchResult.Where(w => w.Type.Equals(TableTypeName) && w.Name.StartsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
+                        removeList.AddRange(searchResult.Where(w => w.Name.StartsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
                         break;
                     case CustomEnums.FilterType.EndsWith:
-                        removeList.AddRange(searchResult.Where(w => w.Type.Equals(TableTypeName) && w.Name.EndsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
+                        removeList.AddRange(searchResult.Where(w => w.Name.EndsWith(ignoreEntry.Value, StringComparison.OrdinalIgnoreCase)));
                         break;
                 }
             }
@@ -193,7 +195,7 @@ namespace MsSqlToolBelt.Data
         /// </summary>
         /// <param name="sqlQuery">The sql query</param>
         /// <returns>The validation result</returns>
-        public static async Task<(bool valid, string message)> ValidateSql(string sqlQuery)
+        public static async Task<(bool valid, string message)> ValidateSqlAsync(string sqlQuery)
         {
             if (string.IsNullOrEmpty(sqlQuery))
                 return (false, "");

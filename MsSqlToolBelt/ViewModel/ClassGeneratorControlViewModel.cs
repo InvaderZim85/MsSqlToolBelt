@@ -359,11 +359,11 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void LoadTables()
         {
-            var controller = await ShowProgress("Please wait", "Please wait while loading the tables...");
+            var controller = await ShowProgressAsync("Please wait", "Please wait while loading the tables...");
 
             try
             {
-                var result = await _manager.LoadTables();
+                var result = await _manager.LoadTablesAsync();
 
                 _originTableList = result.OrderBy(o => o.Name).ToList();
 
@@ -371,7 +371,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {
@@ -405,7 +405,7 @@ namespace MsSqlToolBelt.ViewModel
         {
             if (!ClassNameValid())
             {
-                await ShowMessage("Class generator",
+                await ShowMessageAsync("Class generator",
                     "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
                 return;
             }
@@ -413,11 +413,11 @@ namespace MsSqlToolBelt.ViewModel
             // Check if a column is selected
             if (Columns.All(a => !a.Use))
             {
-                await ShowMessage("Class generator", "You have to select at least one column to generate a class.");
+                await ShowMessageAsync("Class generator", "You have to select at least one column to generate a class.");
                 return;
             }
 
-            var controller = await ShowProgress("Please wait", "Please wait while generating the class...");
+            var controller = await ShowProgressAsync("Please wait", "Please wait while generating the class...");
 
             try
             {
@@ -443,7 +443,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {
@@ -458,7 +458,7 @@ namespace MsSqlToolBelt.ViewModel
         {
             if (!ClassNameValid())
             {
-                await ShowMessage("Class generator",
+                await ShowMessageAsync("Class generator",
                     "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
                 return;
             }
@@ -469,7 +469,7 @@ namespace MsSqlToolBelt.ViewModel
                 Caption = "Insert the SQL query to generate a class from it. Hint: Add a 'TOP (1)' to your query to reduce the load of the SQL server",
                 ShowOption = false,
                 ShowValidateButton = true,
-                ValidationFunc = QueryHelper.ValidateSql,
+                ValidationFunc = QueryHelper.ValidateSqlAsync,
                 CodeType = CodeType.Sql
             })
             {
@@ -481,7 +481,7 @@ namespace MsSqlToolBelt.ViewModel
             if (string.IsNullOrEmpty(dialog.Code))
                 return;
 
-            var controller = await ShowProgress("Please wait", "Please wait while generating the class...");
+            var controller = await ShowProgressAsync("Please wait", "Please wait while generating the class...");
 
             try
             {
@@ -507,7 +507,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {

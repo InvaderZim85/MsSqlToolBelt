@@ -56,7 +56,7 @@ namespace MsSqlToolBelt.Business
         /// <param name="objectList">The object list</param>
         /// <param name="defList">The list with the definition entries</param>
         /// <returns>The awaitable task</returns>
-        public async Task ExportDefinitions(string exportDirectory, string objectList, List<DefinitionEntry> defList)
+        public async Task ExportDefinitionsAsync(string exportDirectory, string objectList, List<DefinitionEntry> defList)
         {
             if (string.IsNullOrWhiteSpace(exportDirectory))
                 throw new ArgumentNullException(nameof(exportDirectory));
