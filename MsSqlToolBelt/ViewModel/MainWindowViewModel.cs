@@ -476,7 +476,7 @@ namespace MsSqlToolBelt.ViewModel
             catch (Exception ex)
             {
                 Connection = "Connection error.";
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
                 ServerConnected = false;
                 Connected = false;
             }
@@ -504,7 +504,7 @@ namespace MsSqlToolBelt.ViewModel
             catch (Exception ex)
             {
                 Connection = "Connection error.";
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
                 Connected = false;
             }
         }
@@ -536,7 +536,7 @@ namespace MsSqlToolBelt.ViewModel
             // The "Forget()" method is used to let the async task run without waiting.
             // More information: https://docs.microsoft.com/en-us/answers/questions/186037/taskrun-without-wait.html
             // To use "Forget" you need the following nuget package: https://www.nuget.org/packages/Microsoft.VisualStudio.Threading/
-            UpdateHelper.LoadReleaseInfo(SetReleaseInfo).Forget();
+            UpdateHelper.LoadReleaseInfoAsync(SetReleaseInfo).Forget();
         }
 
         /// <summary>

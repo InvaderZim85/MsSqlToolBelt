@@ -192,7 +192,7 @@ namespace MsSqlToolBelt.ViewModel
         /// </summary>
         private async void LoadTableTypes()
         {
-            var controller = await ShowProgress("Please wait",
+            var controller = await ShowProgressAsync("Please wait",
                 "Please wait while loading the table types...");
 
             try
@@ -203,7 +203,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
             finally
             {

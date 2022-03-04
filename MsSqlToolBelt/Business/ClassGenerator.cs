@@ -38,9 +38,9 @@ namespace MsSqlToolBelt.Business
         /// Loads all tables with its columns
         /// </summary>
         /// <returns>The list with the tables</returns>
-        public async Task<List<Table>> LoadTables()
+        public async Task<List<Table>> LoadTablesAsync()
         {
-            return await _repo.LoadTables();
+            return await _repo.LoadTablesAsync();
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace MsSqlToolBelt.Business
         /// <returns>The CSharp code and the sql statement</returns>
         public async Task<ClassGenResult> GenerateFromQueryAsync(ClassGenSettingsDto settings)
         {
-            await GenerateClassFromQuery(settings);
+            await GenerateClassFromQueryAsync(settings);
             var classCode = GenerateClass(settings);
 
             var (efKeyCode, efKeyCodeOption) = settings.EfClass ? CreateEfKeyCode(settings) : ("", "");
@@ -335,7 +335,7 @@ namespace MsSqlToolBelt.Business
         /// </summary>
         /// <param name="settings">The settings with the query</param>
         /// <returns>The class code</returns>
-        private async Task GenerateClassFromQuery(ClassGenSettingsDto settings)
+        private async Task GenerateClassFromQueryAsync(ClassGenSettingsDto settings)
         {
             var result = await _repo.ExecuteQueryAsync(settings.SqlQuery);
 

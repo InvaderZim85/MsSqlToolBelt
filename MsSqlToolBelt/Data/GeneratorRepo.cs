@@ -32,7 +32,7 @@ namespace MsSqlToolBelt.Data
         /// Loads all tables with its columns
         /// </summary>
         /// <returns>The list with the tables</returns>
-        public async Task<List<Table>> LoadTables()
+        public async Task<List<Table>> LoadTablesAsync()
         {
             var tables = await _connector.Connection.ExtractMultiSearchTableResultAsync(QueryManager.LoadTables);
 

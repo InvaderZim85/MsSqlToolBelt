@@ -74,7 +74,7 @@ namespace MsSqlToolBelt.ViewModel
             }
             catch (Exception ex)
             {
-                await ShowError(ex);
+                await ShowErrorAsync(ex);
             }
         }
 
