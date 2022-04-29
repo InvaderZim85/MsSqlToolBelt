@@ -1,0 +1,76 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.Ui.View.Windows.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Windows"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
+    Title="MainWindow"
+    Width="1024"
+    Height="768"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="MainWindow_OnLoaded"
+    ResizeMode="CanResizeWithGrip"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    mc:Ignorable="d">
+    <Window.DataContext>
+        <windows:MainWindowViewModel />
+    </Window.DataContext>
+
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <!--<Button
+                Command="{Binding ShowUpdateInfoCommand}"
+                Content="Update available!"
+                Visibility="{Binding UpdateButtonVisible}" />-->
+            <!--<Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
+                <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
+            </Button>
+            <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
+                <iconPacks:PackIconPixelartIcons Kind="Code" />
+            </Button>-->
+            <Button Command="{Binding OpenSettingsCommand}" ToolTip="Shows the settings">
+                <iconPacks:PackIconPixelartIcons Kind="Sliders" />
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+
+    <!--  Fly outs  -->
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout
+                Width="600"
+                ClosingFinished="Flyout_OnClosingFinished"
+                Header="Settings"
+                IsOpen="{Binding SettingsOpen}"
+                Position="Right">
+                <controls:SettingsControl x:Name="SettingsControl" />
+            </mah:Flyout>
+
+            <!--<mah:Flyout
+                Width="600"
+                Header="Data types"
+                IsOpen="{Binding DataTypeOpen}"
+                Position="Right">
+                <local:DataTypeControl x:Name="DataTypeControl" />
+            </mah:Flyout>
+
+            <mah:Flyout
+                Width="600"
+                Header="Info"
+                IsOpen="{Binding InfoOpen}"
+                Position="Right">
+                <local:InfoControl x:Name="InfoControl" />
+            </mah:Flyout>-->
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+    <Grid />
+</mah:MetroWindow>

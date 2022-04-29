@@ -234,6 +234,7 @@
     <Compile Include="Business\DefinitionExportManager.cs" />
     <Compile Include="Business\ExportHelper.cs" />
     <Compile Include="Business\PackageInfo.cs" />
+    <Compile Include="Business\SearchManager.cs" />
     <Compile Include="Business\UpdateHelper.cs" />
     <Compile Include="DataObjects\Arguments.cs" />
     <Compile Include="DataObjects\ClassGenerator\ClassGenResult.cs" />
