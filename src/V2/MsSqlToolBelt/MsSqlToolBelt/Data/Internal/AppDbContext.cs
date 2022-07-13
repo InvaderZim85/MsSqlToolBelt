@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Internal;
+using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Data.Internal;
 
@@ -35,7 +36,7 @@ internal class AppDbContext : DbContext
     /// </summary>
     public AppDbContext()
     {
-        _conString = $"Data Source={Path.Combine(Helper.GetBaseDirPath(), "MsSqlToolBelt.Settings.db")}";
+        _conString = $"Data Source={Path.Combine(Core.GetBaseDirPath(), "MsSqlToolBelt.Settings.db")}";
     }
 
     /// <summary>

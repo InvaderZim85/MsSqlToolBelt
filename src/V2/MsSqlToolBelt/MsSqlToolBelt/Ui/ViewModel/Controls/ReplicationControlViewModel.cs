@@ -1,0 +1,284 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
+using MsSqlToolBelt.Business;
+using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.Ui.View.Common;
+using ZimLabs.CoreLib;
+using ZimLabs.WpfBase.NetCore;
+
+namespace MsSqlToolBelt.Ui.ViewModel.Controls;
+
+internal class ReplicationControlViewModel : ViewModelBase, IConnection
+{
+    /// <summary>
+    /// The instance for the interaction with the replication data
+    /// </summary>
+    private ReplicationManager? _manager;
+
+    /// <summary>
+    /// Contains the value which indicates if the data already loaded
+    /// </summary>
+    private bool _dataLoaded;
+
+    #region View Properties
+
+    /// <summary>
+    /// Backing field for <see cref="Tables"/>
+    /// </summary>
+    private ObservableCollection<TableEntry> _tables = new();
+
+    /// <summary>
+    /// Gets or sets the list with the tables
+    /// </summary>
+    public ObservableCollection<TableEntry> Tables
+    {
+        get => _tables;
+        set => SetField(ref _tables, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="SelectedTable"/>
+    /// </summary>
+    private TableEntry? _selectedTable;
+
+    /// <summary>
+    /// Gets or sets the selected table
+    /// </summary>
+    public TableEntry? SelectedTable
+    {
+        get => _selectedTable;
+        set
+        {
+            SetField(ref _selectedTable, value);
+
+            if (_manager == null)
+                return;
+
+            _manager.SelectedTable = value;
+
+            if (value != null && value.Columns.Any())
+            {
+                SetColumns();
+                SetIndexes();
+            }
+            else
+                EnrichData();
+        }
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="Columns"/>
+    /// </summary>
+    private ObservableCollection<ColumnEntry> _columns = new();
+
+    /// <summary>
+    /// Gets or sets the list with the table columns
+    /// </summary>
+    public ObservableCollection<ColumnEntry> Columns
+    {
+        get => _columns;
+        set => SetField(ref _columns, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="Indexes"/>
+    /// </summary>
+    private ObservableCollection<IndexEntry> _indexes = new();
+
+    /// <summary>
+    /// Gets or sets the list with the indexes
+    /// </summary>
+    public ObservableCollection<IndexEntry> Indexes
+    {
+        get => _indexes;
+        set => SetField(ref _indexes, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="Filter"/>
+    /// </summary>
+    private string _filter = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the filter
+    /// </summary>
+    public string Filter
+    {
+        get => _filter;
+        set => SetField(ref _filter, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="HeaderList"/>
+    /// </summary>
+    private string _headerList = "Tables";
+
+    /// <summary>
+    /// Gets or sets the list header
+    /// </summary>
+    public string HeaderList
+    {
+        get => _headerList;
+        set => SetField(ref _headerList, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="HeaderColumns"/>
+    /// </summary>
+    private string _headerColumns = "Columns";
+
+    /// <summary>
+    /// Gets or sets the column header
+    /// </summary>
+    public string HeaderColumns
+    {
+        get => _headerColumns;
+        set => SetField(ref _headerColumns, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="HeaderIndex"/>
+    /// </summary>
+    private string _headerIndex = "Indexes";
+
+    /// <summary>
+    /// Gets or sets the index header
+    /// </summary>
+    public string HeaderIndex
+    {
+        get => _headerIndex;
+        set => SetField(ref _headerIndex, value);
+    }
+    #endregion
+
+    /// <summary>
+    /// The command to filter the table types
+    /// </summary>
+    public ICommand FilterCommand => new DelegateCommand(FilterResult);
+
+    /// <summary>
+    /// The command to reload the table types
+    /// </summary>
+    public ICommand ReloadCommand => new DelegateCommand(() =>
+    {
+        _dataLoaded = false;
+        LoadData();
+    });
+
+    /// <inheritdoc />
+    public void SetConnection(string dataSource, string database)
+    {
+        // Clear the current result
+        Tables = new ObservableCollection<TableEntry>();
+        Columns = new ObservableCollection<ColumnEntry>();
+
+        _manager?.Dispose();
+        _dataLoaded = false;
+
+        _manager = new ReplicationManager(dataSource, database);
+    }
+
+    /// <summary>
+    /// Loads the data
+    /// </summary>
+    public async void LoadData()
+    {
+        if (_dataLoaded || _manager == null)
+            return;
+
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
+
+        try
+        {
+            await _manager.LoadTablesAsync();
+
+            _dataLoaded = true;
+
+            FilterResult();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
+    /// Filters the result
+    /// </summary>
+    private void FilterResult()
+    {
+        if (_manager == null)
+            return;
+
+        var result = string.IsNullOrEmpty(Filter)
+            ? _manager.Tables
+            : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
+
+        Tables = new ObservableCollection<TableEntry>(result);
+        HeaderList = Tables.Count > 1
+            ? $"{Tables.Count} tables"
+            : Tables.Count == 0
+                ? "Tables"
+                : "1 table";
+    }
+
+    /// <summary>
+    /// Enriches the selected table type
+    /// </summary>
+    private async void EnrichData()
+    {
+        if (_manager?.SelectedTable == null)
+            return;
+
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+
+        try
+        {
+            await _manager.EnrichTableAsync();
+
+            // Set the columns
+            SetColumns();
+            SetIndexes();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
+    /// Sets the columns
+    /// </summary>
+    private void SetColumns()
+    {
+        if (_manager?.SelectedTable == null)
+            return;
+
+        Columns = new ObservableCollection<ColumnEntry>(_manager.SelectedTable.Columns);
+
+        HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
+    }
+
+    /// <summary>
+    /// Sets the indexes
+    /// </summary>
+    private void SetIndexes()
+    {
+        if (_manager?.SelectedTable == null)
+            return;
+
+        Indexes = new ObservableCollection<IndexEntry>(_manager.SelectedTable.Indexes);
+        HeaderIndex = Indexes.Count > 1 ? $"{Indexes.Count} indexes" : "1 index";
+    }
+}

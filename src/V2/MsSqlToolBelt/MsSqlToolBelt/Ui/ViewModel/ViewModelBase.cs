@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using ZimLabs.WpfBase.NetCore;
 
@@ -21,7 +26,7 @@ namespace MsSqlToolBelt.Ui.ViewModel
         /// <summary>
         /// The message timer
         /// </summary>
-        private Timer _messageTimer = new(TimeSpan.FromSeconds(10).TotalMilliseconds);
+        private readonly Timer _messageTimer = new(TimeSpan.FromSeconds(10).TotalMilliseconds);
 
         /// <summary>
         /// Backing field for <see cref="InfoMessage"/>
@@ -142,6 +147,90 @@ namespace MsSqlToolBelt.Ui.ViewModel
         {
             InfoMessage = message;
             _messageTimer.Start();
+        }
+
+        /// <summary>
+        /// Copies the content to the clipboard
+        /// </summary>
+        /// <param name="content">The content which should be copied</param>
+        protected void CopyToClipboard(string content)
+        {
+            Clipboard.SetText(content);
+        }
+
+        /// <summary>
+        /// Exports the desired data 
+        /// </summary>
+        /// <typeparam name="T">The type of the data</typeparam>
+        /// <param name="data">The data which should be exported</param>
+        /// <param name="defaultName">The default name of the file</param>
+        protected async void ExportObjectData<T>(T data, string defaultName) where T : class
+        {
+            ProgressDialogController? controller = null;
+            try
+            {
+                var dialog = new ExportWindow(defaultName, ExportDataType.Single);
+                if (dialog.ShowDialog() != true)
+                    return;
+
+                if (dialog.Export)
+                {
+                    controller = await ShowProgressAsync("Please wait", "Please wait while export the data...");
+
+                    await ExportHelper.ExportObject(data, dialog.FileName, dialog.ExportType);
+                }
+                else
+                {
+                    var content = ExportHelper.CreateObjectContent(data, dialog.ExportType);
+                    CopyToClipboard(content);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorAsync(ex);
+            }
+            finally
+            {
+                if (controller != null)
+                    await controller.CloseAsync();
+            }
+        }
+
+        /// <summary>
+        /// Exports the desired list
+        /// </summary>
+        /// <typeparam name="T">The type of the data</typeparam>
+        /// <param name="data">The data which should be exported</param>
+        /// <param name="defaultName">The default name of the file</param>
+        protected async void ExportListData<T>(IEnumerable<T> data, string defaultName) where T : class
+        {
+            ProgressDialogController? controller = null;
+            try
+            {
+                var dialog = new ExportWindow(defaultName, ExportDataType.List);
+                if (dialog.ShowDialog() != true)
+                    return;
+
+                if (dialog.Export)
+                {
+                    controller = await ShowProgressAsync("Please wait", "Please wait while export the data...");
+                    await ExportHelper.ExportList(data, dialog.FileName, dialog.ExportType);
+                }
+                else
+                {
+                    var content = ExportHelper.CreateListContent(data, dialog.ExportType);
+                    CopyToClipboard(content);
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorAsync(ex);
+            }
+            finally
+            {
+                if (controller != null)
+                    await controller.CloseAsync();
+            }
         }
     }
 }

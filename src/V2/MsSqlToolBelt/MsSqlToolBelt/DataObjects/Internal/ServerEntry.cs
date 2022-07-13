@@ -7,7 +7,7 @@ namespace MsSqlToolBelt.DataObjects.Internal;
 /// Represents a server entry
 /// </summary>
 [Table("Server")]
-internal class ServerEntry
+public class ServerEntry
 {
     /// <summary>
     /// Gets or sets the id of the server
@@ -33,12 +33,21 @@ internal class ServerEntry
     public int Order { get; set; }
 
     /// <summary>
-    /// Creates a new empty entry
+    /// Creates a new empty instance of the <see cref="ServerEntry"/> 
     /// </summary>
     public ServerEntry(){}
 
     /// <summary>
-    /// Creates a new server wit the specified name
+    /// Creates a new instance of the <see cref="ServerEntry"/> with the name / path of the server
+    /// </summary>
+    /// <param name="name">The name / path of the server</param>
+    public ServerEntry(string name)
+    {
+        Name = name;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ServerEntry"/> with the name / path of the server and the default database
     /// </summary>
     /// <param name="name">The name / path of the server</param>
     /// <param name="defaultDatabase">The name of the default database</param>

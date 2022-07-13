@@ -13,12 +13,22 @@ namespace MsSqlToolBelt.Business;
 /// <summary>
 /// The instance for the interaction with the settings
 /// </summary>
-internal class SettingsManager
+public class SettingsManager
 {
     /// <summary>
     /// The app context
     /// </summary>
     private readonly AppDbContext _context;
+
+    /// <summary>
+    /// Gets the list with the servers
+    /// </summary>
+    public List<ServerEntry> ServerList { get; private set; } = new();
+
+    /// <summary>
+    /// Gets the list with the filter entries
+    /// </summary>
+    public List<FilterEntry> FilterList { get; private set; } = new();
 
     /// <summary>
     /// Creates a new instance of the <see cref="SettingsManager"/>
@@ -45,7 +55,7 @@ internal class SettingsManager
 
         try
         {
-            return (T) Convert.ChangeType(value, typeof(T));
+            return (T) Convert.ChangeType(value.Value, typeof(T));
         }
         catch (Exception ex)
         {
@@ -53,19 +63,55 @@ internal class SettingsManager
             return fallback == null ? Activator.CreateInstance<T>() : fallback;
         }
     }
+
+    /// <summary>
+    /// Saves a settings value
+    /// </summary>
+    /// <param name="key">The desired key</param>
+    /// <param name="value">The value which should be saved</param>
+    /// <returns>The awaitable task</returns>
+    public async Task SaveSettingsValueAsync(SettingsKey key, object value)
+    {
+        var tmpValue = await _context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
+        if (tmpValue != null)
+        {
+            tmpValue.Value = value.ToString() ?? "";
+        }
+        else
+        {
+            await _context.Settings.AddAsync(new SettingsEntry
+            {
+                KeyId = (int) key,
+                Value = value.ToString() ?? ""
+            });
+        }
+
+        await _context.SaveChangesAsync();
+    }
     #endregion
 
     #region Server
     /// <summary>
-    /// Loads the server list
+    /// Loads the server list and stores them into <see cref="ServerList"/>
     /// </summary>
     /// <param name="withTracking">true to active the tracking, otherwise false (optional)</param>
     /// <returns>The list with the servers</returns>
-    public async Task<List<ServerEntry>> LoadServerAsync(bool withTracking = false)
+    public async Task LoadServerAsync(bool withTracking = false)
     {
-        return withTracking
+        ServerList = withTracking
             ? await _context.ServerEntries.ToListAsync()
             : await _context.ServerEntries.AsNoTracking().ToListAsync();
+    }
+
+    /// <summary>
+    /// Loads the default database of the server
+    /// </summary>
+    /// <param name="server">The name of the server</param>
+    /// <returns>The default database</returns>
+    public async Task<string> LoadDefaultDatabaseAsync(string server)
+    {
+        var entry = await _context.ServerEntries.FirstOrDefaultAsync(f => f.Name.Equals(server));
+        return entry?.DefaultDatabase ?? "";
     }
 
     /// <summary>
@@ -85,6 +131,18 @@ internal class SettingsManager
         await _context.ServerEntries.AddAsync(server);
 
         await _context.SaveChangesAsync();
+
+        ServerList.Add(server);
+    }
+
+    /// <summary>
+    /// Adds a new server
+    /// </summary>
+    /// <param name="server">The name of the server</param>
+    /// <returns>The awaitable task</returns>
+    public async Task AddServerAsync(string server)
+    {
+        await AddServerAsync(new ServerEntry(server));
     }
 
     /// <summary>
@@ -106,6 +164,8 @@ internal class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task DeleteServerAsync(ServerEntry server)
     {
+        ServerList.Remove(server);
+
         _context.ServerEntries.Remove(server);
 
         await _context.SaveChangesAsync();
@@ -141,13 +201,13 @@ internal class SettingsManager
 
     #region Filter
     /// <summary>
-    /// Loads the list with the filters
+    /// Loads the list with the filters and stores them into <see cref="FilterList"/>
     /// </summary>
     /// <param name="withTracking">true to active the tracking, otherwise false (optional)</param>
     /// <returns>The list with the filter</returns>
-    public async Task<List<FilterEntry>> LoadFilterAsync(bool withTracking = false)
+    public async Task LoadFilterAsync(bool withTracking = false)
     {
-        return withTracking
+        FilterList =  withTracking
             ? await _context.FilterEntries.ToListAsync()
             : await _context.FilterEntries.AsNoTracking().ToListAsync();
     }
@@ -160,26 +220,15 @@ internal class SettingsManager
     public async Task AddFilterAsync(FilterEntry filter)
     {
         // Check if the entry already exists
-        if (_context.FilterEntries.Any(a =>
-                a.FilterTypeId == filter.FilterTypeId &&
-                a.Value.Equals(filter.Value, StringComparison.OrdinalIgnoreCase)))
-            return; 
+        if (await _context.FilterEntries.AnyAsync(a => a.FilterTypeId == filter.FilterTypeId &&
+                                                       a.Value.ToLower().Equals(filter.Value.ToLower())))
+            return;
 
         await _context.FilterEntries.AddAsync(filter);
 
         await _context.SaveChangesAsync();
-    }
 
-    /// <summary>
-    /// Updates the specified filter
-    /// </summary>
-    /// <param name="filter">The filter which should be updated</param>
-    /// <returns></returns>
-    public async Task UpdateFilterAsync(FilterEntry filter)
-    {
-        _context.FilterEntries.Update(filter);
-
-        await _context.SaveChangesAsync();
+        FilterList.Add(filter);
     }
 
     /// <summary>
@@ -189,6 +238,9 @@ internal class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task DeleteFilterAsync(FilterEntry filter)
     {
+        // Remove the filter
+        FilterList.Remove(filter);
+
         _context.FilterEntries.Remove(filter);
 
         await _context.SaveChangesAsync();

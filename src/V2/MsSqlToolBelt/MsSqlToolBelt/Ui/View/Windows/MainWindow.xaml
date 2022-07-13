@@ -72,5 +72,82 @@
             </mah:Flyout>-->
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
-    <Grid />
+    <DockPanel LastChildFill="True">
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="Connection info" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Connection  -->
+            <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Server:" />
+                    <ComboBox
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        IsEditable="True"
+                        ItemsSource="{Binding ServerList}"
+                        SelectedItem="{Binding SelectedServer}" />
+                    <Button
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Command="{Binding ConnectServerCommand}"
+                        Content="Connect" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="Database:" />
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        ItemsSource="{Binding DatabaseList}"
+                        SelectedItem="{Binding SelectedDatabase}" />
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Command="{Binding ConnectDatabaseCommand}"
+                        Content="Select" />
+                </Grid>
+            </Border>
+
+            <TabControl
+                Grid.Row="1"
+                IsEnabled="{Binding ConnectionEstablished}"
+                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}">
+                <TabItem Header="Search">
+                    <controls:SearchControl x:Name="SearchControl" />
+                </TabItem>
+                <TabItem Header="Table types">
+                    <controls:TableTypesControl x:Name="TableTypesControl" />
+                </TabItem>
+                <TabItem Header="Replication info">
+                    <controls:ReplicationControl x:Name="ReplicationControl" />
+                </TabItem>
+                <TabItem Header="Class generator">
+                    <controls:ClassGenControl x:Name="ClassGenControl" />
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

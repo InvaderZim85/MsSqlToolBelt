@@ -42,7 +42,7 @@ internal class BaseRepo : IDisposable
     /// </summary>
     /// <param name="dataSource">The name / path of the MSSQL server</param>
     /// <param name="database">The name of the database</param>
-    public BaseRepo(string dataSource, string database)
+    protected BaseRepo(string dataSource, string database)
     {
         _connector = new Connector(dataSource, database);
     }
@@ -54,7 +54,7 @@ internal class BaseRepo : IDisposable
     /// <param name="query">The query</param>
     /// <param name="parameters">The parameters (optional)</param>
     /// <returns>The result</returns>
-    public async Task<List<T>> QueryAsListAsync<T>(string query, object? parameters = null)
+    protected async Task<List<T>> QueryAsListAsync<T>(string query, object? parameters = null)
     {
         if (string.IsNullOrWhiteSpace(query))
             return new List<T>();

@@ -1,0 +1,167 @@
+﻿[
+    {
+        "SqlType": "BIGINT",
+        "CSharpType": "long",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "BIT",
+        "CSharpType": "bool",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "CHAR",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "DATE",
+        "CSharpType": "DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIME",
+        "CSharpType": "DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIME2",
+        "CSharpType": "DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIMEOFFSET",
+        "CSharpType": "DateTimeOffset",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "VARBINARY",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "FLOAT",
+        "CSharpType": "double",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "IMAGE",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "INT",
+        "CSharpType": "int",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "MONEY",
+        "CSharpType": "decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "NCHAR",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "NTEXT",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "NVARCHAR",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "REAL",
+        "CSharpType": "Single",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "ROWVERSION",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "SMALLDATETIME",
+        "CSharpType": "DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SMALLINT",
+        "CSharpType": "short",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SMALLMONEY",
+        "CSharpType": "decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SYSNAME",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "SQL_VARIANT",
+        "CSharpType": "object",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TEXT",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TIME",
+        "CSharpType": "TimeSpan",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "TIMESTAMP",
+        "CSharpType": "byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TINYINT",
+        "CSharpType": "byte",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "UNIQUEIDENTIFIER",
+        "CSharpType": "Guid",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "VARCHAR",
+        "CSharpType": "string",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "XML",
+        "CSharpType": "string",
+        "IsNullable": true
+    }
+]
