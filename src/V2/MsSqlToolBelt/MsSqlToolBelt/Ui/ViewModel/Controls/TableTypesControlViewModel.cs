@@ -5,6 +5,7 @@ using System.Windows.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using ZimLabs.CoreLib;
 using ZimLabs.WpfBase.NetCore;
@@ -154,6 +155,12 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         _manager = new TableTypeManager(dataSource, database);
     }
 
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        _manager?.Dispose();
+    }
+
     /// <summary>
     /// Loads the data
     /// </summary>
@@ -162,7 +169,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the table types...");
+        await ShowProgressAsync("Loading", "Please wait while loading the table types...");
 
         try
         {
@@ -178,7 +185,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -194,7 +201,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
             ? _manager.TableTypes
             : _manager.TableTypes.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
 
-        TableTypes = new ObservableCollection<TableTypeEntry>(result);
+        TableTypes = result.ToObservableCollection();
         HeaderList = TableTypes.Count > 1 ? $"{TableTypes.Count} table types" : "1 table type";
     }
 
@@ -206,7 +213,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTableType == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -221,7 +228,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -233,7 +240,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTableType == null)
             return;
 
-        Columns = new ObservableCollection<ColumnEntry>(_manager.SelectedTableType.Columns);
+        Columns = _manager.SelectedTableType.Columns.ToObservableCollection();
 
         HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
     }

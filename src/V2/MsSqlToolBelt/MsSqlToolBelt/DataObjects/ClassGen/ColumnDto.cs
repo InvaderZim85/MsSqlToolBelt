@@ -6,7 +6,7 @@ namespace MsSqlToolBelt.DataObjects.ClassGen;
 /// <summary>
 /// Represents a column (only needed for the class generator). For the normal column see <see cref="Common.ColumnEntry"/>
 /// </summary>
-internal class ColumnDto : ObservableObject
+public class ColumnDto : ObservableObject
 {
     /// <summary>
     /// Backing field for <see cref="Use"/>
@@ -46,6 +46,13 @@ internal class ColumnDto : ObservableObject
     }
 
     /// <summary>
+    /// Gets the name for the property.
+    /// <para />
+    /// If the <see cref="Alias"/> is not empty, it will be used, otherwise the <see cref="Name"/> will be used
+    /// </summary>
+    public string PropertyName => string.IsNullOrEmpty(Alias) ? Name : Alias;
+
+    /// <summary>
     /// Gets or sets the data type of the column
     /// </summary>
     public string DataType { get; set; } = string.Empty;
@@ -61,6 +68,11 @@ internal class ColumnDto : ObservableObject
     public bool IsNullable { get; set; }
 
     /// <summary>
+    /// Gets or sets the order of the column
+    /// </summary>
+    public int Order { get; set; }
+
+    /// <summary>
     /// Converts the <see cref="ColumnEntry"/> into a <see cref="ColumnDto"/>
     /// </summary>
     /// <param name="column">The column</param>
@@ -71,7 +83,8 @@ internal class ColumnDto : ObservableObject
             Name = column.Name,
             DataType = column.DataType,
             IsPrimaryKey = column.IsPrimaryKey,
-            IsNullable = column.IsNullable
+            IsNullable = column.IsNullable,
+            Order = column.Order
         };
     }
 }

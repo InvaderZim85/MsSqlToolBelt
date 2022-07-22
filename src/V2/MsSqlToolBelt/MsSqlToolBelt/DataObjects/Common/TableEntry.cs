@@ -52,6 +52,13 @@ public class TableEntry : IdNameBase
     public List<IndexEntry> Indexes { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the value which indicates if there are columns with the same name.
+    /// <para />
+    /// Only needed for the class generator which generates a class from a query
+    /// </summary>
+    public bool ColumnUniqueError { get; set; }
+
+    /// <summary>
     /// Gets an info message of the table
     /// </summary>
     /// <returns>The information of the table</returns>

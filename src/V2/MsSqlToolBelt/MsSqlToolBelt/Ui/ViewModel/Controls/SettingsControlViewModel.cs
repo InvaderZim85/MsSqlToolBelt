@@ -11,6 +11,7 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using ZimLabs.WpfBase.NetCore;
 
@@ -259,10 +260,10 @@ internal class SettingsControlViewModel : ViewModelBase
         try
         {
             // Init the filter types
-            FilterTypeList = new ObservableCollection<IdTextEntry>(Helper.CreateFilterTypeList());
+            FilterTypeList = Helper.CreateFilterTypeList().ToObservableCollection();
 
             // Load the colors
-            ColorThemeList = new ObservableCollection<string>(ThemeManager.Current.ColorSchemes);
+            ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
             var themeName = await _manager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald");
             SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
@@ -287,7 +288,7 @@ internal class SettingsControlViewModel : ViewModelBase
         if (string.IsNullOrEmpty(SelectedColorTheme))
             return;
 
-        var controller = await ShowProgressAsync("Save", "Please wait while saving the theme...");
+        await ShowProgressAsync("Save", "Please wait while saving the theme...");
 
         try
         {
@@ -299,7 +300,7 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -321,7 +322,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// </summary>
     private void SetServerList(ServerEntry? preSelection = null)
     {
-        ServerList = new ObservableCollection<ServerEntry>(_manager.ServerList.OrderBy(o => o.Order));
+        ServerList = _manager.ServerList.OrderBy(o => o.Order).ToObservableCollection();
 
         SelectedServer = preSelection ?? _manager.ServerList.FirstOrDefault(); // Select the first server
     }
@@ -396,7 +397,7 @@ internal class SettingsControlViewModel : ViewModelBase
         {
             await _manager.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
-            ServerList = new ObservableCollection<ServerEntry>(ServerList.OrderBy(o => o.Order));
+            ServerList = ServerList.OrderBy(o => o.Order).ToObservableCollection();
         }
         catch (Exception ex)
         {
@@ -423,7 +424,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <param name="preSelection">The entry which should be selected</param>
     private void SetFilterList(FilterEntry? preSelection = null)
     {
-        FilterList = new ObservableCollection<FilterEntry>(_manager.FilterList);
+        FilterList = _manager.FilterList.ToObservableCollection();
 
         if (preSelection == null)
             return;

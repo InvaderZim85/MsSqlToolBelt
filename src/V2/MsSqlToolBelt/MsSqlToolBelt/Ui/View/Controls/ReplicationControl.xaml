@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -154,6 +155,49 @@
                             Header="Columns" />
                     </DataGrid.Columns>
                 </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Height="250"
+            Background="DarkGray"
+            Opacity="0.9"
+            Visibility="{Binding ShowInfo, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <iconPacks:PackIconPixelartIcons
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Width="30"
+                    Height="30"
+                    Margin="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource MahApps.Brushes.Accent}"
+                    Kind="WarningBox" />
+
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    There are no tables marked for replication.<LineBreak />
+                    Please select another server / database.</TextBlock>
             </Grid>
         </Border>
     </Grid>

@@ -5,10 +5,12 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
@@ -118,34 +120,34 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="ResultTypes"/>
+    /// Backing field for <see cref="ObjectTypes"/>
     /// </summary>
-    private ObservableCollection<string> _resultTypes = new();
+    private ObservableCollection<string> _objectTypes = new();
 
     /// <summary>
     /// Gets or sets the list with the result types
     /// </summary>
-    public ObservableCollection<string> ResultTypes
+    public ObservableCollection<string> ObjectTypes
     {
-        get => _resultTypes;
-        private set => SetField(ref _resultTypes, value);
+        get => _objectTypes;
+        private set => SetField(ref _objectTypes, value);
     }
 
     /// <summary>
-    /// Backing field for <see cref="SelectedResultType"/>
+    /// Backing field for <see cref="SelectedObjectType"/>
     /// </summary>
-    private string _selectedResultType = "All";
+    private string _selectedObjectType = "All";
 
     /// <summary>
     /// Gets or sets the selected result type
     /// </summary>
-    public string SelectedResultType
+    public string SelectedObjectType
     {
-        get => _selectedResultType;
+        get => _selectedObjectType;
         set
         {
-            SetField(ref _selectedResultType, value);
-            FilterResult();
+            if (SetField(ref _selectedObjectType, value))
+                FilterResult();
         }
     }
 
@@ -376,6 +378,12 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         _manager = new SearchManager(dataSource, database);
     }
 
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        _manager?.Dispose();
+    }
+
     /// <summary>
     /// Clears the last search result
     /// </summary>
@@ -401,7 +409,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (AddWildcardAutomatically && !SearchString.Contains('*'))
             SearchString = $"*{SearchString}*";
 
-        var controller = await ShowProgressAsync("Search", $"Please wait while searching for {SearchString}...");
+        await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
 
         try
         {
@@ -409,8 +417,8 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
                 await _settingsManager.LoadFilterAsync();
 
             await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
-            ResultTypes = new ObservableCollection<string>(_manager.ResultTypes);
-            SelectedResultType = ResultTypes.FirstOrDefault() ?? "All";
+            ObjectTypes = _manager.ResultTypes.ToObservableCollection();
+            SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
             FilterResult();
         }
@@ -420,7 +428,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -431,11 +439,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     {
         ClearResult();
 
-        var result = SelectedResultType.Equals("All")
+        var result = SelectedObjectType.Equals("All")
             ? _manager!.SearchResults
-            : _manager!.SearchResults.Where(w => w.Type.Equals(SelectedResultType)).ToList();
+            : _manager!.SearchResults.Where(w => w.Type.Equals(SelectedObjectType)).ToList();
 
-        SearchResults = new ObservableCollection<SearchResult>(result.OrderBy(o => o.Type).ThenBy(t => t.Name));
+        SearchResults = result.OrderBy(o => o.Type).ThenBy(t => t.Name).ToObservableCollection();
     }
 
     /// <summary>
@@ -446,7 +454,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedResult == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
+        await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
 
         try
         {
@@ -460,11 +468,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
             switch (_manager.SelectedResult.BoundItem)
             {
                 case TableEntry table:
-                    Columns = new ObservableCollection<ColumnEntry>(table.Columns);
+                    Columns = table.Columns.ToObservableCollection();
                     ButtonShowIndexEnabled = table.Indexes.Any();
                     break;
                 case JobEntry job:
-                    JobSteps = new ObservableCollection<JobStepEntry>(job.JobSteps);
+                    JobSteps = job.JobSteps.ToObservableCollection();
                     break;
             }
         }
@@ -474,7 +482,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 

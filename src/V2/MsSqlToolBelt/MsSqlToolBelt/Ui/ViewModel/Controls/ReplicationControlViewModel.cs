@@ -5,6 +5,7 @@ using System.Windows.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using ZimLabs.CoreLib;
 using ZimLabs.WpfBase.NetCore;
@@ -36,7 +37,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<TableEntry> Tables
     {
         get => _tables;
-        set => SetField(ref _tables, value);
+        private set => SetField(ref _tables, value);
     }
 
     /// <summary>
@@ -80,7 +81,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnEntry> Columns
     {
         get => _columns;
-        set => SetField(ref _columns, value);
+        private set => SetField(ref _columns, value);
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<IndexEntry> Indexes
     {
         get => _indexes;
-        set => SetField(ref _indexes, value);
+        private set => SetField(ref _indexes, value);
     }
 
     /// <summary>
@@ -122,7 +123,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderList
     {
         get => _headerList;
-        set => SetField(ref _headerList, value);
+        private set => SetField(ref _headerList, value);
     }
 
     /// <summary>
@@ -136,7 +137,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderColumns
     {
         get => _headerColumns;
-        set => SetField(ref _headerColumns, value);
+        private set => SetField(ref _headerColumns, value);
     }
 
     /// <summary>
@@ -150,7 +151,21 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderIndex
     {
         get => _headerIndex;
-        set => SetField(ref _headerIndex, value);
+        private set => SetField(ref _headerIndex, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ShowInfo"/>
+    /// </summary>
+    private bool _showInfo;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the info panel should be shown
+    /// </summary>
+    public bool ShowInfo
+    {
+        get => _showInfo;
+        set => SetField(ref _showInfo, value);
     }
     #endregion
 
@@ -179,6 +194,14 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         _dataLoaded = false;
 
         _manager = new ReplicationManager(dataSource, database);
+
+        ShowInfo = false;
+    }
+
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        _manager?.Dispose();
     }
 
     /// <summary>
@@ -189,7 +212,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
+        await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
 
         try
         {
@@ -205,7 +228,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -221,12 +244,15 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
             ? _manager.Tables
             : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
 
-        Tables = new ObservableCollection<TableEntry>(result);
+        Tables = result.ToObservableCollection();
         HeaderList = Tables.Count > 1
             ? $"{Tables.Count} tables"
             : Tables.Count == 0
                 ? "Tables"
                 : "1 table";
+
+        // Show the info if there are no tables available
+        ShowInfo = Tables.Count == 0;
     }
 
     /// <summary>
@@ -237,7 +263,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -253,7 +279,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -265,7 +291,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        Columns = new ObservableCollection<ColumnEntry>(_manager.SelectedTable.Columns);
+        Columns = _manager.SelectedTable.Columns.ToObservableCollection();
 
         HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
     }
@@ -278,7 +304,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        Indexes = new ObservableCollection<IndexEntry>(_manager.SelectedTable.Indexes);
+        Indexes = _manager.SelectedTable.Indexes.ToObservableCollection();
         HeaderIndex = Indexes.Count > 1 ? $"{Indexes.Count} indexes" : "1 index";
     }
 }

@@ -3,8 +3,13 @@
 /// <summary>
 /// Provides the different code types
 /// </summary>
-internal enum CodeType
+public enum CodeType
 {
+    /// <summary>
+    /// Plain text
+    /// </summary>
+    None,
+
     /// <summary>
     /// SQL
     /// </summary>

@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.Search;
 using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
@@ -83,11 +87,11 @@ internal static class ExportHelper
     /// <param name="filepath">The path of the file</param>
     /// <param name="type">The desired export type</param>
     /// <returns>The awaitable task</returns>
-    public static async Task ExportObject<T>(T obj, string filepath, ExportType type) where T : class
+    public static async Task ExportObjectAsync<T>(T obj, string filepath, ExportType type) where T : class
     {
         if (type == ExportType.Json)
         {
-            await ExportAsJson(obj, filepath);
+            await ExportAsJsonAsync(obj, filepath);
             return;
         }
 
@@ -103,11 +107,11 @@ internal static class ExportHelper
     /// <param name="filepath">The path of the file</param>
     /// <param name="type">The desired export type</param>
     /// <returns></returns>
-    public static async Task ExportList<T>(IEnumerable<T> list, string filepath, ExportType type) where T : class
+    public static async Task ExportListAsync<T>(IEnumerable<T> list, string filepath, ExportType type) where T : class
     {
         if (type == ExportType.Json)
         {
-            await ExportAsJson(list, filepath);
+            await ExportAsJsonAsync(list, filepath);
             return;
         }
 
@@ -122,7 +126,7 @@ internal static class ExportHelper
     /// <param name="value">The value which should be exported</param>
     /// <param name="filepath">The path of the file</param>
     /// <returns>The awaitable task</returns>
-    private static async Task ExportAsJson(object value, string filepath)
+    private static async Task ExportAsJsonAsync(object value, string filepath)
     {
         var content = JsonConvert.SerializeObject(value, Formatting.Indented);
 

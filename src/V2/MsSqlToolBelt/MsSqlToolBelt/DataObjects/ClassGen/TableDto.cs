@@ -7,7 +7,7 @@ namespace MsSqlToolBelt.DataObjects.ClassGen;
 /// <summary>
 /// Represents a table (only needed for the class generator). For the normal table, see <see cref="Common.TableEntry"/>
 /// </summary>
-internal class TableDto
+public class TableDto
 {
     /// <summary>
     /// Gets or sets the name of the table
@@ -39,10 +39,15 @@ internal class TableDto
     /// <param name="table">The table</param>
     public static explicit operator TableDto(TableEntry table)
     {
-        return new TableDto
+        var result = new TableDto
         {
             Name = table.Name,
             Table = table
         };
+
+        if (table.Columns.Any())
+            result.Columns = table.Columns.Select(s => (ColumnDto) s).ToList();
+
+        return result;
     }
 }

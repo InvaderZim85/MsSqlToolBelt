@@ -21,7 +21,7 @@ internal class BaseRepo : IDisposable
     /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
-    private readonly Connector _connector;
+    protected readonly Connector _connector;
 
     /// <summary>
     /// Gets the sql connection

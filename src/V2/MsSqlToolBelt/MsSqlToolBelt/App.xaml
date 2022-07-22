@@ -20,6 +20,10 @@
                 <Setter Property="HorizontalAlignment" Value="Right" />
             </Style>
 
+            <Style BasedOn="{StaticResource MahApps.Styles.TextBlock}" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
             <Style x:Key="ItemKey" TargetType="{x:Type Label}">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
@@ -77,6 +81,7 @@
                 TargetType="{x:Type TextBlock}">
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="3" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontStyle" Value="Italic" />
                 <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase}" />

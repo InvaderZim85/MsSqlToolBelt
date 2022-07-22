@@ -4,6 +4,7 @@ using MahApps.Metro.Controls;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.Ui.View.Controls;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
 
@@ -41,12 +42,9 @@ public partial class MainWindow : MetroWindow
             case FlyOutType.Settings:
                 SettingsControl.InitControl();
                 break;
-            //case FlyOutType.DataTypes:
-            //    DataTypeControl.InitControl();
-            //    break;
-            //case FlyOutType.Info:
-            //    InfoControl.InitControl();
-            //    break;
+            case FlyOutType.Info:
+                InfoControl.InitControl();
+                break;
         }
     }
 
@@ -61,6 +59,19 @@ public partial class MainWindow : MetroWindow
         TableTypesControl.SetConnection(dataSource, database);
         ReplicationControl.SetConnection(dataSource, database);
         ClassGenControl.SetConnection(dataSource, database);
+        DefinitionExportControl.SetConnection(dataSource, database);
+    }
+
+    /// <summary>
+    /// Closes the connection of all sub controls
+    /// </summary>
+    public void CloseConnection()
+    {
+        SearchControl.CloseConnection();
+        TableTypesControl.CloseConnection();
+        ReplicationControl.CloseConnection();
+        ClassGenControl.CloseConnection();
+        DefinitionExportControl.CloseConnection();
     }
 
     /// <summary>
@@ -110,8 +121,11 @@ public partial class MainWindow : MetroWindow
             case 2: // Replication control
                 ReplicationControl.LoadData();
                 break;
-            case 3:
+            case 3: // Class generator
                 ClassGenControl.LoadData();
+                break;
+            case 4: // Definition export
+                DefinitionExportControl.LoadData();
                 break;
         }
     }

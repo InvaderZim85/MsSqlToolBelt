@@ -9,7 +9,7 @@
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    d:DesignHeight="1000"
     d:DesignWidth="1920"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
@@ -164,95 +164,178 @@
 
         <GridSplitter Grid.Column="3" Style="{StaticResource VerticalSplitter}" />
 
+        <!--  Class  -->
         <Border Grid.Column="4" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1.5*" />
+                    <RowDefinition Height="5" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Generator"
-                    Style="{StaticResource Headline}" />
+                <!--  Settings  -->
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <Separator Grid.Row="1" />
+                    <Label
+                        Grid.Row="0"
+                        Content="Generator"
+                        Style="{StaticResource Headline}" />
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal">
-                    <Label Content="Modifier:" />
-                    <ComboBox ItemsSource="{Binding ModifierList}" SelectedItem="{Binding SelectedModifier}" />
-                    <Label Content="Class name:" />
-                    <TextBox
-                        Width="200"
-                        mah:TextBoxHelper.Watermark="Class name (only for the C# class)"
-                        Text="{Binding ClassName}" />
-                </StackPanel>
+                    <Separator Grid.Row="1" />
 
-                <StackPanel Grid.Row="3" Orientation="Horizontal">
-                    <CheckBox Content="Sealed class" IsChecked="{Binding OptionSealedClass}" />
-                    <CheckBox Content="DB Model (EF)" IsChecked="{Binding OptionDbModel}" />
-                    <CheckBox Content="Backing field" IsChecked="{Binding OptionBackingField}" />
-                    <CheckBox Content="Summary" IsChecked="{Binding OptionSummary}" />
-                    <CheckBox Content="Nullable enabled (.NET 6)" IsChecked="{Binding OptionNullable}" />
-                </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Label Content="Modifier:" />
+                        <ComboBox
+                            Width="100"
+                            ItemsSource="{Binding ModifierList}"
+                            SelectedItem="{Binding SelectedModifier}" />
+                        <Label Content="Class name:" />
+                        <TextBox
+                            Width="200"
+                            mah:TextBoxHelper.Watermark="Class name (only for the C# class)"
+                            Text="{Binding ClassName}" />
+                    </StackPanel>
 
-                <StackPanel
-                    Grid.Row="3"
-                    FlowDirection="RightToLeft"
-                    Orientation="Horizontal">
-                    <Button Width="130" Content="Generate from Query" />
-                    <Button
-                        Width="130"
-                        Command="{Binding GenerateCommand}"
-                        Content="Generate" />
-                </StackPanel>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal">
+                        <CheckBox Content="Sealed class" IsChecked="{Binding OptionSealedClass}" />
+                        <CheckBox
+                            Content="DB Model (EF)"
+                            IsChecked="{Binding OptionDbModel}"
+                            ToolTip="Note: This option will be ignored if you generate a class from a query!" />
+                        <CheckBox Content="Backing field" IsChecked="{Binding OptionBackingField}" />
+                        <CheckBox Content="Summary" IsChecked="{Binding OptionSummary}" />
+                        <CheckBox Content="Nullable enabled (.NET 6)" IsChecked="{Binding OptionNullable}" />
+                    </StackPanel>
 
-                <Label
-                    Grid.Row="4"
-                    Content="C# class"
-                    Style="{StaticResource Headline}" />
+                    <StackPanel
+                        Grid.Row="3"
+                        FlowDirection="RightToLeft"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="130"
+                            Command="{Binding FromQueryCommand}"
+                            Content="Generate from Query" />
+                        <Button
+                            Width="130"
+                            Command="{Binding GenerateCommand}"
+                            Content="Generate" />
+                    </StackPanel>
+                </Grid>
 
-                <Separator Grid.Row="5" />
+                <!--  CSharp code  -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <avalonedit:TextEditor
-                    Name="CodeEditor"
-                    Grid.Row="6"
-                    Margin="3"
-                    BorderBrush="Black"
-                    BorderThickness="1"
-                    FontFamily="Hack,COnsolas"
-                    FontSize="12"
-                    IsReadOnly="True"
-                    ShowLineNumbers="True" />
+                    <Label
+                        Grid.Row="0"
+                        Content="C# class"
+                        Style="{StaticResource Headline}" />
 
-                <Separator Grid.Row="7" />
+                    <Separator Grid.Row="1" />
 
-                <Button
-                    Grid.Row="8"
-                    Width="125"
-                    HorizontalAlignment="Left"
-                    Content="Show EF key code" />
+                    <avalonedit:TextEditor
+                        Name="ClassCodeEditor"
+                        Grid.Row="2"
+                        Margin="3"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        FontFamily="Hack,Consolas"
+                        FontSize="12"
+                        IsReadOnly="True"
+                        ShowLineNumbers="True" />
 
-                <StackPanel
-                    Grid.Row="8"
-                    FlowDirection="RightToLeft"
-                    Orientation="Horizontal">
-                    <Button
-                        Width="60"
-                        Command="{Binding CopyCodeCommand}"
-                        Content="Copy" />
-                    <Button
-                        Width="60"
-                        Command="{Binding ClearCodeCommand}"
-                        Content="Clear" />
-                </StackPanel>
+                    <Separator Grid.Row="3" />
+
+                    <StackPanel Grid.Row="4" Orientation="Horizontal">
+                        <Button
+                            Width="125"
+                            Command="{Binding ShowEfKeyCodeCommand}"
+                            Content="Show EF key code"
+                            IsEnabled="{Binding ButtonEfKeyCodeEnabled}" />
+                        <Button
+                            Width="125"
+                            Command="{Binding ShowTypeWindowCommand}"
+                            Content="Show data types" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="4"
+                        FlowDirection="RightToLeft"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="60"
+                            Command="{Binding CopyCodeCommand}"
+                            CommandParameter="{x:Static enums:CodeType.CSharp}"
+                            Content="Copy" />
+                        <Button
+                            Width="60"
+                            Command="{Binding ClearCodeCommand}"
+                            CommandParameter="{x:Static enums:CodeType.CSharp}"
+                            Content="Clear" />
+                    </StackPanel>
+                </Grid>
+
+                <GridSplitter Grid.Row="2" Style="{StaticResource HorizontalSplitter}" />
+
+                <!--  SQL code  -->
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Content="SQL query"
+                        Style="{StaticResource Headline}" />
+
+                    <Separator Grid.Row="1" />
+
+                    <avalonedit:TextEditor
+                        Name="SqlCodeEditor"
+                        Grid.Row="2"
+                        Margin="3"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        FontFamily="Hack,Consolas"
+                        FontSize="12"
+                        IsReadOnly="True"
+                        ShowLineNumbers="True" />
+
+                    <Separator Grid.Row="3" />
+
+                    <StackPanel
+                        Grid.Row="4"
+                        FlowDirection="RightToLeft"
+                        Orientation="Horizontal">
+                        <Button
+                            Width="60"
+                            Command="{Binding CopyCodeCommand}"
+                            CommandParameter="{x:Static enums:CodeType.Sql}"
+                            Content="Copy" />
+                        <Button
+                            Width="60"
+                            Command="{Binding ClearCodeCommand}"
+                            CommandParameter="{x:Static enums:CodeType.Sql}"
+                            Content="Clear" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

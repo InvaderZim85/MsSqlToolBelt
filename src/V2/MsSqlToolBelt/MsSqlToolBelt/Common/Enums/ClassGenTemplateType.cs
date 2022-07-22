@@ -28,5 +28,10 @@ internal enum ClassGenTemplateType
     /// <summary>
     /// Default property with comments
     /// </summary>
-    PropertyDefaultComment
+    PropertyDefaultComment,
+
+    /// <summary>
+    /// Class for the EF model creator
+    /// </summary>
+    EfCreatingBuilder
 }

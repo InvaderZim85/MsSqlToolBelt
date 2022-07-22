@@ -1,4 +1,6 @@
-﻿namespace MsSqlToolBelt.DataObjects.Common;
+﻿using ZimLabs.TableCreator;
+
+namespace MsSqlToolBelt.DataObjects.Common;
 
 /// <summary>
 /// Represents a column
@@ -25,26 +27,31 @@ public class ColumnEntry
     /// <summary>
     /// Gets or sets the max length (if the value is -1 and the <see cref="DataType"/> is "nvarchar", the value is "MAX")
     /// </summary>
+    [Appearance(Ignore = true)]
     public int MaxLength { get; set; }
 
     /// <summary>
     /// Gets the max length value (only needed for the table grid)
     /// </summary>
+    [Appearance(Name = "MaxLength")]
     public string MaxLengthView => MaxLength == -1 ? "MAX" : MaxLength.ToString();
 
     /// <summary>
     /// Gets or sets the precision
     /// </summary>
+    [Appearance(Ignore = true)]
     public int Precision { get; set; }
 
     /// <summary>
     /// Gets or sets the scale (this value defines the decimal places or the milliseconds)
     /// </summary>
+    [Appearance(Ignore = true)]
     public int Scale { get; set; }
 
     /// <summary>
     /// Gets the precision value (<see cref="Precision"/>, <see cref="Scale"/> - only needed for the table grid)
     /// </summary>
+    [Appearance(Name = "Precision")]
     public string PrecisionView => $"{Precision}, {Scale}";
 
     /// <summary>

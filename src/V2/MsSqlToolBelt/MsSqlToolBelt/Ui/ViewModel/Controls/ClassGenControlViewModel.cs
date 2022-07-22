@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
+using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
+using MsSqlToolBelt.Ui.View.Windows;
 using ZimLabs.CoreLib;
 using ZimLabs.WpfBase.NetCore;
 
@@ -29,12 +34,12 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The action to set the SQL text
     /// </summary>
-    private Action<string>? _setCode;
+    private Action<ClassGenResult>? _setCode;
 
     /// <summary>
-    /// Contains the sql text
+    /// Contains the result of the class generator
     /// </summary>
-    private string _code = string.Empty;
+    private ClassGenResult _classGenResult = new();
 
     #region View properties
 
@@ -49,7 +54,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<TableDto> Tables
     {
         get => _tables;
-        set => SetField(ref _tables, value);
+        private set => SetField(ref _tables, value);
     }
 
     /// <summary>
@@ -71,6 +76,9 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
                 return;
 
             _manager.SelectedTable = value;
+            _classGenResult = new ClassGenResult();
+            _setCode?.Invoke(_classGenResult);
+            ButtonEfKeyCodeEnabled = false;
 
             if (value != null && value.Columns.Any())
                 SetColumns();
@@ -90,7 +98,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnDto> Columns
     {
         get => _columns;
-        set => SetField(ref _columns, value);
+        private set => SetField(ref _columns, value);
     }
 
     /// <summary>
@@ -118,7 +126,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public string HeaderList
     {
         get => _headerList;
-        set => SetField(ref _headerList, value);
+        private set => SetField(ref _headerList, value);
     }
 
     /// <summary>
@@ -132,7 +140,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public string HeaderColumns
     {
         get => _headerColumns;
-        set => SetField(ref _headerColumns, value);
+        private set => SetField(ref _headerColumns, value);
     }
 
     #region Options
@@ -143,7 +151,9 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     private ObservableCollection<string> _modifierList = new()
     {
         "public",
-        "internal"
+        "internal",
+        "protected",
+        "protected internal"
     };
 
     /// <summary>
@@ -252,10 +262,25 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _optionNullable;
         set => SetField(ref _optionNullable, value);
     }
+
+    /// <summary>
+    /// Backing field for <see cref="ButtonEfKeyCodeEnabled"/>
+    /// </summary>
+    private bool _buttonEfKeyCodeEnabled;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the ef key code button is enabled
+    /// </summary>
+    public bool ButtonEfKeyCodeEnabled
+    {
+        get => _buttonEfKeyCodeEnabled;
+        set => SetField(ref _buttonEfKeyCodeEnabled, value);
+    }
     #endregion
 
     #endregion
 
+    #region Commands
     /// <summary>
     /// The command to filter the table types
     /// </summary>
@@ -283,12 +308,12 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to clear the code
     /// </summary>
-    public ICommand ClearCodeCommand => new DelegateCommand(ClearCode);
+    public ICommand ClearCodeCommand => new RelayCommand<CodeType>(ClearCode);
 
     /// <summary>
     /// The command to copy the code
     /// </summary>
-    public ICommand CopyCodeCommand => new DelegateCommand(CopyCode);
+    public ICommand CopyCodeCommand => new RelayCommand<CodeType>(CopyCode);
 
     /// <summary>
     /// The command to generate the class
@@ -296,10 +321,52 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public ICommand GenerateCommand => new DelegateCommand(GenerateClass);
 
     /// <summary>
+    /// The command to show the window with the data types
+    /// </summary>
+    public ICommand ShowTypeWindowCommand => new DelegateCommand(() =>
+    {
+        var dialog = new DataTypeWindow(_manager)
+        {
+            Owner = Application.Current.MainWindow
+        };
+        dialog.ShowDialog();
+    });
+
+    /// <summary>
+    /// The command to show the ef key code
+    /// </summary>
+    public ICommand ShowEfKeyCodeCommand => new DelegateCommand(() =>
+    {
+        var dialog = new TextDialogWindow(new TextDialogSettings
+        {
+            Title = "Class generator - EF",
+            Caption = "Code to configure multiple columns as key",
+            CheckboxText = "Without method body",
+            ShowOption = true,
+            Text = _classGenResult.EfCoreKeyCode,
+            TextOption = _classGenResult.EfCoreKeyCodeShort,
+            CodeType = CodeType.CSharp
+        })
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        dialog.ShowDialog();
+    });
+
+    /// <summary>
+    /// The command to generate a class from a query
+    /// </summary>
+    public ICommand FromQueryCommand => new DelegateCommand(GenerateCodeFromQuery);
+
+    #endregion
+
+    #region Basics
+    /// <summary>
     /// Init the view model
     /// </summary>
     /// <param name="setSqlText">The action to set the sql text</param>
-    public void InitViewModel(Action<string> setSqlText)
+    public void InitViewModel(Action<ClassGenResult> setSqlText)
     {
         _setCode = setSqlText;
     }
@@ -310,6 +377,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         // Clear the current result
         Tables = new ObservableCollection<TableDto>();
         Columns = new ObservableCollection<ColumnDto>();
+        _setCode?.Invoke(new ClassGenResult());
 
         _manager?.Dispose();
         _dataLoaded = false;
@@ -317,6 +385,14 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         _manager = new ClassGenManager(dataSource, database);
     }
 
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        _manager?.Dispose();
+    }
+    #endregion
+
+    #region Load / Show
     /// <summary>
     /// Loads the data
     /// </summary>
@@ -325,7 +401,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the tables...");
+        await ShowProgressAsync("Loading", "Please wait while loading the tables...");
 
         try
         {
@@ -341,7 +417,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -353,7 +429,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -368,7 +444,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -384,7 +460,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
             ? _manager.Tables
             : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
 
-        Tables = new ObservableCollection<TableDto>(result);
+        Tables = result.ToObservableCollection();
         HeaderList = Tables.Count > 1 ? $"{Tables.Count} tables" : "1 table";
     }
 
@@ -396,10 +472,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        Columns = new ObservableCollection<ColumnDto>(_manager.SelectedTable.Columns);
+        Columns = _manager.SelectedTable.Columns.ToObservableCollection();
 
         HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
     }
+    #endregion
 
     /// <summary>
     /// Clears the aliases and removes the selection
@@ -440,14 +517,22 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        var controller = await ShowProgressAsync("Generating", "Please wait while generating the class...");
+        if (!_manager.ClassNameValid(ClassName))
+        {
+            await ShowMessageAsync("Class generator",
+                "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+            return;
+        }
+
+        await ShowProgressAsync("Generating", "Please wait while generating the class...");
 
         try
         {
-            var code = _manager.GenerateClassAsync(GetOptions());
+            _classGenResult = _manager.GenerateCode(GetOptions());
 
-            _setCode?.Invoke(code);
-            _code = code;
+            _setCode?.Invoke(_classGenResult);
+
+            ButtonEfKeyCodeEnabled = !string.IsNullOrEmpty(_classGenResult.EfCoreKeyCode);
         }
         catch (Exception ex)
         {
@@ -455,7 +540,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -478,22 +563,117 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
+    /// Generates a class from the inserted query
+    /// </summary>
+    private async void GenerateCodeFromQuery()
+    {
+        if (_manager == null)
+            return;
+
+        if (!_manager.ClassNameValid(ClassName))
+        {
+            await ShowMessageAsync("Class generator",
+                "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+            return;
+        }
+
+        var dialog = new TextDialogWindow(new TextDialogSettings
+        {
+            Title = "SQL Query",
+            Caption = "Insert the SQL query to generate a class from it. If the query does not have a where condition, one is automatically added to reduce the amount of data.",
+            ShowOption = false,
+            ShowValidateButton = true,
+            ValidationFunc = DataHelper.ValidateSqlAsync,
+            CodeType = CodeType.Sql
+        })
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        dialog.ShowDialog();
+
+        if (string.IsNullOrEmpty(dialog.Code))
+            return;
+
+        await ShowProgressAsync("Please wait", "Please wait while generating the class...");
+
+        try
+        {
+            // We ignore this, because it's not possible to gather "correct" table information
+            // because a query can contain more than one table
+            OptionDbModel = false;
+            var options = GetOptions();
+            options.SqlQuery = dialog.Code;
+            _classGenResult = await _manager.GenerateFromQueryAsync(options);
+
+            _setCode?.Invoke(_classGenResult);
+
+            ButtonEfKeyCodeEnabled = !string.IsNullOrEmpty(_classGenResult.EfCoreKeyCode);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await CloseProgressAsync();
+        }
+    }
+
+    /// <summary>
     /// Clears the code
     /// </summary>
-    private void ClearCode()
+    /// <param name="type">The desired code type</param>
+    private void ClearCode(CodeType type)
     {
-        _code = string.Empty;
-        _setCode?.Invoke(string.Empty);
+        _classGenResult = new ClassGenResult();
+
+        switch (type)
+        {
+            case CodeType.CSharp:
+                _classGenResult.ClassCode = string.Empty;
+                break;
+            case CodeType.Sql:
+                _classGenResult.SqlQuery = string.Empty;
+                break;
+        }
+
+        _setCode?.Invoke(_classGenResult);
     }
 
     /// <summary>
     /// Copies the code to the clipboard
     /// </summary>
-    private void CopyCode()
+    /// <param name="type">The desired code type</param>
+    private void CopyCode(CodeType type)
     {
-        if (string.IsNullOrEmpty(_code))
+        var content = type == CodeType.CSharp ? _classGenResult.ClassCode : _classGenResult.SqlQuery;
+        if (string.IsNullOrEmpty(content))
             return;
 
-        CopyToClipboard(_code);
+        CopyToClipboard(content);
+    }
+
+    /// <summary>
+    /// Clears everything
+    /// </summary>
+    public void Clear()
+    {
+        Tables = new ObservableCollection<TableDto>();
+        Columns = new ObservableCollection<ColumnDto>();
+        HeaderColumns = "Columns";
+        HeaderList = "Tables";
+        _classGenResult = new ClassGenResult();
+        _setCode?.Invoke(_classGenResult);
+
+        // Reset the options
+        SelectedModifier = ModifierList.FirstOrDefault() ?? "public";
+        ClassName = string.Empty;
+        OptionSealedClass = false;
+        OptionBackingField = false;
+        OptionDbModel = false;
+        OptionNullable = false;
+        OptionSummary = false;
+        ButtonEfKeyCodeEnabled = false;
     }
 }

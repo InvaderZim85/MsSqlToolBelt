@@ -10,6 +10,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
+using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Log = Serilog.Log;
 
 namespace MsSqlToolBelt
@@ -42,7 +43,7 @@ namespace MsSqlToolBelt
         private async void App_OnStartup(object sender, StartupEventArgs e)
         {
             _startUp = DateTime.Now;
-            Helper.InitLogger();
+            Helper.InitHelper();
 
             try
             {
@@ -70,6 +71,11 @@ namespace MsSqlToolBelt
         private void App_OnExit(object sender, ExitEventArgs e)
         {
             Mediator.RemoveAllActions();
+
+            if (_mainWindow?.DataContext is MainWindowViewModel viewModel)
+                viewModel.CloseViewModel();
+
+            _mainWindow?.CloseConnection();
 
             var duration = DateTime.Now - _startUp;
             Log.Information("Close application after {duration}", duration);

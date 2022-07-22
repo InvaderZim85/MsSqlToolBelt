@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using MsSqlToolBelt.Data;
-using MsSqlToolBelt.DataObjects.Common;
 
-namespace MsSqlToolBelt.DataObjects.Search;
+namespace MsSqlToolBelt.DataObjects.Common;
 
 /// <summary>
 /// Represents a database object like a procedure, view

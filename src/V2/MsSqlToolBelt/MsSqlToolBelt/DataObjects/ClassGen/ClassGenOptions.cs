@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides the class generator options
 /// </summary>
-internal class ClassGenOptions
+public class ClassGenOptions
 {
     /// <summary>
     /// Gets or sets the modifier
@@ -39,4 +39,9 @@ internal class ClassGenOptions
     /// Gets or sets the value which indicates if a class for a nullable project should be created (.NET 6)
     /// </summary>
     public bool Nullable { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sql query (only needed for the function which generates a class from a sql query)
+    /// </summary>
+    public string SqlQuery { get; set; } = string.Empty;
 }

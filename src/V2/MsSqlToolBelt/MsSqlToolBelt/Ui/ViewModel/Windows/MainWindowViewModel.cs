@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using Microsoft.VisualStudio.Threading;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects.Updater;
+using MsSqlToolBelt.Ui.View.Windows;
+using Serilog;
 using ZimLabs.CoreLib;
 using ZimLabs.WpfBase.NetCore;
+using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
+/// <summary>
+/// Provides the logic for the <see cref="View.Windows.MainWindow"/>
+/// </summary>
 internal class MainWindowViewModel : ViewModelBase
 {
     #region Actions
@@ -29,6 +40,8 @@ internal class MainWindowViewModel : ViewModelBase
     private Action<int>? _loadData;
     #endregion
 
+    #region Global variables
+
     /// <summary>
     /// The instance of the base repo
     /// </summary>
@@ -39,6 +52,21 @@ internal class MainWindowViewModel : ViewModelBase
     /// </summary>
     private SettingsManager? _settingsManager;
 
+    /// <summary>
+    /// The instance for the memory analysis
+    /// </summary>
+    private Timer? _memoryTimer;
+
+    /// <summary>
+    /// Contains the max. memory usage
+    /// </summary>
+    private long _maxMemUsage;
+
+    /// <summary>
+    /// Contains the release info
+    /// </summary>
+    private ReleaseInfo _releaseInfo = new();
+    #endregion
 
     #region View Properties
     /// <summary>
@@ -65,6 +93,25 @@ internal class MainWindowViewModel : ViewModelBase
                     LoadServerList();
                     break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="InfoOpen"/>
+    /// </summary>
+    private bool _infoOpen;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the info control is open
+    /// </summary>
+    public bool InfoOpen
+    {
+        get => _infoOpen;
+        set
+        {
+            SetField(ref _infoOpen, value);
+            if (value)
+                _initFlyOut?.Invoke(FlyOutType.Info);
         }
     }
 
@@ -156,6 +203,75 @@ internal class MainWindowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Backing field for <see cref="ConnectionInfo"/>
+    /// </summary>
+    private string _connectionInfo = "Not connected";
+
+    /// <summary>
+    /// Gets or sets the connection info
+    /// </summary>
+    public string ConnectionInfo
+    {
+        get => _connectionInfo;
+        private set => SetField(ref _connectionInfo, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="MemoryUsage"/>
+    /// </summary>
+    private string _memoryUsage = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the memory usage of the program
+    /// </summary>
+    public string MemoryUsage
+    {
+        get => _memoryUsage;
+        private set => SetField(ref _memoryUsage, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="BuildInfo"/>
+    /// </summary>
+    private string _buildInfo = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the build information
+    /// </summary>
+    public string BuildInfo
+    {
+        get => _buildInfo;
+        private set => SetField(ref _buildInfo, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="HeaderApp"/>
+    /// </summary>
+    private string _headerApp = "MsSqlToolBelt";
+
+    /// <summary>
+    /// Gets or sets the app header
+    /// </summary>
+    public string HeaderApp
+    {
+        get => _headerApp;
+        private set => SetField(ref _headerApp, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ButtonUpdateVisible"/>
+    /// </summary>
+    private Visibility _buttonUpdateVisible = Visibility.Hidden;
+
+    /// <summary>
+    /// Gets or sets the visibility value of the update button
+    /// </summary>
+    public Visibility ButtonUpdateVisible
+    {
+        get => _buttonUpdateVisible;
+        set => SetField(ref _buttonUpdateVisible, value);
+    }
     #endregion
 
     #region Commands
@@ -163,6 +279,11 @@ internal class MainWindowViewModel : ViewModelBase
     /// The command to open the settings control
     /// </summary>
     public ICommand OpenSettingsCommand => new DelegateCommand(() => SettingsOpen = !SettingsOpen);
+
+    /// <summary>
+    /// The command to show the info
+    /// </summary>
+    public ICommand InfoCommand => new DelegateCommand(() => InfoOpen = !InfoOpen);
 
     /// <summary>
     /// The command to connect to the server
@@ -173,6 +294,15 @@ internal class MainWindowViewModel : ViewModelBase
     /// The command to set the database
     /// </summary>
     public ICommand ConnectDatabaseCommand => new DelegateCommand(ConnectDatabase);
+
+    /// <summary>
+    /// The command to show the update window
+    /// </summary>
+    public ICommand ShowUpdateInfoCommand => new DelegateCommand(() =>
+    {
+        var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
+    });
     #endregion
 
     /// <summary>
@@ -189,8 +319,26 @@ internal class MainWindowViewModel : ViewModelBase
         _setConnection = setConnection;
         _loadData = loadData;
 
+        _memoryTimer = new Timer(1000);
+        _memoryTimer.Elapsed += (_, _) =>
+        {
+            var memUsage = Process.GetCurrentProcess().PrivateMemorySize64;
+            MemoryUsage = $"Memory usage: {memUsage.ConvertSize()}";
+
+            if (memUsage > _maxMemUsage)
+                _maxMemUsage = memUsage;
+        };
+        _memoryTimer.Start();
+
+        var (version, buildInfo) = Helper.GetVersionInfo();
+        BuildInfo = buildInfo;
+        HeaderApp = $"MsSqlToolBelt | v{version}";
+
         try
         {
+            // Check for an update
+            CheckUpdate();
+
             await _settingsManager.LoadServerAsync();
             ServerList =
                 new ObservableCollection<string>(_settingsManager.ServerList.OrderBy(o => o.Order).Select(s => s.Name));
@@ -199,6 +347,18 @@ internal class MainWindowViewModel : ViewModelBase
         {
             await ShowErrorAsync(ex);
         }
+    }
+
+    /// <summary>
+    /// Closes the view model and stops / dispose all necessary
+    /// </summary>
+    public void CloseViewModel()
+    {
+        _memoryTimer?.Dispose();
+        _baseRepo?.Dispose();
+
+        // Log the max. memory usage
+        Log.Information($"Maximal memory usage: {_maxMemUsage.ConvertSize()} ({_maxMemUsage:N0} bytes)");
     }
 
     /// <summary>
@@ -231,7 +391,7 @@ internal class MainWindowViewModel : ViewModelBase
 
         ConnectionEstablished = false;
 
-        var controller = await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
+        await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
 
         try
         {
@@ -249,6 +409,8 @@ internal class MainWindowViewModel : ViewModelBase
             var defaultDatabase = await _settingsManager.LoadDefaultDatabaseAsync(SelectedServer);
             SelectedDatabase =
                 DatabaseList.FirstOrDefault(f => f.EqualsIgnoreCase(defaultDatabase)) ?? "";
+
+            ConnectionInfo = $"Connected. Server: {SelectedServer}";
         }
         catch (Exception ex)
         {
@@ -256,7 +418,7 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
     }
 
@@ -268,7 +430,7 @@ internal class MainWindowViewModel : ViewModelBase
         if (_baseRepo == null || string.IsNullOrEmpty(SelectedDatabase))
             return;
 
-        var controller = await ShowProgressAsync("Please wait",
+        await ShowProgressAsync("Please wait",
             "Please wait while the connection to the database is established...");
 
         try
@@ -276,6 +438,8 @@ internal class MainWindowViewModel : ViewModelBase
             _setConnection?.Invoke(SelectedServer, SelectedDatabase);
 
             ConnectionEstablished = true;
+
+            ConnectionInfo = $"Connected. Server: {SelectedServer} - Database: {SelectedDatabase}";
         }
         catch (Exception ex)
         {
@@ -283,7 +447,28 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await controller.CloseAsync();
+            await CloseProgressAsync();
         }
+    }
+
+    /// <summary>
+    /// Checks if a new version is available
+    /// </summary>
+    private void CheckUpdate()
+    {
+        // The "Forget()" method is used to let the async task run without waiting.
+        // More information: https://docs.microsoft.com/en-us/answers/questions/186037/taskrun-without-wait.html
+        // To use "Forget" you need the following nuget package: https://www.nuget.org/packages/Microsoft.VisualStudio.Threading/
+        UpdateHelper.LoadReleaseInfoAsync(SetReleaseInfo).Forget();
+    }
+
+    /// <summary>
+    /// Sets the release info and shows the update button
+    /// </summary>
+    /// <param name="releaseInfo">The infos of the latest release</param>
+    private void SetReleaseInfo(ReleaseInfo releaseInfo)
+    {
+        _releaseInfo = releaseInfo;
+        ButtonUpdateVisible = !string.IsNullOrEmpty(releaseInfo.Name) ? Visibility.Visible : Visibility.Hidden;
     }
 }

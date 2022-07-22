@@ -24,6 +24,13 @@ public partial class ReplicationControl : UserControl, IConnection
             viewModel.SetConnection(dataSource, database);
     }
 
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        if (DataContext is ReplicationControlViewModel viewModel)
+            viewModel.CloseConnection();
+    }
+
     /// <summary>
     /// Loads the data
     /// </summary>

@@ -91,8 +91,8 @@
                     <Label Content="Type:" />
                     <ComboBox
                         Width="150"
-                        ItemsSource="{Binding ResultTypes}"
-                        SelectedItem="{Binding SelectedResultType}" />
+                        ItemsSource="{Binding ObjectTypes}"
+                        SelectedItem="{Binding SelectedObjectType}" />
                 </StackPanel>
 
                 <DataGrid
@@ -216,9 +216,13 @@
                 <Separator Grid.Row="1" />
 
                 <DataGrid
+                    Name="DataGridTable"
                     Grid.Row="2"
                     IsReadOnly="True"
                     ItemsSource="{Binding Columns}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridTable_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="Auto"
@@ -333,11 +337,15 @@
                     Grid.ColumnSpan="3" />
 
                 <DataGrid
+                    Name="DataGridJob"
                     Grid.Row="2"
                     Grid.Column="0"
                     IsReadOnly="True"
                     ItemsSource="{Binding JobSteps}"
                     SelectedItem="{Binding SelectedJobStep}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridJob_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="Auto"
@@ -389,66 +397,60 @@
                         Grid.Column="0"
                         Content="Success action:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="0"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.SuccessAction}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.SuccessAction}" />
 
                     <Label
                         Grid.Row="1"
                         Grid.Column="0"
                         Content="Next step:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.SuccessNextStepId}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.SuccessNextStepId}" />
 
                     <Label
                         Grid.Row="2"
                         Grid.Column="0"
                         Content="Fail action:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="2"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.FailAction}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.FailAction}" />
 
                     <Label
                         Grid.Row="3"
                         Grid.Column="0"
                         Content="Next step:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="3"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.FailNextStepId}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.FailNextStepId}" />
 
                     <Label
                         Grid.Row="4"
                         Grid.Column="0"
                         Content="Database:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="4"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.RunsOn}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.RunsOn}" />
 
                     <Label
                         Grid.Row="5"
                         Grid.Column="0"
                         Content="Retry attempts:"
                         Style="{StaticResource ItemKey}" />
-                    <Label
+                    <TextBlock
                         Grid.Row="5"
                         Grid.Column="1"
-                        Content="{Binding SelectedJobStep.RetryAttempts}"
-                        Style="{StaticResource ItemValue}" />
+                        Text="{Binding SelectedJobStep.RetryAttempts}" />
 
                     <Label
                         Grid.Row="6"

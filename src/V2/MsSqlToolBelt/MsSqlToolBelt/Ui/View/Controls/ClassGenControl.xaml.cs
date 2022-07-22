@@ -1,7 +1,9 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Navigation;
 using ICSharpCode.AvalonEdit.Search;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -19,7 +21,8 @@ public partial class ClassGenControl : UserControl, IConnection
     public ClassGenControl()
     {
         InitializeComponent();
-        SearchPanel.Install(CodeEditor);
+        SearchPanel.Install(ClassCodeEditor);
+        SearchPanel.Install(SqlCodeEditor);
     }
 
     /// <summary>
@@ -30,14 +33,25 @@ public partial class ClassGenControl : UserControl, IConnection
         if (DataContext is ClassGenControlViewModel viewModel)
             viewModel.InitViewModel(SetCode);
 
-        CodeEditor.InitAvalonEditor(CodeType.CSharp);
+        ClassCodeEditor.InitAvalonEditor(CodeType.CSharp);
+        SqlCodeEditor.InitAvalonEditor(CodeType.Sql);
     }
 
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
+        if (DataContext is not ClassGenControlViewModel viewModel) 
+            return;
+
+        viewModel.SetConnection(dataSource, database);
+        viewModel.Clear();
+    }
+
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
         if (DataContext is ClassGenControlViewModel viewModel)
-            viewModel.SetConnection(dataSource, database);
+            viewModel.CloseConnection();
     }
 
     /// <summary>
@@ -50,13 +64,16 @@ public partial class ClassGenControl : UserControl, IConnection
     }
 
     /// <summary>
-    /// Sets the text of the code editor
+    /// Sets the code of the CSharp class and the SQL query
     /// </summary>
-    /// <param name="code">The code which should be set</param>
-    private void SetCode(string code)
+    /// <param name="result">The result of the class generator</param>
+    private void SetCode(ClassGenResult result)
     {
-        CodeEditor.Text = code;
-        CodeEditor.ScrollToHome();
+        ClassCodeEditor.Text = result.ClassCode;
+        ClassCodeEditor.ScrollToHome();
+
+        SqlCodeEditor.Text = result.SqlQuery;
+        SqlCodeEditor.ScrollToHome();
     }
 
     /// <summary>
@@ -66,6 +83,6 @@ public partial class ClassGenControl : UserControl, IConnection
     /// <param name="e">The event arguments</param>
     private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
     {
-        // TODO
+        Helper.OpenLink(e.Uri.ToString());
     }
 }

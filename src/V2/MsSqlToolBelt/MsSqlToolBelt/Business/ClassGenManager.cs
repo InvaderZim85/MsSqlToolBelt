@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
+using MsSqlToolBelt.DataObjects.Common;
 using Newtonsoft.Json;
 using ZimLabs.CoreLib;
 
@@ -14,7 +17,7 @@ namespace MsSqlToolBelt.Business;
 /// <summary>
 /// Provides the functions for the generation of a class
 /// </summary>
-internal class ClassGenManager : IDisposable
+public class ClassGenManager : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -22,9 +25,19 @@ internal class ClassGenManager : IDisposable
     private bool _disposed;
 
     /// <summary>
+    /// Contains the tab indent
+    /// </summary>
+    private static readonly string Tab = new(' ', 4);
+
+    /// <summary>
     /// The instance for the interaction with the tables
     /// </summary>
     private readonly TableManager _tableManager;
+
+    /// <summary>
+    /// The instance for the interaction with the database
+    /// </summary>
+    private readonly ClassGenRepo _repo;
 
     /// <summary>
     /// The list with the conversion types
@@ -54,6 +67,7 @@ internal class ClassGenManager : IDisposable
     public ClassGenManager(string dataSource, string database)
     {
         _tableManager = new TableManager(dataSource, database);
+        _repo = new ClassGenRepo(dataSource, database);
     }
 
     #region Loading
@@ -123,15 +137,97 @@ internal class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The desired options</param>
     /// <returns>The content of the class</returns>
-    public string GenerateClassAsync(ClassGenOptions options)
+    public ClassGenResult GenerateCode(ClassGenOptions options)
     {
         if (SelectedTable == null)
-            return string.Empty;
+            return new ClassGenResult();
 
+        return GenerateCode(options, SelectedTable);
+    }
+
+    /// <summary>
+    /// Generates a class based on the options and columns
+    /// </summary>
+    /// <param name="options">The desired options</param>
+    /// <param name="table">The desired table</param>
+    /// <param name="infoText">An info which will be added before the class (optional)</param>
+    /// <returns>The content of the class</returns>
+    private ClassGenResult GenerateCode(ClassGenOptions options, TableDto table, string infoText = "")
+    {
         // Step 1: Load the conversion types
         LoadTypeConversion();
 
-        // Step 2: Load the templates
+        var result = new ClassGenResult
+        {
+            // Class code
+            ClassCode = GenerateClass(options, table, infoText)
+        };
+
+        // Ef key code
+        if (options.DbModel)
+        {
+            var (completeCode, shortCode) = GenerateEfKeyCode(options, table);
+            result.EfCoreKeyCode = completeCode;
+            result.EfCoreKeyCodeShort = shortCode;
+        }
+
+        // SQL Query
+        result.SqlQuery = !string.IsNullOrEmpty(options.SqlQuery) ? options.SqlQuery : GenerateSqlQuery();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Generates a class from a sql query
+    /// </summary>
+    /// <param name="options">The options</param>
+    /// <returns>The content of the class</returns>
+    public async Task<ClassGenResult> GenerateFromQueryAsync(ClassGenOptions options)
+    {
+        // Step 1: Load the conversion types
+        LoadTypeConversion();
+
+        var table = await LoadMetadataAsync(options);
+        var tmpTable = (TableDto) table;
+
+        foreach (var column in tmpTable.Columns)
+        {
+            // Why this? The class generator works with the SQL Type! So that we can use
+            // the existing logic, we convert the system type to the sql type
+            var sqlType = GetSqlTypeBySystemType(column.DataType);
+            if (!string.IsNullOrEmpty(sqlType))
+                column.DataType = sqlType;
+            column.Use = true;
+        }
+
+        var sb = new StringBuilder();
+
+        if (table.ColumnUniqueError)
+        {
+            sb.AppendLine("/*")
+                .AppendLine(" NOTE - Unique property names")
+                .AppendLine(" ----------------------------")
+                .AppendLine(" In your SQL query are several columns with the same name.")
+                .AppendLine(" Since this is not possible in C#, please adjust the column names")
+                .AppendLine(" and run the process again.")
+                .AppendLine("*/")
+                .AppendLine();
+        }
+
+        return GenerateCode(options, tmpTable, sb.ToString());
+    }
+
+    #region CSharp class
+    /// <summary>
+    /// Generates the class code
+    /// </summary>
+    /// <param name="options">The desired options</param>
+    /// <param name="table">The desired table</param>
+    /// <param name="infoText">An info which will be added before the class</param>
+    /// <returns>The code of the class</returns>
+    private string GenerateClass(ClassGenOptions options, TableDto table, string infoText)
+    {
+        // Load the templates
         LoadTemplates();
 
         // Get the class template
@@ -141,23 +237,29 @@ internal class ClassGenManager : IDisposable
         //var properties = SelectedTable.Columns.Where(w => w.Use).Select(column => GenerateColumn(options, column)).ToList();
         var properties = new List<string>();
 
-        foreach (var column in SelectedTable.Columns.Where(w => w.Use))
+        foreach (var column in table.Columns.Where(w => w.Use).OrderBy(o => o.Order))
         {
             properties.Add(GenerateColumn(options, column));
             properties.Add(""); // Add an empty line for the break
         }
 
-        // Remove the last empty line (not very nice, but hey, if it works, it works :D
-        properties.RemoveAt(properties.Count - 1);
+            // Remove the last empty line (not very nice, but hey, if it works, it works :D
+        if (properties.Any())
+            properties.RemoveAt(properties.Count - 1);
 
         classTemplate = classTemplate.Replace("$PROPERTIES$", string.Join(Environment.NewLine, properties));
         classTemplate = classTemplate.Replace("$MODIFIER$", options.Modifier);
         classTemplate = classTemplate.Replace("$SEALED$", options.SealedClass ? " sealed" : "");
         classTemplate = classTemplate.Replace("$NAME$", options.ClassName);
 
-        return !options.DbModel
+        if (options.DbModel && !table.Name.Equals(options.ClassName))
+            classTemplate = string.IsNullOrEmpty(table.Table.Schema)
+                ? $"[Table(\"{table.Name}\")]{Environment.NewLine}{classTemplate}"
+                : $"[Table(\"{table.Name}\", Schema = \"{table.Table.Schema}\")]{Environment.NewLine}{classTemplate}";
+
+        return string.IsNullOrEmpty(infoText)
             ? classTemplate
-            : $"[Table(\"{SelectedTable.Name}\", Schema = \"{SelectedTable.Table.Schema}\")]{Environment.NewLine}{classTemplate}";
+            : $"{infoText}{classTemplate}";
     }
 
     /// <summary>
@@ -168,28 +270,28 @@ internal class ClassGenManager : IDisposable
     /// <returns>The code for the column</returns>
     private string GenerateColumn(ClassGenOptions options, ColumnDto column)
     {
-        var spacer = "".PadLeft(4, ' ');
-        var template = GetTemplate(options);
+        var template = GetClassTemplate(options);
 
         // DataType
         var dataType = GetCSharpType(column.DataType);
-        template = template.Replace("$TYPE$", dataType.CSharpType);
+        template = template.Replace("$TYPE$",
+            string.IsNullOrEmpty(dataType.CSharpType) ? column.DataType : dataType.CSharpType);
         if (column.IsNullable && (!dataType.IsNullable || options.Nullable))
             template = template.Replace("$NULLABLE$", "?");
         else
             template = template.Replace("$NULLABLE$", "");
 
         // Name
-        template = template.Replace("$NAME$", string.IsNullOrEmpty(column.Alias) ? column.Name : column.Alias);
+        template = template.Replace("$NAME$", column.PropertyName);
 
         // Backing field name
         template = template.Replace("$NAME2$",
-            CreateBackingFieldName(string.IsNullOrEmpty(column.Alias) ? column.Name : column.Alias));
+            CreateBackingFieldName(column.PropertyName));
 
         var content = template.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
 
         if (!options.DbModel || string.IsNullOrEmpty(column.Alias) || column.Name.Equals(column.Alias, StringComparison.OrdinalIgnoreCase))
-            return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
+            return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
 
         // Add the EF attribute for the column
         var attribute =
@@ -199,8 +301,7 @@ internal class ClassGenManager : IDisposable
         if (index != -1)
             content.Insert(index, attribute);
 
-        return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
-
+        return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
     }
 
     /// <summary>
@@ -217,11 +318,97 @@ internal class ClassGenManager : IDisposable
     /// Gets the CSharp type according to the specified sql type
     /// </summary>
     /// <param name="sqlType">The sql type</param>
-    /// <returns>The CSharp type</returns>
+    /// <returns>The type entry</returns>
     private ClassGenTypeEntry GetCSharpType(string sqlType)
     {
         return _conversionTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(sqlType)) ?? new ClassGenTypeEntry();
     }
+
+    /// <summary>
+    /// Gets the CSharp type according to the specified system type
+    /// </summary>
+    /// <param name="systemType">The system type like "System.Int32"</param>
+    /// <returns>The type entry</returns>
+    private string GetSqlTypeBySystemType(string systemType)
+    {
+        return _conversionTypes.FirstOrDefault(f => f.CSharpSystemType.EqualsIgnoreCase(systemType))?.SqlType ??
+               systemType;
+    }
+    #endregion
+
+    #region EFCore Key
+    /// <summary>
+    /// Generates the code for the ef key
+    /// </summary>
+    /// <param name="options">The options</param>
+    /// <param name="table">The desired table</param>
+    /// <returns>The code for the keys</returns>
+    private (string completeCode, string shortCode) GenerateEfKeyCode(ClassGenOptions options, TableDto table)
+    {
+        var template = GetTemplate(ClassGenTemplateType.EfCreatingBuilder);
+
+        var keyColumns = table.Columns.Where(w => w.IsPrimaryKey).ToList();
+        if (!keyColumns.Any())
+            return (string.Empty, string.Empty);
+
+        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => s.PropertyName))} }}";
+        var completeCode = template.Replace("$ENTRIES$", shortCode);
+
+        return (completeCode, shortCode);
+
+    }
+    #endregion
+
+    #region Sql
+
+    /// <summary>
+    /// Generates the SQL query
+    /// </summary>
+    /// <returns>The sql query</returns>
+    private string GenerateSqlQuery()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("SELECT");
+
+        var count = 1;
+        var columnCount = SelectedTable!.Columns.Count(c => c.Use);
+        foreach (var column in SelectedTable!.Columns.Where(w => w.Use).OrderBy(o => o.Order))
+        {
+            var comma = count++ == columnCount ? "" : ",";
+
+            sb.AppendLine(string.IsNullOrEmpty(column.Alias)
+                ? $"{Tab}[{column.Name}]{comma}"
+                : $"{Tab}[{column.Name}] AS [{column.Alias}]{comma}");
+        }
+
+        sb.AppendLine("FROM").AppendLine($"{Tab}[{SelectedTable!.Table.Schema}].[{SelectedTable.Name}]");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Loads the metadata of the query
+    /// </summary>
+    /// <param name="options">The options</param>
+    /// <returns>The loaded metadata as table</returns>
+    private async Task<TableEntry> LoadMetadataAsync(ClassGenOptions options)
+    {
+        var columns = await _repo.LoadMetadataAsync(options.SqlQuery);
+
+        var uniqueError = columns.GroupBy(g => g.Name).Select(s => new
+        {
+            Count = s.Count()
+        }).Any(a => a.Count > 1);
+
+        return new TableEntry
+        {
+            Name = options.ClassName,
+            Columns = columns.OrderBy(o => o.Order).ToList(),
+            ColumnUniqueError = uniqueError
+        };
+    }
+
+    #endregion
     #endregion
 
     #region Template
@@ -230,16 +417,26 @@ internal class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The options</param>
     /// <returns>The template</returns>
-    private string GetTemplate(ClassGenOptions options)
+    private string GetClassTemplate(ClassGenOptions options)
     {
         return options.AddSummary switch
         {
-            true when options.WithBackingField => _templates[ClassGenTemplateType.PropertyBackingFieldComment],
-            true when !options.WithBackingField => _templates[ClassGenTemplateType.PropertyDefaultComment],
-            false when options.WithBackingField => _templates[ClassGenTemplateType.PropertyBackingFieldDefault],
-            false when !options.WithBackingField => _templates[ClassGenTemplateType.PropertyDefault],
+            true when options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyBackingFieldComment),
+            true when !options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyDefaultComment),
+            false when options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyBackingFieldDefault),
+            false when !options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyDefault),
             _ => string.Empty
         };
+    }
+
+    /// <summary>
+    /// Loads the desired template
+    /// </summary>
+    /// <param name="type">The template type</param>
+    /// <returns>The template content</returns>
+    private string GetTemplate(ClassGenTemplateType type)
+    {
+        return _templates[type];
     }
 
     /// <summary>
@@ -304,12 +501,20 @@ internal class ClassGenManager : IDisposable
     /// <summary>
     /// Loads the conversion types
     /// </summary>
-    /// <returns>The list with the conversion types</returns>
     private void LoadTypeConversion()
     {
         if (_conversionTypes.Any())
             return;
 
+        _conversionTypes = LoadDataTypes();
+    }
+
+    /// <summary>
+    /// Loads the conversion types
+    /// </summary>
+    /// <returns>The list with the conversion types</returns>
+    public List<ClassGenTypeEntry> LoadDataTypes()
+    {
         var path = Path.Combine(Core.GetBaseDirPath(), "ClassGenTypeConversion.json");
 
         if (!File.Exists(path))
@@ -317,7 +522,27 @@ internal class ClassGenManager : IDisposable
 
         var content = File.ReadAllText(path);
 
-        _conversionTypes = JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? new List<ClassGenTypeEntry>();
+        return JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? new List<ClassGenTypeEntry>();
+    }
+
+    /// <summary>
+    /// Checks if the desired class name is valid
+    /// </summary>
+    /// <param name="className">The name of the class</param>
+    /// <returns><see langword="true"/> when the name is valid, otherwise <see langword="false"/></returns>
+    public bool ClassNameValid(string className)
+    {
+        // Check if the class name starts with a number
+        bool ClassNameStartsWithNumber()
+        {
+            if (string.IsNullOrWhiteSpace(className))
+                return false;
+
+            var firstChar = className[0].ToString();
+            return int.TryParse(firstChar, out _);
+        }
+
+        return !string.IsNullOrWhiteSpace(className) && !ClassNameStartsWithNumber();
     }
     #endregion
 

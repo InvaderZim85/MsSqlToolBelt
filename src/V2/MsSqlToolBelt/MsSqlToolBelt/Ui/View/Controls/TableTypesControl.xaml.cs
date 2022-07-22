@@ -24,6 +24,13 @@ public partial class TableTypesControl : UserControl, IConnection
             viewModel.SetConnection(dataSource, database);
     }
 
+    /// <inheritdoc />
+    public void CloseConnection()
+    {
+        if (DataContext is TableTypesControlViewModel viewModel)
+            viewModel.CloseConnection();
+    }
+
     /// <summary>
     /// Loads the data
     /// </summary>

@@ -9,12 +9,13 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
-    Title="MainWindow"
+    Title="{Binding HeaderApp}"
     Width="1024"
     Height="768"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
+    Icon="../../../MsSqlToolBelt.ico"
     Loaded="MainWindow_OnLoaded"
     ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
@@ -27,16 +28,13 @@
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <!--<Button
+            <Button
                 Command="{Binding ShowUpdateInfoCommand}"
                 Content="Update available!"
-                Visibility="{Binding UpdateButtonVisible}" />-->
-            <!--<Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
+                Visibility="{Binding ButtonUpdateVisible}" />
+            <Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
                 <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
             </Button>
-            <Button Command="{Binding DataTypeCommand}" ToolTip="Shows the data type mapping">
-                <iconPacks:PackIconPixelartIcons Kind="Code" />
-            </Button>-->
             <Button Command="{Binding OpenSettingsCommand}" ToolTip="Shows the settings">
                 <iconPacks:PackIconPixelartIcons Kind="Sliders" />
             </Button>
@@ -55,26 +53,26 @@
                 <controls:SettingsControl x:Name="SettingsControl" />
             </mah:Flyout>
 
-            <!--<mah:Flyout
-                Width="600"
-                Header="Data types"
-                IsOpen="{Binding DataTypeOpen}"
-                Position="Right">
-                <local:DataTypeControl x:Name="DataTypeControl" />
-            </mah:Flyout>
-
             <mah:Flyout
                 Width="600"
                 Header="Info"
                 IsOpen="{Binding InfoOpen}"
                 Position="Right">
-                <local:InfoControl x:Name="InfoControl" />
-            </mah:Flyout>-->
+                <controls:InfoControl x:Name="InfoControl" />
+            </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
+
     <DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="Connection info" />
+            <StatusBarItem Content="{Binding ConnectionInfo}" />
+            <Separator />
+            <StatusBarItem Content="{Binding MemoryUsage}" />
+            <StatusBarItem
+                Margin="0,0,15,0"
+                Padding="0"
+                HorizontalAlignment="Right"
+                Content="{Binding BuildInfo}" />
         </StatusBar>
 
         <Grid>
@@ -146,6 +144,9 @@
                 </TabItem>
                 <TabItem Header="Class generator">
                     <controls:ClassGenControl x:Name="ClassGenControl" />
+                </TabItem>
+                <TabItem Header="Definition export">
+                    <controls:DefinitionExportControl x:Name="DefinitionExportControl" />
                 </TabItem>
             </TabControl>
         </Grid>
