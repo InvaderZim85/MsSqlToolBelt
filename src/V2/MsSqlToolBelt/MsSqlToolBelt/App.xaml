@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:MsSqlToolBelt"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     Exit="App_OnExit"
     Startup="App_OnStartup">
     <Application.Resources>
@@ -32,6 +33,12 @@
 
             <Style x:Key="ItemValue" TargetType="{x:Type Label}">
                 <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="ItemHint" TargetType="{x:Type Label}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Foreground" Value="LightGray" />
             </Style>
 
             <Style x:Key="BorderStyle" TargetType="{x:Type Border}">
@@ -66,7 +73,6 @@
                 <Setter Property="Background" Value="Transparent" />
             </Style>
 
-
             <Style x:Key="Headline" TargetType="{x:Type Label}">
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -93,6 +99,22 @@
 
             <Style BasedOn="{StaticResource MahApps.Styles.TextBox}" TargetType="{x:Type TextBox}">
                 <Setter Property="Margin" Value="3" />
+            </Style>
+
+            <Style
+                x:Key="TextBoxFilter"
+                BasedOn="{StaticResource MahApps.Styles.TextBox}"
+                TargetType="{x:Type TextBox}">
+                <Setter Property="Margin" Value="3" />
+                <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="True" />
+                <Style.Triggers>
+                    <Trigger Property="mah:TextBoxHelper.HasText" Value="False">
+                        <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="False" />
+                    </Trigger>
+                    <Trigger Property="mah:TextBoxHelper.HasText" Value="True">
+                        <Setter Property="mah:TextBoxHelper.ClearTextButton" Value="True" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="{x:Type ComboBox}">

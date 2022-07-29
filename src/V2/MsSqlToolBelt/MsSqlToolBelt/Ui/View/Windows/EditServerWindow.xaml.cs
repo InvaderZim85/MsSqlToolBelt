@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using MahApps.Metro.Controls;
+using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 
 namespace MsSqlToolBelt.Ui.View.Windows;
@@ -10,41 +11,33 @@ namespace MsSqlToolBelt.Ui.View.Windows;
 public partial class EditServerWindow : MetroWindow
 {
     /// <summary>
-    /// Contains the selected server
+    /// Gets or sets the selected server
     /// </summary>
-    private readonly string _selectedServer;
-
-    /// <summary>
-    /// Gets the selected server
-    /// </summary>
-    public string SelectedServer =>
-        DataContext is EditServerWindowViewModel viewModel ? viewModel.Server ?? string.Empty : string.Empty;
-
-    /// <summary>
-    /// Gets the selected database
-    /// </summary>
-    public string SelectedDatabase
+    public ServerEntry SelectedServer
     {
-        get
+        get => DataContext is EditServerWindowViewModel viewModel ? viewModel.SelectedServer : new ServerEntry();
+        set
         {
-            if (DataContext is not EditServerWindowViewModel viewModel)
-                return string.Empty;
-
-            var selectedDatabase = viewModel.SelectedDatabase ?? string.Empty;
-            // The arrow is a indicator for an "empty" selection
-            return selectedDatabase.StartsWith("<") ? string.Empty : selectedDatabase;
+            if (DataContext is EditServerWindowViewModel viewModel)
+                viewModel.SelectedServer = value;
         }
     }
 
     /// <summary>
     /// Creates a new instance of the <see cref="EditServerWindow"/>
     /// </summary>
-    /// <param name="selectedServer">The selected server</param>
-    public EditServerWindow(string selectedServer = "")
+    public EditServerWindow()
     {
         InitializeComponent();
+    }
 
-        _selectedServer = selectedServer;
+    /// <summary>
+    /// Sets the dialog result and closed the window
+    /// </summary>
+    /// <param name="dialogResult">The desired result</param>
+    private void CloseWindow(bool dialogResult)
+    {
+        DialogResult = dialogResult;
     }
 
     /// <summary>
@@ -55,29 +48,6 @@ public partial class EditServerWindow : MetroWindow
     private void EditServerWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (DataContext is EditServerWindowViewModel viewModel)
-            viewModel.InitViewModel(_selectedServer);
-    }
-
-    /// <summary>
-    /// Occurs when the user hits the select button
-    /// </summary>
-    /// <param name="sender">The select button</param>
-    /// <param name="e">The event arguments</param>
-    private void ButtonSelect_Click(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(SelectedServer))
-            DialogResult = false;
-
-        DialogResult = true;
-    }
-
-    /// <summary>
-    /// Occurs when the user hits the close button
-    /// </summary>
-    /// <param name="sender">The close button</param>
-    /// <param name="e">The event arguments</param>
-    private void ButtonClose_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
+            viewModel.InitViewModel(CloseWindow);
     }
 }

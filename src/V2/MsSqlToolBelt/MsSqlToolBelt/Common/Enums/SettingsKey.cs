@@ -13,5 +13,10 @@ public enum SettingsKey
     /// <summary>
     /// The auto wildcard value
     /// </summary>
-    AutoWildcard
+    AutoWildcard,
+
+    /// <summary>
+    /// The format of the clipboard
+    /// </summary>
+    CopyToClipboardFormat
 }

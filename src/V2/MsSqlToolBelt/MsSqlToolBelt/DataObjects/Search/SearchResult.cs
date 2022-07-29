@@ -1,5 +1,7 @@
 ﻿using System;
 using MsSqlToolBelt.DataObjects.Common;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;
 
@@ -36,6 +38,8 @@ internal class SearchResult
     /// <summary>
     /// Gets or sets the bounded item
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public object? BoundItem { get; private init; }
 
     /// <summary>

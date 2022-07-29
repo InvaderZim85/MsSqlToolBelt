@@ -66,7 +66,7 @@ internal static class DataHelper
     public static DateTime ConvertToDateTime(int lastRunDate, int lastRunTime)
     {
         var tmpLastRunDate = lastRunDate.ToString();
-        var tmpLastRunTime = lastRunTime.ToString();
+        var tmpLastRunTime = lastRunTime.ToString().PadLeft(6, '0');
 
         if (tmpLastRunDate.Length != 8 || tmpLastRunTime.Length != 6)
             return DateTime.MinValue;

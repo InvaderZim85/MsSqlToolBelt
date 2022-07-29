@@ -14,7 +14,6 @@
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
     Loaded="TableIndexWindow_OnLoaded"
-    ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -39,9 +38,13 @@
         <Separator Grid.Row="1" />
 
         <DataGrid
+            Name="DataGridIndexes"
             Grid.Row="2"
             IsReadOnly="True"
             ItemsSource="{Binding Indexes}">
+            <DataGrid.CommandBindings>
+                <CommandBinding Command="Copy" Executed="DataGridIndexes_OnExecuted" />
+            </DataGrid.CommandBindings>
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="*"

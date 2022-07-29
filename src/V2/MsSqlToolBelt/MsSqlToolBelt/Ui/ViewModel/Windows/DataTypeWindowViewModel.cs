@@ -27,7 +27,7 @@ internal class DataTypeWindowViewModel : ViewModelBase
     public ObservableCollection<ClassGenTypeEntry> DataTypes
     {
         get => _dataTypes;
-        set => SetField(ref _dataTypes, value);
+        private set => SetField(ref _dataTypes, value);
     }
 
     /// <summary>

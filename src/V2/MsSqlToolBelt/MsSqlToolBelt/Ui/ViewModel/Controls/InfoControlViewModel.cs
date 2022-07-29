@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -48,7 +47,7 @@ internal class InfoControlViewModel : ViewModelBase
     public string VersionInfo
     {
         get => _versionInfo;
-        set => SetField(ref _versionInfo, value);
+        private set => SetField(ref _versionInfo, value);
     }
 
     /// <summary>
@@ -76,7 +75,7 @@ internal class InfoControlViewModel : ViewModelBase
     public ObservableCollection<PackageInfo> PackageList
     {
         get => _packageList;
-        set => SetField(ref _packageList, value);
+        private set => SetField(ref _packageList, value);
     }
 
     /// <summary>

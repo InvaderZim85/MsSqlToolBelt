@@ -131,7 +131,9 @@
 
                     <TextBox
                         Grid.Row="4"
+                        mah:TextBoxHelper.SelectAllOnFocus="True"
                         mah:TextBoxHelper.Watermark="Filter..."
+                        Style="{StaticResource TextBoxFilter}"
                         Text="{Binding Filter}">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />

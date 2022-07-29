@@ -53,6 +53,9 @@
                 <TextBox
                     Grid.Row="0"
                     Grid.Column="1"
+                    mah:TextBoxHelper.SelectAllOnFocus="True"
+                    mah:TextBoxHelper.Watermark="* and % will be interpreted as wildcard"
+                    Style="{StaticResource TextBoxFilter}"
                     Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
@@ -67,7 +70,7 @@
                 <CheckBox
                     Grid.Row="1"
                     Grid.Column="1"
-                    Content="Add wildcard automatically (wildcard = *)"
+                    Content="Add wildcard automatically (wildcard = * or %)"
                     IsChecked="{Binding AddWildcardAutomatically}" />
 
                 <Separator
@@ -79,7 +82,7 @@
                     Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Content="Result"
+                    Content="{Binding HeaderResult}"
                     Style="{StaticResource Headline}" />
 
                 <StackPanel
@@ -96,11 +99,15 @@
                 </StackPanel>
 
                 <DataGrid
+                    Name="DataGridResult"
                     Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     ItemsSource="{Binding SearchResults}"
                     SelectedItem="{Binding SelectedResult}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridResult_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="1.5*"

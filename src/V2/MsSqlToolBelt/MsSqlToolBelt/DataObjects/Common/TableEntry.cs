@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using MsSqlToolBelt.DataObjects.Search;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 
@@ -44,11 +46,15 @@ public class TableEntry : IdNameBase
     /// <summary>
     /// Gets or sets the list with the columns
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<ColumnEntry> Columns { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the list with the indizes
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<IndexEntry> Indexes { get; set; } = new();
 
     /// <summary>
@@ -56,6 +62,8 @@ public class TableEntry : IdNameBase
     /// <para />
     /// Only needed for the class generator which generates a class from a query
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public bool ColumnUniqueError { get; set; }
 
     /// <summary>
@@ -73,6 +81,6 @@ public class TableEntry : IdNameBase
         var replicationFilter = $"Replication filter: {GetYesNo(HasReplicationFilter)}";
         var cdc = $"CDC: {GetYesNo(Cdc)}";
 
-        return $"{replicated}; {replicationFilter}; {cdc}";
+        return $"{replicated}, {replicationFilter}, {cdc}";
     }
 }

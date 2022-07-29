@@ -9,7 +9,9 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Updater;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using ZimLabs.CoreLib;
@@ -118,12 +120,12 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Backing field for <see cref="ServerList"/>
     /// </summary>
-    private ObservableCollection<string> _serverList = new();
+    private ObservableCollection<ServerEntry> _serverList = new();
 
     /// <summary>
     /// Gets or sets the list with the available server
     /// </summary>
-    public ObservableCollection<string> ServerList
+    public ObservableCollection<ServerEntry> ServerList
     {
         get => _serverList;
         private set => SetField(ref _serverList, value);
@@ -132,12 +134,12 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Backing field for <see cref="SelectedServer"/>
     /// </summary>
-    private string _selectedServer = string.Empty;
+    private ServerEntry? _selectedServer;
 
     /// <summary>
     /// Gets or sets the selected server
     /// </summary>
-    public string SelectedServer
+    public ServerEntry? SelectedServer
     {
         get => _selectedServer;
         set => SetField(ref _selectedServer, value);
@@ -154,7 +156,11 @@ internal class MainWindowViewModel : ViewModelBase
     public ObservableCollection<string> DatabaseList
     {
         get => _databaseList;
-        private set => SetField(ref _databaseList, value);
+        private set
+        {
+            SetField(ref _databaseList, value);
+            ConnectedToServer = value.Any();
+        }
     }
 
     /// <summary>
@@ -169,6 +175,20 @@ internal class MainWindowViewModel : ViewModelBase
     {
         get => _selectedDatabase;
         set => SetField(ref _selectedDatabase, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ConnectedToServer"/>
+    /// </summary>
+    private bool _connectedToServer;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if a server connection is established
+    /// </summary>
+    public bool ConnectedToServer
+    {
+        get => _connectedToServer;
+        set => SetField(ref _connectedToServer, value);
     }
 
     /// <summary>
@@ -198,7 +218,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _tabIndex;
         set
         {
-            if (SetField(ref _tabIndex, value) && value != 0)
+            if (SetField(ref _tabIndex, value))
                 _loadData?.Invoke(value);
         }
     }
@@ -272,6 +292,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _buttonUpdateVisible;
         set => SetField(ref _buttonUpdateVisible, value);
     }
+
     #endregion
 
     #region Commands
@@ -312,7 +333,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// <param name="initFlyOut">The action to initialize the flyout</param>
     /// <param name="setConnection">The action to set the connection</param>
     /// <param name="loadData">The action to load the data of the selected tab</param>
-    public async void InitViewModel(SettingsManager settingsManager, Action<FlyOutType> initFlyOut, Action<string, string> setConnection, Action<int> loadData)
+    public void InitViewModel(SettingsManager settingsManager, Action<FlyOutType> initFlyOut, Action<string, string> setConnection, Action<int> loadData)
     {
         _settingsManager = settingsManager;
         _initFlyOut = initFlyOut;
@@ -330,18 +351,22 @@ internal class MainWindowViewModel : ViewModelBase
         };
         _memoryTimer.Start();
 
-        var (version, buildInfo) = Helper.GetVersionInfo();
+        var (_, buildInfo) = Helper.GetVersionInfo();
         BuildInfo = buildInfo;
-        HeaderApp = $"MsSqlToolBelt | v{version}";
+        SetHeaderInfo();
+    }
 
+    /// <summary>
+    /// Loads the data
+    /// </summary>
+    public async void LoadData()
+    {
         try
         {
             // Check for an update
             CheckUpdate();
 
-            await _settingsManager.LoadServerAsync();
-            ServerList =
-                new ObservableCollection<string>(_settingsManager.ServerList.OrderBy(o => o.Order).Select(s => s.Name));
+            LoadServerList();
         }
         catch (Exception ex)
         {
@@ -372,8 +397,7 @@ internal class MainWindowViewModel : ViewModelBase
         try
         {
             await _settingsManager.LoadServerAsync();
-            ServerList =
-                new ObservableCollection<string>(_settingsManager.ServerList.OrderBy(o => o.Order).Select(s => s.Name));
+            ServerList = _settingsManager.ServerList.OrderBy(o => o.Order).ToObservableCollection();
         }
         catch (Exception ex)
         {
@@ -386,7 +410,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// </summary>
     private async void ConnectServer()
     {
-        if (string.IsNullOrEmpty(SelectedServer))
+        if (SelectedServer == null)
             return;
 
         ConnectionEstablished = false;
@@ -395,7 +419,7 @@ internal class MainWindowViewModel : ViewModelBase
 
         try
         {
-            _baseRepo = new BaseRepo(SelectedServer);
+            _baseRepo = new BaseRepo(SelectedServer.Name);
 
             // Load the databases
             var databases = await _baseRepo.LoadDatabasesAsync();
@@ -406,11 +430,16 @@ internal class MainWindowViewModel : ViewModelBase
             // Add the server if it's not in the list
             await _settingsManager.AddServerAsync(SelectedServer);
 
-            var defaultDatabase = await _settingsManager.LoadDefaultDatabaseAsync(SelectedServer);
-            SelectedDatabase =
-                DatabaseList.FirstOrDefault(f => f.EqualsIgnoreCase(defaultDatabase)) ?? "";
+            if (!string.IsNullOrEmpty(SelectedServer.DefaultDatabase))
+                SelectedDatabase = DatabaseList.FirstOrDefault(f => f.EqualsIgnoreCase(SelectedServer.DefaultDatabase)) ?? "";
 
-            ConnectionInfo = $"Connected. Server: {SelectedServer}";
+            if (SelectedServer.AutoConnect && !string.IsNullOrEmpty(SelectedDatabase))
+                SetDatabase();
+            else
+            {
+                ConnectionInfo = $"Connected. Server: {SelectedServer}";
+                SetHeaderInfo($"Server: {SelectedServer}");
+            }
         }
         catch (Exception ex)
         {
@@ -427,7 +456,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// </summary>
     private async void ConnectDatabase()
     {
-        if (_baseRepo == null || string.IsNullOrEmpty(SelectedDatabase))
+        if (_baseRepo == null || SelectedServer == null || string.IsNullOrEmpty(SelectedDatabase))
             return;
 
         await ShowProgressAsync("Please wait",
@@ -435,11 +464,7 @@ internal class MainWindowViewModel : ViewModelBase
 
         try
         {
-            _setConnection?.Invoke(SelectedServer, SelectedDatabase);
-
-            ConnectionEstablished = true;
-
-            ConnectionInfo = $"Connected. Server: {SelectedServer} - Database: {SelectedDatabase}";
+            SetDatabase();
         }
         catch (Exception ex)
         {
@@ -449,6 +474,22 @@ internal class MainWindowViewModel : ViewModelBase
         {
             await CloseProgressAsync();
         }
+    }
+
+    /// <summary>
+    /// Sets the database
+    /// </summary>
+    private void SetDatabase()
+    {
+        if (string.IsNullOrEmpty(SelectedDatabase))
+            return;
+
+        _setConnection?.Invoke(SelectedServer!.Name, SelectedDatabase);
+
+        ConnectionEstablished = true;
+
+        ConnectionInfo = $"Connected. Server: {SelectedServer} - Database: {SelectedDatabase}";
+        SetHeaderInfo($"Server: {SelectedServer} - Database: {SelectedDatabase}");
     }
 
     /// <summary>
@@ -470,5 +511,17 @@ internal class MainWindowViewModel : ViewModelBase
     {
         _releaseInfo = releaseInfo;
         ButtonUpdateVisible = !string.IsNullOrEmpty(releaseInfo.Name) ? Visibility.Visible : Visibility.Hidden;
+    }
+
+    /// <summary>
+    /// Sets the header info
+    /// </summary>
+    /// <param name="additionalText">The additional info</param>
+    private void SetHeaderInfo(string additionalText = "")
+    {
+        HeaderApp = $"MsSqlToolBelt - v{Helper.GetVersionInfo().Version}";
+
+        if (!string.IsNullOrEmpty(additionalText))
+            HeaderApp += $" | {additionalText}";
     }
 }

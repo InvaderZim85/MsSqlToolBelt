@@ -16,7 +16,7 @@ internal class SettingsEntry
     public int Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the id of the key (see <see cref="Common.Enums.SettingsKey"/>)
+    /// Gets or sets the id of the key (see <see cref="MsSqlToolBelt.Common.Enums.SettingsKey"/>)
     /// </summary>
     [Required]
     public int KeyId { get; set; }

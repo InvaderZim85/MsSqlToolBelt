@@ -28,9 +28,13 @@
         </Grid.RowDefinitions>
 
         <DataGrid
+            Name="DataGridTypes"
             Grid.Row="0"
             IsReadOnly="True"
             ItemsSource="{Binding DataTypes}">
+            <DataGrid.CommandBindings>
+                <CommandBinding Command="Copy" Executed="DataGridTypes_OnExecuted" />
+            </DataGrid.CommandBindings>
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="*"

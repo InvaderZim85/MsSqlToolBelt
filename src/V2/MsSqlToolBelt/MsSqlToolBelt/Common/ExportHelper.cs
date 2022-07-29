@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.DataObjects.Search;
 using Newtonsoft.Json;
+using Serilog;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Common;
@@ -21,15 +21,16 @@ internal static class ExportHelper
     /// Converts the internal <see cref="ExportType"/> to the <see cref="OutputType"/> (needed for the export)
     /// </summary>
     /// <param name="type">The export type</param>
+    /// <param name="fallback">The fallback (optional)</param>
     /// <returns>The output type</returns>
-    private static OutputType ConvertToOutputType(ExportType type)
+    public static OutputType ConvertToOutputType(ExportType type, OutputType fallback = OutputType.Default)
     {
         return type switch
         {
             ExportType.Ascii => OutputType.Default,
             ExportType.Csv => OutputType.Csv,
             ExportType.Markdown => OutputType.Markdown,
-            _ => OutputType.Default
+            _ => fallback
         };
     }
 
@@ -131,5 +132,35 @@ internal static class ExportHelper
         var content = JsonConvert.SerializeObject(value, Formatting.Indented);
 
         await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
+    }
+
+
+
+    /// <summary>
+    /// Converts the data and copies them to the clipboard in the desired format
+    /// </summary>
+    /// <typeparam name="T">The type of the data</typeparam>
+    /// <param name="data">The data</param>
+    public static async void CopyGridToClipboard<T>(this IReadOnlyCollection<T> data) where T : class
+    {
+        try
+        {
+            var settingsManager = new SettingsManager();
+            var exportType =
+                (ExportType)await settingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, 1); // 1 = CSV
+
+            var content = exportType switch
+            {
+                ExportType.Json => JsonConvert.SerializeObject(data, Formatting.Indented),
+                _ => data.CreateTable(ConvertToOutputType(exportType))
+            };
+
+            Clipboard.SetText(content);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error has occurred while exporting the data.");
+            Clipboard.Clear();
+        }
     }
 }

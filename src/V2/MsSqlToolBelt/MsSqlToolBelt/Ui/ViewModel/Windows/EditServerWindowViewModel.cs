@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects.Internal;
 using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -13,17 +14,27 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 internal class EditServerWindowViewModel : ViewModelBase
 {
     /// <summary>
-    /// Backing field for <see cref="Server"/>
+    /// The default database entry
     /// </summary>
-    private string? _server;
+    private const string DefaultEntry = "<Select database>";
 
     /// <summary>
-    /// Gets or sets the name / path of the desired server
+    /// The action to close the window
     /// </summary>
-    public string? Server
+    private Action<bool>? _closeWindow;
+
+    /// <summary>
+    /// Backing field for <see cref="SelectedServer"/>
+    /// </summary>
+    private ServerEntry _selectedServer = new();
+
+    /// <summary>
+    /// Gets or sets the selected server
+    /// </summary>
+    public ServerEntry SelectedServer
     {
-        get => _server;
-        set => SetField(ref _server, value);
+        get => _selectedServer;
+        set => SetField(ref _selectedServer, value);
     }
 
     /// <summary>
@@ -37,21 +48,25 @@ internal class EditServerWindowViewModel : ViewModelBase
     public ObservableCollection<string> DatabaseList
     {
         get => _databaseList;
-        set => SetField(ref _databaseList, value);
+        private set => SetField(ref _databaseList, value);
     }
 
     /// <summary>
     /// Backing field for <see cref="SelectedDatabase"/>
     /// </summary>
-    private string? _selectedDatabase;
+    private string _selectedDatabase = string.Empty;
 
     /// <summary>
     /// Gets or sets the selected database
     /// </summary>
-    public string? SelectedDatabase
+    public string SelectedDatabase
     {
         get => _selectedDatabase;
-        set => SetField(ref _selectedDatabase, value);
+        set
+        {
+            SetField(ref _selectedDatabase, value);
+            AutoConnectEnabled = !string.IsNullOrEmpty(value) && !value.Equals(DefaultEntry);
+        }
     }
 
     /// <summary>
@@ -69,20 +84,41 @@ internal class EditServerWindowViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Backing field for <see cref="AutoConnectEnabled"/>
+    /// </summary>
+    private bool _autoConnectEnabled;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the auto connect checkbox is enabled
+    /// </summary>
+    public bool AutoConnectEnabled
+    {
+        get => _autoConnectEnabled;
+        set => SetField(ref _autoConnectEnabled, value);
+    }
+
+    /// <summary>
     /// The command to establish a connection to the desired server
     /// </summary>
     public ICommand ConnectCommand => new DelegateCommand(Connect);
 
     /// <summary>
+    /// The command to set the data
+    /// </summary>
+    public ICommand OkCommand => new DelegateCommand(SetData);
+
+    /// <summary>
+    /// The command to close the window
+    /// </summary>
+    public ICommand CloseCommand => new DelegateCommand(() => _closeWindow?.Invoke(false));
+
+    /// <summary>
     /// Init the view model
     /// </summary>
-    /// <param name="selectedServer">The name / path of the selected server</param>
-    public void InitViewModel(string selectedServer)
+    /// <param name="closeWindow">The action to close the window with the desired dialog result</param>
+    public void InitViewModel(Action<bool> closeWindow)
     {
-        if (string.IsNullOrWhiteSpace(selectedServer))
-            return;
-
-        Server = selectedServer;
+        _closeWindow = closeWindow;
 
         Connect();
     }
@@ -92,20 +128,19 @@ internal class EditServerWindowViewModel : ViewModelBase
     /// </summary>
     private async void Connect()
     {
-        if (string.IsNullOrWhiteSpace(Server))
+        if (string.IsNullOrWhiteSpace(SelectedServer.Name))
             return;
 
         DatabaseList.Clear();
 
         try
         {
-            using var baseRepo = new BaseRepo(Server);
+            using var baseRepo = new BaseRepo(SelectedServer.Name);
             var databases = await baseRepo.LoadDatabasesAsync();
 
-            const string defaultSelection = "<Select database>";
             DatabaseList = new ObservableCollection<string>
             {
-                defaultSelection
+                DefaultEntry
             };
 
             foreach (var database in databases.OrderBy(o => o))
@@ -113,13 +148,34 @@ internal class EditServerWindowViewModel : ViewModelBase
                 DatabaseList.Add(database);
             }
 
-            SelectedDatabase = defaultSelection;
             ButtonSelectedEnabled = databases.Any();
+
+            if (!string.IsNullOrEmpty(SelectedServer.DefaultDatabase))
+            {
+                SelectedDatabase = DatabaseList.FirstOrDefault(f => f.Equals(SelectedServer.DefaultDatabase)) ??
+                                   DefaultEntry;
+            }
         }
         catch (Exception ex)
         {
             LogError(ex);
             ShowInfoMessage("Error: Can't connect to server!");
         }
+    }
+
+    /// <summary>
+    /// Selects the database 
+    /// </summary>
+    private void SetData()
+    {
+        if (string.IsNullOrEmpty(SelectedServer.Name))
+        {
+            ShowInfoMessage("Please specify a server...");
+            return;
+        }
+
+        SelectedServer.DefaultDatabase = SelectedDatabase;
+
+        _closeWindow?.Invoke(true);
     }
 }

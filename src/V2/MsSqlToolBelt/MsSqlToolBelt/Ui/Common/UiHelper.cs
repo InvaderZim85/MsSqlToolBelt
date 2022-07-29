@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
@@ -60,5 +63,46 @@ internal static class UiHelper
     public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> list)
     {
         return new ObservableCollection<T>(list);
+    }
+
+    /// <summary>
+    /// Copies the selected values as CSV formatted string to the clipboard
+    /// </summary>
+    /// <typeparam name="T">The type of the entries</typeparam>
+    /// <param name="dataGrid">The desired data grid</param>
+    public static void CopyToClipboard<T>(this DataGrid dataGrid) where T : class
+    {
+        var items = new List<T>();
+
+        foreach (var item in dataGrid.SelectedItems)
+        {
+            if (item is not T entry)
+                continue;
+            
+            items.Add(entry);
+        }
+
+        items.CopyGridToClipboard();
+    }
+
+    /// <summary>
+    /// Copies the selected values as CSV formatted string to the clipboard
+    /// </summary>
+    /// <typeparam name="TEntry">The type of the entries</typeparam>
+    /// <typeparam name="TKey">The type of the sorting key</typeparam>
+    /// <param name="dataGrid">The desired data grid</param>
+    /// <param name="sortFunc">The sorting function</param>
+    public static void CopyToClipboard<TEntry, TKey>(this DataGrid dataGrid, Func<TEntry, TKey> sortFunc) where TEntry : class
+    {
+        var items = new List<TEntry>();
+
+        foreach (var item in dataGrid.SelectedItems)
+        {
+            if (item is not TEntry entry)
+                continue;
+
+            items.Add(entry);
+        }
+        items.OrderBy(sortFunc).ToList().CopyGridToClipboard();
     }
 }

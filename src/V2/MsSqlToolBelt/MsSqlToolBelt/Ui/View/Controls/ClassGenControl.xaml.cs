@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
 using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.Common;
@@ -84,5 +85,25 @@ public partial class ClassGenControl : UserControl, IConnection
     private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
     {
         Helper.OpenLink(e.Uri.ToString());
+    }
+
+    /// <summary>
+    /// Occurs when the user hits the CTRL + C
+    /// </summary>
+    /// <param name="sender">The <see cref="DataGridTables"/></param>
+    /// <param name="e">The event arguments</param>
+    private void DataGridTables_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        DataGridTables.CopyToClipboard<TableDto>();
+    }
+
+    /// <summary>
+    /// Occurs when the user hits the CTRL + C
+    /// </summary>
+    /// <param name="sender">The <see cref="DataGridColumns"/></param>
+    /// <param name="e">The event arguments</param>
+    private void DataGridColumns_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        DataGridColumns.CopyToClipboard<ColumnDto>();
     }
 }

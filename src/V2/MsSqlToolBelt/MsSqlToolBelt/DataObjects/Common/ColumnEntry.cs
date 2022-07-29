@@ -1,4 +1,5 @@
-﻿using ZimLabs.TableCreator;
+﻿using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 
@@ -28,30 +29,35 @@ public class ColumnEntry
     /// Gets or sets the max length (if the value is -1 and the <see cref="DataType"/> is "nvarchar", the value is "MAX")
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int MaxLength { get; set; }
 
     /// <summary>
     /// Gets the max length value (only needed for the table grid)
     /// </summary>
     [Appearance(Name = "MaxLength")]
+    [JsonProperty("MaxLength")]
     public string MaxLengthView => MaxLength == -1 ? "MAX" : MaxLength.ToString();
 
     /// <summary>
     /// Gets or sets the precision
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int Precision { get; set; }
 
     /// <summary>
     /// Gets or sets the scale (this value defines the decimal places or the milliseconds)
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int Scale { get; set; }
 
     /// <summary>
     /// Gets the precision value (<see cref="Precision"/>, <see cref="Scale"/> - only needed for the table grid)
     /// </summary>
     [Appearance(Name = "Precision")]
+    [JsonProperty("Precision")]
     public string PrecisionView => $"{Precision}, {Scale}";
 
     /// <summary>

@@ -9,7 +9,7 @@
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Server"
     Width="400"
-    Height="140"
+    Height="170"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     Loaded="EditServerWindow_OnLoaded"
@@ -21,6 +21,7 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -40,7 +41,7 @@
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Text="{Binding Server}" />
+            Text="{Binding SelectedServer.Name}" />
         <Button
             Grid.Row="0"
             Grid.Column="2"
@@ -58,29 +59,45 @@
             IsEnabled="{Binding ButtonSelectedEnabled}"
             ItemsSource="{Binding DatabaseList}"
             SelectedItem="{Binding SelectedDatabase}" />
-        <Button
-            Grid.Row="1"
-            Grid.Column="2"
-            Click="ButtonSelect_Click"
-            Content="Select"
-            IsEnabled="{Binding ButtonSelectedEnabled}" />
+
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            Content="Auto connect:" />
+        <CheckBox
+            Grid.Row="2"
+            Grid.Column="1"
+            IsChecked="{Binding SelectedServer.AutoConnect}"
+            IsEnabled="{Binding AutoConnectEnabled}" />
 
         <Separator
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="3" />
 
         <Label
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="1"
             HorizontalAlignment="Left"
             Content="{Binding InfoMessage}"
             Foreground="Red" />
 
-        <Button
-            Grid.Row="3"
-            Grid.Column="2"
-            Click="ButtonClose_Click"
-            Content="Close" />
+        <StackPanel
+            Grid.Row="4"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                Width="75"
+                Command="{Binding CloseCommand}"
+                Content="Close" />
+            <Button
+                Width="75"
+                Command="{Binding OkCommand}"
+                Content="Ok" />
+        </StackPanel>
+
+
     </Grid>
 </mah:MetroWindow>

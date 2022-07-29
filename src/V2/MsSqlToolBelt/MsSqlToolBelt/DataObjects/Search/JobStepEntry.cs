@@ -2,6 +2,7 @@
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
+using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;
@@ -35,6 +36,7 @@ internal class JobStepEntry
     /// Gets or sets the success action
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int SuccessActionId { get; set; }
 
     /// <summary>
@@ -51,6 +53,7 @@ internal class JobStepEntry
     /// Gets or sets the id of the fail action
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int FailActionId { get; set; }
 
     /// <summary>
@@ -67,6 +70,7 @@ internal class JobStepEntry
     /// Gets or sets the name of the database on which the job will be executed
     /// </summary>
     [Appearance(Name = "Database")]
+    [JsonProperty("Database")]
     public string RunsOn { get; set; } = string.Empty;
 
     /// <summary>
@@ -78,6 +82,7 @@ internal class JobStepEntry
     /// Gets or sets the id of the last run
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int LastRunId { get; set; }
 
     /// <summary>
@@ -89,6 +94,7 @@ internal class JobStepEntry
     /// Gets or sets the duration of the last run (format is hhmmss)
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int LastRunDuration { get; set; }
 
     /// <summary>
@@ -105,12 +111,14 @@ internal class JobStepEntry
     /// Gets or sets the last run date (format is yymmdd)
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int LastRunDate { get; set; }
 
     /// <summary>
     /// Gets or sets the last run time (format is hhmmss)
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public int LastRunTime { get; set; }
 
     /// <summary>

@@ -103,7 +103,6 @@
                     <ComboBox
                         Grid.Row="0"
                         Grid.Column="1"
-                        IsEditable="True"
                         ItemsSource="{Binding ServerList}"
                         SelectedItem="{Binding SelectedServer}" />
                     <Button
@@ -119,20 +118,24 @@
                     <ComboBox
                         Grid.Row="1"
                         Grid.Column="1"
+                        IsEnabled="{Binding ConnectedToServer}"
                         ItemsSource="{Binding DatabaseList}"
                         SelectedItem="{Binding SelectedDatabase}" />
                     <Button
                         Grid.Row="1"
                         Grid.Column="2"
                         Command="{Binding ConnectDatabaseCommand}"
-                        Content="Select" />
+                        Content="Select"
+                        IsEnabled="{Binding ConnectedToServer}" />
                 </Grid>
             </Border>
 
             <TabControl
                 Grid.Row="1"
+                mah:TabControlHelper.Underlined="SelectedTabItem"
                 IsEnabled="{Binding ConnectionEstablished}"
-                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}">
+                SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
+                Style="{DynamicResource MahApps.Styles.TabControl.Animated}">
                 <TabItem Header="Search">
                     <controls:SearchControl x:Name="SearchControl" />
                 </TabItem>

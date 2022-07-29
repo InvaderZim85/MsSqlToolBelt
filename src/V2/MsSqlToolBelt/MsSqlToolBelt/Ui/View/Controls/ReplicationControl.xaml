@@ -43,10 +43,14 @@
                 <Separator Grid.Row="1" />
 
                 <DataGrid
+                    Name="DataGridTables"
                     Grid.Row="2"
                     IsReadOnly="True"
                     ItemsSource="{Binding Tables}"
                     SelectedItem="{Binding SelectedTable}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridTables_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"
@@ -59,7 +63,9 @@
 
                 <TextBox
                     Grid.Row="4"
+                    mah:TextBoxHelper.SelectAllOnFocus="True"
                     mah:TextBoxHelper.Watermark="Filter..."
+                    Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
@@ -98,9 +104,13 @@
                 <Separator Grid.Row="1" />
 
                 <DataGrid
+                    Name="DataGridColumns"
                     Grid.Row="2"
                     IsReadOnly="True"
                     ItemsSource="{Binding Columns}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridColumns_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="Auto"
@@ -141,9 +151,13 @@
                 <Separator Grid.Row="4" />
 
                 <DataGrid
+                    Name="DataGridIndexes"
                     Grid.Row="5"
                     IsReadOnly="True"
                     ItemsSource="{Binding Indexes}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridIndexes_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"

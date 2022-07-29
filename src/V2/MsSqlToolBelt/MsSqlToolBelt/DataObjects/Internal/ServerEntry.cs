@@ -33,27 +33,16 @@ public class ServerEntry
     public int Order { get; set; }
 
     /// <summary>
-    /// Creates a new empty instance of the <see cref="ServerEntry"/> 
+    /// Gets or sets the value indicating whether to connect to the default database automatically (only used when a default database is set)
     /// </summary>
-    public ServerEntry(){}
+    public bool AutoConnect { get; set; }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="ServerEntry"/> with the name / path of the server
+    /// Gets the name of the server
     /// </summary>
-    /// <param name="name">The name / path of the server</param>
-    public ServerEntry(string name)
+    /// <returns>The name / path of the server</returns>
+    public override string ToString()
     {
-        Name = name;
-    }
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="ServerEntry"/> with the name / path of the server and the default database
-    /// </summary>
-    /// <param name="name">The name / path of the server</param>
-    /// <param name="defaultDatabase">The name of the default database</param>
-    public ServerEntry(string name, string defaultDatabase)
-    {
-        Name = name;
-        DefaultDatabase = defaultDatabase;
+        return Name;
     }
 }

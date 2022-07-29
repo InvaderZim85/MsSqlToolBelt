@@ -1,4 +1,5 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
+using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 using ZimLabs.WpfBase.NetCore;
 
@@ -18,6 +19,7 @@ internal class ObjectDto : ObservableObject
     /// Gets or sets the value which indicates if the object should be exported
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public bool Export
     {
         get => _export;
@@ -38,6 +40,7 @@ internal class ObjectDto : ObservableObject
     /// Gets the original object
     /// </summary>
     [Appearance(Ignore = true)]
+    [JsonIgnore]
     public ObjectEntry OriginalObject { get; init; } = new();
 
     /// <summary>

@@ -47,10 +47,14 @@
                 <Separator Grid.Row="1" />
 
                 <DataGrid
+                    Name="DataGridTables"
                     Grid.Row="2"
                     IsReadOnly="True"
                     ItemsSource="{Binding Tables}"
                     SelectedItem="{Binding SelectedTable}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridTables_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"
@@ -63,7 +67,9 @@
 
                 <TextBox
                     Grid.Row="4"
+                    mah:TextBoxHelper.SelectAllOnFocus="True"
                     mah:TextBoxHelper.Watermark="Filter..."
+                    Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
@@ -103,7 +109,13 @@
 
                 <Separator Grid.Row="1" />
 
-                <DataGrid Grid.Row="2" ItemsSource="{Binding Columns}">
+                <DataGrid
+                    Name="DataGridColumns"
+                    Grid.Row="2"
+                    ItemsSource="{Binding Columns}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridColumns_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Width="Auto" Binding="{Binding Use}" />
                         <DataGridTextColumn

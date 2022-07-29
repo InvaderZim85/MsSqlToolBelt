@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MsSqlToolBelt.DataObjects.Common;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.ClassGen;
 
@@ -17,11 +19,15 @@ public class TableDto
     /// <summary>
     /// Gets or sets the original table
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public TableEntry Table { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the list with the columns
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<ColumnDto> Columns { get; set; } = new();
 
     /// <summary>

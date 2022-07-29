@@ -20,8 +20,10 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!--  Appearance  -->
         <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -55,13 +57,14 @@
                 <Button
                     Grid.Row="1"
                     Grid.Column="2"
-                    Width="90"
+                    Width="60"
                     HorizontalAlignment="Left"
                     Command="{Binding SaveThemeCommand}"
                     Content="Save" />
             </Grid>
         </Border>
 
+        <!--  Server list  -->
         <Border Grid.Row="1" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -83,6 +86,7 @@
                     Style="{StaticResource Headline}" />
 
                 <DataGrid
+                    Name="DataGridServer"
                     Grid.Row="1"
                     Grid.RowSpan="2"
                     Grid.Column="0"
@@ -91,6 +95,9 @@
                     IsReadOnly="True"
                     ItemsSource="{Binding ServerList}"
                     SelectedItem="{Binding SelectedServer}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridServer_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"
@@ -110,13 +117,13 @@
                     FlowDirection="LeftToRight"
                     Orientation="Horizontal">
                     <Button
-                        Width="90"
+                        Width="60"
                         Command="{Binding MoveServerCommand}"
                         CommandParameter="{x:Static enums:MoveDirection.Up}"
                         Content="Up"
                         IsEnabled="{Binding ButtonMoveUpEnabled}" />
                     <Button
-                        Width="90"
+                        Width="60"
                         Command="{Binding MoveServerCommand}"
                         CommandParameter="{x:Static enums:MoveDirection.Down}"
                         Content="Down"
@@ -129,19 +136,24 @@
                     FlowDirection="RightToLeft"
                     Orientation="Horizontal">
                     <Button
-                        Width="90"
+                        Width="60"
                         Command="{Binding DeleteServerCommand}"
-                        Content="Delete server" />
+                        Content="Delete" />
                     <Button
-                        Width="90"
+                        Width="60"
+                        Command="{Binding EditServerCommand}"
+                        Content="Edit" />
+                    <Button
+                        Width="60"
                         Command="{Binding AddServerCommand}"
-                        Content="Add server" />
+                        Content="Add" />
                 </StackPanel>
 
 
             </Grid>
         </Border>
 
+        <!--  Ignore list  -->
         <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -164,6 +176,7 @@
                     Style="{StaticResource Headline}" />
 
                 <DataGrid
+                    Name="DataGridIgnore"
                     Grid.Row="1"
                     Grid.RowSpan="2"
                     Grid.Column="1"
@@ -171,6 +184,9 @@
                     IsReadOnly="True"
                     ItemsSource="{Binding FilterList}"
                     SelectedItem="{Binding SelectedFilter}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridIgnore_OnExecuted" />
+                    </DataGrid.CommandBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="100"
@@ -206,14 +222,69 @@
                     FlowDirection="RightToLeft"
                     Orientation="Horizontal">
                     <Button
-                        Width="90"
+                        Width="60"
                         Command="{Binding DeleteFilterCommand}"
-                        Content="Delete filter" />
+                        Content="Delete" />
                     <Button
-                        Width="90"
+                        Width="60"
                         Command="{Binding SaveFilterCommand}"
-                        Content="Save filter" />
+                        Content="Save" />
                 </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  Various list  -->
+        <Border Grid.Row="3" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Content="Various"
+                    Style="{StaticResource Headline}" />
+
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3" />
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="Copy format:" />
+                <ComboBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    ItemsSource="{Binding ExportTypes}"
+                    SelectedItem="{Binding SelectedExportType}" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Content="The format to be used when copying a grid"
+                    Style="{StaticResource ItemHint}" />
+
+                <Button
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SaveVariousCommand}"
+                    Content="Save" />
             </Grid>
         </Border>
     </Grid>

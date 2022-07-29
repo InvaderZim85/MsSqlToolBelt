@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;
 
@@ -53,5 +55,7 @@ internal class JobEntry
     /// <summary>
     /// Gets or sets the list with the job steps
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<JobStepEntry> JobSteps { get; set; } = new();
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using MsSqlToolBelt.DataObjects.Common;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.TableType;
 
@@ -21,5 +23,7 @@ internal class TableTypeEntry
     /// <summary>
     /// Gets or sets the list with the columns
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<ColumnEntry> Columns { get; set; } = new();
 }

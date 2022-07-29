@@ -135,9 +135,11 @@
             Grid.Column="1"
             FlowDirection="RightToLeft"
             Orientation="Horizontal">
-            <Button Width="120" Content="Close"
-                    Name="ButtonClose"
-                    Click="ButtonClose_OnClick"/>
+            <Button
+                Name="ButtonClose"
+                Width="120"
+                Click="ButtonClose_OnClick"
+                Content="Close" />
             <Button
                 Width="120"
                 Command="{Binding DownloadCommand}"

@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
-using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
@@ -63,19 +60,6 @@ public partial class DefinitionExportControl : UserControl, IConnection
     /// <param name="e">The event arguments</param>
     private void ObjectGrid_OnExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        var items = new List<ObjectDto>();
-
-        foreach (var item in DataGridObject.SelectedItems)
-        {
-            if (item is not ObjectDto entry)
-                continue;
-
-            items.Add(entry);
-        }
-
-        if (!items.Any())
-            return;
-        
-        Clipboard.SetText(items.CreateTable(OutputType.Csv));
+        DataGridObject.CopyToClipboard<ObjectDto>();
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.DataObjects.ClassGen;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 
 namespace MsSqlToolBelt.Ui.View.Windows;
@@ -47,5 +50,15 @@ public partial class DataTypeWindow : MetroWindow
     private void ButtonClose_OnClick(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    /// <summary>
+    /// Occurs when the user hits the CTRL + C
+    /// </summary>
+    /// <param name="sender">The <see cref="DataGridTypes"/></param>
+    /// <param name="e">The event arguments</param>
+    private void DataGridTypes_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        DataGridTypes.CopyToClipboard<ClassGenTypeEntry>();
     }
 }

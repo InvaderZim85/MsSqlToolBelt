@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -145,7 +144,12 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public string Filter
     {
         get => _filter;
-        set => SetField(ref _filter, value);
+        set
+        {
+            SetField(ref _filter, value);
+            if (string.IsNullOrEmpty(value))
+                FilterList();
+        }
     }
 
     #endregion

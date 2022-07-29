@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.VisualBasic.Logging;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -13,73 +7,72 @@ using MsSqlToolBelt.Ui.View.Windows;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Log = Serilog.Log;
 
-namespace MsSqlToolBelt
+namespace MsSqlToolBelt;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// The instance of the main window
     /// </summary>
-    public partial class App : Application
+    private MainWindow? _mainWindow;
+
+    /// <summary>
+    /// The instance of the settings manager
+    /// </summary>
+    private SettingsManager? _settingsManager;
+
+    /// <summary>
+    /// The start up date
+    /// </summary>
+    private DateTime _startUp = DateTime.Now;
+
+    /// <summary>
+    /// Occurs when the application is starting
+    /// </summary>
+    /// <param name="sender">The application</param>
+    /// <param name="e">The event arguments</param>
+    private async void App_OnStartup(object sender, StartupEventArgs e)
     {
-        /// <summary>
-        /// The instance of the main window
-        /// </summary>
-        private MainWindow? _mainWindow;
+        _startUp = DateTime.Now;
+        Helper.InitHelper();
 
-        /// <summary>
-        /// The instance of the settings manager
-        /// </summary>
-        private SettingsManager? _settingsManager;
-
-        /// <summary>
-        /// The start up date
-        /// </summary>
-        private DateTime _startUp = DateTime.Now;
-
-        /// <summary>
-        /// Occurs when the application is starting
-        /// </summary>
-        /// <param name="sender">The application</param>
-        /// <param name="e">The event arguments</param>
-        private async void App_OnStartup(object sender, StartupEventArgs e)
+        try
         {
-            _startUp = DateTime.Now;
-            Helper.InitHelper();
+            _settingsManager ??= new SettingsManager();
 
-            try
-            {
-                _settingsManager ??= new SettingsManager();
+            _mainWindow = new MainWindow(_settingsManager);
+            _mainWindow.Show();
 
-                _mainWindow = new MainWindow(_settingsManager);
-                _mainWindow.Show();
-
-                // Set the color theme
-                Helper.SetColorTheme(await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald"));
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "An fatal error has occurred.");
-                MessageBox.Show("A fatal error has occurred. The program will be closed.", "Error", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            // Set the color theme
+            Helper.SetColorTheme(await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald"));
         }
-
-        /// <summary>
-        /// Occurs when the application is closing
-        /// </summary>
-        /// <param name="sender">The application</param>
-        /// <param name="e">The event arguments</param>
-        private void App_OnExit(object sender, ExitEventArgs e)
+        catch (Exception ex)
         {
-            Mediator.RemoveAllActions();
-
-            if (_mainWindow?.DataContext is MainWindowViewModel viewModel)
-                viewModel.CloseViewModel();
-
-            _mainWindow?.CloseConnection();
-
-            var duration = DateTime.Now - _startUp;
-            Log.Information("Close application after {duration}", duration);
-            Log.CloseAndFlush();
+            Log.Fatal(ex, "An fatal error has occurred.");
+            MessageBox.Show("A fatal error has occurred. The program will be closed.", "Error", MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
+    }
+
+    /// <summary>
+    /// Occurs when the application is closing
+    /// </summary>
+    /// <param name="sender">The application</param>
+    /// <param name="e">The event arguments</param>
+    private void App_OnExit(object sender, ExitEventArgs e)
+    {
+        Mediator.RemoveAllActions();
+
+        if (_mainWindow?.DataContext is MainWindowViewModel viewModel)
+            viewModel.CloseViewModel();
+
+        _mainWindow?.CloseConnection();
+
+        var duration = DateTime.Now - _startUp;
+        Log.Information("Close application after {duration}", duration);
+        Log.CloseAndFlush();
     }
 }

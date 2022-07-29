@@ -95,10 +95,14 @@
                 Content="This tool uses the following NuGet packages" />
 
             <DataGrid
+                Name="DataGridPackages"
                 Grid.Row="6"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 ItemsSource="{Binding PackageList}">
+                <DataGrid.CommandBindings>
+                    <CommandBinding Command="Copy" Executed="DataGridPackages_OnExecuted" />
+                </DataGrid.CommandBindings>
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="2*"

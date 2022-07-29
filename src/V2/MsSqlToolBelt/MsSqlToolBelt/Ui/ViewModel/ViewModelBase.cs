@@ -158,19 +158,6 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
-    /// Shows a input dialog
-    /// </summary>
-    /// <param name="title">The title of the dialog</param>
-    /// <param name="message">The message of the dialog</param>
-    /// <returns>The result of the input</returns>
-    protected async Task<string> ShowInputAsync(string title, string message)
-    {
-        var result = await _dialogCoordinator.ShowInputAsync(this, title, message);
-
-        return result;
-    }
-
-    /// <summary>
     /// Shows an info message for 10 seconds
     /// </summary>
     /// <param name="message">The message which should be shown</param>

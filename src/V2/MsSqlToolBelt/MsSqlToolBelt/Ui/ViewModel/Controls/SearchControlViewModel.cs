@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
-using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -167,6 +166,20 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
             if (SetField(ref _addWildcardAutomatically, value))
                 SaveWildcardValue();
         }
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="HeaderResult"/>
+    /// </summary>
+    private string _headerResult = "Result";
+
+    /// <summary>
+    /// Gets or sets the header of the result
+    /// </summary>
+    public string HeaderResult
+    {
+        get => _headerResult;
+        set => SetField(ref _headerResult, value);
     }
 
     #endregion
@@ -406,7 +419,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (string.IsNullOrEmpty(SearchString))
             return;
 
-        if (AddWildcardAutomatically && !SearchString.Contains('*'))
+        if (AddWildcardAutomatically && !SearchString.Contains('*') && !SearchString.Contains('%'))
             SearchString = $"*{SearchString}*";
 
         await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
@@ -444,6 +457,15 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
             : _manager!.SearchResults.Where(w => w.Type.Equals(SelectedObjectType)).ToList();
 
         SearchResults = result.OrderBy(o => o.Type).ThenBy(t => t.Name).ToObservableCollection();
+
+        // Create the header result
+        var info = result.GroupBy(g => g.Type).Select(s => new
+        {
+            Type = s.Key,
+            Count = s.Count()
+        }).Select(s => $"{s.Type}: {s.Count}");
+
+        HeaderResult = $"Result - Total: {result.Count} // {string.Join(" // ", info)}";
     }
 
     /// <summary>

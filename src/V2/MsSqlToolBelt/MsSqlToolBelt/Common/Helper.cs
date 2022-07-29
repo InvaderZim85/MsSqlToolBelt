@@ -187,28 +187,6 @@ internal static class Helper
 
     #region Taskbar
     /// <summary>
-    /// Sets the taskbar progress
-    /// </summary>
-    /// <param name="max">The max value</param>
-    /// <param name="current">The current value</param>
-    public static void SetTaskbarProgress(int max, int current)
-    {
-        if (!TaskbarManager.IsPlatformSupported)
-            return;
-
-        var instance = TaskbarManager.Instance;
-
-        if (current > max)
-        {
-            instance.SetProgressState(TaskbarProgressBarState.NoProgress);
-            return;
-        }
-
-        instance.SetProgressState(TaskbarProgressBarState.Normal);
-        instance.SetProgressValue(current, max);
-    }
-
-    /// <summary>
     /// Sets the taskbar into an indeterminate state
     /// </summary>
     /// <param name="enable"><see langword="true"/> to set the indeterminate state, otherwise <see langword="false"/></param>
@@ -242,7 +220,23 @@ internal static class Helper
     /// <param name="state">The desired state</param>
     private static void SetTaskbarState(bool enabled, TaskbarProgressBarState state)
     {
-        _taskbarInstance?.SetProgressState(enabled ? state : TaskbarProgressBarState.NoProgress);
+        try
+        {
+            _taskbarInstance?.SetProgressState(enabled ? state : TaskbarProgressBarState.NoProgress);
+            switch (enabled)
+            {
+                case true when state != TaskbarProgressBarState.Indeterminate:
+                    _taskbarInstance?.SetProgressValue(100, 100);
+                    break;
+                case false:
+                    _taskbarInstance?.SetProgressValue(0, 0);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Can't change taskbar state");
+        }
     }
     #endregion
 

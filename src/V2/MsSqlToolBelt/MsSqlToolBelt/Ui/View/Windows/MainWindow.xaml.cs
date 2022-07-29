@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.Ui.View.Controls;
+using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
 
@@ -75,6 +77,29 @@ public partial class MainWindow : MetroWindow
     }
 
     /// <summary>
+    /// Loads the data of the selected tab
+    /// </summary>
+    /// <param name="tabIndex">The tab index</param>
+    private void LoadData(int tabIndex)
+    {
+        switch (tabIndex)
+        {
+            case 1: // Table types
+                TableTypesControl.LoadData();
+                break;
+            case 2: // Replication control
+                ReplicationControl.LoadData();
+                break;
+            case 3: // Class generator
+                ClassGenControl.LoadData();
+                break;
+            case 4: // Definition export
+                DefinitionExportControl.LoadData();
+                break;
+        }
+    }
+
+    /// <summary>
     /// Occurs when the fly out was closed
     /// </summary>
     /// <param name="sender">The settings fly out</param>
@@ -100,33 +125,13 @@ public partial class MainWindow : MetroWindow
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (DataContext is MainWindowViewModel viewModel)
+        {
             viewModel.InitViewModel(_settingsManager, InitFlyOut, SetConnection, LoadData);
+            viewModel.LoadData();
+        }
 
         // Init the other controls
         SearchControl.InitControl(_settingsManager);
         ClassGenControl.InitControl();
-    }
-
-    /// <summary>
-    /// Loads the data of the selected tab
-    /// </summary>
-    /// <param name="tabIndex">The tab index</param>
-    private void LoadData(int tabIndex)
-    {
-        switch (tabIndex)
-        {
-            case 1: // Table types
-                TableTypesControl.LoadData();
-                break;
-            case 2: // Replication control
-                ReplicationControl.LoadData();
-                break;
-            case 3: // Class generator
-                ClassGenControl.LoadData();
-                break;
-            case 4: // Definition export
-                DefinitionExportControl.LoadData();
-                break;
-        }
     }
 }

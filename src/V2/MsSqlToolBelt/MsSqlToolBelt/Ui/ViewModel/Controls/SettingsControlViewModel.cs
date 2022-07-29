@@ -41,7 +41,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<string> ColorThemeList
     {
         get => _colorThemeList;
-        set => SetField(ref _colorThemeList, value);
+        private set => SetField(ref _colorThemeList, value);
     }
 
     /// <summary>
@@ -98,12 +98,7 @@ internal class SettingsControlViewModel : ViewModelBase
             if (value == null)
                 return;
 
-            var maxOrder = ServerList.Max(m => m.Order);
-            if (value.Order >= 1 && value.Order < maxOrder)
-                ButtonMoveDownEnabled = true;
-
-            if (value.Order > 1 && value.Order <= maxOrder)
-                ButtonMoveUpEnabled = true;
+            SetMovementButtons(value);
         }
     }
 
@@ -209,6 +204,37 @@ internal class SettingsControlViewModel : ViewModelBase
     }
     #endregion
 
+    #region Various
+
+    /// <summary>
+    /// Backing field for <see cref="ExportTypes"/>
+    /// </summary>
+    private ObservableCollection<IdTextEntry> _exportTypes = new();
+
+    /// <summary>
+    /// Gets or sets the list with the export types
+    /// </summary>
+    public ObservableCollection<IdTextEntry> ExportTypes
+    {
+        get => _exportTypes;
+        set => SetField(ref _exportTypes, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="SelectedExportType"/>
+    /// </summary>
+    private IdTextEntry? _selectedExportType;
+
+    /// <summary>
+    /// Gets or sets the selected export type
+    /// </summary>
+    public IdTextEntry? SelectedExportType
+    {
+        get => _selectedExportType;
+        set => SetField(ref _selectedExportType, value);
+    }
+    #endregion
+
     #endregion
 
     #region Commands
@@ -221,6 +247,11 @@ internal class SettingsControlViewModel : ViewModelBase
     /// The command to add a new server
     /// </summary>
     public ICommand AddServerCommand => new DelegateCommand(AddServer);
+
+    /// <summary>
+    /// The command to edit the selected server
+    /// </summary>
+    public ICommand EditServerCommand => new DelegateCommand(EditServer);
 
     /// <summary>
     /// The command to delete the selected server
@@ -241,9 +272,13 @@ internal class SettingsControlViewModel : ViewModelBase
     /// The command to delete the selected filter
     /// </summary>
     public ICommand DeleteFilterCommand => new DelegateCommand(DeleteFilter);
+
+    /// <summary>
+    /// The command to save the various settings
+    /// </summary>
+    public ICommand SaveVariousCommand => new DelegateCommand(SaveVariousSettings);
     #endregion
-
-
+    
     /// <summary>
     /// Init the view model
     /// </summary>
@@ -272,6 +307,12 @@ internal class SettingsControlViewModel : ViewModelBase
 
             // Load the filters
             await LoadFilterAsync();
+
+            // Set the various data
+            var exportList = Helper.CreateExportTypeList(ExportDataType.List);
+            ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
+            var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, 1); // 1 = CSV
+            SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
         }
         catch (Exception ex)
         {
@@ -337,7 +378,7 @@ internal class SettingsControlViewModel : ViewModelBase
             return;
 
 
-        var existingServer = ServerList.FirstOrDefault(f => f.Name.Equals(dialog.SelectedServer, StringComparison.OrdinalIgnoreCase));
+        var existingServer = ServerList.FirstOrDefault(f => f.Name.Equals(dialog.SelectedServer.Name, StringComparison.OrdinalIgnoreCase));
         if (existingServer != null)
         {
             SelectedServer = existingServer;
@@ -347,10 +388,38 @@ internal class SettingsControlViewModel : ViewModelBase
         // Add the new server
         try
         {
-            var newServer = new ServerEntry(dialog.SelectedServer, dialog.SelectedDatabase);
-            await _manager.AddServerAsync(newServer);
+            await _manager.AddServerAsync(dialog.SelectedServer);
 
-            SetServerList(newServer);
+            SetServerList(dialog.SelectedServer);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+    }
+
+    /// <summary>
+    /// Edits the selected server
+    /// </summary>
+    private async void EditServer()
+    {
+        if (SelectedServer == null)
+            return;
+
+        var dialog = new EditServerWindow
+        {
+            SelectedServer = SelectedServer,
+            Owner = Application.Current.MainWindow
+        };
+        if (dialog.ShowDialog() == false)
+            return;
+
+        // Update the server
+        try
+        {
+            await _manager.UpdateServerAsync(SelectedServer);
+
+            SetServerList(SelectedServer);
         }
         catch (Exception ex)
         {
@@ -397,12 +466,31 @@ internal class SettingsControlViewModel : ViewModelBase
         {
             await _manager.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
-            ServerList = ServerList.OrderBy(o => o.Order).ToObservableCollection();
+            ServerList = ServerList.OrderBy(o => o.Id).ToObservableCollection();
+
+            SetMovementButtons(SelectedServer);
         }
         catch (Exception ex)
         {
             await ShowErrorAsync(ex);
         }
+    }
+
+    /// <summary>
+    /// Sets the movement buttons
+    /// </summary>
+    /// <param name="server">The selected server</param>
+    private void SetMovementButtons(ServerEntry server)
+    {
+        ButtonMoveDownEnabled = false;
+        ButtonMoveUpEnabled = false;
+
+        var maxOrder = ServerList.Max(m => m.Order);
+        if (server.Order >= 1 && server.Order < maxOrder)
+            ButtonMoveDownEnabled = true;
+
+        if (server.Order > 1 && server.Order <= maxOrder)
+            ButtonMoveUpEnabled = true;
     }
     #endregion
 
@@ -481,6 +569,27 @@ internal class SettingsControlViewModel : ViewModelBase
             await _manager.DeleteFilterAsync(SelectedFilter);
 
             SetFilterList();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+    }
+    #endregion
+
+    #region Various
+
+    /// <summary>
+    /// Saves the various settings
+    /// </summary>
+    private async void SaveVariousSettings()
+    {
+        if (SelectedExportType == null)
+            return;
+
+        try
+        {
+            await _manager.SaveSettingsValueAsync(SettingsKey.CopyToClipboardFormat, SelectedExportType.Id);
         }
         catch (Exception ex)
         {

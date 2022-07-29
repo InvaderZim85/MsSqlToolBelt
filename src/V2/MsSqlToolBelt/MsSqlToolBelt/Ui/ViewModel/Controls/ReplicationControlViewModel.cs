@@ -109,7 +109,12 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string Filter
     {
         get => _filter;
-        set => SetField(ref _filter, value);
+        set
+        {
+            SetField(ref _filter, value);
+            if (string.IsNullOrEmpty(value))
+                FilterList();
+        }
     }
 
     /// <summary>
@@ -172,7 +177,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to filter the table types
     /// </summary>
-    public ICommand FilterCommand => new DelegateCommand(FilterResult);
+    public ICommand FilterCommand => new DelegateCommand(FilterList);
 
     /// <summary>
     /// The command to reload the table types
@@ -220,7 +225,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
 
             _dataLoaded = true;
 
-            FilterResult();
+            FilterList();
         }
         catch (Exception ex)
         {
@@ -235,7 +240,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Filters the result
     /// </summary>
-    private void FilterResult()
+    private void FilterList()
     {
         if (_manager == null)
             return;

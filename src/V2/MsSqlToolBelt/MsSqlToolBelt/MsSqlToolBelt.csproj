@@ -6,8 +6,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>22.93.4.987</AssemblyVersion>
-    <FileVersion>22.93.4.987</FileVersion>
+    <AssemblyVersion>22.204.2.680</AssemblyVersion>
+    <FileVersion>22.204.2.680</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
@@ -36,6 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Packages.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\ClassDefault.cgt">
@@ -70,9 +73,6 @@
     </None>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;    powershell.exe $(SolutionDir)ChangeVersion.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj&#xD;&#xA;)" />
-  </Target>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="powershell.exe $(SolutionDir)ExtractPackages.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj -outputFile $(TargetDir)Packages.csv" />
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;    powershell.exe $(SolutionDir)ChangeVersion.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;powershell.exe $(SolutionDir)ExtractPackages.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj -outputFile $(ProjectDir)Packages.csv" />
   </Target>
 </Project>

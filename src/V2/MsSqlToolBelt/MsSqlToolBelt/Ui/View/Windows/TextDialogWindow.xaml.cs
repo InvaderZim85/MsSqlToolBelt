@@ -2,7 +2,6 @@
 using System.Windows;
 using ICSharpCode.AvalonEdit.Search;
 using MahApps.Metro.Controls;
-using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;

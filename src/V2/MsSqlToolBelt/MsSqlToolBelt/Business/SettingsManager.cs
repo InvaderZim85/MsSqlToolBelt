@@ -136,16 +136,6 @@ public class SettingsManager
     }
 
     /// <summary>
-    /// Adds a new server
-    /// </summary>
-    /// <param name="server">The name of the server</param>
-    /// <returns>The awaitable task</returns>
-    public async Task AddServerAsync(string server)
-    {
-        await AddServerAsync(new ServerEntry(server));
-    }
-
-    /// <summary>
     /// Updates the specified server
     /// </summary>
     /// <param name="server">The server which should be updated</param>
