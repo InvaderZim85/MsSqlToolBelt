@@ -38,11 +38,16 @@ public class ServerEntry
     public bool AutoConnect { get; set; }
 
     /// <summary>
+    /// Gets or sets the description of the server (optional)
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets the name of the server
     /// </summary>
     /// <returns>The name / path of the server</returns>
     public override string ToString()
     {
-        return Name;
+        return string.IsNullOrEmpty(Description) ? Name : $"{Name} ({Description})";
     }
 }

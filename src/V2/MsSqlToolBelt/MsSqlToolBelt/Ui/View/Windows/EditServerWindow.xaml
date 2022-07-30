@@ -9,7 +9,7 @@
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Server"
     Width="400"
-    Height="170"
+    Height="200"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     Loaded="EditServerWindow_OnLoaded"
@@ -21,6 +21,7 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -41,7 +42,11 @@
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Text="{Binding SelectedServer.Name}" />
+            Text="{Binding SelectedServer.Name, UpdateSourceTrigger=PropertyChanged}">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding ConnectCommand}" />
+            </TextBox.InputBindings>
+        </TextBox>
         <Button
             Grid.Row="0"
             Grid.Column="2"
@@ -70,20 +75,30 @@
             IsChecked="{Binding SelectedServer.AutoConnect}"
             IsEnabled="{Binding AutoConnectEnabled}" />
 
-        <Separator
+        <Label
             Grid.Row="3"
+            Grid.Column="0"
+            Content="Name:" />
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="1"
+            mah:TextBoxHelper.Watermark="e.g. Production (optional)"
+            Text="{Binding SelectedServer.Description}" />
+
+        <Separator
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="3" />
 
         <Label
-            Grid.Row="4"
+            Grid.Row="5"
             Grid.Column="1"
             HorizontalAlignment="Left"
             Content="{Binding InfoMessage}"
             Foreground="Red" />
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="5"
             Grid.Column="1"
             Grid.ColumnSpan="2"
             FlowDirection="RightToLeft"

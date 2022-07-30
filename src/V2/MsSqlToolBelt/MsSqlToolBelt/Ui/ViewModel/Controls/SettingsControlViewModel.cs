@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// The instance for the interaction with the settings
     /// </summary>
-    private readonly SettingsManager _manager = new();
+    private SettingsManager? _manager;
 
     #region View properties
 
@@ -217,7 +218,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<IdTextEntry> ExportTypes
     {
         get => _exportTypes;
-        set => SetField(ref _exportTypes, value);
+        private set => SetField(ref _exportTypes, value);
     }
 
     /// <summary>
@@ -232,6 +233,20 @@ internal class SettingsControlViewModel : ViewModelBase
     {
         get => _selectedExportType;
         set => SetField(ref _selectedExportType, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="SearchHistoryCount"/>
+    /// </summary>
+    private int _searchHistoryCount = 10;
+
+    /// <summary>
+    /// Gets or sets the search history count
+    /// </summary>
+    public int SearchHistoryCount
+    {
+        get => _searchHistoryCount;
+        set => SetField(ref _searchHistoryCount, value);
     }
     #endregion
 
@@ -266,7 +281,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// The command to add a new filter
     /// </summary>
-    public ICommand SaveFilterCommand => new DelegateCommand(SaveFilter);
+    public ICommand AddFilterCommand => new DelegateCommand(AddFilter);
 
     /// <summary>
     /// The command to delete the selected filter
@@ -282,8 +297,11 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Init the view model
     /// </summary>
-    public void InitViewModel()
+    /// <param name="settingsManager">The instance for the interaction with the settings</param>
+    public void InitViewModel(SettingsManager settingsManager)
     {
+        _manager = settingsManager;
+
         LoadSettings();
     }
 
@@ -299,7 +317,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
             // Load the colors
             ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
-            var themeName = await _manager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald");
+            var themeName = await _manager!.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald");
             SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
             // Load the server
@@ -313,6 +331,8 @@ internal class SettingsControlViewModel : ViewModelBase
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
             var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, 1); // 1 = CSV
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
+
+            SearchHistoryCount = await _manager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, 10);
         }
         catch (Exception ex)
         {
@@ -523,7 +543,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Saves the current filter
     /// </summary>
-    private async void SaveFilter()
+    private async void AddFilter()
     {
         if (SelectedFilterType == null || string.IsNullOrEmpty(FilterValue))
             return;
@@ -589,7 +609,13 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.SaveSettingsValueAsync(SettingsKey.CopyToClipboardFormat, SelectedExportType.Id);
+            var saveList = new SortedList<SettingsKey, object>
+            {
+                {SettingsKey.CopyToClipboardFormat, SelectedExportType.Id},
+                {SettingsKey.SearchHistoryEntryCount, SearchHistoryCount}
+            };
+
+            await _manager.SaveSettingsValuesAsync(saveList);
         }
         catch (Exception ex)
         {

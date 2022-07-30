@@ -162,7 +162,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ShowInfo"/>
     /// </summary>
-    private bool _showInfo;
+    private bool _showInfo = true;
 
     /// <summary>
     /// Gets or sets the value which indicates if the info panel should be shown
@@ -171,6 +171,20 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     {
         get => _showInfo;
         set => SetField(ref _showInfo, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ControlEnabled"/>
+    /// </summary>
+    private bool _controlEnabled;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the control is enabled
+    /// </summary>
+    public bool ControlEnabled
+    {
+        get => _controlEnabled;
+        set => SetField(ref _controlEnabled, value);
     }
     #endregion
 
@@ -201,6 +215,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         _manager = new ReplicationManager(dataSource, database);
 
         ShowInfo = false;
+        ControlEnabled = true;
     }
 
     /// <inheritdoc />
@@ -258,6 +273,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
 
         // Show the info if there are no tables available
         ShowInfo = Tables.Count == 0;
+        ControlEnabled = Tables.Any();
     }
 
     /// <summary>

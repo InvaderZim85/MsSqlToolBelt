@@ -14,6 +14,7 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using Serilog;
 using ZimLabs.CoreLib;
+using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
 
@@ -60,7 +61,7 @@ internal static class Helper
     }
 
     /// <summary>
-    /// Creates a list of the filter type enum
+    /// Creates a list of the <see cref="FilterType"/> enum
     /// </summary>
     /// <returns>The list with the entries</returns>
     public static List<IdTextEntry> CreateFilterTypeList()
@@ -111,6 +112,20 @@ internal static class Helper
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Creates a list of the <see cref="TableDtoType"/> enum
+    /// </summary>
+    /// <returns>The list with the entries</returns>
+    public static List<IdTextEntry> CreateTableDtoTypeList()
+    {
+        return (from entry in Enum.GetValues<TableDtoType>()
+            select new IdTextEntry
+            {
+                Id = (int) entry,
+                Text = entry.GetAttribute<DescriptionAttribute>()?.Description ?? entry.ToString()
+            }).ToList();
     }
 
     /// <summary>
@@ -282,6 +297,18 @@ internal static class Helper
             var size when size >= Math.Pow(divider, 4) => $"{size / Math.Pow(divider, 4)} TB",
             _ => value.ToString("N0")
         };
+    }
+
+    /// <summary>
+    /// Creates a clone of the desired entry
+    /// </summary>
+    /// <typeparam name="T">The type of the entry</typeparam>
+    /// <param name="entry">The entry which should be cloned</param>
+    /// <returns>The cloned entry</returns>
+    public static T Clone<T>(this T entry) where T : class, new()
+    {
+        var result = Activator.CreateInstance<T>();
+        return Mapper.CreateAndMap<T, T>(entry);
     }
     #endregion
 }

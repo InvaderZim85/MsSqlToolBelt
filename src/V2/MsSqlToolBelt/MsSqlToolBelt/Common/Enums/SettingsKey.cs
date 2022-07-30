@@ -18,5 +18,10 @@ public enum SettingsKey
     /// <summary>
     /// The format of the clipboard
     /// </summary>
-    CopyToClipboardFormat
+    CopyToClipboardFormat,
+
+    /// <summary>
+    /// The count of history entries
+    /// </summary>
+    SearchHistoryEntryCount
 }

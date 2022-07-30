@@ -61,6 +61,16 @@ internal class TableTypeManager : IDisposable
     }
 
     /// <summary>
+    /// Enriches the selected table
+    /// </summary>
+    /// <param name="tableType">The table which should be enriched</param>
+    /// <returns>The awaitable task</returns>
+    public async Task EnrichTableTypeAsync(TableTypeEntry tableType)
+    {
+        await _repo.EnrichTableTypeAsync(tableType);
+    }
+
+    /// <summary>
     /// Releases all resources used by the <see cref="TableTypeManager"/>
     /// </summary>
     public void Dispose()

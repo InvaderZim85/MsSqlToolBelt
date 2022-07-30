@@ -9,6 +9,7 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
 using ZimLabs.CoreLib;
 
@@ -35,9 +36,19 @@ public class ClassGenManager : IDisposable
     private readonly TableManager _tableManager;
 
     /// <summary>
+    /// The instance for the interaction with the table types
+    /// </summary>
+    private readonly TableTypeManager _tableTypeManager;
+
+    /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
     private readonly ClassGenRepo _repo;
+
+    /// <summary>
+    /// The instance for the interaction with the settings
+    /// </summary>
+    private readonly SettingsManager _settingsManager;
 
     /// <summary>
     /// The list with the conversion types
@@ -50,9 +61,9 @@ public class ClassGenManager : IDisposable
     private readonly SortedList<ClassGenTemplateType, string> _templates = new();
 
     /// <summary>
-    /// Gets or sets the list with the tables
+    /// Gets the list with the tables
     /// </summary>
-    public List<TableDto> Tables { get; set; } = new();
+    public List<TableDto> Tables { get; private set; } = new();
 
     /// <summary>
     /// Gets or sets the selected table
@@ -62,12 +73,15 @@ public class ClassGenManager : IDisposable
     /// <summary>
     /// Creates a new instance of the <see cref="ClassGenManager"/>
     /// </summary>
+    /// <param name="settingsManager">The instance of the settings manager</param>
     /// <param name="dataSource">The name / path of the MSSQL server</param>
     /// <param name="database">The name of the database</param>
-    public ClassGenManager(string dataSource, string database)
+    public ClassGenManager(SettingsManager settingsManager, string dataSource, string database)
     {
         _tableManager = new TableManager(dataSource, database);
+        _tableTypeManager = new TableTypeManager(dataSource, database);
         _repo = new ClassGenRepo(dataSource, database);
+        _settingsManager = settingsManager;
     }
 
     #region Loading
@@ -77,8 +91,19 @@ public class ClassGenManager : IDisposable
     /// <returns>The awaitable task</returns>
     public async Task LoadTablesAsync()
     {
+        // Load the table and the table types
         var tables = await _tableManager.LoadTablesAsync();
-        Tables = tables.Select(s => (TableDto) s).ToList();
+        await _tableTypeManager.LoadTableTypesAsync();
+        
+        // Combine the lists
+        var tmpTables = tables.Select(s => (TableDto) s).ToList();
+        tmpTables.AddRange(_tableTypeManager.TableTypes.Select(s => (TableDto)s));
+
+        // Load the filter and check the entry
+        await _settingsManager.LoadFilterAsync();
+        Tables = _settingsManager.FilterList.Any()
+            ? tmpTables.Where(w => w.Name.IsValid(_settingsManager.FilterList)).ToList()
+            : tmpTables;
     }
 
     /// <summary>
@@ -90,18 +115,38 @@ public class ClassGenManager : IDisposable
         if (SelectedTable == null)
             return;
 
-        await _tableManager.EnrichTableAsync(SelectedTable.Table);
+        switch (SelectedTable.Table)
+        {
+            case TableEntry table:
+                await _tableManager.EnrichTableAsync(table);
+                break;
+            case TableTypeEntry tableType:
+                await _tableTypeManager.EnrichTableTypeAsync(tableType);
+                break;
+        }
 
         SelectedTable.SetColumns();
 
-        // Clean the names of the column
-        foreach (var column in from column in SelectedTable.Columns
-                 let cleanName = CleanName(column.Name)
-                 where !column.Name.EqualsIgnoreCase(cleanName)
-                 select column)
+        // Ignore the alias if we work with a table type but set the use flag
+        if (SelectedTable.Type == TableDtoType.TableType)
         {
-            column.Alias = CleanName(column.Name);
+            foreach (var column in SelectedTable.Columns)
+            {
+                column.Use = true;
+            }
         }
+        else
+        {
+            // Clean the names of the column
+            foreach (var column in from column in SelectedTable.Columns
+                     let cleanName = CleanName(column.Name)
+                     where !column.Name.EqualsIgnoreCase(cleanName)
+                     select column)
+            {
+                column.Alias = CleanName(column.Name);
+            }
+        }
+        
     }
 
     /// <summary>
@@ -162,6 +207,10 @@ public class ClassGenManager : IDisposable
             // Class code
             ClassCode = GenerateClass(options, table, infoText)
         };
+
+        // Check if the table is a table type, if so, 
+        if (table.Type == TableDtoType.TableType)
+            return result;
 
         // Ef key code
         if (options.DbModel)
@@ -253,9 +302,9 @@ public class ClassGenManager : IDisposable
         classTemplate = classTemplate.Replace("$NAME$", options.ClassName);
 
         if (options.DbModel && !table.Name.Equals(options.ClassName))
-            classTemplate = string.IsNullOrEmpty(table.Table.Schema)
+            classTemplate = string.IsNullOrEmpty(table.Schema)
                 ? $"[Table(\"{table.Name}\")]{Environment.NewLine}{classTemplate}"
-                : $"[Table(\"{table.Name}\", Schema = \"{table.Table.Schema}\")]{Environment.NewLine}{classTemplate}";
+                : $"[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]{Environment.NewLine}{classTemplate}";
 
         return string.IsNullOrEmpty(infoText)
             ? classTemplate
@@ -351,7 +400,7 @@ public class ClassGenManager : IDisposable
         if (!keyColumns.Any())
             return (string.Empty, string.Empty);
 
-        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => s.PropertyName))} }}";
+        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }}";
         var completeCode = template.Replace("$ENTRIES$", shortCode);
 
         return (completeCode, shortCode);
@@ -381,7 +430,7 @@ public class ClassGenManager : IDisposable
                 : $"{Tab}[{column.Name}] AS [{column.Alias}]{comma}");
         }
 
-        sb.AppendLine("FROM").AppendLine($"{Tab}[{SelectedTable!.Table.Schema}].[{SelectedTable.Name}]");
+        sb.AppendLine("FROM").AppendLine($"{Tab}[{SelectedTable!.Schema}].[{SelectedTable.Name}]");
 
         return sb.ToString();
     }

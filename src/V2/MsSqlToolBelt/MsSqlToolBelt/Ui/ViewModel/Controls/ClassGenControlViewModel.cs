@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
@@ -27,6 +29,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     private ClassGenManager? _manager;
 
     /// <summary>
+    /// The instance for the interaction with the settings
+    /// </summary>
+    private SettingsManager? _settingsManager;
+
+    /// <summary>
     /// Contains the value which indicates if the data already loaded
     /// </summary>
     private bool _dataLoaded;
@@ -35,6 +42,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The action to set the SQL text
     /// </summary>
     private Action<ClassGenResult>? _setCode;
+
+    /// <summary>
+    /// The action to set the visibility of a column (true = visible, false = hidden)
+    /// </summary>
+    private Action<bool>? _setColumnVisibility;
 
     /// <summary>
     /// Contains the result of the class generator
@@ -84,6 +96,12 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
                 SetColumns();
             else
                 EnrichData();
+
+            TableOptionEnabled = value is {Type: TableDtoType.Table};
+            if (!TableOptionEnabled)
+                OptionDbModel = false;
+
+            _setColumnVisibility?.Invoke(TableOptionEnabled);
         }
     }
 
@@ -116,6 +134,38 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         {
             SetField(ref _filter, value);
             if (string.IsNullOrEmpty(value))
+                FilterList();
+        }
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="TypeList"/>
+    /// </summary>
+    private ObservableCollection<IdTextEntry> _typeList = new();
+
+    /// <summary>
+    /// Gets or sets the list with the types
+    /// </summary>
+    public ObservableCollection<IdTextEntry> TypeList
+    {
+        get => _typeList;
+        private set => SetField(ref _typeList, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="SelectedType"/>
+    /// </summary>
+    private IdTextEntry? _selectedType;
+
+    /// <summary>
+    /// Gets or sets the selected type
+    /// </summary>
+    public IdTextEntry? SelectedType
+    {
+        get => _selectedType;
+        set
+        {
+            if (SetField(ref _selectedType, value) && value != null)
                 FilterList();
         }
     }
@@ -281,6 +331,20 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _buttonEfKeyCodeEnabled;
         set => SetField(ref _buttonEfKeyCodeEnabled, value);
     }
+
+    /// <summary>
+    /// Backing field for <see cref="TableOptionEnabled"/>
+    /// </summary>
+    private bool _tableOptionEnabled;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the table option is enabled or not
+    /// </summary>
+    public bool TableOptionEnabled
+    {
+        get => _tableOptionEnabled;
+        set => SetField(ref _tableOptionEnabled, value);
+    }
     #endregion
 
     #endregion
@@ -370,10 +434,27 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Init the view model
     /// </summary>
+    /// <param name="settingsManager">The instance for the interaction with the settings</param>
     /// <param name="setSqlText">The action to set the sql text</param>
-    public void InitViewModel(Action<ClassGenResult> setSqlText)
+    /// <param name="setColumnVisibility">The action to set the visibility of a column</param>
+    public void InitViewModel(SettingsManager settingsManager, Action<ClassGenResult> setSqlText, Action<bool> setColumnVisibility)
     {
+        _settingsManager = settingsManager;
         _setCode = setSqlText;
+        _setColumnVisibility = setColumnVisibility;
+
+        var tmpList = new List<IdTextEntry>
+        {
+            new()
+            {
+                Id = 0,
+                Text = "All"
+            }
+        };
+
+        tmpList.AddRange(Helper.CreateTableDtoTypeList());
+        TypeList = tmpList.ToObservableCollection();
+        SelectedType = TypeList.FirstOrDefault(f => f.Id == 0);
     }
 
     /// <inheritdoc />
@@ -387,7 +468,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         _manager?.Dispose();
         _dataLoaded = false;
 
-        _manager = new ClassGenManager(dataSource, database);
+        _manager = new ClassGenManager(_settingsManager!, dataSource, database);
     }
 
     /// <inheritdoc />
@@ -465,8 +546,14 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
             ? _manager.Tables
             : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
 
+        if (SelectedType != null && SelectedType.Id != 0)
+        {
+            result = result.Where(w => (int) w.Type == SelectedType.Id).ToList();
+        }
+
         Tables = result.ToObservableCollection();
-        HeaderList = Tables.Count > 1 ? $"{Tables.Count} tables" : "1 table";
+
+        HeaderList = Tables.Count > 1 ? $"{Tables.Count} entries" : "1 entry";
     }
 
     /// <summary>
@@ -483,6 +570,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     }
     #endregion
 
+    #region Class gen
     /// <summary>
     /// Clears the aliases and removes the selection
     /// </summary>
@@ -600,7 +688,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         if (string.IsNullOrEmpty(dialog.Code))
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while generating the class...");
+        await ShowProgressAsync("Generating", "Please wait while generating the class...");
 
         try
         {
@@ -624,7 +712,9 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
             await CloseProgressAsync();
         }
     }
+    #endregion
 
+    #region Various
     /// <summary>
     /// Clears the code
     /// </summary>
@@ -674,11 +764,20 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         // Reset the options
         SelectedModifier = ModifierList.FirstOrDefault() ?? "public";
         ClassName = string.Empty;
+        ButtonEfKeyCodeEnabled = false;
+        ResetOptions();
+    }
+
+    /// <summary>
+    /// Resets the options
+    /// </summary>
+    private void ResetOptions()
+    {
         OptionSealedClass = false;
         OptionBackingField = false;
         OptionDbModel = false;
         OptionNullable = false;
         OptionSummary = false;
-        ButtonEfKeyCodeEnabled = false;
     }
+    #endregion
 }

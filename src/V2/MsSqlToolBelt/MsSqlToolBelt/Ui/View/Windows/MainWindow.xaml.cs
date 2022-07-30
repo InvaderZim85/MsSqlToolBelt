@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
-using ControlzEx.Theming;
+using System.Windows.Media.Effects;
+using System.Windows.Navigation;
 using MahApps.Metro.Controls;
+using MahApps.Metro.IconPacks;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
 
@@ -42,7 +44,7 @@ public partial class MainWindow : MetroWindow
         switch (type)
         {
             case FlyOutType.Settings:
-                SettingsControl.InitControl();
+                SettingsControl.InitControl(_settingsManager);
                 break;
             case FlyOutType.Info:
                 InfoControl.InitControl();
@@ -62,6 +64,9 @@ public partial class MainWindow : MetroWindow
         ReplicationControl.SetConnection(dataSource, database);
         ClassGenControl.SetConnection(dataSource, database);
         DefinitionExportControl.SetConnection(dataSource, database);
+
+        // Reload the data
+        LoadData(TabControl.SelectedIndex);
     }
 
     /// <summary>
@@ -87,14 +92,14 @@ public partial class MainWindow : MetroWindow
             case 1: // Table types
                 TableTypesControl.LoadData();
                 break;
-            case 2: // Replication control
-                ReplicationControl.LoadData();
-                break;
-            case 3: // Class generator
+            case 2: // Class generator
                 ClassGenControl.LoadData();
                 break;
-            case 4: // Definition export
+            case 3: // Definition export
                 DefinitionExportControl.LoadData();
+                break;
+            case 4: // Replication control
+                ReplicationControl.LoadData();
                 break;
         }
     }
@@ -132,6 +137,59 @@ public partial class MainWindow : MetroWindow
 
         // Init the other controls
         SearchControl.InitControl(_settingsManager);
-        ClassGenControl.InitControl();
+        ClassGenControl.InitControl(_settingsManager);
+        DefinitionExportControl.InitControl(_settingsManager);
+    }
+
+    /// <summary>
+    /// Occurs when the user double clicks the build info
+    /// </summary>
+    /// <param name="sender">The build info (on the bottom right)</param>
+    /// <param name="e">The event arguments</param>
+    private void BuildInfo_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        InfoBorder.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>
+    /// Occurs when the user hits the close icon with the left button
+    /// </summary>
+    /// <param name="sender">The <see cref="CloseIcon"/></param>
+    /// <param name="e">The event arguments</param>
+    private void CloseIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        InfoBorder.Visibility = Visibility.Hidden;
+    }
+
+    /// <summary>
+    /// Occurs when the user enters the area of the close icon
+    /// </summary>
+    /// <param name="sender">The <see cref="CloseIcon"/></param>
+    /// <param name="e">The event arguments</param>
+    private void CloseIcon_MouseEnter(object sender, MouseEventArgs e)
+    {
+        CloseIcon.Foreground = new SolidColorBrush(Colors.Red);
+        CloseIcon.Kind = PackIconMaterialKind.CloseBox;
+    }
+
+    /// <summary>
+    /// Occurs when the user leaves the area of the close icon
+    /// </summary>
+    /// <param name="sender">The <see cref="CloseIcon"/></param>
+    /// <param name="e">The event arguments</param>
+    private void CloseIcon_MouseLeave(object sender, MouseEventArgs e)
+    {
+        CloseIcon.Foreground = new SolidColorBrush(Colors.DarkRed);
+        CloseIcon.Kind = PackIconMaterialKind.CloseBoxOutline;
+    }
+
+    /// <summary>
+    /// Occurs when the user clicks the hyperlink of the project file
+    /// </summary>
+    /// <param name="sender">The project link"/></param>
+    /// <param name="e">The event arguments</param>
+    private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        Helper.OpenLink(e.Uri.ToString());
     }
 }

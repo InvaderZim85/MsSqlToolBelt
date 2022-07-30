@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
@@ -14,14 +16,21 @@ public class TableDto
     /// <summary>
     /// Gets or sets the name of the table
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the original table
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]
-    public TableEntry Table { get; set; } = new();
+    public object Table { get; init; } = new();
+
+    /// <summary>
+    /// Gets the schema of the table
+    /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
+    public string Schema => Table is TableEntry table ? table.Schema : string.Empty;
 
     /// <summary>
     /// Gets or sets the list with the columns
@@ -31,12 +40,22 @@ public class TableDto
     public List<ColumnDto> Columns { get; set; } = new();
 
     /// <summary>
+    /// Gets the type of the table
+    /// </summary>
+    public TableDtoType Type { get; init; }
+
+    /// <summary>
     /// Converts the columns of the <see cref="Table"/> and stores them into <see cref="Columns"/>
     /// </summary>
     public void SetColumns()
     {
-        if (Table.Columns.Any())
-            Columns = Table.Columns.Select(s => (ColumnDto) s).ToList();
+        Columns = Table switch
+        {
+            TableEntry table when table.Columns.Any() => table.Columns.Select(s => (ColumnDto) s).ToList(),
+            TableTypeEntry tableType when tableType.Columns.Any() => tableType.Columns.Select(s => (ColumnDto) s)
+                .ToList(),
+            _ => new List<ColumnDto>()
+        };
     }
 
     /// <summary>
@@ -45,15 +64,27 @@ public class TableDto
     /// <param name="table">The table</param>
     public static explicit operator TableDto(TableEntry table)
     {
-        var result = new TableDto
+        return new TableDto
         {
             Name = table.Name,
-            Table = table
+            Table = table,
+            Columns = table.Columns.Any() ? table.Columns.Select(s => (ColumnDto) s).ToList() : new List<ColumnDto>(),
+            Type = TableDtoType.Table
         };
+    }
 
-        if (table.Columns.Any())
-            result.Columns = table.Columns.Select(s => (ColumnDto) s).ToList();
-
-        return result;
+    /// <summary>
+    /// Converts the <see cref="TableTypeEntry"/> into a <see cref="TableDto"/>
+    /// </summary>
+    /// <param name="table">The table</param>
+    public static explicit operator TableDto(TableTypeEntry table)
+    {
+        return new TableDto
+        {
+            Name = table.Name,
+            Table = table,
+            Columns = table.Columns.Any() ? table.Columns.Select(s => (ColumnDto) s).ToList() : new List<ColumnDto>(),
+            Type = TableDtoType.TableType
+        };
     }
 }

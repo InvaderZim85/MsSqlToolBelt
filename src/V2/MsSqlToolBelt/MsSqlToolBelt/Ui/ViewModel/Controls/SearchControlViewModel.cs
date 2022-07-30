@@ -33,6 +33,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     private SettingsManager? _settingsManager;
 
     /// <summary>
+    /// The instance for the interaction with the search history
+    /// </summary>
+    private SearchHistoryManager? _searchHistoryManager;
+
+    /// <summary>
     /// The action to set the SQL text
     /// </summary>
     private Action<string>? _setSqlText;
@@ -179,7 +184,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public string HeaderResult
     {
         get => _headerResult;
-        set => SetField(ref _headerResult, value);
+        private set => SetField(ref _headerResult, value);
     }
 
     #endregion
@@ -261,7 +266,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ShowSql"/>
     /// </summary>
-    private bool _showSql = true;
+    private bool _showSql;
 
     /// <summary>
     /// Gets or sets the value which indicates if the sql editor should be shown
@@ -275,7 +280,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ShowTableGrid"/>
     /// </summary>
-    private bool _showTableGrid;
+    private bool _showTableGrid = true;
 
     /// <summary>
     /// Gets or sets the value which indicates if the table grid should be shown
@@ -354,6 +359,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// The command to show the index window
     /// </summary>
     public ICommand ShowIndexesCommand => new DelegateCommand(ShowTableIndexes);
+
+    /// <summary>
+    /// The command to show the history
+    /// </summary>
+    public ICommand ShowHistoryCommand => new DelegateCommand(ShowHistory);
     #endregion
 
     /// <summary>
@@ -367,6 +377,8 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         _settingsManager = settingsManager;
         _setSqlText = setSqlText;
         _setCmdText = setCmdText;
+
+        _searchHistoryManager = new SearchHistoryManager(settingsManager);
 
         try
         {
@@ -426,13 +438,20 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
 
         try
         {
+            // Add the search entry to the history
+            if (_searchHistoryManager != null)
+                await _searchHistoryManager.AddSearchEntryAsync(SearchString);
+
+            // Load the ignore list
             if (_settingsManager != null)
                 await _settingsManager.LoadFilterAsync();
 
+            // Execute the search
             await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
+            // Filter and show the result
             FilterResult();
         }
         catch (Exception ex)
@@ -561,5 +580,22 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
             Owner = Application.Current.MainWindow
         };
         window.ShowDialog();
+    }
+
+    /// <summary>
+    /// Shows the search history
+    /// </summary>
+    private void ShowHistory()
+    {
+        _settingsManager ??= new SettingsManager();
+        _searchHistoryManager ??= new SearchHistoryManager(_settingsManager);
+        var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
+
+        if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
+            return;
+
+        SearchString = window.SelectedEntry;
+
+        ExecuteSearch();
     }
 }

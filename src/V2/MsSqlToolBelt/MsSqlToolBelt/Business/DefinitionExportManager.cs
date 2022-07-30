@@ -31,6 +31,11 @@ internal class DefinitionExportManager : IDisposable
     private readonly DefinitionExportRepo _repo;
 
     /// <summary>
+    /// The instance for the interaction with the settings
+    /// </summary>
+    private readonly SettingsManager _settingsManager;
+
+    /// <summary>
     /// Gets the list with the objects
     /// </summary>
     public List<ObjectDto> Objects { get; private set; } = new();
@@ -43,11 +48,13 @@ internal class DefinitionExportManager : IDisposable
     /// <summary>
     /// Creates a new instance of the <see cref="DefinitionExportManager"/>
     /// </summary>
+    /// <param name="settingsManager">The instance of the settings manager</param>
     /// <param name="dataSource">The name / path of the MSSQL server</param>
     /// <param name="database">The name of the database</param>
-    public DefinitionExportManager(string dataSource, string database)
+    public DefinitionExportManager(SettingsManager settingsManager, string dataSource, string database)
     {
         _repo = new DefinitionExportRepo(dataSource, database);
+        _settingsManager = settingsManager;
     }
 
     /// <summary>
@@ -57,7 +64,12 @@ internal class DefinitionExportManager : IDisposable
     public async Task LoadObjectsAsync()
     {
         var result = await _repo.LoadObjectsAsync();
-        Objects = result.Select(s => (ObjectDto) s).OrderBy(o => o.Type).ThenBy(t => t.Name).ToList();
+
+        await _settingsManager.LoadFilterAsync();
+        Objects = _settingsManager.FilterList.Any()
+            ? result.Where(w => w.Name.IsValid(_settingsManager.FilterList)).Select(s => (ObjectDto) s)
+                .OrderBy(o => o.Type).ThenBy(t => t.Name).ToList()
+            : result.Select(s => (ObjectDto) s).OrderBy(o => o.Type).ThenBy(t => t.Name).ToList();
 
         Types.Add("All");
         Types.AddRange(result.Select(s => s.TypeName).Distinct());

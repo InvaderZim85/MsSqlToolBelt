@@ -48,6 +48,8 @@ public partial class App : Application
 
             // Set the color theme
             Helper.SetColorTheme(await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald"));
+
+            Log.Information("Application startet.");
         }
         catch (Exception ex)
         {

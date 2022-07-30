@@ -44,6 +44,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label
@@ -64,8 +65,15 @@
                 <Button
                     Grid.Row="0"
                     Grid.Column="2"
+                    Width="60"
                     Command="{Binding SearchCommand}"
                     Content="Search" />
+                <Button
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    Width="60"
+                    Command="{Binding ShowHistoryCommand}"
+                    Content="History" />
 
                 <CheckBox
                     Grid.Row="1"
@@ -76,7 +84,7 @@
                 <Separator
                     Grid.Row="2"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3" />
+                    Grid.ColumnSpan="4" />
 
                 <Label
                     Grid.Row="3"
@@ -88,7 +96,7 @@
                 <StackPanel
                     Grid.Row="3"
                     Grid.Column="1"
-                    Grid.ColumnSpan="2"
+                    Grid.ColumnSpan="3"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
                     <Label Content="Type:" />
@@ -102,7 +110,7 @@
                     Name="DataGridResult"
                     Grid.Row="4"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     ItemsSource="{Binding SearchResults}"
                     SelectedItem="{Binding SelectedResult}">
                     <DataGrid.CommandBindings>
@@ -140,12 +148,12 @@
                 <Separator
                     Grid.Row="5"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3" />
+                    Grid.ColumnSpan="4" />
 
                 <StackPanel
                     Grid.Row="6"
                     Grid.Column="0"
-                    Grid.ColumnSpan="3"
+                    Grid.ColumnSpan="4"
                     Orientation="Horizontal">
                     <Button
                         Width="100"
@@ -194,7 +202,7 @@
 
                 <Button
                     Grid.Row="4"
-                    Width="50"
+                    Width="100"
                     HorizontalAlignment="Right"
                     Command="{Binding CopySqlCommand}"
                     Content="Copy" />
@@ -300,6 +308,7 @@
 
                 <Button
                     Grid.Row="4"
+                    Width="100"
                     HorizontalAlignment="Right"
                     Command="{Binding CopyExportTableCommand}"
                     Content="Copy / Export" />
@@ -487,6 +496,7 @@
                 <Button
                     Grid.Row="4"
                     Grid.Column="2"
+                    Width="100"
                     HorizontalAlignment="Right"
                     Command="{Binding CopyExportJobCommand}"
                     Content="Copy / Export" />

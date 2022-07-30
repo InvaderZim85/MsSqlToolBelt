@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
@@ -10,7 +11,7 @@ namespace MsSqlToolBelt.Ui.View.Controls;
 /// <summary>
 /// Interaction logic for DefinitionExportControl.xaml
 /// </summary>
-public partial class DefinitionExportControl : UserControl, IConnection
+public partial class DefinitionExportControl : UserControl, IUserControl
 {
     /// <summary>
     /// Creates a new instance of the <see cref="DefinitionExportControl"/>
@@ -18,6 +19,13 @@ public partial class DefinitionExportControl : UserControl, IConnection
     public DefinitionExportControl()
     {
         InitializeComponent();
+    }
+
+    /// <inheritdoc />
+    public void InitControl(SettingsManager manager)
+    {
+        if (DataContext is DefinitionExportControlViewModel viewModel)
+            viewModel.InitViewModel(manager);
     }
 
     /// <inheritdoc />

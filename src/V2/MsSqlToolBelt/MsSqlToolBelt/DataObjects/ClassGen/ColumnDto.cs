@@ -4,7 +4,7 @@ using ZimLabs.WpfBase.NetCore;
 namespace MsSqlToolBelt.DataObjects.ClassGen;
 
 /// <summary>
-/// Represents a column (only needed for the class generator). For the normal column see <see cref="Common.ColumnEntry"/>
+/// Represents a column (only needed for the class generator). For the normal column see <see cref="ColumnEntry"/>
 /// </summary>
 public class ColumnDto : ObservableObject
 {

@@ -155,6 +155,10 @@ internal class EditServerWindowViewModel : ViewModelBase
                 SelectedDatabase = DatabaseList.FirstOrDefault(f => f.Equals(SelectedServer.DefaultDatabase)) ??
                                    DefaultEntry;
             }
+            else
+            {
+                SelectedDatabase = DefaultEntry;
+            }
         }
         catch (Exception ex)
         {

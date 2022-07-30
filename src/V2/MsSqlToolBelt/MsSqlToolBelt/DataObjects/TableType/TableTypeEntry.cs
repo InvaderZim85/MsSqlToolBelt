@@ -8,7 +8,7 @@ namespace MsSqlToolBelt.DataObjects.TableType;
 /// <summary>
 /// Represents a table type
 /// </summary>
-internal class TableTypeEntry
+public class TableTypeEntry
 {
     /// <summary>
     /// Gets or sets the id of the table type

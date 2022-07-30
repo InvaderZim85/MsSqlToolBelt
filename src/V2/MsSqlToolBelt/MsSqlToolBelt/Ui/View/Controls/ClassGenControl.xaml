@@ -44,6 +44,17 @@
                     Content="{Binding HeaderList}"
                     Style="{StaticResource Headline}" />
 
+                <StackPanel
+                    Grid.Row="0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+                    <Label Content="Type:" />
+                    <ComboBox
+                        Width="100"
+                        ItemsSource="{Binding TypeList}"
+                        SelectedItem="{Binding SelectedType}" />
+                </StackPanel>
+
                 <Separator Grid.Row="1" />
 
                 <DataGrid
@@ -60,6 +71,10 @@
                             Width="*"
                             Binding="{Binding Name}"
                             Header="Name" />
+                        <DataGridTextColumn
+                            Width="100"
+                            Binding="{Binding Type}"
+                            Header="Type" />
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -124,7 +139,9 @@
                             Header="Name"
                             IsReadOnly="True" />
                         <DataGridTextColumn
+                            x:Name="ColumnAlias"
                             Width="*"
+                            mah:DataGridHelper.EnableCellEditAssist="True"
                             Binding="{Binding Alias}"
                             Header="Alias" />
                         <DataGridTextColumn
@@ -220,6 +237,7 @@
                         <CheckBox
                             Content="DB Model (EF)"
                             IsChecked="{Binding OptionDbModel}"
+                            IsEnabled="{Binding TableOptionEnabled}"
                             ToolTip="Note: This option will be ignored if you generate a class from a query!" />
                         <CheckBox Content="Backing field" IsChecked="{Binding OptionBackingField}" />
                         <CheckBox Content="Summary" IsChecked="{Binding OptionSummary}" />

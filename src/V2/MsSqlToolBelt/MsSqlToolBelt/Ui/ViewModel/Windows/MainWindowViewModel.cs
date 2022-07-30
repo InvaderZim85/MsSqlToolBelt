@@ -254,7 +254,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Backing field for <see cref="BuildInfo"/>
     /// </summary>
-    private string _buildInfo = string.Empty;
+    private string _buildInfo = "Build info";
 
     /// <summary>
     /// Gets or sets the build information
@@ -396,8 +396,12 @@ internal class MainWindowViewModel : ViewModelBase
 
         try
         {
+            var tmpSelectedServer = SelectedServer?.Clone() ?? null;
             await _settingsManager.LoadServerAsync();
             ServerList = _settingsManager.ServerList.OrderBy(o => o.Order).ToObservableCollection();
+
+            if (tmpSelectedServer != null)
+                SelectedServer = ServerList.FirstOrDefault(f => f.Id == tmpSelectedServer.Id);
         }
         catch (Exception ex)
         {

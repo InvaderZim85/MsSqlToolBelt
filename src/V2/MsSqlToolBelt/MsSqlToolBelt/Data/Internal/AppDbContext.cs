@@ -31,6 +31,11 @@ internal class AppDbContext : DbContext
     public DbSet<SettingsEntry> Settings => Set<SettingsEntry>();
 
     /// <summary>
+    /// Gets or sets the list with the search history
+    /// </summary>
+    public DbSet<SearchHistoryEntry> SearchHistory => Set<SearchHistoryEntry>();
+
+    /// <summary>
     /// Creates a new instance of the <see cref="AppDbContext"/>
     /// </summary>
     public AppDbContext()
@@ -55,5 +60,6 @@ internal class AppDbContext : DbContext
     {
         modelBuilder.Entity<ServerEntry>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<SettingsEntry>().HasIndex(x => x.KeyId).IsUnique();
+        modelBuilder.Entity<SearchHistoryEntry>().HasIndex(x => x.SearchEntry);
     }
 }

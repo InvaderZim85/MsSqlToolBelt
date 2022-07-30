@@ -9,7 +9,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="600"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
     <UserControl.DataContext>
@@ -107,6 +107,14 @@
                             Width="*"
                             Binding="{Binding DefaultDatabase}"
                             Header="Default database" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding AutoConnect}"
+                            Header="Auto connect" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Description}"
+                            Header="Name" />
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -227,8 +235,8 @@
                         Content="Delete" />
                     <Button
                         Width="60"
-                        Command="{Binding SaveFilterCommand}"
-                        Content="Save" />
+                        Command="{Binding AddFilterCommand}"
+                        Content="Add" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -237,6 +245,7 @@
         <Border Grid.Row="3" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -277,8 +286,25 @@
                     Content="The format to be used when copying a grid"
                     Style="{StaticResource ItemHint}" />
 
-                <Button
+                <Label
                     Grid.Row="3"
+                    Grid.Column="0"
+                    Content="Search history count:" />
+                <mah:NumericUpDown
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="3"
+                    Minimum="1"
+                    NumericInputMode="Numbers"
+                    Value="{Binding SearchHistoryCount}" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    Content="The number of search history entries"
+                    Style="{StaticResource ItemHint}" />
+
+                <Button
+                    Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     Width="60"

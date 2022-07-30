@@ -15,7 +15,6 @@
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
-    Icon="../../../MsSqlToolBelt.ico"
     Loaded="MainWindow_OnLoaded"
     ResizeMode="CanResizeWithGrip"
     TitleCharacterCasing="Normal"
@@ -25,6 +24,19 @@
     <Window.DataContext>
         <windows:MainWindowViewModel />
     </Window.DataContext>
+
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <iconPacks:PackIconMaterial
+                Width="22"
+                Height="22"
+                Margin="6,3,0,0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource MahApps.Brushes.IdealForeground}"
+                Kind="DatabaseSearchOutline" />
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
@@ -72,7 +84,9 @@
                 Margin="0,0,15,0"
                 Padding="0"
                 HorizontalAlignment="Right"
-                Content="{Binding BuildInfo}" />
+                Content="{Binding BuildInfo}"
+                Cursor="Hand"
+                MouseDoubleClick="BuildInfo_OnMouseDoubleClick" />
         </StatusBar>
 
         <Grid>
@@ -131,7 +145,9 @@
             </Border>
 
             <TabControl
+                Name="TabControl"
                 Grid.Row="1"
+                mah:TabControlHelper.Transition="Left"
                 mah:TabControlHelper.Underlined="SelectedTabItem"
                 IsEnabled="{Binding ConnectionEstablished}"
                 SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
@@ -142,16 +158,100 @@
                 <TabItem Header="Table types">
                     <controls:TableTypesControl x:Name="TableTypesControl" />
                 </TabItem>
-                <TabItem Header="Replication info">
-                    <controls:ReplicationControl x:Name="ReplicationControl" />
-                </TabItem>
                 <TabItem Header="Class generator">
                     <controls:ClassGenControl x:Name="ClassGenControl" />
                 </TabItem>
                 <TabItem Header="Definition export">
                     <controls:DefinitionExportControl x:Name="DefinitionExportControl" />
                 </TabItem>
+                <TabItem Header="Replication info">
+                    <controls:ReplicationControl x:Name="ReplicationControl" />
+                </TabItem>
             </TabControl>
+
+            <Border
+                Name="InfoBorder"
+                Grid.Row="1"
+                Width="550"
+                Height="250"
+                Margin="15"
+                VerticalAlignment="Center"
+                Background="{DynamicResource MahApps.Brushes.Control.Background}"
+                BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                BorderThickness="2"
+                CornerRadius="10"
+                UseLayoutRounding="True"
+                Visibility="Hidden">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="25" ShadowDepth="10" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <iconPacks:PackIconMaterial
+                        Name="CloseIcon"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Width="20"
+                        Height="20"
+                        Margin="3"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Cursor="Hand"
+                        Foreground="DarkRed"
+                        Kind="CloseBoxOutline"
+                        MouseEnter="CloseIcon_MouseEnter"
+                        MouseLeave="CloseIcon_MouseLeave"
+                        MouseLeftButtonDown="CloseIcon_MouseLeftButtonDown" />
+
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Content="MsSqlToolBelt"
+                        FontSize="20"
+                        FontStyle="Italic"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource MahApps.Brushes.Accent}" />
+
+                    <Separator Grid.Row="2" Grid.Column="1" />
+
+                    <Label
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Content="{Binding BuildInfo}" />
+
+                    <Separator Grid.Row="4" Grid.Column="1" />
+
+                    <TextBlock
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        TextWrapping="Wrap">
+                        Thank you for using my program. I hope everything works as planned.<LineBreak />
+                        If you find something that doesn't work or if you have any suggestions,<LineBreak />
+                        feel free to leave me a comment on the git repository.<LineBreak />
+                        <LineBreak />
+                        <Hyperlink NavigateUri="https://github.com/InvaderZim85/MsSqlToolBelt" RequestNavigate="Hyperlink_OnRequestNavigate">MsSqlToolBelt on Github</Hyperlink>
+                        <LineBreak />
+                        <LineBreak />
+                        Cheers, InvaderZim</TextBlock>
+                </Grid>
+            </Border>
         </Grid>
     </DockPanel>
 </mah:MetroWindow>

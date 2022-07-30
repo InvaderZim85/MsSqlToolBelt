@@ -1,9 +1,11 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
+using MsSqlToolBelt.Ui.View.Windows;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
 
 namespace MsSqlToolBelt.Ui.View.Controls;

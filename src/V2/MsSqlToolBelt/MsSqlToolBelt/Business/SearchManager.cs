@@ -7,7 +7,6 @@ using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
-using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Business;
 
@@ -30,6 +29,11 @@ internal class SearchManager : IDisposable
     /// The instance for the interaction with the tables
     /// </summary>
     private readonly TableManager _tableManager;
+
+    /// <summary>
+    /// The instance for the interaction with the settings
+    /// </summary>
+    private readonly SettingsManager _settingsManager;
 
     /// <summary>
     /// Gets the list with the result types
@@ -55,6 +59,7 @@ internal class SearchManager : IDisposable
     {
         _repo = new SearchRepo(dataSource, database);
         _tableManager = new TableManager(dataSource, database);
+        _settingsManager = new SettingsManager();
     }
 
     /// <summary>
@@ -75,13 +80,13 @@ internal class SearchManager : IDisposable
 
         // Add the tables
         result.AddRange(ignoreList.Any()
-            ? tables.Where(w => IsValid(w.Name, ignoreList)).Select(s => (SearchResult) s)
+            ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
             : tables.Select(s => (SearchResult) s));
 
         // Load the other objects (procedures, jobs, etc.)
         var searchResult = await _repo.SearchAsync(search);
         result.AddRange(ignoreList.Any()
-            ? searchResult.Where(w => IsValid(w.Name, ignoreList))
+            ? searchResult.Where(w => w.Name.IsValid(ignoreList))
             : searchResult);
 
         SearchResults = result;
@@ -90,26 +95,6 @@ internal class SearchManager : IDisposable
         ResultTypes.Clear();
         ResultTypes.Add("All");
         ResultTypes.AddRange(SearchResults.Select(s => s.Type).Distinct().ToList());
-    }
-
-    /// <summary>
-    /// Checks if the value is valid
-    /// </summary>
-    /// <param name="value">The value which should be checked</param>
-    /// <param name="ignoreList">The list with the ignore filters</param>
-    /// <returns><see langword="true"/> is the entry is valid, otherwise <see langword="false"/></returns>
-    private static bool IsValid(string value, IEnumerable<FilterEntry> ignoreList)
-    {
-        return (from entry in ignoreList
-            let filterType = (FilterType)entry.FilterTypeId
-            select filterType switch
-            {
-                FilterType.Contains => value.ContainsIgnoreCase(entry.Value),
-                FilterType.Equals => value.EqualsIgnoreCase(entry.Value),
-                FilterType.StartsWith => value.StartsWith(entry.Value, StringComparison.OrdinalIgnoreCase),
-                FilterType.EndsWith => value.EndsWith(entry.Value, StringComparison.OrdinalIgnoreCase),
-                _ => false
-            }).All(invalid => !invalid);
     }
 
     /// <summary>

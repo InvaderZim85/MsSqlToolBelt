@@ -88,6 +88,19 @@ public class SettingsManager
 
         await _context.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Saves a list of settings
+    /// </summary>
+    /// <param name="values">The list with the data</param>
+    /// <returns>The awaitable task</returns>
+    public async Task SaveSettingsValuesAsync(SortedList<SettingsKey, object> values)
+    {
+        foreach (var value in values)
+        {
+            await SaveSettingsValueAsync(value.Key, value.Value);
+        }
+    }
     #endregion
 
     #region Server

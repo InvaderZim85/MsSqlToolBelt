@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -22,10 +23,11 @@ public partial class SettingsControl : UserControl
     /// <summary>
     /// Init the control
     /// </summary>
-    public void InitControl()
+    /// <param name="settingsManager">The instance for the interaction with the settings</param>
+    public void InitControl(SettingsManager settingsManager)
     {
         if (DataContext is SettingsControlViewModel viewModel)
-            viewModel.InitViewModel();
+            viewModel.InitViewModel(settingsManager);
     }
 
     /// <summary>

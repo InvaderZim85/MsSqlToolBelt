@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Name="RepControl"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mah:DialogParticipation.Register="{Binding}"
@@ -16,7 +17,7 @@
         <controls:ReplicationControlViewModel />
     </UserControl.DataContext>
 
-    <Grid>
+    <Grid IsEnabled="{Binding ControlEnabled}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -175,26 +176,36 @@
         <Border
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Height="250"
-            Background="DarkGray"
-            Opacity="0.9"
+            Height="200"
+            Margin="15"
+            Background="{DynamicResource MahApps.Brushes.Control.Background}"
+            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            BorderThickness="2"
+            Opacity="1"
             Visibility="{Binding ShowInfo, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="10"
+                    Opacity="0.8"
+                    ShadowDepth="10" />
+            </Border.Effect>
 
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="40" />
                     <RowDefinition Height="10" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="40" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <iconPacks:PackIconPixelartIcons
+                <iconPacks:PackIconMaterial
                     Grid.Row="1"
                     Grid.Column="1"
                     Width="30"
@@ -202,8 +213,8 @@
                     Margin="3"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Foreground="{StaticResource MahApps.Brushes.Accent}"
-                    Kind="WarningBox" />
+                    Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                    Kind="InformationOutline" />
 
                 <TextBlock
                     Grid.Row="3"

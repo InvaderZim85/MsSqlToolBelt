@@ -25,6 +25,11 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     private DefinitionExportManager? _manager;
 
     /// <summary>
+    /// The instance for the interaction with the settings
+    /// </summary>
+    private SettingsManager? _settingsManager;
+
+    /// <summary>
     /// Contains the value which indicates if the data already loaded
     /// </summary>
     private bool _dataLoaded;
@@ -194,6 +199,15 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     });
     #endregion
 
+    /// <summary>
+    /// Init the view model
+    /// </summary>
+    /// <param name="settingsManager">The instance for the interaction with the settings</param>
+    public void InitViewModel(SettingsManager settingsManager)
+    {
+        _settingsManager = settingsManager;
+    }
+
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
@@ -203,7 +217,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
 
         _manager?.Dispose();
 
-        _manager = new DefinitionExportManager(dataSource, database);
+        _manager = new DefinitionExportManager(_settingsManager!, dataSource, database);
     }
 
     /// <inheritdoc />
@@ -229,6 +243,8 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
             // Set the types
             ObjectTypes = _manager.Types.ToObservableCollection();
             SelectedObjectType = _manager.Types.FirstOrDefault() ?? "All";
+
+            _dataLoaded = true;
 
             FilterList();
         }
