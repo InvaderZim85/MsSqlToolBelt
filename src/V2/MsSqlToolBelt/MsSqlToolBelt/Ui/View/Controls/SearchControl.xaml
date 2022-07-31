@@ -55,11 +55,15 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     mah:TextBoxHelper.SelectAllOnFocus="True"
-                    mah:TextBoxHelper.Watermark="* and % will be interpreted as wildcard"
+                    mah:TextBoxHelper.Watermark="* and % will be interpreted as wildcard / Press CTRL + F to show the history"
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
+                        <KeyBinding
+                            Key="F"
+                            Command="{Binding ShowHistoryCommand}"
+                            Modifiers="Control" />
                     </TextBox.InputBindings>
                 </TextBox>
                 <Button

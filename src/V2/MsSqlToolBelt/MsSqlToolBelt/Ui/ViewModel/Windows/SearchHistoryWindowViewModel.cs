@@ -63,6 +63,11 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     public ICommand DeleteCommand => new DelegateCommand(DeleteEntry);
 
     /// <summary>
+    /// The command to clear the history
+    /// </summary>
+    public ICommand ClearHistoryCommand => new DelegateCommand(ClearHistory);
+
+    /// <summary>
     /// The command to set the selected entry
     /// </summary>
     public ICommand SetSelectionCommand => new DelegateCommand(() =>
@@ -138,6 +143,37 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         try
         {
             await _manager.DeleteEntryAsync();
+
+            SetList();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await CloseProgressAsync();
+        }
+    }
+
+    /// <summary>
+    /// Clears the complete history
+    /// </summary>
+    private async void ClearHistory()
+    {
+        if (_manager == null)
+            return;
+
+        var result = await ShowQuestionAsync("Delete", "Do you really want to delete the entire history?",
+            okButtonText: "Yes", cancelButtonText: "No");
+        if (result != MessageDialogResult.Affirmative)
+            return;
+
+        await ShowProgressAsync("Deleting", "Please wait while clearing the history...");
+
+        try
+        {
+            await _manager.ClearHistoryAsync();
 
             SetList();
         }

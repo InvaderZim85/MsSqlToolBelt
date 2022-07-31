@@ -51,18 +51,31 @@
 
         <Separator Grid.Row="1" />
 
-        <Button
-            Grid.Row="2"
-            Width="60"
-            HorizontalAlignment="Left"
-            Command="{Binding DeleteCommand}"
-            Content="Delete" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button
+                Width="60"
+                Command="{Binding DeleteCommand}"
+                Content="Delete"
+                ToolTip="Deletes the selected entry" />
+            <Button
+                Width="60"
+                Command="{Binding ClearHistoryCommand}"
+                Content="Clear"
+                ToolTip="Clears the complete history" />
+        </StackPanel>
 
-        <Button
+        <StackPanel
             Grid.Row="2"
-            Width="60"
-            HorizontalAlignment="Right"
-            Click="ButtonClose_Click"
-            Content="Close" />
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                Width="60"
+                Click="ButtonClose_Click"
+                Content="Close" />
+            <Button
+                Width="60"
+                Command="{Binding SetSelectionCommand}"
+                Content="Select" />
+        </StackPanel>
     </Grid>
 </mah:MetroWindow>

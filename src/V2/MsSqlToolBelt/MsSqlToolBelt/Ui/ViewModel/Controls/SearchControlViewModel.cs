@@ -266,7 +266,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ShowSql"/>
     /// </summary>
-    private bool _showSql;
+    private bool _showSql = true;
 
     /// <summary>
     /// Gets or sets the value which indicates if the sql editor should be shown
@@ -280,7 +280,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ShowTableGrid"/>
     /// </summary>
-    private bool _showTableGrid = true;
+    private bool _showTableGrid;
 
     /// <summary>
     /// Gets or sets the value which indicates if the table grid should be shown

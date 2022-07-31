@@ -121,4 +121,17 @@ public class SearchHistoryManager
 
         await _context.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Clears the complete history
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    public async Task ClearHistoryAsync()
+    {
+        _context.SearchHistory.RemoveRange(_context.SearchHistory);
+        await _context.SaveChangesAsync();
+
+        SearchHistory.Clear();
+        SelectedEntry = null;
+    }
 }
