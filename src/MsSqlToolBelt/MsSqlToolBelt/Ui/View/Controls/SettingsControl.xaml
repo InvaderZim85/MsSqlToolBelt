@@ -255,7 +255,7 @@
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="175" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
@@ -294,13 +294,13 @@
                     Grid.Row="3"
                     Grid.Column="1"
                     Margin="3"
-                    Minimum="1"
+                    Minimum="0"
                     NumericInputMode="Numbers"
                     Value="{Binding SearchHistoryCount}" />
                 <Label
                     Grid.Row="3"
                     Grid.Column="2"
-                    Content="The number of search history entries"
+                    Content="The number of search history entries (0 = infitiniy)"
                     Style="{StaticResource ItemHint}" />
 
                 <Button

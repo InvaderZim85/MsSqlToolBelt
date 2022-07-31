@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -86,7 +87,11 @@ public class SearchHistoryManager
     /// <returns>The awaitable task</returns>
     private async Task CheckEntryCountAsync()
     {
-        var entryCount = await _settingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, 10);
+        var entryCount = await _settingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount,
+            DefaultEntries.SearchHistoryCount);
+        if (entryCount == 0) // 0 = infinity
+            return;
+
         var historyCount = await _context.SearchHistory.AsNoTracking().CountAsync();
         if (historyCount < entryCount)
             return;

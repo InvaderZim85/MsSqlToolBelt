@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -382,7 +383,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
 
         try
         {
-            AddWildcardAutomatically = await _settingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, true);
+            AddWildcardAutomatically = await _settingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
         }
         catch (Exception ex)
         {

@@ -147,7 +147,7 @@ internal static class ExportHelper
         {
             var settingsManager = new SettingsManager();
             var exportType =
-                (ExportType)await settingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, 1); // 1 = CSV
+                (ExportType)await settingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
 
             var content = exportType switch
             {

@@ -179,7 +179,7 @@
                 Background="{DynamicResource MahApps.Brushes.Control.Background}"
                 BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                 BorderThickness="2"
-                CornerRadius="10"
+                CornerRadius="10, 0, 10, 0"
                 UseLayoutRounding="True"
                 Visibility="Hidden">
                 <Border.Effect>
@@ -187,7 +187,7 @@
                 </Border.Effect>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="28" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="10" />
                         <RowDefinition Height="Auto" />
@@ -208,7 +208,7 @@
                         Grid.Column="2"
                         Width="20"
                         Height="20"
-                        Margin="3"
+                        Margin="3,4,3,3"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Cursor="Hand"

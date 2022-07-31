@@ -36,7 +36,8 @@ public class SettingsManager
     public SettingsManager()
     {
         _context = new AppDbContext();
-        _context.Database.EnsureCreated();
+        // Create / update the database if needed
+        _context.Database.Migrate();
     }
 
     #region Settings

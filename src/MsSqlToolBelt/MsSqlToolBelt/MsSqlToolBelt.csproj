@@ -6,8 +6,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>22.212.3.482</AssemblyVersion>
-    <FileVersion>22.212.3.482</FileVersion>
+    <AssemblyVersion>22.212.7.692</AssemblyVersion>
+    <FileVersion>22.212.7.692</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
@@ -21,6 +21,10 @@
     <PackageReference Include="Markdig" Version="0.30.2" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="160.22506.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.2.32" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

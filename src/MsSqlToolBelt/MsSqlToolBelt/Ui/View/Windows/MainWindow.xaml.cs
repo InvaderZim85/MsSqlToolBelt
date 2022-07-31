@@ -113,7 +113,7 @@ public partial class MainWindow : MetroWindow
     {
         try
         {
-            var scheme = await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald");
+            var scheme = await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             Helper.SetColorTheme(scheme);
         }
         catch (Exception ex)

@@ -238,7 +238,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Backing field for <see cref="SearchHistoryCount"/>
     /// </summary>
-    private int _searchHistoryCount = 10;
+    private int _searchHistoryCount = 50;
 
     /// <summary>
     /// Gets or sets the search history count
@@ -317,7 +317,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
             // Load the colors
             ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
-            var themeName = await _manager!.LoadSettingsValueAsync(SettingsKey.ColorScheme, "Emerald");
+            var themeName = await _manager!.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
             // Load the server
@@ -329,10 +329,10 @@ internal class SettingsControlViewModel : ViewModelBase
             // Set the various data
             var exportList = Helper.CreateExportTypeList(ExportDataType.List);
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
-            var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, 1); // 1 = CSV
+            var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
 
-            SearchHistoryCount = await _manager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, 10);
+            SearchHistoryCount = await _manager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
         }
         catch (Exception ex)
         {
