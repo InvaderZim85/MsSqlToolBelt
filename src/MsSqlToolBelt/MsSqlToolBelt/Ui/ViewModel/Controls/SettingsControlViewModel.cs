@@ -353,7 +353,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
+            await _manager!.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
         }
         catch (Exception ex)
         {
@@ -373,7 +373,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <returns>The awaitable task</returns>
     private async Task LoadServerAsync(ServerEntry? preSelection = null)
     {
-        await _manager.LoadServerAsync(true);
+        await _manager!.LoadServerAsync(true);
         
         SetServerList(preSelection);
     }
@@ -383,7 +383,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// </summary>
     private void SetServerList(ServerEntry? preSelection = null)
     {
-        ServerList = _manager.ServerList.OrderBy(o => o.Order).ToObservableCollection();
+        ServerList = _manager!.ServerList.OrderBy(o => o.Order).ToObservableCollection();
 
         SelectedServer = preSelection ?? _manager.ServerList.FirstOrDefault(); // Select the first server
     }
@@ -408,7 +408,7 @@ internal class SettingsControlViewModel : ViewModelBase
         // Add the new server
         try
         {
-            await _manager.AddServerAsync(dialog.SelectedServer);
+            await _manager!.AddServerAsync(dialog.SelectedServer);
 
             SetServerList(dialog.SelectedServer);
         }
@@ -437,7 +437,7 @@ internal class SettingsControlViewModel : ViewModelBase
         // Update the server
         try
         {
-            await _manager.UpdateServerAsync(SelectedServer);
+            await _manager!.UpdateServerAsync(SelectedServer);
 
             SetServerList(SelectedServer);
         }
@@ -461,7 +461,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.DeleteServerAsync(SelectedServer);
+            await _manager!.DeleteServerAsync(SelectedServer);
 
             SelectedServer = null;
 
@@ -484,7 +484,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
+            await _manager!.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
             ServerList = ServerList.OrderBy(o => o.Id).ToObservableCollection();
 
@@ -521,7 +521,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <returns>The awaitable task</returns>
     private async Task LoadFilterAsync()
     {
-        await _manager.LoadFilterAsync();
+        await _manager!.LoadFilterAsync();
 
         SetFilterList();
     }
@@ -532,7 +532,7 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <param name="preSelection">The entry which should be selected</param>
     private void SetFilterList(FilterEntry? preSelection = null)
     {
-        FilterList = _manager.FilterList.ToObservableCollection();
+        FilterList = _manager!.FilterList.ToObservableCollection();
 
         if (preSelection == null)
             return;
@@ -556,7 +556,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.AddFilterAsync(entry);
+            await _manager!.AddFilterAsync(entry);
 
             SetFilterList(entry);
 
@@ -586,7 +586,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.DeleteFilterAsync(SelectedFilter);
+            await _manager!.DeleteFilterAsync(SelectedFilter);
 
             SetFilterList();
         }
@@ -615,7 +615,7 @@ internal class SettingsControlViewModel : ViewModelBase
                 {SettingsKey.SearchHistoryEntryCount, SearchHistoryCount}
             };
 
-            await _manager.SaveSettingsValuesAsync(saveList);
+            await _manager!.SaveSettingsValuesAsync(saveList);
         }
         catch (Exception ex)
         {

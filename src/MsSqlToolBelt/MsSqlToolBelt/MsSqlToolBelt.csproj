@@ -6,8 +6,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>22.204.2.680</AssemblyVersion>
-    <FileVersion>22.204.2.680</FileVersion>
+    <AssemblyVersion>22.212.3.482</AssemblyVersion>
+    <FileVersion>22.212.3.482</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
