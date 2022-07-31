@@ -1,0 +1,174 @@
+﻿<UserControl
+    x:Class="MsSqlToolBelt.Ui.View.Controls.TableTypesControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mah:DialogParticipation.Register="{Binding}"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <controls:TableTypesControlViewModel />
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="{Binding HeaderList}"
+                    Style="{StaticResource Headline}" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid
+                    Name="DataGridTypes"
+                    Grid.Row="2"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding TableTypes}"
+                    SelectedItem="{Binding SelectedTableType}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridTypes_OnExecuted" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Name" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Separator Grid.Row="3" />
+
+                <TextBox
+                    Grid.Row="4"
+                    mah:TextBoxHelper.SelectAllOnFocus="True"
+                    mah:TextBoxHelper.Watermark="Filter..."
+                    Style="{StaticResource TextBoxFilter}"
+                    Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <Separator Grid.Row="5" />
+
+                <Button
+                    Grid.Row="6"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding ReloadCommand}"
+                    Content="Reload" />
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="1" Style="{StaticResource VerticalSplitter}" />
+
+        <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="{Binding HeaderColumns}"
+                    Style="{StaticResource Headline}" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid
+                    Name="DataGridColumns"
+                    Grid.Row="2"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding Columns}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridColumns_OnExecuted" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding Order}"
+                            Header="Pos." />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Name" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding DataType}"
+                            Header="Type" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding MaxLengthView, Mode=OneWay}"
+                            Header="Max. length">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Margin" Value="3" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding PrecisionView, Mode=OneWay}"
+                            Header="Precision">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                    <Setter Property="Margin" Value="3" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsPrimaryKey}"
+                            Header="PK" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsIdentity}"
+                            Header="Identity" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsNullable}"
+                            Header="Null" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding IsComputed}"
+                            Header="Computed" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding DefaultValue}"
+                            Header="Default" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="3" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

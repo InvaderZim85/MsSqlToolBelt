@@ -1,0 +1,70 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.Ui.View.Windows.TableIndexWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Windows"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
+    Title="TableIndexWindow"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="TableIndexWindow_OnLoaded"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Window.DataContext>
+        <windows:TableIndexWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Style="{StaticResource HeadlineBlock}"
+            Text="{Binding Header}" />
+
+        <Separator Grid.Row="1" />
+
+        <DataGrid
+            Name="DataGridIndexes"
+            Grid.Row="2"
+            IsReadOnly="True"
+            ItemsSource="{Binding Indexes}">
+            <DataGrid.CommandBindings>
+                <CommandBinding Command="Copy" Executed="DataGridIndexes_OnExecuted" />
+            </DataGrid.CommandBindings>
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Name}"
+                    Header="Name" />
+                <DataGridTextColumn
+                    Width="2*"
+                    Binding="{Binding Columns}"
+                    Header="Columns" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Separator Grid.Row="3" />
+
+        <Button
+            Name="ButtonClose"
+            Grid.Row="4"
+            Width="60"
+            HorizontalAlignment="Right"
+            Click="ButtonClose_OnClick"
+            Content="Close" />
+    </Grid>
+</mah:MetroWindow>

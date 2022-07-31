@@ -1,0 +1,317 @@
+﻿<UserControl
+    x:Class="MsSqlToolBelt.Ui.View.Controls.SettingsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:enums="clr-namespace:MsSqlToolBelt.Common.Enums"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="600"
+    mah:DialogParticipation.Register="{Binding}"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <controls:SettingsControlViewModel />
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Appearance  -->
+        <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Content="Appearance"
+                    Style="{StaticResource Headline}" />
+
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Content="Color theme:" />
+                <ComboBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    ItemsSource="{Binding ColorThemeList}"
+                    SelectedItem="{Binding SelectedColorTheme}" />
+
+                <Button
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Command="{Binding SaveThemeCommand}"
+                    Content="Save" />
+            </Grid>
+        </Border>
+
+        <!--  Server list  -->
+        <Border Grid.Row="1" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Content="Server list"
+                    Style="{StaticResource Headline}" />
+
+                <DataGrid
+                    Name="DataGridServer"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="3"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding ServerList}"
+                    SelectedItem="{Binding SelectedServer}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridServer_OnExecuted" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Server" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding DefaultDatabase}"
+                            Header="Default database" />
+                        <DataGridCheckBoxColumn
+                            Width="Auto"
+                            Binding="{Binding AutoConnect}"
+                            Header="Auto connect" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Description}"
+                            Header="Name" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    FlowDirection="LeftToRight"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        Command="{Binding MoveServerCommand}"
+                        CommandParameter="{x:Static enums:MoveDirection.Up}"
+                        Content="Up"
+                        IsEnabled="{Binding ButtonMoveUpEnabled}" />
+                    <Button
+                        Width="60"
+                        Command="{Binding MoveServerCommand}"
+                        CommandParameter="{x:Static enums:MoveDirection.Down}"
+                        Content="Down"
+                        IsEnabled="{Binding ButtonMoveDownEnabled}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        Command="{Binding DeleteServerCommand}"
+                        Content="Delete" />
+                    <Button
+                        Width="60"
+                        Command="{Binding EditServerCommand}"
+                        Content="Edit" />
+                    <Button
+                        Width="60"
+                        Command="{Binding AddServerCommand}"
+                        Content="Add" />
+                </StackPanel>
+
+
+            </Grid>
+        </Border>
+
+        <!--  Ignore list  -->
+        <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Content="Ignore list"
+                    Style="{StaticResource Headline}" />
+
+                <DataGrid
+                    Name="DataGridIgnore"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    Margin="3"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding FilterList}"
+                    SelectedItem="{Binding SelectedFilter}">
+                    <DataGrid.CommandBindings>
+                        <CommandBinding Command="Copy" Executed="DataGridIgnore_OnExecuted" />
+                    </DataGrid.CommandBindings>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="100"
+                            Binding="{Binding FilterType}"
+                            Header="Filter" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Value}"
+                            Header="Value" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Orientation="Horizontal">
+                    <Label Content="Filter" />
+                    <ComboBox
+                        Width="150"
+                        Margin="3"
+                        ItemsSource="{Binding FilterTypeList}"
+                        SelectedItem="{Binding SelectedFilterType}" />
+                    <Label Content="Value" />
+                    <TextBox
+                        Width="150"
+                        Margin="3"
+                        Text="{Binding FilterValue}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        Command="{Binding DeleteFilterCommand}"
+                        Content="Delete" />
+                    <Button
+                        Width="60"
+                        Command="{Binding AddFilterCommand}"
+                        Content="Add" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--  Various list  -->
+        <Border Grid.Row="3" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Content="Various"
+                    Style="{StaticResource Headline}" />
+
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3" />
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="Copy format:" />
+                <ComboBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    ItemsSource="{Binding ExportTypes}"
+                    SelectedItem="{Binding SelectedExportType}" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Content="The format to be used when copying a grid"
+                    Style="{StaticResource ItemHint}" />
+
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Content="Search history count:" />
+                <mah:NumericUpDown
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="3"
+                    Minimum="1"
+                    NumericInputMode="Numbers"
+                    Value="{Binding SearchHistoryCount}" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    Content="The number of search history entries"
+                    Style="{StaticResource ItemHint}" />
+
+                <Button
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SaveVariousCommand}"
+                    Content="Save" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

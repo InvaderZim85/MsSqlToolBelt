@@ -1,0 +1,200 @@
+﻿[
+    {
+        "SqlType": "BIGINT",
+        "CSharpType": "long",
+        "CSharpSystemType": "System.Int64",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "BIT",
+        "CSharpType": "bool",
+        "CSharpSystemType": "System.Boolean",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "CHAR",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "DATE",
+        "CSharpType": "DateTime",
+        "CSharpSystemType": "System.DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIME",
+        "CSharpType": "DateTime",
+        "CSharpSystemType": "System.DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIME2",
+        "CSharpType": "DateTime",
+        "CSharpSystemType": "System.DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DATETIMEOFFSET",
+        "CSharpType": "DateTimeOffset",
+        "CSharpSystemType": "System.DateTimeOffset",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal",
+        "CSharpSystemType": "System.Decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "VARBINARY",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "FLOAT",
+        "CSharpType": "double",
+        "CSharpSystemType": "System.Double",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "BINARY",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "IMAGE",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "INT",
+        "CSharpType": "int",
+        "CSharpSystemType": "System.Int32",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "MONEY",
+        "CSharpType": "decimal",
+        "CSharpSystemType": "System.Decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "NCHAR",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "NTEXT",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "DECIMAL",
+        "CSharpType": "decimal",
+        "CSharpSystemType": "System.Decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "NVARCHAR",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "REAL",
+        "CSharpType": "Single",
+        "CSharpSystemType": "System.Single",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "ROWVERSION",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "SMALLDATETIME",
+        "CSharpType": "DateTime",
+        "CSharpSystemType": "System.DateTime",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SMALLINT",
+        "CSharpType": "short",
+        "CSharpSystemType": "System.Int16",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SMALLMONEY",
+        "CSharpType": "decimal",
+        "CSharpSystemType": "System.Decimal",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "SYSNAME",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "SQL_VARIANT",
+        "CSharpType": "object",
+        "CSharpSystemType": "System.Object",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TEXT",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TIME",
+        "CSharpType": "TimeSpan",
+        "CSharpSystemType": "System.TimeSpan",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "TIMESTAMP",
+        "CSharpType": "byte[]",
+        "CSharpSystemType": "System.Byte[]",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "TINYINT",
+        "CSharpType": "byte",
+        "CSharpSystemType": "System.Byte",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "UNIQUEIDENTIFIER",
+        "CSharpType": "Guid",
+        "CSharpSystemType": "System.Guid",
+        "IsNullable": false
+    },
+    {
+        "SqlType": "VARCHAR",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    },
+    {
+        "SqlType": "XML",
+        "CSharpType": "string",
+        "CSharpSystemType": "System.String",
+        "IsNullable": true
+    }
+]

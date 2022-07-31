@@ -1,0 +1,4 @@
+﻿/// <summary>
+/// Gets or sets the TODO
+/// </summary>
+public $TYPE$$NULLABLE$ $NAME$ { get; set; }
