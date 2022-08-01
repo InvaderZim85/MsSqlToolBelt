@@ -6,8 +6,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>22.212.7.692</AssemblyVersion>
-    <FileVersion>22.212.7.692</FileVersion>
+    <AssemblyVersion>22.213.0.508</AssemblyVersion>
+    <FileVersion>22.213.0.508</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="MsSqlToolBelt.ico" />
@@ -79,6 +79,6 @@
     </None>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;    powershell.exe $(SolutionDir)ChangeVersion.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;powershell.exe $(SolutionDir)ExtractPackages.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj -outputFile $(ProjectDir)Packages.csv" />
+    <Exec Command="powershell.exe $(SolutionDir)ExtractPackages.ps1 -projectFile $(ProjectDir)MsSqlToolBelt.csproj -outputFile $(ProjectDir)Packages.csv" />
   </Target>
 </Project>

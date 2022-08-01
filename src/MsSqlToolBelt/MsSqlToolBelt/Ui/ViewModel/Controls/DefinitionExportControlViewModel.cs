@@ -34,6 +34,17 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private bool _dataLoaded;
 
+    /// <summary>
+    /// The functions to get the input text
+    /// </summary>
+    private Func<string>? _getText;
+
+    /// <summary>
+    /// The action to set the input text
+    /// </summary>
+    private Action<string>? _setText;
+
+
     #region View properties
 
     /// <summary>
@@ -80,20 +91,6 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
             if (SetField(ref _selectedObjectType, value))
                 FilterList();
         }
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ObjectList"/>
-    /// </summary>
-    private string _objectList = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the list with the custom entries
-    /// </summary>
-    public string ObjectList
-    {
-        get => _objectList;
-        set => SetField(ref _objectList, value);
     }
 
     /// <summary>
@@ -195,7 +192,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// </summary>
     public ICommand ClearObjectListCommand => new DelegateCommand(() =>
     {
-        ObjectList = string.Empty;
+        _setText?.Invoke(string.Empty);
     });
     #endregion
 
@@ -203,16 +200,20 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// Init the view model
     /// </summary>
     /// <param name="settingsManager">The instance for the interaction with the settings</param>
-    public void InitViewModel(SettingsManager settingsManager)
+    /// <param name="getText">The function to get the input text</param>
+    /// <param name="setText">The action to set the input text</param>
+    public void InitViewModel(SettingsManager settingsManager, Func<string> getText, Action<string> setText)
     {
         _settingsManager = settingsManager;
+        _getText = getText;
+        _setText = setText;
     }
 
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
         Objects = new ObservableCollection<ObjectDto>();
-        ObjectList = string.Empty;
+        _setText?.Invoke(string.Empty);
         InfoList = string.Empty;
 
         _manager?.Dispose();
@@ -296,9 +297,10 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
             return;
         }
 
-        if (!Objects.Any(a => a.Export))
+        var objectList = _getText?.Invoke() ?? string.Empty;
+        if (!Objects.Any(a => a.Export) && string.IsNullOrEmpty(objectList))
         {
-            InfoList = "Select at least one entry for the export.";
+            InfoList = "Select or add at least one entry for the export.";
             return;
         }
 
@@ -311,7 +313,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
                 InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
             };
 
-            await _manager.ExportAsync(Objects.ToList(), ObjectList, ExportDir, CreateTypeDir);
+            await _manager.ExportAsync(Objects.ToList(), objectList, ExportDir, CreateTypeDir);
         }
         catch (Exception ex)
         {

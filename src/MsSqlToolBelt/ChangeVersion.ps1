@@ -1,6 +1,6 @@
 Param
 (
-    [Parameter(Position = 0, Mandatory = $true, HelpMessage = "The path of the project file")]
+    [Parameter(Position = 0, Mandatory = $false, HelpMessage = "The path of the project file")]
     [string]$projectFile
 )
 
@@ -123,6 +123,11 @@ function ChangeXmlFile($filePath, $nodeName, $newValue)
 
     # Save the changes
     $doc.Save($filePath)
+}
+
+if ([string]::IsNullOrEmpty($projectFile))
+{
+    $projectFile = ".\MsSqlToolBelt\MsSqlToolBelt.csproj"
 }
 
 Write-Host "Start version update. Files:"
