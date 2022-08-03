@@ -334,21 +334,29 @@ public class ClassGenManager : IDisposable
         template = template.Replace("$NAME$", column.PropertyName);
 
         // Backing field name
-        template = template.Replace("$NAME2$",
-            CreateBackingFieldName(column.PropertyName));
+        template = template.Replace("$NAME2$", CreateBackingFieldName(column.PropertyName));
 
         var content = template.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
 
+        int index;
+        if (options.DbModel && column.IsPrimaryKey)
+        {
+            // Add the key attribute for the column
+            index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
+            if (index != -1)
+                content.Insert(index, "[Key]");
+        }
+
         if (!options.DbModel || string.IsNullOrEmpty(column.Alias) || column.Name.Equals(column.Alias, StringComparison.OrdinalIgnoreCase))
             return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
-
+        
         // Add the EF attribute for the column
-        var attribute =
+        var columnAttribute =
             $"[Column(\"{column.Name}\"{(column.DataType.EqualsIgnoreCase("date") ? ", DataType(DataType.Date)" : "")})]";
 
-        var index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
+        index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
         if (index != -1)
-            content.Insert(index, attribute);
+            content.Insert(index, columnAttribute);
 
         return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
     }
