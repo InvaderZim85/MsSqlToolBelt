@@ -46,4 +46,16 @@ internal static class Mediator
     {
         Actions.Clear();
     }
+
+    /// <summary>
+    /// Removes an action
+    /// </summary>
+    /// <param name="key">The key of the action</param>
+    public static void RemoveAction(string key)
+    {
+        if (!Actions.ContainsKey(key))
+            return;
+
+        Actions.Remove(key);
+    }
 }

@@ -27,6 +27,13 @@ internal sealed class ClassGenRepo : BaseRepo
     /// <returns>THe list with the columns</returns>
     public async Task<List<ColumnEntry>> LoadMetadataAsync(string query)
     {
+        // Sanitize the query
+        query = query.TrimEnd();
+
+        // Check if the query ends with a semicolon. If so remove it.
+        if (query.EndsWith(";"))
+            query = query.Replace(";", "");
+
         if (!query.ContainsIgnoreCase("WHERE"))
             query += " WHERE 0 = 1"; // Add this to force an "empty" result
 

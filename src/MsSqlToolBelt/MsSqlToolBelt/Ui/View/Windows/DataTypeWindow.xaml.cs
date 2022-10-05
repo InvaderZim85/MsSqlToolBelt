@@ -14,18 +14,11 @@ namespace MsSqlToolBelt.Ui.View.Windows;
 public partial class DataTypeWindow : MetroWindow
 {
     /// <summary>
-    /// The instance of the class generator
-    /// </summary>
-    private readonly ClassGenManager? _manager;
-
-    /// <summary>
     /// Creates a new instance of the <see cref="DataTypeWindow"/>
     /// </summary>
-    public DataTypeWindow(ClassGenManager? manager)
+    public DataTypeWindow()
     {
         InitializeComponent();
-
-        _manager = manager;
     }
 
     /// <summary>
@@ -38,7 +31,6 @@ public partial class DataTypeWindow : MetroWindow
         if (DataContext is not DataTypeWindowViewModel viewModel) 
             return;
 
-        viewModel.InitViewModel(_manager);
         viewModel.LoadData();
     }
 

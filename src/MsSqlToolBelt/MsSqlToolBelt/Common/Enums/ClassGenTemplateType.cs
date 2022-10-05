@@ -16,10 +16,20 @@ internal enum ClassGenTemplateType
     PropertyBackingFieldComment,
 
     /// <summary>
+    /// Default property with backing field which uses the SetField method and comments
+    /// </summary>
+    PropertyBackingFieldCommentSetField,
+
+    /// <summary>
     /// Default property with backing field
     /// </summary>
     PropertyBackingFieldDefault,
-    
+
+    /// <summary>
+    /// Default property with backing field which uses the SetField method
+    /// </summary>
+    PropertyBackingFieldDefaultSetField,
+
     /// <summary>
     /// Default property without comments
     /// </summary>

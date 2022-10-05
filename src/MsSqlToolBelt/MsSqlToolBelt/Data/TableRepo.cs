@@ -140,7 +140,7 @@ internal class TableRepo : BaseRepo
             );
 
             INSERT INTO @pkValues
-            EXEC sp_pkeys @table_name = @name;
+            EXEC sp_pkeys @table_name = @name, @table_owner = @schema;
 
             SELECT
                 [Column]

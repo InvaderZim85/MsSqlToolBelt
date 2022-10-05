@@ -192,4 +192,14 @@ public partial class MainWindow : MetroWindow
     {
         Helper.OpenLink(e.Uri.ToString());
     }
+
+    /// <summary>
+    /// Occurs when the user hits the close menu (program > close)
+    /// </summary>
+    /// <param name="sender">The close menu item</param>
+    /// <param name="e">The event arguments</param>
+    private void MainMenuClose_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

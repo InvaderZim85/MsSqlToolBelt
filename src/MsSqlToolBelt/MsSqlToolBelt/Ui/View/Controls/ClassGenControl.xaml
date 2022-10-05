@@ -6,11 +6,13 @@
     xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:enums="clr-namespace:MsSqlToolBelt.Common.Enums"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    MinWidth="1800"
     d:DesignHeight="1000"
-    d:DesignWidth="1920"
+    d:DesignWidth="1800"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
     <UserControl.DataContext>
@@ -198,6 +200,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="1.5*" />
                     <RowDefinition Height="5" />
                     <RowDefinition Height="*" />
@@ -219,48 +222,114 @@
 
                     <Separator Grid.Row="1" />
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <Label Content="Modifier:" />
-                        <ComboBox
-                            Width="100"
-                            ItemsSource="{Binding ModifierList}"
-                            SelectedItem="{Binding SelectedModifier}" />
-                        <Label Content="Class name:" />
-                        <TextBox
-                            Width="200"
-                            mah:TextBoxHelper.Watermark="Class name (only for the C# class)"
-                            Text="{Binding ClassName}" />
-                    </StackPanel>
+                    <Grid Grid.Row="2" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="3" Orientation="Horizontal">
-                        <CheckBox Content="Sealed class" IsChecked="{Binding OptionSealedClass}" />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Content="Modifier:" />
+
+                        <StackPanel
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="5"
+                            Orientation="Horizontal">
+
+                            <ComboBox
+                                Width="200"
+                                ItemsSource="{Binding ModifierList}"
+                                SelectedItem="{Binding SelectedModifier}" />
+                            <Label Content="Class name:" />
+                            <TextBox
+                                Width="200"
+                                mah:TextBoxHelper.Watermark="Class name (only for the C# class)"
+                                Text="{Binding ClassName}" />
+                        </StackPanel>
+
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Content="Options:" />
+
                         <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Content="Sealed class"
+                            IsChecked="{Binding OptionSealedClass}" />
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="2"
                             Content="DB Model (EF)"
                             IsChecked="{Binding OptionDbModel}"
                             IsEnabled="{Binding TableOptionEnabled}"
                             ToolTip="Note: This option will be ignored if you generate a class from a query!" />
-                        <CheckBox Content="Backing field" IsChecked="{Binding OptionBackingField}" />
-                        <CheckBox Content="Summary" IsChecked="{Binding OptionSummary}" />
-                        <CheckBox Content="Nullable enabled (.NET 6)" IsChecked="{Binding OptionNullable}" />
-                    </StackPanel>
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            Content="Backing field"
+                            IsChecked="{Binding OptionBackingField}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Content="Summary"
+                            IsChecked="{Binding OptionSummary}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Content="Nullable enabled (.NET 6)"
+                            IsChecked="{Binding OptionNullable}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="3"
+                            Content="Use 'SetField' method"
+                            IsChecked="{Binding OptionSetField}">
+                            <CheckBox.ToolTip>
+                                <TextBlock>
+                                    Note:<LineBreak />
+                                    1. This works only if you use a special "ObservableObject" (see ZimLabs.WpfBase.NetCore) because the "SetField" method is a part of the "ObservableObject" class.<LineBreak />
+                                    2. If you use this option, the option "Backing fiel" will be set to true otherwise this option will be ignored<LineBreak />
+                                    Open the context menu for more information</TextBlock>
+                            </CheckBox.ToolTip>
+                            <CheckBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="{Binding ShowSetFieldInfoCommand}" Header="Show info" />
+                                </ContextMenu>
+                            </CheckBox.ContextMenu>
+                        </CheckBox>
 
-                    <StackPanel
-                        Grid.Row="3"
-                        FlowDirection="RightToLeft"
-                        Orientation="Horizontal">
                         <Button
+                            Grid.Row="2"
+                            Grid.Column="4"
                             Width="130"
                             Command="{Binding FromQueryCommand}"
                             Content="Generate from Query" />
                         <Button
+                            Grid.Row="2"
+                            Grid.Column="5"
                             Width="130"
                             Command="{Binding GenerateCommand}"
                             Content="Generate" />
-                    </StackPanel>
+                    </Grid>
                 </Grid>
 
+                <Separator Grid.Row="1" />
+
                 <!--  CSharp code  -->
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -289,17 +358,13 @@
 
                     <Separator Grid.Row="3" />
 
-                    <StackPanel Grid.Row="4" Orientation="Horizontal">
-                        <Button
-                            Width="125"
-                            Command="{Binding ShowEfKeyCodeCommand}"
-                            Content="Show EF key code"
-                            IsEnabled="{Binding ButtonEfKeyCodeEnabled}" />
-                        <Button
-                            Width="125"
-                            Command="{Binding ShowTypeWindowCommand}"
-                            Content="Show data types" />
-                    </StackPanel>
+                    <Button
+                        Grid.Row="4"
+                        Width="125"
+                        HorizontalAlignment="Left"
+                        Command="{Binding ShowEfKeyCodeCommand}"
+                        Content="Show EF key code"
+                        IsEnabled="{Binding ButtonEfKeyCodeEnabled}" />
 
                     <StackPanel
                         Grid.Row="4"
@@ -318,10 +383,10 @@
                     </StackPanel>
                 </Grid>
 
-                <GridSplitter Grid.Row="2" Style="{StaticResource HorizontalSplitter}" />
+                <GridSplitter Grid.Row="3" Style="{StaticResource HorizontalSplitter}" />
 
                 <!--  SQL code  -->
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

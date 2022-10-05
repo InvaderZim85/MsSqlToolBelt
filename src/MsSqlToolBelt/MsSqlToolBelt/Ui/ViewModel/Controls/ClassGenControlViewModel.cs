@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -21,7 +22,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.ClassGenControl"/>
 /// </summary>
-internal class ClassGenControlViewModel : ViewModelBase, IConnection
+internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the interaction with the class generator
@@ -91,6 +92,7 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
             _classGenResult = new ClassGenResult();
             _setCode?.Invoke(_classGenResult);
             ButtonEfKeyCodeEnabled = false;
+            ClassName = string.Empty;
 
             if (value != null && value.Columns.Any())
                 SetColumns();
@@ -98,9 +100,6 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
                 EnrichData();
 
             TableOptionEnabled = value is {Type: TableDtoType.Table};
-            if (!TableOptionEnabled)
-                OptionDbModel = false;
-
             _setColumnVisibility?.Invoke(TableOptionEnabled);
         }
     }
@@ -287,7 +286,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool OptionBackingField
     {
         get => _optionBackingField;
-        set => SetField(ref _optionBackingField, value);
+        set
+        {
+            if (SetField(ref _optionBackingField, value) && !value)
+                OptionSetField = false;
+        }
     }
 
     /// <summary>
@@ -345,6 +348,27 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _tableOptionEnabled;
         set => SetField(ref _tableOptionEnabled, value);
     }
+
+    /// <summary>
+    /// Backing field for <see cref="OptionSetField"/>
+    /// </summary>
+    private bool _optionSetField;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the set field method should be used.
+    /// <para />
+    /// If this option is enabled, the option <see cref="OptionBackingField"/> will be enabled)
+    /// </summary>
+    public bool OptionSetField
+    {
+        get => _optionSetField;
+        set
+        {
+            if (SetField(ref _optionSetField, value) && value)
+                OptionBackingField = true;
+        }
+    }
+
     #endregion
 
     #endregion
@@ -390,18 +414,6 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     public ICommand GenerateCommand => new DelegateCommand(GenerateClass);
 
     /// <summary>
-    /// The command to show the window with the data types
-    /// </summary>
-    public ICommand ShowTypeWindowCommand => new DelegateCommand(() =>
-    {
-        var dialog = new DataTypeWindow(_manager)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        dialog.ShowDialog();
-    });
-
-    /// <summary>
     /// The command to show the ef key code
     /// </summary>
     public ICommand ShowEfKeyCodeCommand => new DelegateCommand(() =>
@@ -427,6 +439,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The command to generate a class from a query
     /// </summary>
     public ICommand FromQueryCommand => new DelegateCommand(GenerateCodeFromQuery);
+
+    /// <summary>
+    /// The command which occurs when the user hits the show info menu item (context menu of the set field option)
+    /// </summary>
+    public ICommand ShowSetFieldInfoCommand => new DelegateCommand(ShowSetFieldInfo);
 
     #endregion
 
@@ -648,10 +665,11 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
             ClassName = ClassName,
             Modifier = SelectedModifier,
             SealedClass = OptionSealedClass,
-            DbModel = OptionDbModel,
+            DbModel = TableOptionEnabled && OptionDbModel,
             WithBackingField = OptionBackingField,
             AddSummary = OptionSummary,
-            Nullable = OptionNullable
+            Nullable = OptionNullable,
+            AddSetField = OptionSetField
         };
     }
 
@@ -692,10 +710,10 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
 
         try
         {
+            var options = GetOptions();
             // We ignore this, because it's not possible to gather "correct" table information
             // because a query can contain more than one table
-            OptionDbModel = false;
-            var options = GetOptions();
+            options.DbModel = false;
             options.SqlQuery = dialog.Code;
             _classGenResult = await _manager.GenerateFromQueryAsync(options);
 
@@ -778,6 +796,24 @@ internal class ClassGenControlViewModel : ViewModelBase, IConnection
         OptionDbModel = false;
         OptionNullable = false;
         OptionSummary = false;
+    }
+
+    /// <summary>
+    /// Shows the info of the set field option
+    /// </summary>
+    private async void ShowSetFieldInfo()
+    {
+        var result = await ShowQuestionAsync("Info",
+            "The 'Set Field' option uses a template that requires the 'ObservableObject' class and 'SetField' method. For WPF projects the class can be added with a NuGet package (e.g. 'ZimLabs.WpfBase' (.NET Framework) or 'ZimLabs.WpfBase.NetCore (.NET)).",
+            "Ok", "Show on GitHub");
+
+        if (result != MessageDialogResult.Negative)
+            return;
+
+        const string gitHubLink =
+            "https://github.com/InvaderZim85/ZimLabs.WpfBase.NetCore/blob/main/ZimLabs.WpfBase.NetCore/ObservableObject.cs";
+
+        Helper.OpenLink(gitHubLink);
     }
     #endregion
 }

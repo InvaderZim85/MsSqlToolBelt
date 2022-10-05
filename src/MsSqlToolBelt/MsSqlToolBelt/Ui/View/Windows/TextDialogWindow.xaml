@@ -47,7 +47,7 @@
             Margin="3"
             HorizontalAlignment="Right"
             Content="{Binding Settings.CheckboxText}"
-            IsChecked="{Binding Settings.ShowOption}"
+            IsChecked="{Binding ShowOptionalText}"
             Visibility="{Binding Settings.ShowOption, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
         <Separator Grid.Row="1" />

@@ -41,6 +41,7 @@ internal class AppDbContext : DbContext
     public AppDbContext()
     {
         _conString = $"Data Source={Path.Combine(Core.GetBaseDirPath(), "MsSqlToolBelt.Settings.db")}";
+        
     }
 
     /// <summary>

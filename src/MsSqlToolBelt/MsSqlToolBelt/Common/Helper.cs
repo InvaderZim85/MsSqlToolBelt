@@ -289,12 +289,12 @@ internal static class Helper
     {
         return value switch
         {
-            var size when size < divider => $"{size:N0} Bytes",
-            var size when size >= divider && size < Math.Pow(divider, 2) => $"{size / divider:N2} KB",
-            var size when size >= Math.Pow(divider, 2) && size < Math.Pow(divider, 3) =>
-                $"{size / Math.Pow(divider, 2):N2} MB",
-            var size when size >= Math.Pow(divider, 3) && size <= Math.Pow(divider, 4) => $"{size / Math.Pow(divider, 3):N2} GB",
-            var size when size >= Math.Pow(divider, 4) => $"{size / Math.Pow(divider, 4)} TB",
+            _ when value < divider => $"{value:N0} Bytes",
+            _ when value >= divider && value < Math.Pow(divider, 2) => $"{value / divider:N2} KB",
+            _ when value >= Math.Pow(divider, 2) && value < Math.Pow(divider, 3) =>
+                $"{value / Math.Pow(divider, 2):N2} MB",
+            _ when value >= Math.Pow(divider, 3) && value <= Math.Pow(divider, 4) => $"{value / Math.Pow(divider, 3):N2} GB",
+            _ when value >= Math.Pow(divider, 4) => $"{value / Math.Pow(divider, 4)} TB",
             _ => value.ToString("N0")
         };
     }
@@ -307,7 +307,6 @@ internal static class Helper
     /// <returns>The cloned entry</returns>
     public static T Clone<T>(this T entry) where T : class, new()
     {
-        var result = Activator.CreateInstance<T>();
         return Mapper.CreateAndMap<T, T>(entry);
     }
     #endregion

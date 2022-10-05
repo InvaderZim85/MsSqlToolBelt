@@ -324,6 +324,24 @@ internal class MainWindowViewModel : ViewModelBase
         var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
         dialog.ShowDialog();
     });
+
+    /// <summary>
+    /// The command which occurs when the user hits the template manager menu item (main menu)
+    /// </summary>
+    public ICommand ShowTemplateManagerCommand => new DelegateCommand(() =>
+    {
+        var dialog = new TemplateWindow {Owner = Application.Current.MainWindow};
+        dialog.ShowDialog();
+    });
+
+    /// <summary>
+    /// The command which occurs when the user hits the show data type menu item
+    /// </summary>
+    public ICommand ShowDataTypeCommand => new DelegateCommand(() =>
+    {
+        var dialog = new DataTypeWindow {Owner = Application.Current.MainWindow};
+        dialog.ShowDialog();
+    });
     #endregion
 
     /// <summary>

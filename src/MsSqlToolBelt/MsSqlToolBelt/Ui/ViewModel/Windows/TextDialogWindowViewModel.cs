@@ -34,7 +34,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
     public TextDialogSettings Settings
     {
         get => _settings;
-        set => SetField(ref _settings, value);
+        private set => SetField(ref _settings, value);
     }
 
     /// <summary>
@@ -78,6 +78,24 @@ internal class TextDialogWindowViewModel : ViewModelBase
     {
         get => _validateButtonVisible;
         set => SetField(ref _validateButtonVisible, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ShowOptionalText"/>
+    /// </summary>
+    private bool _showOptionalText;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the optional text should be shown
+    /// </summary>
+    public bool ShowOptionalText
+    {
+        get => _showOptionalText;
+        set
+        {
+            SetField(ref _showOptionalText, value);
+            _setEditorText?.Invoke(value ? _settings.TextOption : _settings.Text);
+        }
     }
 
     /// <summary>

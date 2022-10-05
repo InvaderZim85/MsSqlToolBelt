@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -37,7 +38,11 @@ public class SettingsManager
     {
         _context = new AppDbContext();
         // Create / update the database if needed
-        _context.Database.Migrate();
+        var databaseCreated = _context.Database.EnsureCreated();
+
+        // If the database was already created, start the migration
+        if (!databaseCreated)
+            _context.Database.Migrate();
     }
 
     #region Settings

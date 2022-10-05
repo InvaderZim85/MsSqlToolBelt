@@ -10,6 +10,7 @@ using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
+using MsSqlToolBelt.Templates;
 using Newtonsoft.Json;
 using ZimLabs.CoreLib;
 
@@ -18,7 +19,7 @@ namespace MsSqlToolBelt.Business;
 /// <summary>
 /// Provides the functions for the generation of a class
 /// </summary>
-public class ClassGenManager : IDisposable
+public sealed class ClassGenManager : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -51,14 +52,14 @@ public class ClassGenManager : IDisposable
     private readonly SettingsManager _settingsManager;
 
     /// <summary>
+    /// The instance for the interaction with the templates
+    /// </summary>
+    private readonly TemplateManager _templateManager = new();
+
+    /// <summary>
     /// The list with the conversion types
     /// </summary>
     private List<ClassGenTypeEntry> _conversionTypes = new();
-
-    /// <summary>
-    /// Contains the list with the templates
-    /// </summary>
-    private readonly SortedList<ClassGenTemplateType, string> _templates = new();
 
     /// <summary>
     /// Gets the list with the tables
@@ -82,6 +83,8 @@ public class ClassGenManager : IDisposable
         _tableTypeManager = new TableTypeManager(dataSource, database);
         _repo = new ClassGenRepo(dataSource, database);
         _settingsManager = settingsManager;
+
+        Mediator.AddAction("ReloadTemplates", ReloadTemplates);
     }
 
     #region Loading
@@ -184,10 +187,7 @@ public class ClassGenManager : IDisposable
     /// <returns>The content of the class</returns>
     public ClassGenResult GenerateCode(ClassGenOptions options)
     {
-        if (SelectedTable == null)
-            return new ClassGenResult();
-
-        return GenerateCode(options, SelectedTable);
+        return SelectedTable == null ? new ClassGenResult() : GenerateCode(options, SelectedTable);
     }
 
     /// <summary>
@@ -268,6 +268,14 @@ public class ClassGenManager : IDisposable
 
     #region CSharp class
     /// <summary>
+    /// Loads the templates
+    /// </summary>
+    private void ReloadTemplates()
+    {
+        _templateManager.LoadTemplates();
+    }
+
+    /// <summary>
     /// Generates the class code
     /// </summary>
     /// <param name="options">The desired options</param>
@@ -277,10 +285,10 @@ public class ClassGenManager : IDisposable
     private string GenerateClass(ClassGenOptions options, TableDto table, string infoText)
     {
         // Load the templates
-        LoadTemplates();
+        _templateManager.LoadTemplates(false);
 
         // Get the class template
-        var classTemplate = _templates[ClassGenTemplateType.ClassDefault];
+        var classTemplate = _templateManager.GetTemplateContent(ClassGenTemplateType.ClassDefault);
 
         // Generate the properties
         //var properties = SelectedTable.Columns.Where(w => w.Use).Select(column => GenerateColumn(options, column)).ToList();
@@ -292,14 +300,19 @@ public class ClassGenManager : IDisposable
             properties.Add(""); // Add an empty line for the break
         }
 
-            // Remove the last empty line (not very nice, but hey, if it works, it works :D
+        // Remove the last empty line (not very nice, but hey, if it works, it works :D
         if (properties.Any())
             properties.RemoveAt(properties.Count - 1);
 
+        // Set the values
         classTemplate = classTemplate.Replace("$PROPERTIES$", string.Join(Environment.NewLine, properties));
         classTemplate = classTemplate.Replace("$MODIFIER$", options.Modifier);
-        classTemplate = classTemplate.Replace("$SEALED$", options.SealedClass ? " sealed" : "");
+        classTemplate = classTemplate.Replace("$SEALED$", options.SealedClass ? " sealed" : string.Empty);
         classTemplate = classTemplate.Replace("$NAME$", options.ClassName);
+        
+        // Set the "inherits" value
+        var inherits = options.AddSetField ? ": ObservableObject" : string.Empty;
+        classTemplate = classTemplate.Replace("$INHERITS$", inherits);
 
         if (options.DbModel && !table.Name.Equals(options.ClassName))
             classTemplate = string.IsNullOrEmpty(table.Schema)
@@ -402,13 +415,13 @@ public class ClassGenManager : IDisposable
     /// <returns>The code for the keys</returns>
     private (string completeCode, string shortCode) GenerateEfKeyCode(ClassGenOptions options, TableDto table)
     {
-        var template = GetTemplate(ClassGenTemplateType.EfCreatingBuilder);
+        var template = _templateManager.GetTemplateContent(ClassGenTemplateType.EfCreatingBuilder);
 
         var keyColumns = table.Columns.Where(w => w.IsPrimaryKey).ToList();
         if (!keyColumns.Any())
             return (string.Empty, string.Empty);
 
-        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }}";
+        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }});";
         var completeCode = template.Replace("$ENTRIES$", shortCode);
 
         return (completeCode, shortCode);
@@ -478,58 +491,15 @@ public class ClassGenManager : IDisposable
     {
         return options.AddSummary switch
         {
-            true when options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyBackingFieldComment),
-            true when !options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyDefaultComment),
-            false when options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyBackingFieldDefault),
-            false when !options.WithBackingField => GetTemplate(ClassGenTemplateType.PropertyDefault),
+            true when options.WithBackingField && !options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
+            true when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
+            true when !options.WithBackingField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
+            false when options.WithBackingField &&! options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
+            false when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
+            false when !options.WithBackingField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
+                
             _ => string.Empty
         };
-    }
-
-    /// <summary>
-    /// Loads the desired template
-    /// </summary>
-    /// <param name="type">The template type</param>
-    /// <returns>The template content</returns>
-    private string GetTemplate(ClassGenTemplateType type)
-    {
-        return _templates[type];
-    }
-
-    /// <summary>
-    /// Loads all templates and stores them into <see cref="_templates"/>
-    /// </summary>
-    private void LoadTemplates()
-    {
-        if (_templates.Any())
-            return;
-
-        foreach (var template in Enum.GetValues<ClassGenTemplateType>())
-        {
-            _templates.Add(template, LoadTemplate(template));
-        }
-    }
-
-    /// <summary>
-    /// Loads the template for the desired type
-    /// </summary>
-    /// <param name="type">The template type</param>
-    /// <returns></returns>
-    /// <exception cref="DirectoryNotFoundException">Will be thrown when the template directory is missing</exception>
-    /// <exception cref="FileNotFoundException">Will be thrown when the template file is missing</exception>
-    private static string LoadTemplate(ClassGenTemplateType type)
-    {
-        var dir = new DirectoryInfo(Path.Combine(Core.GetBaseDirPath(), "Templates"));
-        if (!dir.Exists)
-            throw new DirectoryNotFoundException("The template directory is missing.");
-
-        var templates = dir.GetFiles("*.cgt");
-
-        var file = templates.FirstOrDefault(f => f.Name.ContainsIgnoreCase(type.ToString()));
-        if (file is not {Exists: true})
-            throw new FileNotFoundException($"The template file for '{type}' is missing.");
-
-        return File.ReadAllText(file.FullName);
     }
     #endregion
 
@@ -570,12 +540,12 @@ public class ClassGenManager : IDisposable
     /// Loads the conversion types
     /// </summary>
     /// <returns>The list with the conversion types</returns>
-    public List<ClassGenTypeEntry> LoadDataTypes()
+    public static List<ClassGenTypeEntry> LoadDataTypes()
     {
         var path = Path.Combine(Core.GetBaseDirPath(), "ClassGenTypeConversion.json");
 
         if (!File.Exists(path))
-            _conversionTypes = new List<ClassGenTypeEntry>();
+            return new List<ClassGenTypeEntry>();
 
         var content = File.ReadAllText(path);
 
@@ -612,6 +582,8 @@ public class ClassGenManager : IDisposable
             return;
 
         _tableManager.Dispose();
+
+        Mediator.RemoveAction("LoadTemplates");
 
         _disposed = true;
     }

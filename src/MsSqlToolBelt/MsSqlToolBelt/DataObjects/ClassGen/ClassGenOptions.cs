@@ -31,6 +31,13 @@ public class ClassGenOptions
     public bool WithBackingField { get; set; }
 
     /// <summary>
+    /// Gets or sets the value which indicates if the "SetField" method should be used
+    /// <para />
+    /// If this value is enabled, the <see cref="WithBackingField"/> will be overwritten and set to true
+    /// </summary>
+    public bool AddSetField { get; set; }
+
+    /// <summary>
     /// Gets or sets the value which indicates if a summary should be added
     /// </summary>
     public bool AddSummary { get; set; }

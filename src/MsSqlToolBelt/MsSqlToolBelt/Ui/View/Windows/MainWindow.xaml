@@ -89,6 +89,16 @@
                 MouseDoubleClick="BuildInfo_OnMouseDoubleClick" />
         </StatusBar>
 
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Program">
+                <MenuItem Click="MainMenuClose_Click" Header="Close" />
+            </MenuItem>
+            <MenuItem Header="Class generator">
+                <MenuItem Command="{Binding ShowTemplateManagerCommand}" Header="Template editor" />
+                <MenuItem Command="{Binding ShowDataTypeCommand}" Header="Data types" />
+            </MenuItem>
+        </Menu>
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
