@@ -420,7 +420,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     {
         var dialog = new TextDialogWindow(new TextDialogSettings
         {
-            Title = "Class generator - EF",
+            Title = "Class generator - EF key code",
             Caption = "Code to configure multiple columns as key",
             CheckboxText = "Without method body",
             ShowOption = true,

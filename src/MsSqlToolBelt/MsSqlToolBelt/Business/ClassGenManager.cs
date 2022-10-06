@@ -421,7 +421,7 @@ public sealed class ClassGenManager : IDisposable
         if (!keyColumns.Any())
             return (string.Empty, string.Empty);
 
-        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }});";
+        var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => new {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }});";
         var completeCode = template.Replace("$ENTRIES$", shortCode);
 
         return (completeCode, shortCode);
