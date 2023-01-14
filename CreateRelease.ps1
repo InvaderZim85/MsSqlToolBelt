@@ -138,10 +138,11 @@ try {
 
     # ===========================
     # Extract the packages to 
-    # generate the package file
-    $packageScript = "src/MsSqlToolBelt/ExtractPackages.ps1"
+    # generate the package file    
+    $packageScript = ".\ExtractPackages.ps1"
 
     # Run the file
+    Write-Host "Extract packages"
     & $packageScript
 
     # ===========================

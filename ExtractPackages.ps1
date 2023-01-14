@@ -1,10 +1,9 @@
-Param
-(
-    [Parameter(Position = 0, Mandatory = $true, HelpMessage = "The path of the project file")]
-    $projectFile,
-    [Parameter(Position = 1, Mandatory = $true, HelpMessage = "The path of the output file")]
-    $outputFile
-)
+# Variables
+$projectFile = "src\MsSqlToolBelt\MsSqlToolBelt\MsSqlToolBelt.csproj"
+$projectFile = Resolve-Path -Path $projectFile
+
+$outputFile = "src\MsSqlToolBelt\MsSqlToolBelt\Packages.csv"
+$outputFile = Resolve-Path -Path $outputFile
 
 Write-Host "Files:"
 Write-Host " - Project file: $projectFile"
