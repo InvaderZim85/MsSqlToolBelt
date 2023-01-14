@@ -1,5 +1,7 @@
 # MsSqlToolBelt
 
+![Logo](https://repository-images.githubusercontent.com/273479602/9e50b60c-a523-44bf-8e03-c6d5669b0684)
+
 [![Releases](https://img.shields.io/github/v/release/InvaderZim85/MsSqlToolBelt)](https://github.com/InvaderZim85/MsSqlToolBelt/releases)
 
 **Content**
