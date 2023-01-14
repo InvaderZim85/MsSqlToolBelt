@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
-using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -37,7 +36,7 @@ public partial class DataTypeWindow : MetroWindow
     /// <summary>
     /// Occurs when the user hits the close button
     /// </summary>
-    /// <param name="sender">The <see cref="ButtonClose"/></param>
+    /// <param name="sender">The close button</param>
     /// <param name="e">The event arguments</param>
     private void ButtonClose_OnClick(object sender, RoutedEventArgs e)
     {

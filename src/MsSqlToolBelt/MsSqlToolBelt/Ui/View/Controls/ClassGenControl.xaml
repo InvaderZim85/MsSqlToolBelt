@@ -224,9 +224,9 @@
 
                     <Grid Grid.Row="2" Grid.Column="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="34" />
+                            <RowDefinition Height="34" />
+                            <RowDefinition Height="34" />
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -292,24 +292,21 @@
                             Grid.Column="2"
                             Content="Nullable enabled (.NET 6)"
                             IsChecked="{Binding OptionNullable}" />
-                        <CheckBox
+                        <StackPanel
                             Grid.Row="2"
                             Grid.Column="3"
-                            Content="Use 'SetField' method"
-                            IsChecked="{Binding OptionSetField}">
-                            <CheckBox.ToolTip>
-                                <TextBlock>
-                                    Note:<LineBreak />
-                                    1. This works only if you use a special "ObservableObject" (see ZimLabs.WpfBase.NetCore) because the "SetField" method is a part of the "ObservableObject" class.<LineBreak />
-                                    2. If you use this option, the option "Backing fiel" will be set to true otherwise this option will be ignored<LineBreak />
-                                    Open the context menu for more information</TextBlock>
-                            </CheckBox.ToolTip>
-                            <CheckBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Command="{Binding ShowSetFieldInfoCommand}" Header="Show info" />
-                                </ContextMenu>
-                            </CheckBox.ContextMenu>
-                        </CheckBox>
+                            Margin="1,0,0,0"
+                            Orientation="Horizontal">
+                            <CheckBox Content="Use 'SetProperty' method" IsChecked="{Binding OptionSetField}" />
+
+                            <Button BorderThickness="0" Command="{Binding ShowSetFieldInfoCommand}">
+                                <iconPacks:Material Kind="Information" />
+                                <Button.ToolTip>
+                                    Show information about the "SetProperty" option
+                                </Button.ToolTip>
+                            </Button>
+                        </StackPanel>
+
 
                         <Button
                             Grid.Row="2"

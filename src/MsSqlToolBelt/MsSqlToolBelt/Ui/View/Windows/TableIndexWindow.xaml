@@ -7,7 +7,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
-    Title="TableIndexWindow"
+    Title="Indices / Foreign Key's"
     Width="800"
     Height="450"
     mah:DialogParticipation.Register="{Binding}"
@@ -53,7 +53,7 @@
                 <DataGridTextColumn
                     Width="2*"
                     Binding="{Binding Columns}"
-                    Header="Columns" />
+                    Header="Columns / Info" />
             </DataGrid.Columns>
         </DataGrid>
 

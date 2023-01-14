@@ -4,12 +4,12 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel;
 
@@ -29,6 +29,11 @@ internal class ViewModelBase : ObservableObject
     private ProgressDialogController? _progressDialogController;
 
     /// <summary>
+    /// Gets or sets the value which indicates if there is any error (only needed for the input validation)
+    /// </summary>
+    public bool HasErrors { get; set; }
+
+    /// <summary>
     /// The message timer
     /// </summary>
     private readonly Timer _messageTimer = new(TimeSpan.FromSeconds(10).TotalMilliseconds);
@@ -44,7 +49,7 @@ internal class ViewModelBase : ObservableObject
     public string InfoMessage
     {
         get => _infoMessage;
-        private set => SetField(ref _infoMessage, value);
+        private set => SetProperty(ref _infoMessage, value);
     }
 
     /// <summary>

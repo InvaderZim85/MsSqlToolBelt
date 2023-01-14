@@ -122,7 +122,8 @@
             Grid.Row="8"
             Grid.RowSpan="2"
             Grid.Column="1"
-            Margin="3" />
+            Margin="3"
+            Visibility="{Binding BrowserVisibility}" />
 
         <Separator
             Grid.Row="10"

@@ -27,6 +27,11 @@ public sealed class ClassGenManager : IDisposable
     private bool _disposed;
 
     /// <summary>
+    /// The name of the class gen type conversion file
+    /// </summary>
+    private const string ClassGenTypeConversionFileName = "ClassGenTypeConversion.json";
+
+    /// <summary>
     /// Contains the tab indent
     /// </summary>
     private static readonly string Tab = new(' ', 4);
@@ -84,7 +89,8 @@ public sealed class ClassGenManager : IDisposable
         _repo = new ClassGenRepo(dataSource, database);
         _settingsManager = settingsManager;
 
-        Mediator.AddAction("ReloadTemplates", ReloadTemplates);
+        Mediator.AddAction(nameof(ReloadTemplates), ReloadTemplates);
+        Mediator.AddAction(nameof(ResetConversionTypes), ResetConversionTypes);
     }
 
     #region Loading
@@ -332,10 +338,11 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The code for the column</returns>
     private string GenerateColumn(ClassGenOptions options, ColumnDto column)
     {
-        var template = GetClassTemplate(options);
-
         // DataType
         var dataType = GetCSharpType(column.DataType);
+
+        // Template
+        var template = GetClassTemplate(options, dataType);
         template = template.Replace("$TYPE$",
             string.IsNullOrEmpty(dataType.CSharpType) ? column.DataType : dataType.CSharpType);
         if (column.IsNullable && (!dataType.IsNullable || options.Nullable))
@@ -486,10 +493,11 @@ public sealed class ClassGenManager : IDisposable
     /// Loads the desired template
     /// </summary>
     /// <param name="options">The options</param>
+    /// <param name="dataType">Gets the data type</param>
     /// <returns>The template</returns>
-    private string GetClassTemplate(ClassGenOptions options)
+    private string GetClassTemplate(ClassGenOptions options, ClassGenTypeEntry dataType)
     {
-        return options.AddSummary switch
+        var template = options.AddSummary switch
         {
             true when options.WithBackingField && !options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
             true when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
@@ -497,9 +505,66 @@ public sealed class ClassGenManager : IDisposable
             false when options.WithBackingField &&! options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
             false when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
             false when !options.WithBackingField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
-                
             _ => string.Empty
         };
+
+        if (!options.Nullable) 
+            return template;
+
+        if (!dataType.CSharpType.EqualsIgnoreCase("string"))
+            return template;
+
+        var lines = GetTemplateLines(template);
+        if (!lines.Any()) // If there is no line, something is wrong...
+            return template;
+
+        if (template.Contains("$NAME2$"))
+        {
+            var index = GetLineIndex(lines, "$NAME2$");
+            if (index == -1) // If this happen, something is wrong...
+                return template;
+
+            lines[index] = lines[index].Replace(";", " = string.Empty;");
+        }
+        else if (template.Contains("$NAME$"))
+        {
+            var index = GetLineIndex(lines, "$NAME$");
+            if (index == -1) // If this happen, something is wrong...
+                return template;
+
+            lines[index] += " = string.Empty;";
+        }
+
+        template = string.Join(Environment.NewLine, lines);
+
+        return template;
+    }
+
+    /// <summary>
+    /// Splits the template into each line
+    /// </summary>
+    /// <param name="template">The template</param>
+    /// <returns>The lines of the template</returns>
+    private static List<string> GetTemplateLines(string template)
+    {
+        return template.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
+    }
+
+    /// <summary>
+    /// Gets the index of the line, which contains the desired value
+    /// </summary>
+    /// <param name="lines">The list with the lines</param>
+    /// <param name="value">The value to search for</param>
+    /// <returns>The index of the line, if nothing was found, -1 will returned</returns>
+    private static int GetLineIndex(IReadOnlyList<string> lines, string value)
+    {
+        for (var i = 0; i < lines.Count; i++)
+        {
+            if (lines[i].Contains(value))
+                return i;
+        }
+
+        return -1;
     }
     #endregion
 
@@ -537,19 +602,50 @@ public sealed class ClassGenManager : IDisposable
     }
 
     /// <summary>
+    /// Reload the types
+    /// </summary>
+    private void ResetConversionTypes()
+    {
+        // Clear the list so it has to be reloaded the next time
+        _conversionTypes.Clear();
+    }
+
+    /// <summary>
     /// Loads the conversion types
     /// </summary>
     /// <returns>The list with the conversion types</returns>
     public static List<ClassGenTypeEntry> LoadDataTypes()
     {
-        var path = Path.Combine(Core.GetBaseDirPath(), "ClassGenTypeConversion.json");
+        var path = Path.Combine(Core.GetBaseDirPath(), ClassGenTypeConversionFileName);
 
         if (!File.Exists(path))
             return new List<ClassGenTypeEntry>();
 
         var content = File.ReadAllText(path);
 
-        return JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? new List<ClassGenTypeEntry>();
+        var data = JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? new List<ClassGenTypeEntry>();
+
+        foreach (var entry in data)
+        {
+            entry.Id = Helper.GenerateHashCode(entry.CSharpType, entry.CSharpSystemType, entry.SqlType);
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// Saves the data types
+    /// </summary>
+    /// <param name="types">The list with the data types</param>
+    public static void SaveDataTypes(IEnumerable<ClassGenTypeEntry> types)
+    {
+        var path = Path.Combine(Core.GetBaseDirPath(), ClassGenTypeConversionFileName);
+
+        var content = JsonConvert.SerializeObject(types, Formatting.Indented);
+
+        File.WriteAllText(path, content, Encoding.UTF8);
+
+        Mediator.ExecuteAction(nameof(ResetConversionTypes));
     }
 
     /// <summary>

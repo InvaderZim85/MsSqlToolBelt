@@ -2,13 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -37,7 +37,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<TableEntry> Tables
     {
         get => _tables;
-        private set => SetField(ref _tables, value);
+        private set => SetProperty(ref _tables, value);
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         get => _selectedTable;
         set
         {
-            SetField(ref _selectedTable, value);
+            SetProperty(ref _selectedTable, value);
 
             if (_manager == null)
                 return;
@@ -81,7 +81,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnEntry> Columns
     {
         get => _columns;
-        private set => SetField(ref _columns, value);
+        private set => SetProperty(ref _columns, value);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<IndexEntry> Indexes
     {
         get => _indexes;
-        private set => SetField(ref _indexes, value);
+        private set => SetProperty(ref _indexes, value);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         get => _filter;
         set
         {
-            SetField(ref _filter, value);
+            SetProperty(ref _filter, value);
             if (string.IsNullOrEmpty(value))
                 FilterList();
         }
@@ -128,7 +128,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderList
     {
         get => _headerList;
-        private set => SetField(ref _headerList, value);
+        private set => SetProperty(ref _headerList, value);
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderColumns
     {
         get => _headerColumns;
-        private set => SetField(ref _headerColumns, value);
+        private set => SetProperty(ref _headerColumns, value);
     }
 
     /// <summary>
@@ -156,7 +156,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public string HeaderIndex
     {
         get => _headerIndex;
-        private set => SetField(ref _headerIndex, value);
+        private set => SetProperty(ref _headerIndex, value);
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public bool ShowInfo
     {
         get => _showInfo;
-        set => SetField(ref _showInfo, value);
+        set => SetProperty(ref _showInfo, value);
     }
 
     /// <summary>
@@ -184,19 +184,19 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     public bool ControlEnabled
     {
         get => _controlEnabled;
-        set => SetField(ref _controlEnabled, value);
+        set => SetProperty(ref _controlEnabled, value);
     }
     #endregion
 
     /// <summary>
     /// The command to filter the table types
     /// </summary>
-    public ICommand FilterCommand => new DelegateCommand(FilterList);
+    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to reload the table types
     /// </summary>
-    public ICommand ReloadCommand => new DelegateCommand(() =>
+    public ICommand ReloadCommand => new RelayCommand(() =>
     {
         _dataLoaded = false;
         LoadData();

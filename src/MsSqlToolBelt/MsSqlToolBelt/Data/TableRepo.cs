@@ -94,34 +94,6 @@ internal class TableRepo : BaseRepo
     }
 
     /// <summary>
-    /// Loads the indexes of the specified tables
-    /// </summary>
-    /// <param name="table">The table</param>
-    /// <returns>The awaitable task</returns>
-    public async Task<List<IndexDto>> LoadTableIndexAsync(TableEntry table)
-    {
-        const string query =
-            @"SELECT DISTINCT
-                i.[name] AS [Name],
-                COL_NAME(ic.object_id, ic.column_id) AS [Column]
-            FROM
-                sys.indexes AS i
-
-                INNER JOIN sys.index_columns AS ic
-                ON ic.object_id = i.object_id
-                AND ic.index_id = i.index_id
-
-                INNER JOIN sys.columns AS c
-                ON c.object_id = ic.object_id
-            WHERE
-                c.object_id = @id";
-
-        var result = await QueryAsListAsync<IndexDto>(query, table);
-
-        return result;
-    }
-
-    /// <summary>
     /// Loads the primary key information of the table
     /// </summary>
     /// <param name="table">The table</param>
@@ -153,5 +125,76 @@ internal class TableRepo : BaseRepo
         {
             column.IsPrimaryKey = columns.Contains(column.Name);
         }
+    }
+
+    /// <summary>
+    /// Loads the indexes of the specified tables
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <returns>The awaitable task</returns>
+    public async Task<List<IndexDto>> LoadTableIndexAsync(TableEntry table)
+    {
+        const string query =
+            @"SELECT DISTINCT
+                i.[name] AS [Name],
+                COL_NAME(ic.object_id, ic.column_id) AS [Column]
+            FROM
+                sys.indexes AS i
+
+                INNER JOIN sys.index_columns AS ic
+                ON ic.object_id = i.object_id
+                AND ic.index_id = i.index_id
+
+                INNER JOIN sys.columns AS c
+                ON c.object_id = ic.object_id
+            WHERE
+                c.object_id = @id";
+
+        var result = await QueryAsListAsync<IndexDto>(query, table);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Loads the foreign keys of the desired table
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <returns>The list with the foreign keys</returns>
+    public async Task<List<ForeignKeyDto>> LoadForeignKeyInfoAsync(TableEntry table)
+    {
+        const string query =
+            @"SELECT 
+                fk.name AS [Name],
+                c_parent.name AS ColumnName,
+                t_child.name AS ReferencedTableName,
+                c_child.name AS ReferencedColumnName
+            FROM 
+                sys.foreign_keys AS fk 
+
+                INNER JOIN sys.foreign_key_columns AS fkc
+                ON fkc.constraint_object_id = fk.object_id
+
+                INNER JOIN sys.tables AS t_parent
+                ON t_parent.object_id = fk.parent_object_id
+
+                INNER JOIN sys.columns AS c_parent
+                ON fkc.parent_column_id = c_parent.column_id  
+                AND c_parent.object_id = t_parent.object_id 
+
+                INNER JOIN sys.tables AS t_child
+                ON t_child.object_id = fk.referenced_object_id
+
+                INNER JOIN sys.columns AS c_child
+                ON c_child.object_id = t_child.object_id
+                AND fkc.referenced_column_id = c_child.column_id
+            WHERE
+                t_parent.object_id = @id
+            ORDER BY 
+                t_parent.name,
+                c_parent.name;";
+
+        var result = await QueryAsListAsync<ForeignKeyDto>(query, table);
+
+        return result;
     }
 }

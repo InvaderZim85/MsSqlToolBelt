@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Templates;
 using MsSqlToolBelt.Ui.Common;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -42,7 +42,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
     public ObservableCollection<TemplateEntry> Templates
     {
         get => _templates;
-        set => SetField(ref _templates, value);
+        set => SetProperty(ref _templates, value);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         get => _selectedTemplate;
         set
         {
-            if (SetField(ref _selectedTemplate, value) && value != null)
+            if (SetProperty(ref _selectedTemplate, value) && value != null)
                 _setCodeEditorText?.Invoke(value.Content);
         }
     }
@@ -70,22 +70,22 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
     /// <summary>
     /// The command occurs when the user hits the copy button
     /// </summary>
-    public ICommand CopyCommand => new DelegateCommand(() => CopyToClipboard(_getCodeEditorText?.Invoke() ?? ""));
+    public ICommand CopyCommand => new RelayCommand(() => CopyToClipboard(_getCodeEditorText?.Invoke() ?? ""));
 
     /// <summary>
     /// The command occurs when the user hits the save button
     /// </summary>
-    public ICommand SaveCommand => new DelegateCommand(SaveChanges);
+    public ICommand SaveCommand => new RelayCommand(SaveChanges);
 
     /// <summary>
     /// The command occurs when the user hits the backup button
     /// </summary>
-    public ICommand BackupCommand => new DelegateCommand(CreateBackup);
+    public ICommand BackupCommand => new RelayCommand(CreateBackup);
 
     /// <summary>
     /// The command occurs when the user hits the load backup button
     /// </summary>
-    public ICommand LoadBackupCommand => new DelegateCommand(LoadBackup);
+    public ICommand LoadBackupCommand => new RelayCommand(LoadBackup);
     #endregion
 
     /// <summary>

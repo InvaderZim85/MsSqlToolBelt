@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.DataObjects.Common;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -34,7 +34,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
     public TextDialogSettings Settings
     {
         get => _settings;
-        private set => SetField(ref _settings, value);
+        private set => SetProperty(ref _settings, value);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
     public bool ShowValidationInfo
     {
         get => _showValidationInfo;
-        set => SetField(ref _showValidationInfo, value);
+        set => SetProperty(ref _showValidationInfo, value);
     }
 
     private bool _codeValid;
@@ -77,7 +77,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
     public bool ValidateButtonVisible
     {
         get => _validateButtonVisible;
-        set => SetField(ref _validateButtonVisible, value);
+        set => SetProperty(ref _validateButtonVisible, value);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
         get => _showOptionalText;
         set
         {
-            SetField(ref _showOptionalText, value);
+            SetProperty(ref _showOptionalText, value);
             _setEditorText?.Invoke(value ? _settings.TextOption : _settings.Text);
         }
     }
@@ -101,17 +101,17 @@ internal class TextDialogWindowViewModel : ViewModelBase
     /// <summary>
     /// The command to copy the code
     /// </summary>
-    public ICommand CopyCommand => new DelegateCommand(Copy);
+    public ICommand CopyCommand => new RelayCommand(Copy);
 
     /// <summary>
     /// The command to validate the inserted text
     /// </summary>
-    public ICommand ValidateCommand => new DelegateCommand(ExecuteValidation);
+    public ICommand ValidateCommand => new RelayCommand(ExecuteValidation);
 
     /// <summary>
     /// The command to close the window
     /// </summary>
-    public ICommand CloseCommand => new DelegateCommand(CloseWindow);
+    public ICommand CloseCommand => new RelayCommand(CloseWindow);
 
     /// <summary>
     /// Init the view model

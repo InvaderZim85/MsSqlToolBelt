@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -120,17 +119,6 @@ public class SettingsManager
         ServerList = withTracking
             ? await _context.ServerEntries.ToListAsync()
             : await _context.ServerEntries.AsNoTracking().ToListAsync();
-    }
-
-    /// <summary>
-    /// Loads the default database of the server
-    /// </summary>
-    /// <param name="server">The name of the server</param>
-    /// <returns>The default database</returns>
-    public async Task<string> LoadDefaultDatabaseAsync(string server)
-    {
-        var entry = await _context.ServerEntries.FirstOrDefaultAsync(f => f.Name.Equals(server));
-        return entry?.DefaultDatabase ?? "";
     }
 
     /// <summary>

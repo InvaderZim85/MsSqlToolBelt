@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.Common;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -33,7 +33,7 @@ internal class InfoControlViewModel : ViewModelBase
     public string LogDir
     {
         get => _logDir;
-        set => SetField(ref _logDir, value);
+        set => SetProperty(ref _logDir, value);
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ internal class InfoControlViewModel : ViewModelBase
     public string VersionInfo
     {
         get => _versionInfo;
-        private set => SetField(ref _versionInfo, value);
+        private set => SetProperty(ref _versionInfo, value);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ internal class InfoControlViewModel : ViewModelBase
     public string BuildInfo
     {
         get => _buildInfo;
-        private set => SetField(ref _buildInfo, value);
+        private set => SetProperty(ref _buildInfo, value);
     }
 
     /// <summary>
@@ -75,13 +75,13 @@ internal class InfoControlViewModel : ViewModelBase
     public ObservableCollection<PackageInfo> PackageList
     {
         get => _packageList;
-        private set => SetField(ref _packageList, value);
+        private set => SetProperty(ref _packageList, value);
     }
 
     /// <summary>
     /// The command to open the log dir
     /// </summary>
-    public ICommand OpenLogDirCommand => new DelegateCommand(() =>
+    public ICommand OpenLogDirCommand => new RelayCommand(() =>
     {
         if (string.IsNullOrEmpty(LogDir) || !Directory.Exists(LogDir))
             return;

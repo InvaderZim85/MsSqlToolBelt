@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -41,7 +41,7 @@ internal class ExportWindowViewModel : ViewModelBase
     public ObservableCollection<IdTextEntry> ExportTypes
     {
         get => _exportTypes;
-        private set => SetField(ref _exportTypes, value);
+        private set => SetProperty(ref _exportTypes, value);
     }
 
     /// <summary>
@@ -55,13 +55,13 @@ internal class ExportWindowViewModel : ViewModelBase
     public IdTextEntry? SelectedExportType
     {
         get => _selectedExportType;
-        set => SetField(ref _selectedExportType, value);
+        set => SetProperty(ref _selectedExportType, value);
     }
 
     /// <summary>
     /// The command to export the data
     /// </summary>
-    public ICommand ExportCommand => new DelegateCommand(ExportData);
+    public ICommand ExportCommand => new RelayCommand(ExportData);
 
     /// <summary>
     /// Init the view model

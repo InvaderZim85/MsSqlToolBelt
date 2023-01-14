@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
@@ -31,11 +30,6 @@ internal class SearchManager : IDisposable
     private readonly TableManager _tableManager;
 
     /// <summary>
-    /// The instance for the interaction with the settings
-    /// </summary>
-    private readonly SettingsManager _settingsManager;
-
-    /// <summary>
     /// Gets the list with the result types
     /// </summary>
     public List<string> ResultTypes { get; private set; } = new();
@@ -59,7 +53,6 @@ internal class SearchManager : IDisposable
     {
         _repo = new SearchRepo(dataSource, database);
         _tableManager = new TableManager(dataSource, database);
-        _settingsManager = new SettingsManager();
     }
 
     /// <summary>

@@ -2,13 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -40,7 +40,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<TableTypeEntry> TableTypes
     {
         get => _tableTypes;
-        private set => SetField(ref _tableTypes, value);
+        private set => SetProperty(ref _tableTypes, value);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         get => _selectedTableType;
         set
         {
-            SetField(ref _selectedTableType, value);
+            SetProperty(ref _selectedTableType, value);
 
             if (_manager == null)
                 return;
@@ -81,7 +81,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnEntry> Columns
     {
         get => _columns;
-        private set => SetField(ref _columns, value);
+        private set => SetProperty(ref _columns, value);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         get => _filter;
         set
         {
-            SetField(ref _filter, value);
+            SetProperty(ref _filter, value);
             if (string.IsNullOrEmpty(value))
                 FilterList();
         }
@@ -114,7 +114,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
     public string HeaderList
     {
         get => _headerList;
-        set => SetField(ref _headerList, value);
+        set => SetProperty(ref _headerList, value);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
     public string HeaderColumns
     {
         get => _headerColumns;
-        set => SetField(ref _headerColumns, value);
+        set => SetProperty(ref _headerColumns, value);
     }
 
     #endregion
@@ -136,12 +136,12 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to filter the table types
     /// </summary>
-    public ICommand FilterCommand => new DelegateCommand(FilterList);
+    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to reload the table types
     /// </summary>
-    public ICommand ReloadCommand => new DelegateCommand(() =>
+    public ICommand ReloadCommand => new RelayCommand(() =>
     {
         _dataLoaded = false;
         LoadData();

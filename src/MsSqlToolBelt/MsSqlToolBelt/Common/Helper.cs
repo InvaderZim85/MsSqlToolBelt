@@ -200,6 +200,21 @@ internal static class Helper
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Generates a hash value out of the different values
+    /// </summary>
+    /// <param name="values">The values</param>
+    /// <returns>The generated hash code</returns>
+    public static int GenerateHashCode(params string[] values)
+    {
+        if (values.Length == 0)
+            return 0;
+
+        var tmpValue = string.Join("", values);
+
+        return tmpValue.GetHashCode();
+    }
+
     #region Taskbar
     /// <summary>
     /// Sets the taskbar into an indeterminate state

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.VisualStudio.Threading;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
@@ -15,7 +16,6 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -84,7 +84,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _settingsOpen;
         set
         {
-            SetField(ref _settingsOpen, value);
+            SetProperty(ref _settingsOpen, value);
 
             switch (value)
             {
@@ -111,7 +111,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _infoOpen;
         set
         {
-            SetField(ref _infoOpen, value);
+            SetProperty(ref _infoOpen, value);
             if (value)
                 _initFlyOut?.Invoke(FlyOutType.Info);
         }
@@ -128,7 +128,7 @@ internal class MainWindowViewModel : ViewModelBase
     public ObservableCollection<ServerEntry> ServerList
     {
         get => _serverList;
-        private set => SetField(ref _serverList, value);
+        private set => SetProperty(ref _serverList, value);
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ internal class MainWindowViewModel : ViewModelBase
     public ServerEntry? SelectedServer
     {
         get => _selectedServer;
-        set => SetField(ref _selectedServer, value);
+        set => SetProperty(ref _selectedServer, value);
     }
 
     /// <summary>
@@ -158,7 +158,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _databaseList;
         private set
         {
-            SetField(ref _databaseList, value);
+            SetProperty(ref _databaseList, value);
             ConnectedToServer = value.Any();
         }
     }
@@ -174,7 +174,7 @@ internal class MainWindowViewModel : ViewModelBase
     public string SelectedDatabase
     {
         get => _selectedDatabase;
-        set => SetField(ref _selectedDatabase, value);
+        set => SetProperty(ref _selectedDatabase, value);
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ internal class MainWindowViewModel : ViewModelBase
     public bool ConnectedToServer
     {
         get => _connectedToServer;
-        set => SetField(ref _connectedToServer, value);
+        set => SetProperty(ref _connectedToServer, value);
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ internal class MainWindowViewModel : ViewModelBase
     public bool ConnectionEstablished
     {
         get => _connectionEstablished;
-        set => SetField(ref _connectionEstablished, value);
+        set => SetProperty(ref _connectionEstablished, value);
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ internal class MainWindowViewModel : ViewModelBase
         get => _tabIndex;
         set
         {
-            if (SetField(ref _tabIndex, value))
+            if (SetProperty(ref _tabIndex, value))
                 _loadData?.Invoke(value);
         }
     }
@@ -234,7 +234,7 @@ internal class MainWindowViewModel : ViewModelBase
     public string ConnectionInfo
     {
         get => _connectionInfo;
-        private set => SetField(ref _connectionInfo, value);
+        private set => SetProperty(ref _connectionInfo, value);
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ internal class MainWindowViewModel : ViewModelBase
     public string MemoryUsage
     {
         get => _memoryUsage;
-        private set => SetField(ref _memoryUsage, value);
+        private set => SetProperty(ref _memoryUsage, value);
     }
 
     /// <summary>
@@ -262,7 +262,7 @@ internal class MainWindowViewModel : ViewModelBase
     public string BuildInfo
     {
         get => _buildInfo;
-        private set => SetField(ref _buildInfo, value);
+        private set => SetProperty(ref _buildInfo, value);
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ internal class MainWindowViewModel : ViewModelBase
     public string HeaderApp
     {
         get => _headerApp;
-        private set => SetField(ref _headerApp, value);
+        private set => SetProperty(ref _headerApp, value);
     }
 
     /// <summary>
@@ -290,7 +290,7 @@ internal class MainWindowViewModel : ViewModelBase
     public Visibility ButtonUpdateVisible
     {
         get => _buttonUpdateVisible;
-        set => SetField(ref _buttonUpdateVisible, value);
+        set => SetProperty(ref _buttonUpdateVisible, value);
     }
 
     #endregion
@@ -299,27 +299,27 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// The command to open the settings control
     /// </summary>
-    public ICommand OpenSettingsCommand => new DelegateCommand(() => SettingsOpen = !SettingsOpen);
+    public ICommand OpenSettingsCommand => new RelayCommand(() => SettingsOpen = !SettingsOpen);
 
     /// <summary>
     /// The command to show the info
     /// </summary>
-    public ICommand InfoCommand => new DelegateCommand(() => InfoOpen = !InfoOpen);
+    public ICommand InfoCommand => new RelayCommand(() => InfoOpen = !InfoOpen);
 
     /// <summary>
     /// The command to connect to the server
     /// </summary>
-    public ICommand ConnectServerCommand => new DelegateCommand(ConnectServer);
+    public ICommand ConnectServerCommand => new RelayCommand(ConnectServer);
 
     /// <summary>
     /// The command to set the database
     /// </summary>
-    public ICommand ConnectDatabaseCommand => new DelegateCommand(ConnectDatabase);
+    public ICommand ConnectDatabaseCommand => new RelayCommand(ConnectDatabase);
 
     /// <summary>
     /// The command to show the update window
     /// </summary>
-    public ICommand ShowUpdateInfoCommand => new DelegateCommand(() =>
+    public ICommand ShowUpdateInfoCommand => new RelayCommand(() =>
     {
         var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
         dialog.ShowDialog();
@@ -328,7 +328,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// The command which occurs when the user hits the template manager menu item (main menu)
     /// </summary>
-    public ICommand ShowTemplateManagerCommand => new DelegateCommand(() =>
+    public ICommand ShowTemplateManagerCommand => new RelayCommand(() =>
     {
         var dialog = new TemplateWindow {Owner = Application.Current.MainWindow};
         dialog.ShowDialog();
@@ -337,7 +337,7 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// The command which occurs when the user hits the show data type menu item
     /// </summary>
-    public ICommand ShowDataTypeCommand => new DelegateCommand(() =>
+    public ICommand ShowDataTypeCommand => new RelayCommand(() =>
     {
         var dialog = new DataTypeWindow {Owner = Application.Current.MainWindow};
         dialog.ShowDialog();

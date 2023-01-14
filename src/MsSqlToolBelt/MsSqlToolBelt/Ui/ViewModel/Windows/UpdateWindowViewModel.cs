@@ -4,10 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Updater;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -42,7 +42,7 @@ internal class UpdateWindowViewModel : ViewModelBase
     public ReleaseInfo ReleaseInfo
     {
         get => _releaseInfo;
-        private set => SetField(ref _releaseInfo, value);
+        private set => SetProperty(ref _releaseInfo, value);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ internal class UpdateWindowViewModel : ViewModelBase
     public string FileSize
     {
         get => _fileSize;
-        private set => SetField(ref _fileSize, value);
+        private set => SetProperty(ref _fileSize, value);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ internal class UpdateWindowViewModel : ViewModelBase
     public bool ButtonOpenFileEnabled
     {
         get => _buttonOpenFileEnabled;
-        set => SetField(ref _buttonOpenFileEnabled, value);
+        set => SetProperty(ref _buttonOpenFileEnabled, value);
     }
 
     /// <summary>
@@ -84,23 +84,23 @@ internal class UpdateWindowViewModel : ViewModelBase
     public Visibility BrowserVisibility
     {
         get => _browserVisibility;
-        set => SetField(ref _browserVisibility, value);
+        set => SetProperty(ref _browserVisibility, value);
     }
 
     /// <summary>
     /// The command to open the git link
     /// </summary>
-    public ICommand OpenGitCommand => new DelegateCommand(OpenGithub);
+    public ICommand OpenGitCommand => new RelayCommand(OpenGithub);
 
     /// <summary>
     /// The command to start the download
     /// </summary>
-    public ICommand DownloadCommand => new DelegateCommand(StartDownload);
+    public ICommand DownloadCommand => new RelayCommand(StartDownload);
 
     /// <summary>
     /// The command to open the downloaded file
     /// </summary>
-    public ICommand OpenFileCommand => new DelegateCommand(() =>
+    public ICommand OpenFileCommand => new RelayCommand(() =>
     {
         if (string.IsNullOrEmpty(_filepath) || !File.Exists(_filepath))
             return;
@@ -157,8 +157,8 @@ internal class UpdateWindowViewModel : ViewModelBase
         _filepath = dialog.FileName;
         // We need to hide the browser, because the dialog overlay is behind the browser ....
         BrowserVisibility = Visibility.Hidden;
-        await ShowProgressAsync("Please wait", "Please wait while downloading the file...");
 
+        await ShowProgressAsync("Please wait", "Please wait while downloading the file...");
 
         try
         {

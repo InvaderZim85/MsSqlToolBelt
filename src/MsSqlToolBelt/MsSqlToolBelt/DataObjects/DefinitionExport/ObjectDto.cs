@@ -1,7 +1,7 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.DataObjects.Common;
 using Newtonsoft.Json;
 using ZimLabs.TableCreator;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.DataObjects.DefinitionExport;
 
@@ -23,7 +23,7 @@ internal class ObjectDto : ObservableObject
     public bool Export
     {
         get => _export;
-        set => SetField(ref _export, value);
+        set => SetProperty(ref _export, value);
     }
 
     /// <summary>

@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Internal;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -34,7 +34,7 @@ internal class EditServerWindowViewModel : ViewModelBase
     public ServerEntry SelectedServer
     {
         get => _selectedServer;
-        set => SetField(ref _selectedServer, value);
+        set => SetProperty(ref _selectedServer, value);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ internal class EditServerWindowViewModel : ViewModelBase
     public ObservableCollection<string> DatabaseList
     {
         get => _databaseList;
-        private set => SetField(ref _databaseList, value);
+        private set => SetProperty(ref _databaseList, value);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ internal class EditServerWindowViewModel : ViewModelBase
         get => _selectedDatabase;
         set
         {
-            SetField(ref _selectedDatabase, value);
+            SetProperty(ref _selectedDatabase, value);
             AutoConnectEnabled = !string.IsNullOrEmpty(value) && !value.Equals(DefaultEntry);
         }
     }
@@ -80,7 +80,7 @@ internal class EditServerWindowViewModel : ViewModelBase
     public bool ButtonSelectedEnabled
     {
         get => _buttonSelectedEnabled;
-        set => SetField(ref _buttonSelectedEnabled, value);
+        set => SetProperty(ref _buttonSelectedEnabled, value);
     }
 
     /// <summary>
@@ -94,23 +94,23 @@ internal class EditServerWindowViewModel : ViewModelBase
     public bool AutoConnectEnabled
     {
         get => _autoConnectEnabled;
-        set => SetField(ref _autoConnectEnabled, value);
+        set => SetProperty(ref _autoConnectEnabled, value);
     }
 
     /// <summary>
     /// The command to establish a connection to the desired server
     /// </summary>
-    public ICommand ConnectCommand => new DelegateCommand(Connect);
+    public ICommand ConnectCommand => new RelayCommand(Connect);
 
     /// <summary>
     /// The command to set the data
     /// </summary>
-    public ICommand OkCommand => new DelegateCommand(SetData);
+    public ICommand OkCommand => new RelayCommand(SetData);
 
     /// <summary>
     /// The command to close the window
     /// </summary>
-    public ICommand CloseCommand => new DelegateCommand(() => _closeWindow?.Invoke(false));
+    public ICommand CloseCommand => new RelayCommand(() => _closeWindow?.Invoke(false));
 
     /// <summary>
     /// Init the view model

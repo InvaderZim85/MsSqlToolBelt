@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -36,7 +36,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     public ObservableCollection<SearchHistoryEntry> SearchHistory
     {
         get => _searchHistory;
-        private set => SetField(ref _searchHistory, value);
+        private set => SetProperty(ref _searchHistory, value);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         get => _selectedEntry;
         set
         {
-            if (SetField(ref _selectedEntry, value) && _manager != null)
+            if (SetProperty(ref _selectedEntry, value) && _manager != null)
                 _manager.SelectedEntry = value;
         }
     }
@@ -60,17 +60,17 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     /// <summary>
     /// The command to delete the selected entry
     /// </summary>
-    public ICommand DeleteCommand => new DelegateCommand(DeleteEntry);
+    public ICommand DeleteCommand => new RelayCommand(DeleteEntry);
 
     /// <summary>
     /// The command to clear the history
     /// </summary>
-    public ICommand ClearHistoryCommand => new DelegateCommand(ClearHistory);
+    public ICommand ClearHistoryCommand => new RelayCommand(ClearHistory);
 
     /// <summary>
     /// The command to set the selected entry
     /// </summary>
-    public ICommand SetSelectionCommand => new DelegateCommand(() =>
+    public ICommand SetSelectionCommand => new RelayCommand(() =>
     {
         if (SelectedEntry == null)
             return;

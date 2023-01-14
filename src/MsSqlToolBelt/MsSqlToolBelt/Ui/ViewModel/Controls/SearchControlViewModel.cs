@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -14,7 +15,6 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -67,7 +67,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public string SearchString
     {
         get => _searchString;
-        set => SetField(ref _searchString, value);
+        set => SetProperty(ref _searchString, value);
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<SearchResult> SearchResults
     {
         get => _searchResults;
-        private set => SetField(ref _searchResults, value);
+        private set => SetProperty(ref _searchResults, value);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedResult;
         set
         {
-            if (!SetField(ref _selectedResult, value) || _manager == null) 
+            if (!SetProperty(ref _selectedResult, value) || _manager == null) 
                 return;
 
             _manager.SelectedResult = value;
@@ -135,7 +135,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<string> ObjectTypes
     {
         get => _objectTypes;
-        private set => SetField(ref _objectTypes, value);
+        private set => SetProperty(ref _objectTypes, value);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedObjectType;
         set
         {
-            if (SetField(ref _selectedObjectType, value))
+            if (SetProperty(ref _selectedObjectType, value))
                 FilterResult();
         }
     }
@@ -169,7 +169,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         get => _addWildcardAutomatically;
         set
         {
-            if (SetField(ref _addWildcardAutomatically, value))
+            if (SetProperty(ref _addWildcardAutomatically, value))
                 SaveWildcardValue();
         }
     }
@@ -185,7 +185,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public string HeaderResult
     {
         get => _headerResult;
-        private set => SetField(ref _headerResult, value);
+        private set => SetProperty(ref _headerResult, value);
     }
 
     #endregion
@@ -203,7 +203,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnEntry> Columns
     {
         get => _columns;
-        private set => SetField(ref _columns, value);
+        private set => SetProperty(ref _columns, value);
     }
     #endregion
 
@@ -220,7 +220,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<JobStepEntry> JobSteps
     {
         get => _jobSteps;
-        private set => SetField(ref _jobSteps, value);
+        private set => SetProperty(ref _jobSteps, value);
     }
 
     /// <summary>
@@ -236,7 +236,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedJobStep;
         set
         {
-            if (SetField(ref _selectedJobStep, value))
+            if (SetProperty(ref _selectedJobStep, value))
                 _setCmdText?.Invoke(value?.Command ?? "");
         }
     }
@@ -256,7 +256,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public bool ButtonShowIndexEnabled
     {
         get => _buttonShowIndexEnabled;
-        set => SetField(ref _buttonShowIndexEnabled, value);
+        set => SetProperty(ref _buttonShowIndexEnabled, value);
     }
     #endregion
 
@@ -275,7 +275,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public bool ShowSql
     {
         get => _showSql;
-        set => SetField(ref _showSql, value);
+        set => SetProperty(ref _showSql, value);
     }
 
     /// <summary>
@@ -289,7 +289,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public bool ShowTableGrid
     {
         get => _showTableGrid;
-        set => SetField(ref _showTableGrid, value);
+        set => SetProperty(ref _showTableGrid, value);
     }
 
     /// <summary>
@@ -303,7 +303,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     public bool ShowJobGrid
     {
         get => _showJobGrid;
-        set => SetField(ref _showJobGrid, value);
+        set => SetProperty(ref _showJobGrid, value);
     }
 
     /// <summary>
@@ -339,32 +339,32 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to 
     /// </summary>
-    public ICommand SearchCommand => new DelegateCommand(ExecuteSearch);
+    public ICommand SearchCommand => new RelayCommand(ExecuteSearch);
 
     /// <summary>
     /// The command to copy the sql text
     /// </summary>
-    public ICommand CopySqlCommand => new DelegateCommand(() => CopyToClipboard(_sqlText));
+    public ICommand CopySqlCommand => new RelayCommand(() => CopyToClipboard(_sqlText));
 
     /// <summary>
     /// The command to copy / export the table data
     /// </summary>
-    public ICommand CopyExportTableCommand => new DelegateCommand(CopyExportTable);
+    public ICommand CopyExportTableCommand => new RelayCommand(CopyExportTable);
 
     /// <summary>
     /// The command to copy / export the job
     /// </summary>
-    public ICommand CopyExportJobCommand => new DelegateCommand(CopyExportJob);
+    public ICommand CopyExportJobCommand => new RelayCommand(CopyExportJob);
 
     /// <summary>
     /// The command to show the index window
     /// </summary>
-    public ICommand ShowIndexesCommand => new DelegateCommand(ShowTableIndexes);
+    public ICommand ShowIndexesCommand => new RelayCommand(ShowTableIndexes);
 
     /// <summary>
     /// The command to show the history
     /// </summary>
-    public ICommand ShowHistoryCommand => new DelegateCommand(ShowHistory);
+    public ICommand ShowHistoryCommand => new RelayCommand(ShowHistory);
     #endregion
 
     /// <summary>

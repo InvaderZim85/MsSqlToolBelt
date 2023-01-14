@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
@@ -15,7 +16,6 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -67,7 +67,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<TableDto> Tables
     {
         get => _tables;
-        private set => SetField(ref _tables, value);
+        private set => SetProperty(ref _tables, value);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _selectedTable;
         set
         {
-            SetField(ref _selectedTable, value);
+            SetProperty(ref _selectedTable, value);
 
             if (_manager == null)
                 return;
@@ -115,7 +115,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ColumnDto> Columns
     {
         get => _columns;
-        private set => SetField(ref _columns, value);
+        private set => SetProperty(ref _columns, value);
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _filter;
         set
         {
-            SetField(ref _filter, value);
+            SetProperty(ref _filter, value);
             if (string.IsNullOrEmpty(value))
                 FilterList();
         }
@@ -148,7 +148,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<IdTextEntry> TypeList
     {
         get => _typeList;
-        private set => SetField(ref _typeList, value);
+        private set => SetProperty(ref _typeList, value);
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _selectedType;
         set
         {
-            if (SetField(ref _selectedType, value) && value != null)
+            if (SetProperty(ref _selectedType, value) && value != null)
                 FilterList();
         }
     }
@@ -180,7 +180,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public string HeaderList
     {
         get => _headerList;
-        private set => SetField(ref _headerList, value);
+        private set => SetProperty(ref _headerList, value);
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public string HeaderColumns
     {
         get => _headerColumns;
-        private set => SetField(ref _headerColumns, value);
+        private set => SetProperty(ref _headerColumns, value);
     }
 
     #region Options
@@ -216,7 +216,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<string> ModifierList
     {
         get => _modifierList;
-        set => SetField(ref _modifierList, value);
+        set => SetProperty(ref _modifierList, value);
     }
 
     /// <summary>
@@ -230,7 +230,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public string SelectedModifier
     {
         get => _selectedModifier;
-        set => SetField(ref _selectedModifier, value);
+        set => SetProperty(ref _selectedModifier, value);
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public string ClassName
     {
         get => _className;
-        set => SetField(ref _className, value);
+        set => SetProperty(ref _className, value);
     }
 
     /// <summary>
@@ -258,7 +258,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool OptionSealedClass
     {
         get => _optionSealedClass;
-        set => SetField(ref _optionSealedClass, value);
+        set => SetProperty(ref _optionSealedClass, value);
     }
 
     /// <summary>
@@ -272,7 +272,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool OptionDbModel
     {
         get => _optionDbModel;
-        set => SetField(ref _optionDbModel, value);
+        set => SetProperty(ref _optionDbModel, value);
     }
 
     /// <summary>
@@ -288,7 +288,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _optionBackingField;
         set
         {
-            if (SetField(ref _optionBackingField, value) && !value)
+            if (SetProperty(ref _optionBackingField, value) && !value)
                 OptionSetField = false;
         }
     }
@@ -304,7 +304,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool OptionSummary
     {
         get => _optionSummary;
-        set => SetField(ref _optionSummary, value);
+        set => SetProperty(ref _optionSummary, value);
     }
 
     /// <summary>
@@ -318,7 +318,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool OptionNullable
     {
         get => _optionNullable;
-        set => SetField(ref _optionNullable, value);
+        set => SetProperty(ref _optionNullable, value);
     }
 
     /// <summary>
@@ -332,7 +332,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool ButtonEfKeyCodeEnabled
     {
         get => _buttonEfKeyCodeEnabled;
-        set => SetField(ref _buttonEfKeyCodeEnabled, value);
+        set => SetProperty(ref _buttonEfKeyCodeEnabled, value);
     }
 
     /// <summary>
@@ -346,7 +346,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public bool TableOptionEnabled
     {
         get => _tableOptionEnabled;
-        set => SetField(ref _tableOptionEnabled, value);
+        set => SetProperty(ref _tableOptionEnabled, value);
     }
 
     /// <summary>
@@ -364,7 +364,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         get => _optionSetField;
         set
         {
-            if (SetField(ref _optionSetField, value) && value)
+            if (SetProperty(ref _optionSetField, value) && value)
                 OptionBackingField = true;
         }
     }
@@ -377,12 +377,12 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to filter the table types
     /// </summary>
-    public ICommand FilterCommand => new DelegateCommand(FilterList);
+    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to reload the table types
     /// </summary>
-    public ICommand ReloadCommand => new DelegateCommand(() =>
+    public ICommand ReloadCommand => new RelayCommand(() =>
     {
         _dataLoaded = false;
         LoadData();
@@ -396,7 +396,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to remove the alias from every entry
     /// </summary>
-    public ICommand ClearAliasCommand => new DelegateCommand(ClearAlias);
+    public ICommand ClearAliasCommand => new RelayCommand(ClearAlias);
 
     /// <summary>
     /// The command to clear the code
@@ -411,12 +411,12 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to generate the class
     /// </summary>
-    public ICommand GenerateCommand => new DelegateCommand(GenerateClass);
+    public ICommand GenerateCommand => new RelayCommand(GenerateClass);
 
     /// <summary>
     /// The command to show the ef key code
     /// </summary>
-    public ICommand ShowEfKeyCodeCommand => new DelegateCommand(() =>
+    public ICommand ShowEfKeyCodeCommand => new RelayCommand(() =>
     {
         var dialog = new TextDialogWindow(new TextDialogSettings
         {
@@ -438,12 +438,12 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to generate a class from a query
     /// </summary>
-    public ICommand FromQueryCommand => new DelegateCommand(GenerateCodeFromQuery);
+    public ICommand FromQueryCommand => new RelayCommand(GenerateCodeFromQuery);
 
     /// <summary>
     /// The command which occurs when the user hits the show info menu item (context menu of the set field option)
     /// </summary>
-    public ICommand ShowSetFieldInfoCommand => new DelegateCommand(ShowSetFieldInfo);
+    public ICommand ShowSetFieldInfoCommand => new RelayCommand(ShowSetFieldInfo);
 
     #endregion
 
@@ -804,14 +804,13 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     private async void ShowSetFieldInfo()
     {
         var result = await ShowQuestionAsync("Info",
-            "The 'Set Field' option uses a template that requires the 'ObservableObject' class and 'SetField' method. For WPF projects the class can be added with a NuGet package (e.g. 'ZimLabs.WpfBase' (.NET Framework) or 'ZimLabs.WpfBase.NetCore (.NET)).",
-            "Ok", "Show on GitHub");
+            "The 'SetProperty' option uses a template that requires the 'ObservableObject' class which is a part of the \"CommunityToolkit.MVVM\" package (available via NuGet).",
+            "Ok", "Show online");
 
         if (result != MessageDialogResult.Negative)
             return;
 
-        const string gitHubLink =
-            "https://github.com/InvaderZim85/ZimLabs.WpfBase.NetCore/blob/main/ZimLabs.WpfBase.NetCore/ObservableObject.cs";
+        const string gitHubLink = "https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/";
 
         Helper.OpenLink(gitHubLink);
     }

@@ -1,5 +1,5 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
-using ZimLabs.WpfBase.NetCore;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.DataObjects.Common;
 
 namespace MsSqlToolBelt.DataObjects.ClassGen;
 
@@ -11,7 +11,7 @@ public class ColumnDto : ObservableObject
     /// <summary>
     /// Backing field for <see cref="Use"/>
     /// </summary>
-    private bool _use;
+    private bool _use = true;
 
     /// <summary>
     /// Gets or sets the value which indicates if the column should be used
@@ -19,7 +19,7 @@ public class ColumnDto : ObservableObject
     public bool Use
     {
         get => _use;
-        set => SetField(ref _use, value);
+        set => SetProperty(ref _use, value);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class ColumnDto : ObservableObject
         get => _alias;
         set
         {
-            SetField(ref _alias, value);
+            SetProperty(ref _alias, value);
             Use = !string.IsNullOrEmpty(value);
         }
     }

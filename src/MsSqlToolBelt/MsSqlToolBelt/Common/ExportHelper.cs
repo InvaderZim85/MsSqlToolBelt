@@ -134,8 +134,6 @@ internal static class ExportHelper
         await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
     }
 
-
-
     /// <summary>
     /// Converts the data and copies them to the clipboard in the desired format
     /// </summary>

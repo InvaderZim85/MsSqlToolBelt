@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
@@ -14,7 +15,6 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -42,7 +42,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<string> ColorThemeList
     {
         get => _colorThemeList;
-        private set => SetField(ref _colorThemeList, value);
+        private set => SetProperty(ref _colorThemeList, value);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ internal class SettingsControlViewModel : ViewModelBase
         get => _selectedColorTheme;
         set
         {
-            if (SetField(ref _selectedColorTheme, value) && !string.IsNullOrEmpty(value))
+            if (SetProperty(ref _selectedColorTheme, value) && !string.IsNullOrEmpty(value))
                 Helper.SetColorTheme(value);
         }
     }
@@ -76,7 +76,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<ServerEntry> ServerList
     {
         get => _serverList;
-        private set => SetField(ref _serverList, value);
+        private set => SetProperty(ref _serverList, value);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ internal class SettingsControlViewModel : ViewModelBase
         get => _selectedServer;
         set
         {
-            SetField(ref _selectedServer, value);
+            SetProperty(ref _selectedServer, value);
             ButtonMoveDownEnabled = false;
             ButtonMoveUpEnabled = false;
 
@@ -114,7 +114,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public bool ButtonMoveUpEnabled
     {
         get => _buttonMoveUpEnabled;
-        set => SetField(ref _buttonMoveUpEnabled, value);
+        set => SetProperty(ref _buttonMoveUpEnabled, value);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public bool ButtonMoveDownEnabled
     {
         get => _buttonMoveDownEnabled;
-        set => SetField(ref _buttonMoveDownEnabled, value);
+        set => SetProperty(ref _buttonMoveDownEnabled, value);
     }
 
     #endregion
@@ -145,7 +145,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<FilterEntry> FilterList
     {
         get => _filterList;
-        private set => SetField(ref _filterList, value);
+        private set => SetProperty(ref _filterList, value);
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public FilterEntry? SelectedFilter
     {
         get => _selectedFilter;
-        set => SetField(ref _selectedFilter, value);
+        set => SetProperty(ref _selectedFilter, value);
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<IdTextEntry> FilterTypeList
     {
         get => _filterTypeList;
-        private set => SetField(ref _filterTypeList, value);
+        private set => SetProperty(ref _filterTypeList, value);
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public IdTextEntry? SelectedFilterType
     {
         get => _selectedFilterType;
-        set => SetField(ref _selectedFilterType, value);
+        set => SetProperty(ref _selectedFilterType, value);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public string FilterValue
     {
         get => _filterValue;
-        set => SetField(ref _filterValue, value);
+        set => SetProperty(ref _filterValue, value);
     }
     #endregion
 
@@ -218,7 +218,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public ObservableCollection<IdTextEntry> ExportTypes
     {
         get => _exportTypes;
-        private set => SetField(ref _exportTypes, value);
+        private set => SetProperty(ref _exportTypes, value);
     }
 
     /// <summary>
@@ -232,7 +232,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public IdTextEntry? SelectedExportType
     {
         get => _selectedExportType;
-        set => SetField(ref _selectedExportType, value);
+        set => SetProperty(ref _selectedExportType, value);
     }
 
     /// <summary>
@@ -246,7 +246,7 @@ internal class SettingsControlViewModel : ViewModelBase
     public int SearchHistoryCount
     {
         get => _searchHistoryCount;
-        set => SetField(ref _searchHistoryCount, value);
+        set => SetProperty(ref _searchHistoryCount, value);
     }
     #endregion
 
@@ -256,22 +256,22 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// The command to save the theme
     /// </summary>
-    public ICommand SaveThemeCommand => new DelegateCommand(SaveTheme);
+    public ICommand SaveThemeCommand => new RelayCommand(SaveTheme);
 
     /// <summary>
     /// The command to add a new server
     /// </summary>
-    public ICommand AddServerCommand => new DelegateCommand(AddServer);
+    public ICommand AddServerCommand => new RelayCommand(AddServer);
 
     /// <summary>
     /// The command to edit the selected server
     /// </summary>
-    public ICommand EditServerCommand => new DelegateCommand(EditServer);
+    public ICommand EditServerCommand => new RelayCommand(EditServer);
 
     /// <summary>
     /// The command to delete the selected server
     /// </summary>
-    public ICommand DeleteServerCommand => new DelegateCommand(DeleteServer);
+    public ICommand DeleteServerCommand => new RelayCommand(DeleteServer);
 
     /// <summary>
     /// The command to move the serer up / down
@@ -281,17 +281,17 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// The command to add a new filter
     /// </summary>
-    public ICommand AddFilterCommand => new DelegateCommand(AddFilter);
+    public ICommand AddFilterCommand => new RelayCommand(AddFilter);
 
     /// <summary>
     /// The command to delete the selected filter
     /// </summary>
-    public ICommand DeleteFilterCommand => new DelegateCommand(DeleteFilter);
+    public ICommand DeleteFilterCommand => new RelayCommand(DeleteFilter);
 
     /// <summary>
     /// The command to save the various settings
     /// </summary>
-    public ICommand SaveVariousCommand => new DelegateCommand(SaveVariousSettings);
+    public ICommand SaveVariousCommand => new RelayCommand(SaveVariousSettings);
     #endregion
     
     /// <summary>
@@ -486,9 +486,9 @@ internal class SettingsControlViewModel : ViewModelBase
         {
             await _manager!.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
-            ServerList = ServerList.OrderBy(o => o.Id).ToObservableCollection();
-
             SetMovementButtons(SelectedServer);
+
+            ServerList = ServerList.OrderBy(o => o.Order).ToObservableCollection();
         }
         catch (Exception ex)
         {

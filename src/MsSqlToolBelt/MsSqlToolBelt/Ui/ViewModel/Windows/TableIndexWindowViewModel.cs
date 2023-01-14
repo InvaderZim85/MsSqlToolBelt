@@ -20,7 +20,7 @@ internal class TableIndexWindowViewModel : ViewModelBase
     public string Header
     {
         get => _header;
-        private set => SetField(ref _header, value);
+        private set => SetProperty(ref _header, value);
     }
     /// <summary>
     /// Backing field for <see cref="Indexes"/>
@@ -33,7 +33,7 @@ internal class TableIndexWindowViewModel : ViewModelBase
     public ObservableCollection<IndexEntry> Indexes
     {
         get => _indexes;
-        private set => SetField(ref _indexes, value);
+        private set => SetProperty(ref _indexes, value);
     }
 
     /// <summary>

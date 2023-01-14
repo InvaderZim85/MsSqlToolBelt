@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using ZimLabs.CoreLib;
-using ZimLabs.WpfBase.NetCore;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -44,7 +44,6 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private Action<string>? _setText;
 
-
     #region View properties
 
     /// <summary>
@@ -58,7 +57,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<ObjectDto> Objects
     {
         get => _objects;
-        private set => SetField(ref _objects, value);
+        private set => SetProperty(ref _objects, value);
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<string> ObjectTypes
     {
         get => _objectTypes;
-        private set => SetField(ref _objectTypes, value);
+        private set => SetProperty(ref _objectTypes, value);
     }
 
     /// <summary>
@@ -88,7 +87,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         get => _selectedObjectType;
         set
         {
-            if (SetField(ref _selectedObjectType, value))
+            if (SetProperty(ref _selectedObjectType, value))
                 FilterList();
         }
     }
@@ -104,7 +103,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public string ExportDir
     {
         get => _exportDir;
-        set => SetField(ref _exportDir, value);
+        set => SetProperty(ref _exportDir, value);
     }
 
     /// <summary>
@@ -118,7 +117,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public string InfoList
     {
         get => _infoList;
-        set => SetField(ref _infoList, value);
+        set => SetProperty(ref _infoList, value);
     }
 
     /// <summary>
@@ -132,7 +131,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     public bool CreateTypeDir
     {
         get => _createTypeDir;
-        set => SetField(ref _createTypeDir, value);
+        set => SetProperty(ref _createTypeDir, value);
     }
 
     /// <summary>
@@ -148,7 +147,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         get => _filter;
         set
         {
-            SetField(ref _filter, value);
+            SetProperty(ref _filter, value);
             if (string.IsNullOrEmpty(value))
                 FilterList();
         }
@@ -161,12 +160,12 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to browse for the export directory
     /// </summary>
-    public ICommand BrowseCommand => new DelegateCommand(BrowseExportDir);
+    public ICommand BrowseCommand => new RelayCommand(BrowseExportDir);
 
     /// <summary>
     /// The command to load the data
     /// </summary>
-    public ICommand ReloadCommand => new DelegateCommand(() =>
+    public ICommand ReloadCommand => new RelayCommand(() =>
     {
         _dataLoaded = false;
         LoadData();
@@ -180,17 +179,17 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// The command to export the selected entries
     /// </summary>
-    public ICommand ExportCommand => new DelegateCommand(Export);
+    public ICommand ExportCommand => new RelayCommand(Export);
 
     /// <summary>
     /// The command to filter the list
     /// </summary>
-    public ICommand FilterCommand => new DelegateCommand(FilterList);
+    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to clear the object list
     /// </summary>
-    public ICommand ClearObjectListCommand => new DelegateCommand(() =>
+    public ICommand ClearObjectListCommand => new RelayCommand(() =>
     {
         _setText?.Invoke(string.Empty);
     });

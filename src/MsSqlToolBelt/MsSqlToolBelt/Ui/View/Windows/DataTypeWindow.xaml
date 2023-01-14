@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Data types"
-    Width="400"
-    Height="375"
+    Width="500"
+    Height="400"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
@@ -31,7 +31,8 @@
             Name="DataGridTypes"
             Grid.Row="0"
             IsReadOnly="True"
-            ItemsSource="{Binding DataTypes}">
+            ItemsSource="{Binding DataTypes}"
+            SelectedItem="{Binding SelectedEntry}">
             <DataGrid.CommandBindings>
                 <CommandBinding Command="Copy" Executed="DataGridTypes_OnExecuted" />
             </DataGrid.CommandBindings>
@@ -44,17 +45,40 @@
                     Width="*"
                     Binding="{Binding CSharpType}"
                     Header="C# type" />
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding CSharpSystemType}"
+                    Header="C# system type" />
+
             </DataGrid.Columns>
         </DataGrid>
 
         <Separator Grid.Row="1" />
 
-        <Button
-            Name="ButtonClose"
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button
+                Width="60"
+                Command="{Binding AddCommand}"
+                Content="Add" />
+            <Button
+                Width="60"
+                Command="{Binding EditCommand}"
+                Content="Edit" />
+            <Button
+                Width="60"
+                Command="{Binding DeleteCommand}"
+                Content="Delete" />
+        </StackPanel>
+
+        <StackPanel
             Grid.Row="2"
-            Width="60"
-            HorizontalAlignment="Right"
-            Click="ButtonClose_OnClick"
-            Content="Close" />
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                Width="60"
+                HorizontalAlignment="Right"
+                Click="ButtonClose_OnClick"
+                Content="Close" />
+        </StackPanel>
     </Grid>
 </mah:MetroWindow>

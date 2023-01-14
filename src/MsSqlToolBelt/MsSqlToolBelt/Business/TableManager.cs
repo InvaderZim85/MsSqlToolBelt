@@ -59,6 +59,9 @@ internal class TableManager : IDisposable
 
         // Step 3: Indexes
         await LoadTableIndizesAsync(table);
+
+        // Step 4: ForeignKeys
+        await LoadForeignKeysAsync(table);
     }
 
     /// <summary>
@@ -82,6 +85,30 @@ internal class TableManager : IDisposable
         foreach (var column in table.Columns)
         {
             column.InIndex = indizes.Any(a => a.Column.Equals(column.Name));
+        }
+    }
+
+    /// <summary>
+    /// Loads and sets the foreign keys
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <returns>The awaitable task</returns>
+    private async Task LoadForeignKeysAsync(TableEntry table)
+    {
+        var foreignKeys = await _repo.LoadForeignKeyInfoAsync(table);
+
+        var names = foreignKeys.Select(s => s.Name).Distinct();
+
+        table.Indexes.AddRange(names.Select(s => new IndexEntry
+        {
+            Name = s,
+            Columns = string.Join(", ", foreignKeys.Where(w => w.Name.Equals(s)).Select(ss => $"Column '{ss.ColumnName}' references '{ss.ReferencedTableName}.{ss.ReferencedColumnName}'"))
+        }));
+
+        // Update the columns
+        foreach (var column in table.Columns)
+        {
+            column.InIndex = foreignKeys.Any(a => a.ColumnName.Equals(column.Name));
         }
     }
 

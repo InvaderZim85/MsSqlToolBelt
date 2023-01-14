@@ -284,7 +284,7 @@
                         <DataGridCheckBoxColumn
                             Width="Auto"
                             Binding="{Binding InIndex}"
-                            Header="Index" />
+                            Header="Index / FK" />
                         <DataGridCheckBoxColumn
                             Width="Auto"
                             Binding="{Binding IsIdentity}"
