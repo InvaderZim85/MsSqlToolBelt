@@ -72,7 +72,7 @@ internal class TableRepo : BaseRepo
                 c.[name],
                 c.column_id AS [Order],
                 t.[name] AS DataType,
-                c.max_length AS [MaxLength],
+                COALESCE(ic.CHARACTER_MAXIMUM_LENGTH, c.max_length) AS [MaxLength],
                 c.[precision],
                 c.scale,
                 c.is_nullable AS IsNullable,
@@ -83,10 +83,18 @@ internal class TableRepo : BaseRepo
             FROM
                 sys.columns AS c
 
+                INNER JOIN sys.tables AS ta
+                ON ta.object_id = c.object_id
+
+                -- This join is needed to get the correct 'length' of the column
+                INNER JOIN INFORMATION_SCHEMA.COLUMNS AS ic
+                ON ic.TABLE_NAME = ta.[name]
+                AND ic.COLUMN_NAME = c.[name]
+
                 INNER JOIN sys.types AS t
                 ON t.user_type_id = c.user_type_id
             WHERE
-                object_id = @id;";
+                ta.object_id = @id;";
 
         var result = await QueryAsListAsync<ColumnEntry>(query, table);
 
