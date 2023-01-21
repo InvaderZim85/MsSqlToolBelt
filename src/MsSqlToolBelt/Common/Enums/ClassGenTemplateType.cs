@@ -9,6 +9,11 @@ internal enum ClassGenTemplateType
     /// Default class
     /// </summary>
     ClassDefault,
+    
+    /// <summary>
+    /// Default class with namespace
+    /// </summary>
+    ClassDefaultWithNs,
 
     /// <summary>
     /// Default property with backing field and comments

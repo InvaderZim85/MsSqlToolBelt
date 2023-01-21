@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -25,6 +27,11 @@ public sealed class ClassGenManager : IDisposable
     /// Contains the value which indicates if the class was already disposed
     /// </summary>
     private bool _disposed;
+
+    /// <summary>
+    /// Occurs when the export makes progress
+    /// </summary>
+    public event EventHandler<string>? Progress;
 
     /// <summary>
     /// The name of the class gen type conversion file
@@ -148,14 +155,13 @@ public sealed class ClassGenManager : IDisposable
         {
             // Clean the names of the column
             foreach (var column in from column in SelectedTable.Columns
-                     let cleanName = CleanName(column.Name)
+                     let cleanName = CleanColumnName(column.Name)
                      where !column.Name.EqualsIgnoreCase(cleanName)
                      select column)
             {
-                column.Alias = CleanName(column.Name);
+                column.Alias = CleanColumnName(column.Name);
             }
         }
-        
     }
 
     /// <summary>
@@ -163,7 +169,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="name">The original name</param>
     /// <returns>The cleaned name</returns>
-    private static string CleanName(string name)
+    private static string CleanColumnName(string name)
     {
         var replaceValues = GetReplaceList();
 
@@ -183,6 +189,57 @@ public sealed class ClassGenManager : IDisposable
 
         return name;
     }
+
+    /// <summary>
+    /// Cleans the name of the namespace
+    /// </summary>
+    /// <param name="name">The name</param>
+    /// <returns>The cleaned namespace name</returns>
+    private static string CleanNamespace(string name)
+    {
+        if (name.Contains('.'))
+        {
+            var content = name.Split(new[] {"."}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            name = string.Join(".", content.Select(s => s.FirstChatToUpper()));
+        }
+
+        return name.FirstChatToUpper().Replace(" ", "");
+    }
+
+    /// <summary>
+    /// Generates a "valid" class name
+    /// </summary>
+    /// <param name="tableName">The original name of the table</param>
+    /// <returns>The generated class name</returns>
+    private static string GenerateClassName(string tableName)
+    {
+        IEnumerable<ReplaceEntry> replaceList;
+
+        // Check if the class name contains a underscore
+        if (tableName.Contains('_'))
+        {
+            replaceList = GetReplaceList(false);
+
+            // Split entry at underscore
+            var content = tableName.Split(new[] {"_"}, StringSplitOptions.RemoveEmptyEntries);
+
+            // Create a new "class" name
+            tableName = content.Aggregate(string.Empty, (current, entry) => current + entry.FirstChatToUpper());
+        }
+        else
+        {
+            replaceList = GetReplaceList();
+            tableName = tableName.FirstChatToUpper();
+        }
+
+        // Remove all "invalid" chars
+        foreach (var entry in replaceList.Where(w => tableName.Contains(w.OldValue)))
+        {
+            tableName = tableName.Replace(entry.OldValue, entry.NewValue);
+        }
+
+        return tableName;
+    }
     #endregion
 
     #region Class generator
@@ -201,9 +258,10 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The desired options</param>
     /// <param name="table">The desired table</param>
+    /// <param name="createSqlQuery"><see langword="true"/> to generate a sql query, otherwise <see langword="false"/></param>
     /// <param name="infoText">An info which will be added before the class (optional)</param>
     /// <returns>The content of the class</returns>
-    private ClassGenResult GenerateCode(ClassGenOptions options, TableDto table, string infoText = "")
+    private ClassGenResult GenerateCode(ClassGenOptions options, TableDto table, bool createSqlQuery = true, string infoText = "")
     {
         // Step 1: Load the conversion types
         LoadTypeConversion();
@@ -214,7 +272,7 @@ public sealed class ClassGenManager : IDisposable
             ClassCode = GenerateClass(options, table, infoText)
         };
 
-        // Check if the table is a table type, if so, 
+        // Check if the table is a table type, if so, return the result
         if (table.Type == TableDtoType.TableType)
             return result;
 
@@ -227,7 +285,8 @@ public sealed class ClassGenManager : IDisposable
         }
 
         // SQL Query
-        result.SqlQuery = !string.IsNullOrEmpty(options.SqlQuery) ? options.SqlQuery : GenerateSqlQuery();
+        if (createSqlQuery)
+            result.SqlQuery = !string.IsNullOrEmpty(options.SqlQuery) ? options.SqlQuery : GenerateSqlQuery();
 
         return result;
     }
@@ -269,7 +328,72 @@ public sealed class ClassGenManager : IDisposable
                 .AppendLine();
         }
 
-        return GenerateCode(options, tmpTable, sb.ToString());
+        return GenerateCode(options, tmpTable, infoText: sb.ToString());
+    }
+
+    /// <summary>
+    /// Generates the classes for the given tables
+    /// </summary>
+    /// <param name="options">The desired options</param>
+    /// <param name="tables">The list with the tables</param>
+    /// <param name="ct">The token to cancel the process</param>
+    /// <returns>The awaitable task</returns>
+    public async Task GenerateClassesAsync(ClassGenOptions options, List<TableDto> tables, CancellationToken ct)
+    {
+        // Generates the file name for the class
+        string GenerateFilePath(string tableName, int index)
+        {
+            while (true)
+            {
+                var path = Path.Combine(options.OutputDirectory, index == 0 ? $"{tableName}.cs" : $"{tableName}_{index}.cs");
+
+                // Check if the file already exists
+                if (!File.Exists(path)) 
+                    return path;
+
+                index += 1;
+            }
+        }
+
+        // Check if the directory should be cleared
+        if (options.EmptyDirectoryBeforeExport)
+        {
+            Directory.Delete(options.OutputDirectory, true); // Delete the dir
+            Directory.CreateDirectory(options.OutputDirectory); // Create it new
+        }
+
+        var count = 1;
+        var total = tables.Count(c => c.Use);
+        foreach (var table in tables.Where(w => w.Use))
+        {
+            options.ClassName = string.IsNullOrEmpty(table.Alias) ? GenerateClassName(table.Name) : table.Alias;
+            var path = GenerateFilePath(options.ClassName, 0);
+            Progress?.Invoke(this, $"{count++} of {total} > Generate class for table '{table.Name}'. File name: '{Path.GetFileName(path)}'");
+
+            if (ct.IsCancellationRequested)
+            {
+                Progress?.Invoke(this, "Cancellation requested by user.");
+                return;
+            }
+
+            if (table.Table is not TableEntry tmpTable)
+                continue;
+
+            // Step 1: Load the columns of the table (only if they are empty)
+            if (!tmpTable.Columns.Any())
+            {
+                await _tableManager.EnrichTableAsync(tmpTable);
+                table.SetColumns();
+            }
+
+            // Step 2: Create the class
+            var result = GenerateCode(options, table, false);
+
+            // Step 3: Export the class
+            await File.WriteAllTextAsync(path, result.ClassCode, Encoding.UTF8, ct);
+        }
+
+        Progress?.Invoke(this, "Done.");
     }
 
     #region CSharp class
@@ -294,10 +418,11 @@ public sealed class ClassGenManager : IDisposable
         _templateManager.LoadTemplates(false);
 
         // Get the class template
-        var classTemplate = _templateManager.GetTemplateContent(ClassGenTemplateType.ClassDefault);
+        var classTemplate = _templateManager.GetTemplateContent(options.WithNamespace
+            ? ClassGenTemplateType.ClassDefaultWithNs
+            : ClassGenTemplateType.ClassDefault);
 
         // Generate the properties
-        //var properties = SelectedTable.Columns.Where(w => w.Use).Select(column => GenerateColumn(options, column)).ToList();
         var properties = new List<string>();
 
         foreach (var column in table.Columns.Where(w => w.Use).OrderBy(o => o.Order))
@@ -311,6 +436,7 @@ public sealed class ClassGenManager : IDisposable
             properties.RemoveAt(properties.Count - 1);
 
         // Set the values
+        classTemplate = classTemplate.Replace("$NAMESPACE$", CleanNamespace(options.Namespace));
         classTemplate = classTemplate.Replace("$PROPERTIES$", string.Join(Environment.NewLine, properties));
         classTemplate = classTemplate.Replace("$MODIFIER$", options.Modifier);
         classTemplate = classTemplate.Replace("$SEALED$", options.SealedClass ? " sealed" : string.Empty);
@@ -320,10 +446,30 @@ public sealed class ClassGenManager : IDisposable
         var inherits = options.AddSetField ? ": ObservableObject" : string.Empty;
         classTemplate = classTemplate.Replace("$INHERITS$", inherits);
 
-        if (options.DbModel && !table.Name.Equals(options.ClassName))
-            classTemplate = string.IsNullOrEmpty(table.Schema)
-                ? $"[Table(\"{table.Name}\")]{Environment.NewLine}{classTemplate}"
-                : $"[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]{Environment.NewLine}{classTemplate}";
+        // A normal class should be created, so we don't need the table attribute
+        if (!options.DbModel || table.Name.Equals(options.ClassName))
+            return string.IsNullOrEmpty(infoText)
+                ? classTemplate
+                : $"{infoText}{classTemplate}";
+
+        // Create the table attribute
+        var spacer = options.WithNamespace ? new string(' ', 4) : string.Empty;
+        var classHeader = string.IsNullOrEmpty(table.Schema)
+            ? $"{spacer}[Table(\"{table.Name}\")]"
+            : $"{spacer}[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]";
+
+        // Split the template into it's lines to add the class header
+        var content = classTemplate.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
+
+        // Get the index of the class name
+        var classIndex = content.FindIndex(f => f.ContainsIgnoreCase("class"));
+        if (classIndex != -1) // Nothing found
+        {
+            // Add the table attribute before the class name
+            content.Insert(classIndex, classHeader);
+        }
+
+        classTemplate = string.Join(Environment.NewLine, content);
 
         return string.IsNullOrEmpty(infoText)
             ? classTemplate
@@ -338,6 +484,7 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The code for the column</returns>
     private string GenerateColumn(ClassGenOptions options, ColumnDto column)
     {
+        var spacer = options.WithNamespace ? $"{Tab}{Tab}" : Tab;
         // DataType
         var dataType = GetCSharpType(column.DataType);
 
@@ -368,7 +515,7 @@ public sealed class ClassGenManager : IDisposable
         }
 
         if (!options.DbModel || string.IsNullOrEmpty(column.Alias) || column.Name.Equals(column.Alias, StringComparison.OrdinalIgnoreCase))
-            return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
+            return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
         
         // Add the EF attribute for the column
         var columnAttribute =
@@ -378,7 +525,7 @@ public sealed class ClassGenManager : IDisposable
         if (index != -1)
             content.Insert(index, columnAttribute);
 
-        return string.Join(Environment.NewLine, content.Select(s => $"{Tab}{s}"));
+        return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
     }
 
     /// <summary>
@@ -499,12 +646,18 @@ public sealed class ClassGenManager : IDisposable
     {
         var template = options.AddSummary switch
         {
-            true when options.WithBackingField && !options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
-            true when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
-            true when !options.WithBackingField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
-            false when options.WithBackingField &&! options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
-            false when options.WithBackingField && options.AddSetField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
-            false when !options.WithBackingField => _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
+            true when options is {WithBackingField: true, AddSetField: false} =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
+            true when options is {WithBackingField: true, AddSetField: true} =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
+            true when !options.WithBackingField =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
+            false when options is {WithBackingField: true, AddSetField: false} =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
+            false when options is {WithBackingField: true, AddSetField: true} =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
+            false when !options.WithBackingField =>
+                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
             _ => string.Empty
         };
 
@@ -572,13 +725,13 @@ public sealed class ClassGenManager : IDisposable
     /// <summary>
     /// Gets the list with the replace values
     /// </summary>
+    /// <param name="includeUnderscore"><see langword="true"/> to include the underscore in the list, otherwise <see langword="false"/> (optional)</param>
     /// <returns>The list with the replace values</returns>
-    private static IEnumerable<ReplaceEntry> GetReplaceList()
+    private static IEnumerable<ReplaceEntry> GetReplaceList(bool includeUnderscore = true)
     {
-        return new List<ReplaceEntry>
+        var tmpList = new List<ReplaceEntry>
         {
             new("_", ""),
-            new("-", ""),
             new(" ", ""), // this should never happen...
             new("ä", "ae"),
             new("ö", "oe"),
@@ -587,6 +740,26 @@ public sealed class ClassGenManager : IDisposable
             new("Ä", "Ae"),
             new("Ö", "Oe"),
             new("Ü", "Ue")
+        };
+
+        if (includeUnderscore)
+            tmpList.Add(new ReplaceEntry("_", ""));
+
+        return tmpList;
+    }
+
+    /// <summary>
+    /// Gets the list with the modifier
+    /// </summary>
+    /// <returns>The list with the modifier</returns>
+    public ObservableCollection<string> GetModifierList()
+    {
+        return new ObservableCollection<string>
+        {
+            "public",
+            "internal",
+            "protected",
+            "protected internal"
         };
     }
 
@@ -653,7 +826,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="className">The name of the class</param>
     /// <returns><see langword="true"/> when the name is valid, otherwise <see langword="false"/></returns>
-    public bool ClassNameValid(string className)
+    public static bool ClassNameValid(string className)
     {
         // Check if the class name starts with a number
         bool ClassNameStartsWithNumber()

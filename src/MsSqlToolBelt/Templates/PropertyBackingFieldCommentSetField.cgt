@@ -9,5 +9,5 @@ private $TYPE$$NULLABLE$ $NAME2$;
 public $TYPE$$NULLABLE$ $NAME$
 {
     get => $NAME2$;
-    set => SetField(ref $NAME2$, value);
+    set => SetProperty(ref $NAME2$, value);
 }

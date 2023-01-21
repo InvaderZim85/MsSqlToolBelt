@@ -95,12 +95,18 @@
 
                 <Separator Grid.Row="5" />
 
-                <Button
+                <StackPanel
                     Grid.Row="6"
-                    Width="60"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ReloadCommand}"
-                    Content="Reload" />
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        HorizontalAlignment="Right"
+                        Command="{Binding ReloadCommand}"
+                        Content="Reload" />
+                    <Button Command="{Binding MultipleExportCommand}" Content="Generate multiple" />
+                </StackPanel>
+
             </Grid>
         </Border>
 
@@ -227,6 +233,7 @@
                             <RowDefinition Height="34" />
                             <RowDefinition Height="34" />
                             <RowDefinition Height="34" />
+                            <RowDefinition Height="34" />
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -250,7 +257,7 @@
                             Orientation="Horizontal">
 
                             <ComboBox
-                                Width="200"
+                                Width="251"
                                 ItemsSource="{Binding ModifierList}"
                                 SelectedItem="{Binding SelectedModifier}" />
                             <Label Content="Class name:" />
@@ -263,37 +270,54 @@
                         <Label
                             Grid.Row="1"
                             Grid.Column="0"
+                            Content="Namespace:" />
+                        <TextBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            mah:TextBoxHelper.Watermark="Namespace (optional)"
+                            Text="{Binding Namespace}" />
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            Grid.ColumnSpan="3"
+                            Content="If a namespace is specified, a corresponding template is used"
+                            Style="{StaticResource ItemHint}" />
+
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="0"
                             Content="Options:" />
 
                         <CheckBox
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="1"
                             Content="Sealed class"
                             IsChecked="{Binding OptionSealedClass}" />
                         <CheckBox
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="2"
                             Content="DB Model (EF)"
                             IsChecked="{Binding OptionDbModel}"
                             IsEnabled="{Binding TableOptionEnabled}"
                             ToolTip="Note: This option will be ignored if you generate a class from a query!" />
                         <CheckBox
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="3"
                             Content="Backing field"
                             IsChecked="{Binding OptionBackingField}" />
                         <CheckBox
-                            Grid.Row="2"
+                            Grid.Row="3"
                             Grid.Column="1"
                             Content="Summary"
                             IsChecked="{Binding OptionSummary}" />
                         <CheckBox
-                            Grid.Row="2"
+                            Grid.Row="3"
                             Grid.Column="2"
                             Content="Nullable enabled (.NET 6)"
                             IsChecked="{Binding OptionNullable}" />
                         <StackPanel
-                            Grid.Row="2"
+                            Grid.Row="3"
                             Grid.Column="3"
                             Margin="1,0,0,0"
                             Orientation="Horizontal">

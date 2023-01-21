@@ -289,8 +289,32 @@ internal static class Helper
     /// <returns>The converted string</returns>
     public static string FirstCharToLower(this string value)
     {
-        return string.IsNullOrEmpty(value)
-            ? value
+        return ChangeFirstChart(value, false);
+    }
+
+    /// <summary>
+    /// Converts the first char of a string to upper case
+    /// </summary>
+    /// <param name="value">The original value</param>
+    /// <returns>The converted string</returns>
+    public static string FirstChatToUpper(this string value)
+    {
+        return ChangeFirstChart(value, true);
+    }
+
+    /// <summary>
+    /// Changes the casing of the first char
+    /// </summary>
+    /// <param name="value">The original value</param>
+    /// <param name="upper"><see langword="true"/> to convert the first char to upper, <see langword="false"/> to convert the first char to lower</param>
+    /// <returns>The converted string</returns>
+    private static string ChangeFirstChart(string value, bool upper)
+    {
+        if (string.IsNullOrEmpty(value))
+            return value;
+
+        return upper 
+            ? $"{value[..1].ToUpper()}{value[1..]}" 
             : $"{value[..1].ToLower()}{value[1..]}";
     }
 

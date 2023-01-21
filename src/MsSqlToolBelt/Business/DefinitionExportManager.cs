@@ -88,9 +88,11 @@ internal class DefinitionExportManager : IDisposable
         if (!string.IsNullOrEmpty(objectList))
             SetExportFlag(objects, objectList);
 
+        var count = 1;
+        var totalCount = objects.Count(c => c.Export);
         foreach (var entry in objects.Where(w => w.Export))
         {
-            Progress?.Invoke(this, $"Export '{entry.Name}' definition...");
+            Progress?.Invoke(this, $"{count++} of {totalCount} > Export '{entry.Name}' definition...");
             await ExportAsync(entry, exportDir, createTypeDir);
         }
     }

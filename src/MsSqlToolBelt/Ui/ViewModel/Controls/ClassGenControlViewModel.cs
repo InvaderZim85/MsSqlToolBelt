@@ -92,7 +92,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
             _classGenResult = new ClassGenResult();
             _setCode?.Invoke(_classGenResult);
             ButtonEfKeyCodeEnabled = false;
-            ClassName = string.Empty;
+            ClassName = value?.Name ?? string.Empty;
 
             if (value != null && value.Columns.Any())
                 SetColumns();
@@ -202,13 +202,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Backing field for <see cref="ModifierList"/>
     /// </summary>
-    private ObservableCollection<string> _modifierList = new()
-    {
-        "public",
-        "internal",
-        "protected",
-        "protected internal"
-    };
+    private ObservableCollection<string> _modifierList = new();
 
     /// <summary>
     /// Gets or sets the list with the modifier
@@ -216,7 +210,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     public ObservableCollection<string> ModifierList
     {
         get => _modifierList;
-        set => SetProperty(ref _modifierList, value);
+        private set => SetProperty(ref _modifierList, value);
     }
 
     /// <summary>
@@ -369,6 +363,20 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         }
     }
 
+    /// <summary>
+    /// Backing field for <see cref="Namespace"/>
+    /// </summary>
+    private string _namespace = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the desired namespace
+    /// </summary>
+    public string Namespace
+    {
+        get => _namespace;
+        set => SetProperty(ref _namespace, value);
+    }
+
     #endregion
 
     #endregion
@@ -436,6 +444,18 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     });
 
     /// <summary>
+    /// The command which occurs when the user hits the "multiple export" button
+    /// </summary>
+    public ICommand MultipleExportCommand => new RelayCommand(() =>
+    {
+        if (_manager == null)
+            return;
+
+        var exportDialog = new ClassGenWindow(_manager) {Owner = Application.Current.MainWindow};
+        exportDialog.ShowDialog();
+    });
+
+    /// <summary>
     /// The command to generate a class from a query
     /// </summary>
     public ICommand FromQueryCommand => new RelayCommand(GenerateCodeFromQuery);
@@ -452,12 +472,12 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Init the view model
     /// </summary>
     /// <param name="settingsManager">The instance for the interaction with the settings</param>
-    /// <param name="setSqlText">The action to set the sql text</param>
+    /// <param name="setCode">The action to set the sql text</param>
     /// <param name="setColumnVisibility">The action to set the visibility of a column</param>
-    public void InitViewModel(SettingsManager settingsManager, Action<ClassGenResult> setSqlText, Action<bool> setColumnVisibility)
+    public void InitViewModel(SettingsManager settingsManager, Action<ClassGenResult> setCode, Action<bool> setColumnVisibility)
     {
         _settingsManager = settingsManager;
-        _setCode = setSqlText;
+        _setCode = setCode;
         _setColumnVisibility = setColumnVisibility;
 
         var tmpList = new List<IdTextEntry>
@@ -508,6 +528,8 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
 
         try
         {
+            ModifierList = _manager.GetModifierList();
+
             await _manager.LoadTablesAsync();
 
             _dataLoaded = true;
@@ -627,7 +649,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        if (!_manager.ClassNameValid(ClassName))
+        if (!ClassGenManager.ClassNameValid(ClassName))
         {
             await ShowMessageAsync("Class generator",
                 "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
@@ -669,7 +691,8 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
             WithBackingField = OptionBackingField,
             AddSummary = OptionSummary,
             Nullable = OptionNullable,
-            AddSetField = OptionSetField
+            AddSetField = OptionSetField,
+            Namespace = Namespace
         };
     }
 
@@ -681,7 +704,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager == null)
             return;
 
-        if (!_manager.ClassNameValid(ClassName))
+        if (!ClassGenManager.ClassNameValid(ClassName))
         {
             await ShowMessageAsync("Class generator",
                 "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");

@@ -116,14 +116,4 @@ public partial class ClassGenControl : UserControl, IUserControl
     {
         DataGridColumns.CopyToClipboard<ColumnDto>();
     }
-
-    /// <summary>
-    /// Occurs when the user hits the link in the tool tip (SeeProperty checkbox)
-    /// </summary>
-    /// <param name="sender">The hyper link of the SeeProperty tool tip</param>
-    /// <param name="e">The event arguments</param>
-    private void HyperlinkSetPropertyToolTip_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
-    {
-        Helper.OpenLink(e.Uri.ToString());
-    }
 }

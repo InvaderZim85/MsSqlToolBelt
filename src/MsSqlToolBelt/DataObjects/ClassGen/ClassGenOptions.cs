@@ -11,7 +11,7 @@ public class ClassGenOptions
     public string Modifier { get; set; } = "public";
 
     /// <summary>
-    /// Gets or sets the name of the class
+    /// Gets or sets the name of the class (only for the generation of a single class)
     /// </summary>
     public string ClassName { get; set; } = string.Empty;
 
@@ -51,4 +51,24 @@ public class ClassGenOptions
     /// Gets or sets the sql query (only needed for the function which generates a class from a sql query)
     /// </summary>
     public string SqlQuery { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the path of the output directory (only needed for the generation of multiple classes)
+    /// </summary>
+    public string OutputDirectory { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the export directory should be cleared before the export starts (only needed for the generation of multiple classes)
+    /// </summary>
+    public bool EmptyDirectoryBeforeExport { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the namespace
+    /// </summary>
+    public string Namespace { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the value which indicates if the template with namespace should be used
+    /// </summary>
+    public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
 }

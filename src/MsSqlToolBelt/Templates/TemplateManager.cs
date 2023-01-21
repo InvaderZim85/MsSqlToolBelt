@@ -30,7 +30,8 @@ internal sealed class TemplateManager
         if (!Templates.Any())
             LoadTemplates();
 
-        return Templates.FirstOrDefault(f => f.Type == type)?.Content ?? string.Empty;
+        return Templates.FirstOrDefault(f => f.Type == type)?.Content ??
+               string.Empty;
     }
 
     /// <summary>
@@ -47,6 +48,7 @@ internal sealed class TemplateManager
 
         foreach (var type in Enum.GetValues<ClassGenTemplateType>())
         {
+            // Load and store the template
             Templates.Add(LoadTemplate(type));
         }
     }
@@ -60,13 +62,14 @@ internal sealed class TemplateManager
     /// <exception cref="FileNotFoundException">Will be thrown when the specified template file doesn't exist</exception>
     private static TemplateEntry LoadTemplate(ClassGenTemplateType type)
     {
+        var templateName = type.ToString();
         var dir = new DirectoryInfo(Path.Combine(Core.GetBaseDirPath(), "Templates"));
         if (!dir.Exists)
             throw new DirectoryNotFoundException("The template directory is missing");
 
         var templates = dir.GetFiles("*.cgt");
 
-        var file = templates.FirstOrDefault(f => f.Name.Contains(type.ToString()));
+        var file = templates.FirstOrDefault(f => f.Name.Contains(templateName, StringComparison.OrdinalIgnoreCase));
         if (file is not {Exists: true})
             throw new FileNotFoundException($"The template file for '{type}' is missing.");
 

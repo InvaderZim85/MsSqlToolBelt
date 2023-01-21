@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls.Dialogs;
@@ -10,6 +10,7 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel;
 
@@ -31,7 +32,7 @@ internal class ViewModelBase : ObservableObject
     /// <summary>
     /// Gets or sets the value which indicates if there is any error (only needed for the input validation)
     /// </summary>
-    public bool HasErrors { get; set; }
+    protected bool HasErrors { get; set; }
 
     /// <summary>
     /// The message timer
@@ -133,16 +134,22 @@ internal class ViewModelBase : ObservableObject
     /// </summary>
     /// <param name="title">The title of the dialog</param>
     /// <param name="message">The message of the dialog</param>
+    /// <param name="ctSource">The cancellation token source (optional)</param>
     /// <returns>The awaitable task</returns>
-    protected async Task ShowProgressAsync(string title, string message)
+    protected async Task ShowProgressAsync(string title, string message, CancellationTokenSource? ctSource = default)
     {
         // Close the dialog before a new one will be created
         await CloseProgressAsync();
 
         Helper.SetTaskbarIndeterminate(true);
 
-        _progressDialogController = await _dialogCoordinator.ShowProgressAsync(this, title, message);
+        _progressDialogController = await _dialogCoordinator.ShowProgressAsync(this, title, message, ctSource != null);
         _progressDialogController.SetIndeterminate();
+
+        if (ctSource != null)
+        {
+            _progressDialogController.Canceled += (_, _) => ctSource.Cancel();
+        }
     }
 
     /// <summary>
