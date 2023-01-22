@@ -1,0 +1,7 @@
+private $TYPE$$NULLABLE$ $NAME2$;
+
+public $TYPE$$NULLABLE$ $NAME$
+{
+    get => $NAME2$;
+    set => SetProperty(ref $NAME2$, value);
+}
