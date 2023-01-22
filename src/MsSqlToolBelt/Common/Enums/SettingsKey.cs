@@ -23,5 +23,10 @@ public enum SettingsKey
     /// <summary>
     /// The count of history entries
     /// </summary>
-    SearchHistoryEntryCount
+    SearchHistoryEntryCount,
+
+    /// <summary>
+    /// The up time of the application
+    /// </summary>
+    UpTime
 }

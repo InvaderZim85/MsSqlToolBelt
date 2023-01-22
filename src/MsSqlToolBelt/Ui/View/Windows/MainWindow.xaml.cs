@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using System.Windows.Navigation;
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
@@ -20,6 +19,11 @@ namespace MsSqlToolBelt.Ui.View.Windows;
 public partial class MainWindow : MetroWindow
 {
     /// <summary>
+    /// The start time of the application
+    /// </summary>
+    private readonly DateTime _startTime;
+
+    /// <summary>
     /// The instance of the settings manager
     /// </summary>
     private readonly SettingsManager _settingsManager;
@@ -27,11 +31,13 @@ public partial class MainWindow : MetroWindow
     /// <summary>
     /// Creates a new instance of the <see cref="MainWindow"/>
     /// </summary>
+    /// <param name="startTime">The start time of the application</param>
     /// <param name="settingsManager">The instance of the settings manager</param>
-    public MainWindow(SettingsManager settingsManager)
+    public MainWindow(DateTime startTime, SettingsManager settingsManager)
     {
         InitializeComponent();
 
+        _startTime = startTime;
         _settingsManager = settingsManager;
     }
 
@@ -47,7 +53,7 @@ public partial class MainWindow : MetroWindow
                 SettingsControl.InitControl(_settingsManager);
                 break;
             case FlyOutType.Info:
-                InfoControl.InitControl();
+                InfoControl.InitControl(_startTime, _settingsManager);
                 break;
         }
     }
@@ -115,6 +121,9 @@ public partial class MainWindow : MetroWindow
         {
             var scheme = await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             Helper.SetColorTheme(scheme);
+
+            // Stops the info timer (only if needed)
+            InfoControl.StopUpTimeTimer();
         }
         catch (Exception ex)
         {

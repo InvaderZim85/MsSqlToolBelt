@@ -310,6 +310,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
             _manager.Progress += (_, msg) =>
             {
                 InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
+                SetProgressMessage(msg);
             };
 
             await _manager.ExportAsync(Objects.ToList(), objectList, ExportDir, CreateTypeDir);

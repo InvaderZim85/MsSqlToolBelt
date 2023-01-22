@@ -36,12 +36,7 @@ public class SettingsManager
     public SettingsManager()
     {
         _context = new AppDbContext();
-        // Create / update the database if needed
-        var databaseCreated = _context.Database.EnsureCreated();
-
-        // If the database was already created, start the migration
-        if (!databaseCreated)
-            _context.Database.Migrate();
+        _context.Database.Migrate();
     }
 
     #region Settings

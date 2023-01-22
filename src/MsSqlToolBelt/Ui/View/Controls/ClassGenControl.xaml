@@ -104,7 +104,10 @@
                         HorizontalAlignment="Right"
                         Command="{Binding ReloadCommand}"
                         Content="Reload" />
-                    <Button Command="{Binding MultipleExportCommand}" Content="Generate multiple" />
+                    <Button
+                        Command="{Binding MultipleExportCommand}"
+                        Content="Generate multiple"
+                        ToolTip="Note: The settings already made (alias, selected columns) will be adopted as well" />
                 </StackPanel>
 
             </Grid>

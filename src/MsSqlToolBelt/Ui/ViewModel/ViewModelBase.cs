@@ -170,6 +170,15 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
+    /// Sets the message of the progress dialog (if available)
+    /// </summary>
+    /// <param name="message">The message which should be set</param>
+    protected void SetProgressMessage(string message)
+    {
+        _progressDialogController?.SetMessage(message);
+    }
+
+    /// <summary>
     /// Shows an info message for 10 seconds
     /// </summary>
     /// <param name="message">The message which should be shown</param>

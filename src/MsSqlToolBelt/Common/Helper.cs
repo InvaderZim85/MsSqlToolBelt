@@ -33,7 +33,13 @@ internal static class Helper
     /// </summary>
     public static void InitHelper()
     {
-        Log.Logger = new LoggerConfiguration().WriteTo.SQLite("logs/Log.db").CreateLogger();
+        const string template = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
+
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.SQLite("logs/Log.db")
+            .WriteTo.File("logs/log_.log", rollingInterval: RollingInterval.Day, outputTemplate: template)
+            .CreateLogger();
+
         if (TaskbarManager.IsPlatformSupported)
             _taskbarInstance = TaskbarManager.Instance;
     }
@@ -47,7 +53,7 @@ internal static class Helper
     public static string ToFormattedString(this TimeSpan value, bool showDays = false)
     {
         return showDays
-            ? $"{value.TotalDays}d {value.Hours:00}:{value.Minutes:00}:{value.Seconds:00}"
+            ? $"{value.TotalDays:N0}d {value.Hours:00}:{value.Minutes:00}:{value.Seconds:00}"
             : $"{value.TotalHours:#00}:{value.Minutes:00}:{value.Seconds:00}";
     }
 
@@ -145,7 +151,7 @@ internal static class Helper
 
         var tmpDate = new DateTime(year, 1, 1).AddDays(dayOfYear).AddMinutes(minutesSinceMidnight);
 
-        return (version.ToString(), $"Build date: {tmpDate:yyyy-MM-dd HH:mm} - build nr. {build}");
+        return (version.ToString(), $"{tmpDate:yyyy-MM-dd HH:mm} - build nr. {build}");
     }
 
     /// <summary>

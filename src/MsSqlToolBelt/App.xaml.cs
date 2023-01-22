@@ -5,7 +5,7 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
-using Log = Serilog.Log;
+using Serilog;
 
 namespace MsSqlToolBelt;
 
@@ -43,7 +43,7 @@ public partial class App : Application
         {
             _settingsManager ??= new SettingsManager();
 
-            _mainWindow = new MainWindow(_settingsManager);
+            _mainWindow = new MainWindow(_startUp, _settingsManager);
             _mainWindow.Show();
 
             // Set the color theme
@@ -74,7 +74,33 @@ public partial class App : Application
         _mainWindow?.CloseConnection();
 
         var duration = DateTime.Now - _startUp;
+
+        SaveUpTime(duration);
+        
         Log.Information("Close application after {duration}", duration);
         Log.CloseAndFlush();
+    }
+
+    /// <summary>
+    /// Saves the up time of the application
+    /// </summary>
+    /// <param name="duration">The duration</param>
+    private async void SaveUpTime(TimeSpan duration)
+    {
+        if (_settingsManager == null)
+            return;
+
+        try
+        {
+            var upTime = await _settingsManager.LoadSettingsValueAsync<long>(SettingsKey.UpTime);
+
+            upTime += duration.Ticks;
+
+            await _settingsManager.SaveSettingsValueAsync(SettingsKey.UpTime, upTime);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "An error has occurred while saving the up time.");
+        }
     }
 }

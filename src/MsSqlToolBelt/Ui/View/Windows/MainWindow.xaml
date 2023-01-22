@@ -183,18 +183,15 @@
                 Name="InfoBorder"
                 Grid.Row="1"
                 Width="550"
-                Height="250"
+                Height="270"
                 Margin="15"
                 VerticalAlignment="Center"
                 Background="{DynamicResource MahApps.Brushes.Control.Background}"
                 BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                 BorderThickness="2"
-                CornerRadius="10, 0, 10, 0"
+                CornerRadius="5"
                 UseLayoutRounding="True"
                 Visibility="Hidden">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="25" ShadowDepth="10" />
-                </Border.Effect>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="28" />
@@ -252,9 +249,9 @@
                         Grid.Row="5"
                         Grid.Column="1"
                         TextWrapping="Wrap">
-                        Thank you for using my program. I hope everything works as planned.<LineBreak />
-                        If you find something that doesn't work or if you have any suggestions,<LineBreak />
-                        feel free to leave me a comment on the git repository.<LineBreak />
+                        Thank you for using my program. I hope you are satisfied with it.<LineBreak /><LineBreak />
+                        If you find something that doesn't meet your expectations, doesn't work correctly<LineBreak />
+                        or something is missing, feel free to leave me a message on GitHub.<LineBreak />
                         <LineBreak />
                         <Hyperlink NavigateUri="https://github.com/InvaderZim85/MsSqlToolBelt" RequestNavigate="Hyperlink_OnRequestNavigate">MsSqlToolBelt on Github</Hyperlink>
                         <LineBreak />

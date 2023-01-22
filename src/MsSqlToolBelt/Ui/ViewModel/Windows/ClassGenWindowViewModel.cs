@@ -306,6 +306,7 @@ internal class ClassGenWindowViewModel : ViewModelBase
         _manager.Progress += (_, msg) =>
         {
             InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
+            SetProgressMessage(msg);
         };
     }
 
@@ -344,15 +345,25 @@ internal class ClassGenWindowViewModel : ViewModelBase
     /// </summary>
     private async void GenerateClasses()
     {
-        if (_manager == null || !Tables.Any())
+        InfoList = string.Empty;
+
+        if (_manager == null)
+        {
+            InfoList = "An error has occurred.";
             return;
+        }
+
+        if (!Tables.Any())
+        {
+            InfoList = "Please select at least on table.";
+            return;
+        }
 
         var ctSource = new CancellationTokenSource();
-        await ShowProgressAsync("Please wait", "Please wait while creating the classes...");
+        await ShowProgressAsync("Please wait", "Please wait while creating the classes...", ctSource);
 
         try
         {
-            InfoList = string.Empty;
             var options = GetOptions();
 
             await _manager.GenerateClassesAsync(options, Tables.ToList(), ctSource.Token);

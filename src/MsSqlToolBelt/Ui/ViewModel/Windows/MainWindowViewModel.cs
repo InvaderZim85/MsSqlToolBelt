@@ -370,7 +370,7 @@ internal class MainWindowViewModel : ViewModelBase
         _memoryTimer.Start();
 
         var (_, buildInfo) = Helper.GetVersionInfo();
-        BuildInfo = buildInfo;
+        BuildInfo = $"Build date: {buildInfo}";
         SetHeaderInfo();
     }
 

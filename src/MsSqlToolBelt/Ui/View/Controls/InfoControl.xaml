@@ -18,10 +18,11 @@
     <Border Style="{StaticResource BorderStyle}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="34" />
+                <RowDefinition Height="34" />
+                <RowDefinition Height="34" />
+                <RowDefinition Height="34" />
+                <RowDefinition Height="34" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -60,7 +61,7 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="0"
-                Content="Build:" />
+                Content="Build date:" />
             <Label
                 Grid.Row="2"
                 Grid.Column="1"
@@ -82,13 +83,24 @@
                 Command="{Binding OpenLogDirCommand}"
                 Content="Open" />
 
-            <Separator
+            <Label
                 Grid.Row="4"
+                Grid.Column="0"
+                Content="Up time:" />
+            <Label
+                Name="LabelUpTime"
+                Grid.Row="4"
+                Grid.Column="1"
+                Content="0d 00:00:00"
+                Style="{StaticResource ItemValue}" />
+
+            <Separator
+                Grid.Row="5"
                 Grid.Column="0"
                 Grid.ColumnSpan="3" />
 
             <Label
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Left"
@@ -96,7 +108,7 @@
 
             <DataGrid
                 Name="DataGridPackages"
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 ItemsSource="{Binding PackageList}">
