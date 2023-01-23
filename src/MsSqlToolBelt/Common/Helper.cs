@@ -145,7 +145,7 @@ internal static class Helper
             return (string.Empty, string.Empty);
 
         var year = version.Major + 2000; // add 2 thousand years because the year contains only the last two places but we need the complete year
-        var dayOfYear = version.Minor;
+        var dayOfYear = version.Minor - 1; // we have to remove one day, because the date time starts always on the first day (we can't start at day 0)
         var build = version.Build + 1;
         var minutesSinceMidnight = version.Revision;
 
