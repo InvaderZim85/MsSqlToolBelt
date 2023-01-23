@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace MsSqlToolBelt.Business;
@@ -55,7 +58,8 @@ public class SettingsManager
     /// <returns>The value</returns>
     public async Task<T> LoadSettingsValueAsync<T>(SettingsKey key, T? fallback = default)
     {
-        var value = await _context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
+        await using var context = new AppDbContext();
+        var value = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
         if (value == null)
             return fallback == null ? Activator.CreateInstance<T>() : fallback;
 
@@ -78,7 +82,8 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task SaveSettingsValueAsync(SettingsKey key, object value)
     {
-        var tmpValue = await _context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
+        await using var context = new AppDbContext();
+        var tmpValue = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
         if (tmpValue != null)
         {
             tmpValue.Value = value.ToString() ?? "";
@@ -117,9 +122,10 @@ public class SettingsManager
     /// <returns>The list with the servers</returns>
     public async Task LoadServerAsync(bool withTracking = false)
     {
+        await using var context = new AppDbContext();
         ServerList = withTracking
-            ? await _context.ServerEntries.ToListAsync()
-            : await _context.ServerEntries.AsNoTracking().ToListAsync();
+            ? await context.ServerEntries.ToListAsync()
+            : await context.ServerEntries.AsNoTracking().ToListAsync();
     }
 
     /// <summary>
@@ -129,16 +135,18 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task AddServerAsync(ServerEntry server)
     {
+        await using var context = new AppDbContext();
+
         // Check if the entry already exists
-        if (_context.ServerEntries.Any(a => a.Name.Equals(server.Name)))
+        if (context.ServerEntries.Any(a => a.Name.Equals(server.Name)))
             return;
 
-        var newOrder = (_context.ServerEntries.Any() ? await _context.ServerEntries.MaxAsync(m => m.Order) : 0) + 1;
+        var newOrder = (context.ServerEntries.Any() ? await context.ServerEntries.MaxAsync(m => m.Order) : 0) + 1;
         server.Order = newOrder;
 
-        await _context.ServerEntries.AddAsync(server);
+        await context.ServerEntries.AddAsync(server);
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         ServerList.Add(server);
     }
@@ -150,9 +158,11 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task UpdateServerAsync(ServerEntry server)
     {
-        _context.ServerEntries.Update(server);
+        await using var context = new AppDbContext();
 
-        await _context.SaveChangesAsync();
+        context.ServerEntries.Update(server);
+
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -162,11 +172,13 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task DeleteServerAsync(ServerEntry server)
     {
+        await using var context = new AppDbContext();
+
         ServerList.Remove(server);
 
-        _context.ServerEntries.Remove(server);
+        context.ServerEntries.Remove(server);
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -177,23 +189,25 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task MoveServerOrderAsync(ServerEntry server, bool moveUp)
     {
+        await using var context = new AppDbContext();
+
         if (server.Order == 1 && moveUp)
             return; // The server is already at the top
 
-        var maxOrder = await _context.ServerEntries.MaxAsync(m => m.Order);
+        var maxOrder = await context.ServerEntries.MaxAsync(m => m.Order);
         if (server.Order == maxOrder && !moveUp)
             return; // The server is already at the bottom
 
         var newOrder = moveUp ? server.Order - 1 : server.Order + 1; // Get the new order
-        var otherServer = await _context.ServerEntries.FirstOrDefaultAsync(f => f.Order == newOrder);
+        var otherServer = await context.ServerEntries.FirstOrDefaultAsync(f => f.Order == newOrder);
         if (otherServer == null)
             return; // Can't find any server, something went wrong
 
         otherServer.Order = server.Order;
         server.Order = newOrder;
 
-        _context.ServerEntries.UpdateRange(server, otherServer);
-        await _context.SaveChangesAsync();
+        context.ServerEntries.UpdateRange(server, otherServer);
+        await context.SaveChangesAsync();
     }
     #endregion
 
@@ -205,9 +219,11 @@ public class SettingsManager
     /// <returns>The list with the filter</returns>
     public async Task LoadFilterAsync(bool withTracking = false)
     {
+        await using var context = new AppDbContext();
+
         FilterList =  withTracking
-            ? await _context.FilterEntries.ToListAsync()
-            : await _context.FilterEntries.AsNoTracking().ToListAsync();
+            ? await context.FilterEntries.ToListAsync()
+            : await context.FilterEntries.AsNoTracking().ToListAsync();
     }
 
     /// <summary>
@@ -217,14 +233,16 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task AddFilterAsync(FilterEntry filter)
     {
+        await using var context = new AppDbContext();
+
         // Check if the entry already exists
-        if (await _context.FilterEntries.AnyAsync(a => a.FilterTypeId == filter.FilterTypeId &&
+        if (await context.FilterEntries.AnyAsync(a => a.FilterTypeId == filter.FilterTypeId &&
                                                        a.Value.ToLower().Equals(filter.Value.ToLower())))
             return;
 
-        await _context.FilterEntries.AddAsync(filter);
+        await context.FilterEntries.AddAsync(filter);
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         FilterList.Add(filter);
     }
@@ -236,12 +254,156 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public async Task DeleteFilterAsync(FilterEntry filter)
     {
+        await using var context = new AppDbContext();
+
         // Remove the filter
         FilterList.Remove(filter);
 
-        _context.FilterEntries.Remove(filter);
+        context.FilterEntries.Remove(filter);
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
+    }
+    #endregion
+
+    #region Export / Import
+    /// <summary>
+    /// Exports all existing settings
+    /// </summary>
+    /// <param name="filepath">The path of the destination</param>
+    /// <returns>The awaitable task</returns>
+    public async Task ExportSettingsAsync(string filepath)
+    {
+        await using var context = new AppDbContext();
+
+        var settings = await context.Settings.AsNoTracking().ToListAsync();
+        var server = await context.ServerEntries.AsNoTracking().ToListAsync();
+        var filter = await context.FilterEntries.AsNoTracking().ToListAsync();
+
+        var data = new SettingsDto
+        {
+            Settings = settings,
+            Servers = server,
+            Filters = filter
+        };
+
+        var content = JsonConvert.SerializeObject(data, Formatting.Indented);
+
+        await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// Imports the settings
+    /// </summary>
+    /// <param name="filepath">The path of the settings file</param>
+    /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
+    /// <returns>The awaitable task</returns>
+    public async Task ImportSettingsAsync(string filepath, bool overrideSettings)
+    {
+        if (!File.Exists(filepath)) 
+            return;
+
+        var content = await File.ReadAllTextAsync(filepath);
+
+        if (string.IsNullOrWhiteSpace(content))
+            return;
+
+        var data = JsonConvert.DeserializeObject<SettingsDto>(content) ?? new SettingsDto();
+
+        // Check if the dto is default
+        if (!data.Servers.Any() && !data.Settings.Any() && !data.Filters.Any())
+            return;
+
+        // Import settings
+        await ImportSettingsAsync(data.Settings, overrideSettings);
+
+        // Import server
+        await ImportServerAsync(data.Servers, overrideSettings);
+
+        // Import filter
+        await ImportFilterAsync(data.Filters, overrideSettings);
+    }
+
+    /// <summary>
+    /// Imports the server entries
+    /// </summary>
+    /// <param name="server">The list with the server</param>
+    /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
+    /// <returns>The awaitable task</returns>
+    private async Task ImportServerAsync(List<ServerEntry> server, bool overrideSettings)
+    {
+        await using var context = new AppDbContext();
+
+        var currentOrder = await context.ServerEntries.AsNoTracking().MaxAsync(m => m.Order);
+        foreach (var entry in server)
+        {
+            var existingEntry = await context.ServerEntries.FirstOrDefaultAsync(f => f.Name.ToLower().Equals(entry.Name.ToLower()));
+            if (existingEntry != null && overrideSettings)
+            {
+                existingEntry.AutoConnect = entry.AutoConnect;
+                existingEntry.DefaultDatabase = entry.DefaultDatabase;
+                existingEntry.Description = entry.Description;
+            }
+            else if (existingEntry == null)
+            {
+                entry.Order = ++currentOrder;
+                await context.ServerEntries.AddAsync(entry);
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Imports the settings entries
+    /// </summary>
+    /// <param name="settings">The list with the settings</param>
+    /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
+    /// <returns>The awaitable task</returns>
+    private async Task ImportSettingsAsync(List<SettingsEntry> settings, bool overrideSettings)
+    {
+        await using var context = new AppDbContext();
+
+        foreach (var entry in settings.Where(entry => entry.KeyId != (int)SettingsKey.UpTime))
+        {
+            var existingEntry = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == entry.KeyId);
+            if (existingEntry != null && overrideSettings)
+            {
+                existingEntry.Value = entry.Value;
+            }
+            else if (existingEntry == null)
+            {
+                await context.Settings.AddAsync(entry);
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Imports the filter entries
+    /// </summary>
+    /// <param name="filter">The list with the filters</param>
+    /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
+    /// <returns>The awaitable task</returns>
+    private async Task ImportFilterAsync(List<FilterEntry> filter, bool overrideSettings)
+    {
+        await using var context = new AppDbContext();
+
+        foreach (var entry in filter)
+        {
+            var existingEntry =
+                await context.FilterEntries.FirstOrDefaultAsync(f => f.Value.ToLower().Equals(entry.Value.ToLower()));
+            if (existingEntry != null && overrideSettings)
+            {
+                existingEntry.FilterTypeId = entry.FilterTypeId;
+            }
+            else if (existingEntry == null)
+            {
+                await context.FilterEntries.AddAsync(entry);
+            }
+        }
+
+        await context.SaveChangesAsync();
     }
     #endregion
 }

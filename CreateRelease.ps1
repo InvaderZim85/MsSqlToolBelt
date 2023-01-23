@@ -108,7 +108,7 @@ function ChangeProjectFile($filePath, $newVersion) {
 # ===========================
 # Main entry point
 # ===========================
-$projectFile = "src\MsSqlToolBelt\MsSqlToolBelt\MsSqlToolBelt.csproj"
+$projectFile = "src\MsSqlToolBelt\MsSqlToolBelt.csproj"
 Write-Host "Start version update. Files:"
 Write-Host " - Project file: $projectFile"
 
@@ -148,14 +148,14 @@ try {
     # ===========================
     # Create the release
     $dotnet = "C:\Program Files\dotnet\dotnet.exe"
-    $output = Resolve-Path -Path "src\MsSqlToolBelt\MsSqlToolBelt\bin\"
+    $output = Resolve-Path -Path "src\MsSqlToolBelt\bin\"
 
     # Clear the previous builds
     Write-Host "Clear output directory $output"
     Remove-Item "$output\*" -Recurse -Confirm:$false
 
     # Create the release
-    & $dotnet publish "src/MsSqlToolBelt/MsSqlToolBelt.sln" -p:PublishProfile=src/InputCounter/Properties/PublishProfiles/FolderProfile
+    & $dotnet publish "src/MsSqlToolBelt.sln" -p:PublishProfile=src/MsSqlToolBelt/Properties/PublishProfiles/FolderProfile
 
     return 0
 }

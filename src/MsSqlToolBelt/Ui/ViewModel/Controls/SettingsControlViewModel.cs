@@ -8,6 +8,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -129,6 +130,20 @@ internal class SettingsControlViewModel : ViewModelBase
     {
         get => _buttonMoveDownEnabled;
         set => SetProperty(ref _buttonMoveDownEnabled, value);
+    }
+
+    /// <summary>
+    /// Backing field for <see cref="ImportOverride"/>
+    /// </summary>
+    private bool _importOverride;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the values should be overwritten during the import
+    /// </summary>
+    public bool ImportOverride
+    {
+        get => _importOverride;
+        set => SetProperty(ref _importOverride, value);
     }
 
     #endregion
@@ -292,6 +307,16 @@ internal class SettingsControlViewModel : ViewModelBase
     /// The command to save the various settings
     /// </summary>
     public ICommand SaveVariousCommand => new RelayCommand(SaveVariousSettings);
+
+    /// <summary>
+    /// The command which occurs when the user hits the export button
+    /// </summary>
+    public ICommand ExportCommand => new RelayCommand(ExportSettings);
+
+    /// <summary>
+    /// The command which occurs when the user hits the import button
+    /// </summary>
+    public ICommand ImportCommand => new RelayCommand(ImportSettings);
     #endregion
     
     /// <summary>
@@ -620,6 +645,71 @@ internal class SettingsControlViewModel : ViewModelBase
         catch (Exception ex)
         {
             await ShowErrorAsync(ex);
+        }
+    }
+
+    /// <summary>
+    /// Exports the settings as JSON file
+    /// </summary>
+    private async void ExportSettings()
+    {
+        if (_manager == null)
+            return;
+
+        var dialog = new CommonSaveFileDialog
+        {
+            Filters = {new CommonFileDialogFilter("JSON file", "*.json")},
+            DefaultFileName = "MsSqlToolBelt_Settings",
+            DefaultExtension = "json"
+        };
+
+        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            return;
+
+        await ShowProgressAsync("Export", "Please wait while exporting the settings...");
+        try
+        {
+            await _manager.ExportSettingsAsync(dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await CloseProgressAsync();
+        }
+    }
+
+    /// <summary>
+    /// Imports the selected settings (JSON file)
+    /// </summary>
+    private async void ImportSettings()
+    {
+        if (_manager == null)
+            return;
+
+        var dialog = new CommonOpenFileDialog
+        {
+            Filters = {new CommonFileDialogFilter("JSON file", "*.json")},
+            EnsureFileExists = true
+        };
+
+        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            return;
+
+        await ShowProgressAsync("Import", "Please wait while importing the settings...");
+        try
+        {
+            await _manager.ImportSettingsAsync(dialog.FileName, ImportOverride);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            await CloseProgressAsync();
         }
     }
     #endregion

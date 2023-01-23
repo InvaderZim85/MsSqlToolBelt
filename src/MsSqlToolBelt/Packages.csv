@@ -1,5 +1,5 @@
 AvalonEdit;6.2.0.78
-CommunityToolkit.Mvvm;8.0.0
+CommunityToolkit.Mvvm;8.1.0
 Dapper;2.0.123
 MahApps.Metro;2.4.9
 MahApps.Metro.IconPacks.Material;4.11.0
@@ -13,6 +13,7 @@ Microsoft.VisualStudio.Threading;17.4.33
 Newtonsoft.Json;13.0.2
 RestSharp;108.0.3
 RestSharp.Serializers.NewtonsoftJson;108.0.3
+Serilog.Sinks.File;5.0.0
 Serilog.Sinks.SQLite;5.5.0
 ZimLabs.CoreLib;2.1.0
 ZimLabs.Database.MsSql;1.2.2

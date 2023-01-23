@@ -1,8 +1,8 @@
 # Variables
-$projectFile = "src\MsSqlToolBelt\MsSqlToolBelt\MsSqlToolBelt.csproj"
+$projectFile = "src\MsSqlToolBelt\MsSqlToolBelt.csproj"
 $projectFile = Resolve-Path -Path $projectFile
 
-$outputFile = "src\MsSqlToolBelt\MsSqlToolBelt\Packages.csv"
+$outputFile = "src\MsSqlToolBelt\Packages.csv"
 $outputFile = Resolve-Path -Path $outputFile
 
 Write-Host "Files:"

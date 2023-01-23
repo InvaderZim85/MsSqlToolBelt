@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    d:DesignHeight="650"
     d:DesignWidth="600"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -311,6 +312,57 @@
                     HorizontalAlignment="Right"
                     Command="{Binding SaveVariousCommand}"
                     Content="Save" />
+            </Grid>
+        </Border>
+
+        <!--  Import / Export  -->
+        <Border Grid.Row="4" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Content="Import / Export"
+                    Style="{StaticResource Headline}" />
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2" />
+
+                <Button
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Width="60"
+                    Command="{Binding ExportCommand}"
+                    Content="Export" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Content="Exports the current settings as JSON file"
+                    Style="{StaticResource ItemHint}" />
+
+                <Button
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Command="{Binding ImportCommand}"
+                    Content="Import" />
+                <CheckBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Content="Override existing settings during import"
+                    IsChecked="{Binding ImportOverride}" />
             </Grid>
         </Border>
     </Grid>
