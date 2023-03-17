@@ -437,7 +437,7 @@ internal class MainWindowViewModel : ViewModelBase
 
         ConnectionEstablished = false;
 
-        await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
+        var controller = await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
 
         try
         {
@@ -469,7 +469,7 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -481,7 +481,7 @@ internal class MainWindowViewModel : ViewModelBase
         if (_baseRepo == null || SelectedServer == null || string.IsNullOrEmpty(SelectedDatabase))
             return;
 
-        await ShowProgressAsync("Please wait",
+        var controller = await ShowProgressAsync("Please wait",
             "Please wait while the connection to the database is established...");
 
         try
@@ -494,7 +494,7 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

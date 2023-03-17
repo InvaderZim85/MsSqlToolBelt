@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
+using System.Windows.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
@@ -299,15 +300,8 @@ internal class ClassGenWindowViewModel : ViewModelBase
 
         FilterList();
 
-        ModifierList = _manager.GetModifierList();
+        ModifierList = ClassGenManager.GetModifierList();
         SelectedModifier = "public";
-
-        // Add the info event
-        _manager.Progress += (_, msg) =>
-        {
-            InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
-            SetProgressMessage(msg);
-        };
     }
 
     #region Class gen
@@ -360,11 +354,13 @@ internal class ClassGenWindowViewModel : ViewModelBase
         }
 
         var ctSource = new CancellationTokenSource();
-        await ShowProgressAsync("Please wait", "Please wait while creating the classes...", ctSource);
+        var controller = await ShowProgressAsync("Please wait", "Please wait while creating the classes...", ctSource);
 
         try
         {
             var options = GetOptions();
+
+            _manager.Progress += (_, msg) => controller.SetMessage(msg);
 
             await _manager.GenerateClassesAsync(options, Tables.ToList(), ctSource.Token);
         }
@@ -374,7 +370,7 @@ internal class ClassGenWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
     

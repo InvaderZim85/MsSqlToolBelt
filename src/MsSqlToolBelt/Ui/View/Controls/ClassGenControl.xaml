@@ -89,7 +89,7 @@
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
 
@@ -183,13 +183,13 @@
                 <StackPanel Grid.Row="6" Orientation="Horizontal">
                     <Button
                         Width="80"
-                        Command="{Binding SelectCommand}"
+                        Command="{Binding SelectColumnsCommand}"
                         CommandParameter="{x:Static enums:SelectionType.All}"
                         Content="Select all"
                         ToolTip="Checks all entries" />
                     <Button
                         Width="80"
-                        Command="{Binding SelectCommand}"
+                        Command="{Binding SelectColumnsCommand}"
                         CommandParameter="{x:Static enums:SelectionType.None}"
                         Content="Select none"
                         ToolTip="Uncheck all entries" />
@@ -345,7 +345,7 @@
                             Grid.Row="2"
                             Grid.Column="5"
                             Width="130"
-                            Command="{Binding GenerateCommand}"
+                            Command="{Binding GenerateClassCommand}"
                             Content="Generate" />
                     </Grid>
                 </Grid>

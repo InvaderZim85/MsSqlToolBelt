@@ -232,7 +232,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
 
         try
         {
@@ -248,7 +248,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -284,7 +284,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -300,7 +300,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

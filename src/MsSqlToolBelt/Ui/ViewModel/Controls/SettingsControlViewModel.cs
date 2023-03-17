@@ -374,7 +374,7 @@ internal class SettingsControlViewModel : ViewModelBase
         if (string.IsNullOrEmpty(SelectedColorTheme))
             return;
 
-        await ShowProgressAsync("Save", "Please wait while saving the theme...");
+        var controller = await ShowProgressAsync("Save", "Please wait while saving the theme...");
 
         try
         {
@@ -386,7 +386,7 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -666,7 +666,8 @@ internal class SettingsControlViewModel : ViewModelBase
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        await ShowProgressAsync("Export", "Please wait while exporting the settings...");
+        var controller = await ShowProgressAsync("Export", "Please wait while exporting the settings...");
+
         try
         {
             await _manager.ExportSettingsAsync(dialog.FileName);
@@ -677,7 +678,7 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -698,7 +699,7 @@ internal class SettingsControlViewModel : ViewModelBase
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        await ShowProgressAsync("Import", "Please wait while importing the settings...");
+        var controller = await ShowProgressAsync("Import", "Please wait while importing the settings...");
         try
         {
             await _manager.ImportSettingsAsync(dialog.FileName, ImportOverride);
@@ -709,7 +710,7 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
     #endregion

@@ -514,12 +514,25 @@ public sealed class ClassGenManager : IDisposable
                 content.Insert(index, "[Key]");
         }
 
-        if (!options.DbModel || string.IsNullOrEmpty(column.Alias) || column.Name.Equals(column.Alias, StringComparison.OrdinalIgnoreCase))
+        if (!options.DbModel)
             return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
         
         // Add the EF attribute for the column
-        var columnAttribute =
-            $"[Column(\"{column.Name}\"{(column.DataType.EqualsIgnoreCase("date") ? ", DataType(DataType.Date)" : "")})]";
+        var columnAttributes = new List<string>();
+        if (!string.IsNullOrEmpty(column.Alias) && !column.Name.EqualsIgnoreCase(column.Alias))
+        {
+            columnAttributes.Add($"[Column[\"{column.Name}\")]");
+        }
+
+        if (column.DataType.EqualsIgnoreCase("date"))
+        {
+            columnAttributes.Add("[DataType(DataType.Date)]");
+        }
+
+        if (columnAttributes.Count == 0)
+            return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
+
+        var columnAttribute = string.Join(Environment.NewLine, columnAttributes);
 
         index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
         if (index != -1)
@@ -752,7 +765,7 @@ public sealed class ClassGenManager : IDisposable
     /// Gets the list with the modifier
     /// </summary>
     /// <returns>The list with the modifier</returns>
-    public ObservableCollection<string> GetModifierList()
+    public static ObservableCollection<string> GetModifierList()
     {
         return new ObservableCollection<string>
         {

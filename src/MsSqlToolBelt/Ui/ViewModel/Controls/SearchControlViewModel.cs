@@ -435,7 +435,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (AddWildcardAutomatically && !SearchString.Contains('*') && !SearchString.Contains('%'))
             SearchString = $"*{SearchString}*";
 
-        await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
+        var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
 
         try
         {
@@ -461,7 +461,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -496,7 +496,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedResult == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
 
         try
         {
@@ -524,7 +524,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

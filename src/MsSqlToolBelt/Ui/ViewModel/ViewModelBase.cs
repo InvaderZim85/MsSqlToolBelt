@@ -25,11 +25,6 @@ internal class ViewModelBase : ObservableObject
     private readonly IDialogCoordinator _dialogCoordinator;
 
     /// <summary>
-    /// The controller of the progress dialog
-    /// </summary>
-    private ProgressDialogController? _progressDialogController;
-
-    /// <summary>
     /// Gets or sets the value which indicates if there is any error (only needed for the input validation)
     /// </summary>
     protected bool HasErrors { get; set; }
@@ -135,47 +130,26 @@ internal class ViewModelBase : ObservableObject
     /// <param name="title">The title of the dialog</param>
     /// <param name="message">The message of the dialog</param>
     /// <param name="ctSource">The cancellation token source (optional)</param>
-    /// <returns>The awaitable task</returns>
-    protected async Task ShowProgressAsync(string title, string message, CancellationTokenSource? ctSource = default)
+    /// <returns>The dialog controller</returns>
+    protected async Task<ProgressDialogController> ShowProgressAsync(string title, string message, CancellationTokenSource? ctSource = default)
     {
-        // Close the dialog before a new one will be created
-        await CloseProgressAsync();
-
         Helper.SetTaskbarIndeterminate(true);
 
-        _progressDialogController = await _dialogCoordinator.ShowProgressAsync(this, title, message, ctSource != null);
-        _progressDialogController.SetIndeterminate();
+        var controller = await _dialogCoordinator.ShowProgressAsync(this, title, message, ctSource != null);
+        controller.SetIndeterminate();
 
         if (ctSource != null)
         {
-            _progressDialogController.Canceled += (_, _) => ctSource.Cancel();
+            controller.Canceled += (_, _) => ctSource.Cancel();
         }
-    }
 
-    /// <summary>
-    /// Closes the progress
-    /// </summary>
-    /// <returns>The awaitable task</returns>
-    protected async Task CloseProgressAsync()
-    {
-        if (_progressDialogController == null)
-            return;
+        controller.Closed += (_, _) =>
+        {
+            // Reset the taskbar when the controller was closed
+            Helper.SetTaskbarIndeterminate(false);
+        };
 
-        Helper.SetTaskbarIndeterminate(false);
-
-        await _progressDialogController.CloseAsync();
-
-        // Remove the old dialog
-        _progressDialogController = null;
-    }
-
-    /// <summary>
-    /// Sets the message of the progress dialog (if available)
-    /// </summary>
-    /// <param name="message">The message which should be set</param>
-    protected void SetProgressMessage(string message)
-    {
-        _progressDialogController?.SetMessage(message);
+        return controller;
     }
 
     /// <summary>

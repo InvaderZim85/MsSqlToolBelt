@@ -105,7 +105,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         if (_manager == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the search history entries...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the search history entries...");
 
         try
         {
@@ -119,7 +119,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -138,7 +138,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         if (result != MessageDialogResult.Affirmative)
             return;
 
-        await ShowProgressAsync("Deleting", "Please wait while deleting the entry...");
+        var controller = await ShowProgressAsync("Deleting", "Please wait while deleting the entry...");
 
         try
         {
@@ -152,7 +152,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -169,7 +169,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         if (result != MessageDialogResult.Affirmative)
             return;
 
-        await ShowProgressAsync("Deleting", "Please wait while clearing the history...");
+        var controller = await ShowProgressAsync("Deleting", "Please wait while clearing the history...");
 
         try
         {
@@ -183,7 +183,7 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 }

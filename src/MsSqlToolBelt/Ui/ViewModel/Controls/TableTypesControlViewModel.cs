@@ -174,7 +174,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the table types...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the table types...");
 
         try
         {
@@ -190,7 +190,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -218,7 +218,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTableType == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -233,7 +233,7 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

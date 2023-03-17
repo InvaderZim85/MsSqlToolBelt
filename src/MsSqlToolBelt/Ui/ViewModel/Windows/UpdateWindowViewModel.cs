@@ -158,7 +158,7 @@ internal class UpdateWindowViewModel : ViewModelBase
         // We need to hide the browser, because the dialog overlay is behind the browser ....
         BrowserVisibility = Visibility.Hidden;
 
-        await ShowProgressAsync("Please wait", "Please wait while downloading the file...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while downloading the file...");
 
         try
         {
@@ -174,7 +174,7 @@ internal class UpdateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
             BrowserVisibility = Visibility.Visible;
         }
     }

@@ -234,7 +234,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the objects...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the objects...");
 
         try
         {
@@ -254,7 +254,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -303,14 +303,14 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
             return;
         }
 
-        await ShowProgressAsync("Please wait", "Please wait while exporting the definitions...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while exporting the definitions...");
 
         try
         {
             _manager.Progress += (_, msg) =>
             {
                 InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
-                SetProgressMessage(msg);
+                controller.SetMessage(msg);
             };
 
             await _manager.ExportAsync(Objects.ToList(), objectList, ExportDir, CreateTypeDir);
@@ -321,7 +321,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MsSqlToolBelt.DataObjects.Updater;
 using RestSharp;
+using RestSharp.Serializers.Json;
 using RestSharp.Serializers.NewtonsoftJson;
 using Serilog;
 
@@ -27,9 +29,10 @@ internal static class UpdateHelper
     {
         try
         {
-            var client = new RestClient(GitHubApiUrl);
+            var client = new RestClient(GitHubApiUrl,
+                configureSerialization: s => s.UseNewtonsoftJson());
+
             client.AddDefaultHeader("accept", "application/vnd.github.v3+json");
-            client.UseNewtonsoftJson();
 
             var request = new RestRequest();
 

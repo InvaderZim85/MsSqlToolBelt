@@ -113,7 +113,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         // Get the content
         SelectedTemplate.Content = _getCodeEditorText?.Invoke() ?? string.Empty;
 
-        await ShowProgressAsync("Please wait", "Please wait while saving the changes...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while saving the changes...");
 
         try
         {
@@ -125,7 +125,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -146,7 +146,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         if (dialog.ShowDialog() != true)
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while saving the backup...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while saving the backup...");
 
         try
         {
@@ -158,7 +158,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -178,7 +178,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         if (dialog.ShowDialog() != true)
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while loading the backup...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while loading the backup...");
 
         try
         {
@@ -192,7 +192,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 }

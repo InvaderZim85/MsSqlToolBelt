@@ -155,7 +155,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
         if (string.IsNullOrEmpty(text))
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while validating the query...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while validating the query...");
 
         try
         {
@@ -181,7 +181,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
