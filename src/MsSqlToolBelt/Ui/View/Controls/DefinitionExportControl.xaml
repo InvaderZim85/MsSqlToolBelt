@@ -51,7 +51,7 @@
                     Grid.Row="0"
                     Grid.Column="2"
                     Width="40"
-                    Command="{Binding BrowseCommand}"
+                    Command="{Binding BrowseExportDirCommand}"
                     Content="..." />
 
                 <CheckBox
@@ -137,7 +137,7 @@
                         Style="{StaticResource TextBoxFilter}"
                         Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                            <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
                         </TextBox.InputBindings>
                     </TextBox>
 
@@ -146,12 +146,12 @@
                     <StackPanel Grid.Row="6" Orientation="Horizontal">
                         <Button
                             Width="90"
-                            Command="{Binding SelectCommand}"
+                            Command="{Binding SetSelectionCommand}"
                             CommandParameter="{x:Static enums:SelectionType.All}"
                             Content="Select all" />
                         <Button
                             Width="90"
-                            Command="{Binding SelectCommand}"
+                            Command="{Binding SetSelectionCommand}"
                             CommandParameter="{x:Static enums:SelectionType.None}"
                             Content="Select none" />
                         <Button
@@ -230,7 +230,7 @@
                     Grid.Column="2"
                     Width="60"
                     HorizontalAlignment="Right"
-                    Command="{Binding ExportCommand}"
+                    Command="{Binding ExportDefinitionCommand}"
                     Content="Export" />
             </Grid>
         </Border>

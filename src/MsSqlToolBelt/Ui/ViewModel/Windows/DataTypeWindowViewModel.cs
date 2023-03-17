@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
@@ -17,50 +19,19 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.DataTypeWindow"/>
 /// </summary>
-internal class DataTypeWindowViewModel : ViewModelBase
+internal partial class DataTypeWindowViewModel : ViewModelBase
 {
     /// <summary>
-    /// Backing field for <see cref="DataTypes"/>
+    /// The list with the data types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ClassGenTypeEntry> _dataTypes = new();
 
     /// <summary>
-    /// Gets or sets the list with the data types
+    /// The selected entry
     /// </summary>
-    public ObservableCollection<ClassGenTypeEntry> DataTypes
-    {
-        get => _dataTypes;
-        private set => SetProperty(ref _dataTypes, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedEntry"/>
-    /// </summary>
+    [ObservableProperty]
     private ClassGenTypeEntry? _selectedEntry;
-
-    /// <summary>
-    /// Gets or sets the selected entry
-    /// </summary>
-    public ClassGenTypeEntry? SelectedEntry
-    {
-        get => _selectedEntry;
-        set => SetProperty(ref _selectedEntry, value);
-    }
-
-    /// <summary>
-    /// The command which occurs when the user hits the add button
-    /// </summary>
-    public ICommand AddCommand => new RelayCommand(AddEntry);
-
-    /// <summary>
-    /// The command which occurs when the user hits the edit button
-    /// </summary>
-    public ICommand EditCommand => new RelayCommand(EditEntry);
-
-    /// <summary>
-    /// The command which occurs when the user hits the delete button
-    /// </summary>
-    public ICommand DeleteCommand => new RelayCommand(DeleteEntry);
 
     /// <summary>
     /// Loads / shows the data
@@ -80,7 +51,9 @@ internal class DataTypeWindowViewModel : ViewModelBase
     /// <summary>
     /// Adds a new entry
     /// </summary>
-    private async void AddEntry()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task AddEntryAsync()
     {
         var dialog = new DataTypeInputWindow(DataTypes.ToList())
             {Owner = Application.Current.MainWindow};
@@ -103,7 +76,9 @@ internal class DataTypeWindowViewModel : ViewModelBase
     /// <summary>
     /// Edits the selected entry
     /// </summary>
-    private async void EditEntry()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task EditEntryAsync()
     {
         if (SelectedEntry == null)
             return;
@@ -135,7 +110,9 @@ internal class DataTypeWindowViewModel : ViewModelBase
     /// <summary>
     /// Deletes the selected entry
     /// </summary>
-    private async void DeleteEntry()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task DeleteEntryAsync()
     {
         if (SelectedEntry == null)
             return;

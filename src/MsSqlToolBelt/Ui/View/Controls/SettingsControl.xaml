@@ -310,7 +310,7 @@
                     Grid.ColumnSpan="3"
                     Width="60"
                     HorizontalAlignment="Right"
-                    Command="{Binding SaveVariousCommand}"
+                    Command="{Binding SaveVariousSettingsCommand}"
                     Content="Save" />
             </Grid>
         </Border>
@@ -345,7 +345,7 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Width="60"
-                    Command="{Binding ExportCommand}"
+                    Command="{Binding ExportSettingsCommand}"
                     Content="Export" />
                 <Label
                     Grid.Row="2"
@@ -356,7 +356,7 @@
                 <Button
                     Grid.Row="3"
                     Grid.Column="0"
-                    Command="{Binding ImportCommand}"
+                    Command="{Binding ImportSettingsCommand}"
                     Content="Import" />
                 <CheckBox
                     Grid.Row="3"

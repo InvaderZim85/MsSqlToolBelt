@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.DataObjects.ClassGen;
 
@@ -11,7 +12,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.DataTypeInputWindow"/>
 /// </summary>
-internal class DataTypeInputWindowViewModel : ViewModelBase, IDataErrorInfo
+internal partial class DataTypeInputWindowViewModel : ViewModelBase, IDataErrorInfo
 {
     /// <inheritdoc />
     public string Error => string.Empty;
@@ -35,79 +36,34 @@ internal class DataTypeInputWindowViewModel : ViewModelBase, IDataErrorInfo
     private ClassGenTypeEntry _entry = new();
 
     /// <summary>
-    /// Backing field for <see cref="ExistingEntry"/>
+    /// The value which indicates if the entry is an existing entry
     /// </summary>
+    [ObservableProperty]
     private bool _existingEntry;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the entry is an existing entry
+    /// The sql type
     /// </summary>
-    public bool ExistingEntry
-    {
-        get => _existingEntry;
-        private set => SetProperty(ref _existingEntry, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SqlType"/>
-    /// </summary>
+    [ObservableProperty]
     private string _sqlType = string.Empty;
 
     /// <summary>
-    /// Gets or sets the sql type
+    /// The CSharp type
     /// </summary>
-    public string SqlType
-    {
-        get => _sqlType;
-        set => SetProperty(ref _sqlType, value.ToUpper());
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="CSharpType"/>
-    /// </summary>
+    [ObservableProperty]
     private string _cSharpType = string.Empty;
 
     /// <summary>
-    /// Gets or sets the CSharp type
+    /// The CSharp system type
     /// </summary>
-    public string CSharpType
-    {
-        get => _cSharpType;
-        set => SetProperty(ref _cSharpType, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="CSharpSystemType"/>
-    /// </summary>
+    [ObservableProperty]
     private string _cSharpSystemType = string.Empty;
 
     /// <summary>
-    /// Gets or sets the CSharp system type
+    /// The value which indicates if the C# type is nullable
     /// </summary>
-    public string CSharpSystemType
-    {
-        get => _cSharpSystemType;
-        set => SetProperty(ref _cSharpSystemType, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="IsNullable"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _isNullable;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the C# type is nullable
-    /// </summary>
-    public bool IsNullable
-    {
-        get => _isNullable;
-        set => SetProperty(ref _isNullable, value);
-    }
-
-    /// <summary>
-    /// The command which occurs when the user hits the ok button
-    /// </summary>
-    public ICommand OkCommand => new RelayCommand(GetValues);
 
     /// <summary>
     /// Init the view model
@@ -180,6 +136,7 @@ internal class DataTypeInputWindowViewModel : ViewModelBase, IDataErrorInfo
     /// <summary>
     /// Sets the values
     /// </summary>
+    [RelayCommand]
     private void GetValues()
     {
         if (HasErrors)

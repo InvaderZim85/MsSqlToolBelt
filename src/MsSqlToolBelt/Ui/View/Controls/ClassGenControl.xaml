@@ -339,7 +339,7 @@
                             Grid.Row="2"
                             Grid.Column="4"
                             Width="130"
-                            Command="{Binding FromQueryCommand}"
+                            Command="{Binding GenerateCodeFromQueryCommand}"
                             Content="Generate from Query" />
                         <Button
                             Grid.Row="2"

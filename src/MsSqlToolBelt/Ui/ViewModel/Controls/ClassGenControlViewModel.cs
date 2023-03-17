@@ -252,6 +252,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     #endregion
 
     #region Commands
+    // Note: This are not all commands! The other commands are provided via the "RelayCommand" attribute!
 
     /// <summary>
     /// The command to reload the table types
@@ -295,16 +296,6 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         var exportDialog = new ClassGenWindow(_manager) {Owner = Application.Current.MainWindow};
         exportDialog.ShowDialog();
     });
-
-    /// <summary>
-    /// The command to generate a class from a query
-    /// </summary>
-    public ICommand FromQueryCommand => new RelayCommand(GenerateCodeFromQuery);
-
-    /// <summary>
-    /// The command which occurs when the user hits the show info menu item (context menu of the set field option)
-    /// </summary>
-    public ICommand ShowSetFieldInfoCommand => new RelayCommand(ShowSetFieldInfo);
 
     #endregion
 
@@ -545,7 +536,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Generates a class from the inserted query
     /// </summary>
-    private async void GenerateCodeFromQuery()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task GenerateCodeFromQueryAsync()
     {
         if (_manager == null)
             return;
@@ -606,6 +599,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Clears the code
     /// </summary>
     /// <param name="type">The desired code type</param>
+    /// <returns>The awaitable task</returns>
     [RelayCommand]
     private void ClearCode(CodeType type)
     {
@@ -628,6 +622,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Copies the code to the clipboard
     /// </summary>
     /// <param name="type">The desired code type</param>
+    /// <returns>The awaitable task</returns>
     [RelayCommand]
     private void CopyCode(CodeType type)
     {
@@ -672,7 +667,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the info of the set field option
     /// </summary>
-    private async void ShowSetFieldInfo()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowSetFieldInfoAsync()
     {
         var result = await ShowQuestionAsync("Info",
             "The 'SetProperty' option uses a template that requires the 'ObservableObject' class which is a part of the \"CommunityToolkit.MVVM\" package (available via NuGet).",

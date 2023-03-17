@@ -109,7 +109,7 @@
                 Content="Close" />
             <Button
                 Width="75"
-                Command="{Binding OkCommand}"
+                Command="{Binding SetDataCommand}"
                 Content="Ok" />
         </StackPanel>
 

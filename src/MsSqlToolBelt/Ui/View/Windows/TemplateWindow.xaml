@@ -96,7 +96,7 @@
                 Content="Copy" />
             <Button
                 Width="75"
-                Command="{Binding BackupCommand}"
+                Command="{Binding CreateBackupCommand}"
                 Content="Backup" />
             <Button Command="{Binding LoadBackupCommand}" Content="Load backup" />
         </StackPanel>
@@ -114,7 +114,7 @@
             <Button
                 Width="75"
                 HorizontalAlignment="Right"
-                Command="{Binding SaveCommand}"
+                Command="{Binding SaveChangesCommand}"
                 Content="Save" />
         </StackPanel>
     </Grid>

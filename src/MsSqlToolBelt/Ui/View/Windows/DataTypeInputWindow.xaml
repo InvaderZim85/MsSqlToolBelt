@@ -90,7 +90,7 @@
                 Content="Cancel" />
             <Button
                 Width="60"
-                Command="{Binding OkCommand}"
+                Command="{Binding GetValuesCommand}"
                 Content="Ok" />
         </StackPanel>
     </Grid>

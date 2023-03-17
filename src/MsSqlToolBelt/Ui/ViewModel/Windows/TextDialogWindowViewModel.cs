@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.DataObjects.Common;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
-internal class TextDialogWindowViewModel : ViewModelBase
+internal partial class TextDialogWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// Gets the text of the editor control
@@ -24,33 +26,20 @@ internal class TextDialogWindowViewModel : ViewModelBase
     private Action? _closeWindow;
 
     /// <summary>
-    /// Backing field for <see cref="Settings"/>
+    /// The settings
     /// </summary>
+    [ObservableProperty]
     private TextDialogSettings _settings = new();
 
     /// <summary>
-    /// Gets or sets the settings
+    /// The value which indicates if the validation info label should be shown
     /// </summary>
-    public TextDialogSettings Settings
-    {
-        get => _settings;
-        private set => SetProperty(ref _settings, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowValidationInfo"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showValidationInfo;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the validation info label should be shown
+    /// Backing field for <see cref="CodeValid"/>
     /// </summary>
-    public bool ShowValidationInfo
-    {
-        get => _showValidationInfo;
-        set => SetProperty(ref _showValidationInfo, value);
-    }
-
     private bool _codeValid;
 
     /// <summary>
@@ -62,23 +51,15 @@ internal class TextDialogWindowViewModel : ViewModelBase
         set
         {
             _codeValid = value;
-            ShowValidationInfo = !value && _settings.ShowValidateButton && _settings.ValidationFunc != null;
+            ShowValidationInfo = !value && Settings.ShowValidateButton && Settings.ValidationFunc != null;
         }
     }
 
     /// <summary>
-    /// Backing field for <see cref="ValidateButtonVisible"/>
+    /// The value which indicates if the validate button is visible
     /// </summary>
+    [ObservableProperty]
     private bool _validateButtonVisible;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the validate button is visible
-    /// </summary>
-    public bool ValidateButtonVisible
-    {
-        get => _validateButtonVisible;
-        set => SetProperty(ref _validateButtonVisible, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="ShowOptionalText"/>
@@ -94,24 +75,9 @@ internal class TextDialogWindowViewModel : ViewModelBase
         set
         {
             SetProperty(ref _showOptionalText, value);
-            _setEditorText?.Invoke(value ? _settings.TextOption : _settings.Text);
+            _setEditorText?.Invoke(value ? Settings.TextOption : Settings.Text);
         }
     }
-
-    /// <summary>
-    /// The command to copy the code
-    /// </summary>
-    public ICommand CopyCommand => new RelayCommand(Copy);
-
-    /// <summary>
-    /// The command to validate the inserted text
-    /// </summary>
-    public ICommand ValidateCommand => new RelayCommand(ExecuteValidation);
-
-    /// <summary>
-    /// The command to close the window
-    /// </summary>
-    public ICommand CloseCommand => new RelayCommand(CloseWindow);
 
     /// <summary>
     /// Init the view model
@@ -137,7 +103,8 @@ internal class TextDialogWindowViewModel : ViewModelBase
     /// <summary>
     /// Copies the code
     /// </summary>
-    private void Copy()
+    [RelayCommand]
+    private void CopyContent()
     {
         CopyToClipboard(_getEditorText?.Invoke() ?? string.Empty);
     }
@@ -145,9 +112,11 @@ internal class TextDialogWindowViewModel : ViewModelBase
     /// <summary>
     /// Executes the validation
     /// </summary>
-    private async void ExecuteValidation()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExecuteValidationAsync()
     {
-        if (_settings.ValidationFunc == null)
+        if (Settings.ValidationFunc == null)
             return;
 
         var text = _getEditorText?.Invoke();
@@ -159,7 +128,7 @@ internal class TextDialogWindowViewModel : ViewModelBase
 
         try
         {
-            var (valid, message) = await _settings.ValidationFunc(text);
+            var (valid, message) = await Settings.ValidationFunc(text);
 
             if (valid)
             {
@@ -188,9 +157,11 @@ internal class TextDialogWindowViewModel : ViewModelBase
     /// <summary>
     /// Closes the window if everything is okay (code validation)
     /// </summary>
-    private async void CloseWindow()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task CloseWindowAsync()
     {
-        if (!_settings.ShowValidateButton || _settings.ValidationFunc == null)
+        if (!Settings.ShowValidateButton || Settings.ValidationFunc == null)
             _closeWindow?.Invoke();
 
         if (CodeValid)

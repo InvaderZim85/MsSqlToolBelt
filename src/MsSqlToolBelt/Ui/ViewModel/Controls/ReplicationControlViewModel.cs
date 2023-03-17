@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
@@ -12,7 +13,7 @@ using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
-internal class ReplicationControlViewModel : ViewModelBase, IConnection
+internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the interaction with the replication data
@@ -27,19 +28,11 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     #region View Properties
 
     /// <summary>
-    /// Backing field for <see cref="Tables"/>
+    /// The list with the tables
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<TableEntry> _tables = new();
-
-    /// <summary>
-    /// Gets or sets the list with the tables
-    /// </summary>
-    public ObservableCollection<TableEntry> Tables
-    {
-        get => _tables;
-        private set => SetProperty(ref _tables, value);
-    }
-
+    
     /// <summary>
     /// Backing field for <see cref="SelectedTable"/>
     /// </summary>
@@ -71,32 +64,16 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="Columns"/>
+    /// The list with the table columns
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ColumnEntry> _columns = new();
 
     /// <summary>
-    /// Gets or sets the list with the table columns
+    /// The list with the indices
     /// </summary>
-    public ObservableCollection<ColumnEntry> Columns
-    {
-        get => _columns;
-        private set => SetProperty(ref _columns, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="Indexes"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IndexEntry> _indexes = new();
-
-    /// <summary>
-    /// Gets or sets the list with the indexes
-    /// </summary>
-    public ObservableCollection<IndexEntry> Indexes
-    {
-        get => _indexes;
-        private set => SetProperty(ref _indexes, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -118,80 +95,35 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="HeaderList"/>
+    /// The list header
     /// </summary>
+    [ObservableProperty]
     private string _headerList = "Tables";
 
     /// <summary>
-    /// Gets or sets the list header
+    /// The column header
     /// </summary>
-    public string HeaderList
-    {
-        get => _headerList;
-        private set => SetProperty(ref _headerList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="HeaderColumns"/>
-    /// </summary>
+    [ObservableProperty]
     private string _headerColumns = "Columns";
 
     /// <summary>
-    /// Gets or sets the column header
+    /// The index header
     /// </summary>
-    public string HeaderColumns
-    {
-        get => _headerColumns;
-        private set => SetProperty(ref _headerColumns, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="HeaderIndex"/>
-    /// </summary>
+    [ObservableProperty]
     private string _headerIndex = "Indexes";
 
     /// <summary>
-    /// Gets or sets the index header
+    /// The value which indicates if the info panel should be shown
     /// </summary>
-    public string HeaderIndex
-    {
-        get => _headerIndex;
-        private set => SetProperty(ref _headerIndex, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowInfo"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showInfo = true;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the info panel should be shown
+    /// The value which indicates if the control is enabled
     /// </summary>
-    public bool ShowInfo
-    {
-        get => _showInfo;
-        set => SetProperty(ref _showInfo, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ControlEnabled"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _controlEnabled;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the control is enabled
-    /// </summary>
-    public bool ControlEnabled
-    {
-        get => _controlEnabled;
-        set => SetProperty(ref _controlEnabled, value);
-    }
     #endregion
-
-    /// <summary>
-    /// The command to filter the table types
-    /// </summary>
-    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to reload the table types
@@ -258,6 +190,7 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Filters the result
     /// </summary>
+    [RelayCommand]
     private void FilterList()
     {
         if (_manager == null)

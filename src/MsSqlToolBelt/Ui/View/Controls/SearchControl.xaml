@@ -59,7 +59,7 @@
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding ExecuteSearchCommand}" />
                         <KeyBinding
                             Key="F"
                             Command="{Binding ShowHistoryCommand}"
@@ -70,7 +70,7 @@
                     Grid.Row="0"
                     Grid.Column="2"
                     Width="60"
-                    Command="{Binding SearchCommand}"
+                    Command="{Binding ExecuteSearchCommand}"
                     Content="Search" />
                 <Button
                     Grid.Row="0"
@@ -161,7 +161,7 @@
                     Orientation="Horizontal">
                     <Button
                         Width="100"
-                        Command="{Binding ShowIndexesCommand}"
+                        Command="{Binding ShowTableIndicesCommand}"
                         Content="Show indexes"
                         IsEnabled="{Binding ButtonShowIndexEnabled}" />
                 </StackPanel>

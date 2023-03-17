@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.SearchHistoryWindow"/>
 /// </summary>
-internal class SearchHistoryWindowViewModel : ViewModelBase
+internal partial class SearchHistoryWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the search history
@@ -26,18 +28,10 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     private Action<string>? _setSelectedEntry;
 
     /// <summary>
-    /// Backing field for <see cref="SearchHistory"/>
+    /// The list with the search history
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<SearchHistoryEntry> _searchHistory = new();
-
-    /// <summary>
-    /// Gets or sets the list with the search history
-    /// </summary>
-    public ObservableCollection<SearchHistoryEntry> SearchHistory
-    {
-        get => _searchHistory;
-        private set => SetProperty(ref _searchHistory, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedEntry"/>
@@ -56,16 +50,6 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
                 _manager.SelectedEntry = value;
         }
     }
-
-    /// <summary>
-    /// The command to delete the selected entry
-    /// </summary>
-    public ICommand DeleteCommand => new RelayCommand(DeleteEntry);
-
-    /// <summary>
-    /// The command to clear the history
-    /// </summary>
-    public ICommand ClearHistoryCommand => new RelayCommand(ClearHistory);
 
     /// <summary>
     /// The command to set the selected entry
@@ -126,7 +110,9 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     /// <summary>
     /// Deletes the selected entry
     /// </summary>
-    private async void DeleteEntry()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task DeleteEntryAsync()
     {
         if (SelectedEntry == null || _manager == null)
             return;
@@ -159,7 +145,9 @@ internal class SearchHistoryWindowViewModel : ViewModelBase
     /// <summary>
     /// Clears the complete history
     /// </summary>
-    private async void ClearHistory()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ClearHistoryAsync()
     {
         if (_manager == null)
             return;

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.Common;
-using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -18,7 +16,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.InfoControl"/>
 /// </summary>
-internal class InfoControlViewModel : ViewModelBase
+internal partial class InfoControlViewModel : ViewModelBase
 {
     /// <summary>
     /// Contains the value which indicates if the data were already loaded
@@ -26,60 +24,28 @@ internal class InfoControlViewModel : ViewModelBase
     private bool _dataLoaded;
 
     /// <summary>
-    /// Backing field for <see cref="LogDir"/>
+    /// The path of the directory which contains the log files
     /// </summary>
+    [ObservableProperty]
     private string _logDir = string.Empty;
 
     /// <summary>
-    /// Gets or sets the path of the directory which contains the log files
+    /// The info about the version
     /// </summary>
-    public string LogDir
-    {
-        get => _logDir;
-        set => SetProperty(ref _logDir, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="VersionInfo"/>
-    /// </summary>
+    [ObservableProperty]
     private string _versionInfo = string.Empty;
 
     /// <summary>
-    /// Gets or sets the info about the version
+    /// The build info
     /// </summary>
-    public string VersionInfo
-    {
-        get => _versionInfo;
-        private set => SetProperty(ref _versionInfo, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="BuildInfo"/>
-    /// </summary>
+    [ObservableProperty]
     private string _buildInfo = string.Empty;
 
     /// <summary>
-    /// Gets or sets the build info
+    /// The list with the used packages
     /// </summary>
-    public string BuildInfo
-    {
-        get => _buildInfo;
-        private set => SetProperty(ref _buildInfo, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="PackageList"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<PackageInfo> _packageList = new();
-
-    /// <summary>
-    /// Gets or sets the list with the used packages
-    /// </summary>
-    public ObservableCollection<PackageInfo> PackageList
-    {
-        get => _packageList;
-        private set => SetProperty(ref _packageList, value);
-    }
 
     /// <summary>
     /// The command to open the log dir

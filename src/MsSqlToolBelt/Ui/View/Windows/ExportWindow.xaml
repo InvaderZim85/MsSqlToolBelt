@@ -60,7 +60,7 @@
                 Content="Close" />
             <Button
                 Width="60"
-                Command="{Binding ExportCommand}"
+                Command="{Binding ExportDataCommand}"
                 Content="Export" />
             <Button
                 Name="ButtonCopy"

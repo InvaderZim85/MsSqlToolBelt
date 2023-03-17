@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -15,14 +9,21 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using ZimLabs.TableCreator;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.SettingsControl"/>
 /// </summary>
-internal class SearchControlViewModel : ViewModelBase, IConnection
+internal partial class SearchControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the search
@@ -58,32 +59,16 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
 
     #region Search
     /// <summary>
-    /// Backing field for <see cref="SearchString"/>
+    /// The search string
     /// </summary>
+    [ObservableProperty]
     private string _searchString = string.Empty;
 
     /// <summary>
-    /// Gets or sets the search string
+    /// The search result
     /// </summary>
-    public string SearchString
-    {
-        get => _searchString;
-        set => SetProperty(ref _searchString, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SearchResults"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<SearchResult> _searchResults = new();
-
-    /// <summary>
-    /// Gets or sets the search result
-    /// </summary>
-    public ObservableCollection<SearchResult> SearchResults
-    {
-        get => _searchResults;
-        private set => SetProperty(ref _searchResults, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedResult"/>
@@ -126,18 +111,10 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="ObjectTypes"/>
+    /// The list with the result types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _objectTypes = new();
-
-    /// <summary>
-    /// Gets or sets the list with the result types
-    /// </summary>
-    public ObservableCollection<string> ObjectTypes
-    {
-        get => _objectTypes;
-        private set => SetProperty(ref _objectTypes, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedObjectType"/>
@@ -176,53 +153,29 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="HeaderResult"/>
+    /// The result header
     /// </summary>
+    [ObservableProperty]
     private string _headerResult = "Result";
-
-    /// <summary>
-    /// Gets or sets the header of the result
-    /// </summary>
-    public string HeaderResult
-    {
-        get => _headerResult;
-        private set => SetProperty(ref _headerResult, value);
-    }
 
     #endregion
 
     #region Table grid
 
     /// <summary>
-    /// Backing field for <see cref="Columns"/>
+    /// The list with the table columns
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ColumnEntry> _columns = new();
-
-    /// <summary>
-    /// Gets or sets the list with the table columns
-    /// </summary>
-    public ObservableCollection<ColumnEntry> Columns
-    {
-        get => _columns;
-        private set => SetProperty(ref _columns, value);
-    }
     #endregion
 
     #region Job grid
 
     /// <summary>
-    /// Backing field for <see cref="JobSteps"/>
+    /// The list with the job steps
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<JobStepEntry> _jobSteps = new();
-
-    /// <summary>
-    /// Gets or sets the list with the job steps
-    /// </summary>
-    public ObservableCollection<JobStepEntry> JobSteps
-    {
-        get => _jobSteps;
-        private set => SetProperty(ref _jobSteps, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedJobStep"/>
@@ -247,18 +200,10 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #region Buttons
 
     /// <summary>
-    /// Backing field for <see cref="ButtonShowIndexEnabled"/>
+    /// The value which indicates if the show indices button is enabled
     /// </summary>
+    [ObservableProperty]
     private bool _buttonShowIndexEnabled;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the show indexes button is enabled
-    /// </summary>
-    public bool ButtonShowIndexEnabled
-    {
-        get => _buttonShowIndexEnabled;
-        set => SetProperty(ref _buttonShowIndexEnabled, value);
-    }
     #endregion
 
     #endregion
@@ -266,46 +211,22 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #region View Properties - Bottom view
 
     /// <summary>
-    /// Backing field for <see cref="ShowSql"/>
+    /// The value which indicates if the sql editor should be shown
     /// </summary>
+    [ObservableProperty]
     private bool _showSql = true;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the sql editor should be shown
+    /// The value which indicates if the table grid should be shown
     /// </summary>
-    public bool ShowSql
-    {
-        get => _showSql;
-        set => SetProperty(ref _showSql, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowTableGrid"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showTableGrid;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the table grid should be shown
+    /// The value which indicates if the job grid should be shown
     /// </summary>
-    public bool ShowTableGrid
-    {
-        get => _showTableGrid;
-        set => SetProperty(ref _showTableGrid, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowJobGrid"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showJobGrid;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the job grid should be shown
-    /// </summary>
-    public bool ShowJobGrid
-    {
-        get => _showJobGrid;
-        set => SetProperty(ref _showJobGrid, value);
-    }
 
     /// <summary>
     /// Sets the visibility of the specified type
@@ -337,35 +258,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #endregion
 
     #region Commands
-    /// <summary>
-    /// The command to 
-    /// </summary>
-    public ICommand SearchCommand => new RelayCommand(ExecuteSearch);
 
     /// <summary>
     /// The command to copy the sql text
     /// </summary>
     public ICommand CopySqlCommand => new RelayCommand(() => CopyToClipboard(_sqlText));
-
-    /// <summary>
-    /// The command to copy / export the table data
-    /// </summary>
-    public ICommand CopyExportTableCommand => new RelayCommand(CopyExportTable);
-
-    /// <summary>
-    /// The command to copy / export the job
-    /// </summary>
-    public ICommand CopyExportJobCommand => new RelayCommand(CopyExportJob);
-
-    /// <summary>
-    /// The command to show the index window
-    /// </summary>
-    public ICommand ShowIndexesCommand => new RelayCommand(ShowTableIndexes);
-
-    /// <summary>
-    /// The command to show the history
-    /// </summary>
-    public ICommand ShowHistoryCommand => new RelayCommand(ShowHistory);
     #endregion
 
     /// <summary>
@@ -423,7 +320,9 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Executes the search
     /// </summary>
-    private async void ExecuteSearch()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExecuteSearchAsync()
     {
         if (_manager == null)
             return;
@@ -550,6 +449,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Copies / Exports the table information
     /// </summary>
+    [RelayCommand]
     private void CopyExportTable()
     {
         if (SelectedResult == null)
@@ -561,6 +461,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Copies / Exports the job information
     /// </summary>
+    [RelayCommand]
     private void CopyExportJob()
     {
         if (SelectedJobStep == null)
@@ -572,7 +473,8 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the window with the table indexes
     /// </summary>
-    private void ShowTableIndexes()
+    [RelayCommand]
+    private void ShowTableIndices()
     {
         if (SelectedResult is not {BoundItem: TableEntry table})
             return;
@@ -587,7 +489,9 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the search history
     /// </summary>
-    private void ShowHistory()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowHistoryAsync()
     {
         _settingsManager ??= new SettingsManager();
         _searchHistoryManager ??= new SearchHistoryManager(_settingsManager);
@@ -598,6 +502,6 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
 
         SearchString = window.SelectedEntry;
 
-        ExecuteSearch();
+        await ExecuteSearchAsync();
     }
 }

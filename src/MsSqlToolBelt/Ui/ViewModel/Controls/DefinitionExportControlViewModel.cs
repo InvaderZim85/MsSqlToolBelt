@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Input;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -17,7 +19,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="Controls.DefinitionExportControlViewModel"/>
 /// </summary>
-internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
+internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the interaction with the objects
@@ -47,35 +49,19 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     #region View properties
 
     /// <summary>
-    /// Backing field for <see cref="Objects"/>
+    /// The list with the objects
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ObjectDto> _objects = new();
 
     /// <summary>
-    /// Gets or sets the list with the objects
+    /// The list with the types
     /// </summary>
-    public ObservableCollection<ObjectDto> Objects
-    {
-        get => _objects;
-        private set => SetProperty(ref _objects, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ObjectTypes"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _objectTypes = new();
 
     /// <summary>
-    /// Gets or sets the list with the types
-    /// </summary>
-    public ObservableCollection<string> ObjectTypes
-    {
-        get => _objectTypes;
-        private set => SetProperty(ref _objectTypes, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedObjectType"/>
+    /// The selected type
     /// </summary>
     private string _selectedObjectType = string.Empty;
 
@@ -93,46 +79,22 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="ExportDir"/>
+    /// The path of the export directory
     /// </summary>
+    [ObservableProperty]
     private string _exportDir = string.Empty;
 
     /// <summary>
-    /// Gets or sets the path of the export directory
+    /// The information of the export
     /// </summary>
-    public string ExportDir
-    {
-        get => _exportDir;
-        set => SetProperty(ref _exportDir, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="InfoList"/>
-    /// </summary>
+    [ObservableProperty]
     private string _infoList = string.Empty;
 
     /// <summary>
-    /// Gets or sets the information of the export
+    /// The value which indicates if a sub dir should be created for each type
     /// </summary>
-    public string InfoList
-    {
-        get => _infoList;
-        set => SetProperty(ref _infoList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="CreateTypeDir"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _createTypeDir;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if a sub dir should be created for reach type
-    /// </summary>
-    public bool CreateTypeDir
-    {
-        get => _createTypeDir;
-        set => SetProperty(ref _createTypeDir, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -158,11 +120,6 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     #region Commands
 
     /// <summary>
-    /// The command to browse for the export directory
-    /// </summary>
-    public ICommand BrowseCommand => new RelayCommand(BrowseExportDir);
-
-    /// <summary>
     /// The command to load the data
     /// </summary>
     public ICommand ReloadCommand => new RelayCommand(() =>
@@ -170,21 +127,6 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
         _dataLoaded = false;
         LoadData();
     });
-
-    /// <summary>
-    /// The command to set the selection
-    /// </summary>
-    public ICommand SelectCommand => new RelayCommand<SelectionType>(SetSelection);
-
-    /// <summary>
-    /// The command to export the selected entries
-    /// </summary>
-    public ICommand ExportCommand => new RelayCommand(Export);
-
-    /// <summary>
-    /// The command to filter the list
-    /// </summary>
-    public ICommand FilterCommand => new RelayCommand(FilterList);
 
     /// <summary>
     /// The command to clear the object list
@@ -265,6 +207,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Filters the list
     /// </summary>
+    [RelayCommand]
     private void FilterList()
     {
         var tmpResult = string.IsNullOrEmpty(Filter)
@@ -281,7 +224,9 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Starts the export
     /// </summary>
-    private async void Export()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExportDefinitionAsync()
     {
         if (_manager == null)
             return;
@@ -332,6 +277,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Browse for the export directory
     /// </summary>
+    [RelayCommand]
     private void BrowseExportDir()
     {
         var dialog = new FolderBrowserDialog
@@ -350,6 +296,7 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// Sets the selection
     /// </summary>
     /// <param name="type">The desired selection type</param>
+    [RelayCommand]
     private void SetSelection(SelectionType type)
     {
         foreach (var entry in Objects)

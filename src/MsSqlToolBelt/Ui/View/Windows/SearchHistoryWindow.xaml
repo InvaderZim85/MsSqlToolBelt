@@ -54,7 +54,7 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button
                 Width="60"
-                Command="{Binding DeleteCommand}"
+                Command="{Binding DeleteEntryCommand}"
                 Content="Delete"
                 ToolTip="Deletes the selected entry" />
             <Button

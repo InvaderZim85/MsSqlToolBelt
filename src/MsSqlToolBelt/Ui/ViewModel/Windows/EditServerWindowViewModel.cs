@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Internal;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.EditServerWindow"/>
 /// </summary>
-internal class EditServerWindowViewModel : ViewModelBase
+internal partial class EditServerWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// The default database entry
@@ -24,32 +25,16 @@ internal class EditServerWindowViewModel : ViewModelBase
     private Action<bool>? _closeWindow;
 
     /// <summary>
-    /// Backing field for <see cref="SelectedServer"/>
+    /// The selected server
     /// </summary>
+    [ObservableProperty]
     private ServerEntry _selectedServer = new();
 
     /// <summary>
-    /// Gets or sets the selected server
+    /// The list with the databases
     /// </summary>
-    public ServerEntry SelectedServer
-    {
-        get => _selectedServer;
-        set => SetProperty(ref _selectedServer, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="DatabaseList"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _databaseList = new();
-
-    /// <summary>
-    /// Gets or sets the list with the databases
-    /// </summary>
-    public ObservableCollection<string> DatabaseList
-    {
-        get => _databaseList;
-        private set => SetProperty(ref _databaseList, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedDatabase"/>
@@ -70,42 +55,16 @@ internal class EditServerWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="ButtonSelectedEnabled"/>
+    /// The value which indicates if the select button is enabled
     /// </summary>
+    [ObservableProperty]
     private bool _buttonSelectedEnabled;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the select button is enabled
+    /// The value which indicates if the auto connect checkbox is enabled
     /// </summary>
-    public bool ButtonSelectedEnabled
-    {
-        get => _buttonSelectedEnabled;
-        set => SetProperty(ref _buttonSelectedEnabled, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="AutoConnectEnabled"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _autoConnectEnabled;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the auto connect checkbox is enabled
-    /// </summary>
-    public bool AutoConnectEnabled
-    {
-        get => _autoConnectEnabled;
-        set => SetProperty(ref _autoConnectEnabled, value);
-    }
-
-    /// <summary>
-    /// The command to establish a connection to the desired server
-    /// </summary>
-    public ICommand ConnectCommand => new RelayCommand(Connect);
-
-    /// <summary>
-    /// The command to set the data
-    /// </summary>
-    public ICommand OkCommand => new RelayCommand(SetData);
 
     /// <summary>
     /// The command to close the window
@@ -126,6 +85,7 @@ internal class EditServerWindowViewModel : ViewModelBase
     /// <summary>
     /// Creates a connection to the MSSQL server and loads the available databases
     /// </summary>
+    [RelayCommand]
     private async void Connect()
     {
         if (string.IsNullOrWhiteSpace(SelectedServer.Name))
@@ -170,6 +130,7 @@ internal class EditServerWindowViewModel : ViewModelBase
     /// <summary>
     /// Selects the database 
     /// </summary>
+    [RelayCommand]
     private void SetData()
     {
         if (string.IsNullOrEmpty(SelectedServer.Name))
