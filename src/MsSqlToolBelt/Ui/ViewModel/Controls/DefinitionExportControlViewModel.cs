@@ -211,13 +211,17 @@ internal class DefinitionExportControlViewModel : ViewModelBase, IConnection
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
+        // Reset the lists
         Objects = new ObservableCollection<ObjectDto>();
         _setText?.Invoke(string.Empty);
         InfoList = string.Empty;
 
+        // Reset the manager
         _manager?.Dispose();
-
         _manager = new DefinitionExportManager(_settingsManager!, dataSource, database);
+
+        // Reset the "data loaded" flag
+        _dataLoaded = false;
     }
 
     /// <inheritdoc />

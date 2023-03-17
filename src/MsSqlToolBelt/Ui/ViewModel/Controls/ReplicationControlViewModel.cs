@@ -209,13 +209,16 @@ internal class ReplicationControlViewModel : ViewModelBase, IConnection
         Tables = new ObservableCollection<TableEntry>();
         Columns = new ObservableCollection<ColumnEntry>();
 
+        // Reset the manager
         _manager?.Dispose();
-        _dataLoaded = false;
-
         _manager = new ReplicationManager(dataSource, database);
 
+        // Reset the info values
         ShowInfo = false;
         ControlEnabled = true;
+
+        // Reset the data loaded value
+        _dataLoaded = false;
     }
 
     /// <inheritdoc />

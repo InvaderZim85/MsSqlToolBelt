@@ -76,7 +76,7 @@ internal static class ExportHelper
     /// <param name="list">The list</param>
     /// <param name="type">The desired export type</param>
     /// <returns>The content</returns>
-    public static string CreateListContent(IEnumerable<object> list, ExportType type)
+    public static string CreateListContent<T>(IEnumerable<T> list, ExportType type) where T : class
     {
         return list.CreateTable(ConvertToOutputType(type));
     }

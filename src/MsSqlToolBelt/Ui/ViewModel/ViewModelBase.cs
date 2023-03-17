@@ -254,7 +254,7 @@ internal class ViewModelBase : ObservableObject
         ProgressDialogController? controller = null;
         try
         {
-            var dialog = new ExportWindow(defaultName, ExportDataType.List);
+            var dialog = new ExportWindow(defaultName, ExportDataType.List) {Owner = Application.Current.MainWindow};
             if (dialog.ShowDialog() != true)
                 return;
 

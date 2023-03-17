@@ -88,6 +88,8 @@ internal class DefinitionExportManager : IDisposable
         if (!string.IsNullOrEmpty(objectList))
             SetExportFlag(objects, objectList);
 
+        objects.Sort();
+
         var count = 1;
         var totalCount = objects.Count(c => c.Export);
         foreach (var entry in objects.Where(w => w.Export))
@@ -106,7 +108,7 @@ internal class DefinitionExportManager : IDisposable
     /// <returns>The awaitable task</returns>
     private static async Task ExportAsync(ObjectDto obj, string exportDir, bool createTypeDir)
     {
-        var name = $"{obj.Name}.sql";
+        var name = $"{obj.Name.Trim()}.sql";
         var path = Path.Combine(exportDir, name);
 
         if (createTypeDir)

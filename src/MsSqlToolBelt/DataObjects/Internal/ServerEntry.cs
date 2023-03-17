@@ -43,6 +43,24 @@ public class ServerEntry
     public string Description { get; set; } = string.Empty;
 
     /// <summary>
+    /// Creates a new empty instance of the <see cref="ServerEntry"/>
+    /// </summary>
+    public ServerEntry() { }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ServerEntry"/>
+    /// </summary>
+    /// <param name="entry">The "old" entry</param>
+    public ServerEntry(ServerEntry entry)
+    {
+        Name = entry.Name;
+        DefaultDatabase = entry.DefaultDatabase;
+        Order = entry.Order;
+        AutoConnect = entry.AutoConnect;
+        Description = entry.Description;
+    }
+
+    /// <summary>
     /// Gets the name of the server
     /// </summary>
     /// <returns>The name / path of the server</returns>
