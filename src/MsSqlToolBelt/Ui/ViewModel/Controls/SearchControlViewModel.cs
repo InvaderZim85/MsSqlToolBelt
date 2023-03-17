@@ -15,6 +15,7 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 

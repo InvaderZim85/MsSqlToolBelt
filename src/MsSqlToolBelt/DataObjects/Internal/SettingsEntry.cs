@@ -26,4 +26,19 @@ internal class SettingsEntry
     /// </summary>
     [Required]
     public string Value { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Creates a new empty instance of the <see cref="SettingsEntry"/>
+    /// </summary>
+    public SettingsEntry() { }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="SettingsEntry"/>
+    /// </summary>
+    /// <param name="entry">The "old" entry</param>
+    public SettingsEntry(SettingsEntry entry)
+    {
+        KeyId = entry.KeyId;
+        Value = entry.Value;
+    }
 }

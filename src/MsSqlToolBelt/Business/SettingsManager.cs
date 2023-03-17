@@ -345,8 +345,12 @@ public class SettingsManager
             }
             else if (existingEntry == null)
             {
-                entry.Order = ++currentOrder;
-                await context.ServerEntries.AddAsync(entry);
+                var insertEntry = new ServerEntry(entry)
+                {
+                    Order = ++currentOrder
+                };
+
+                await context.ServerEntries.AddAsync(insertEntry);
             }
         }
 
@@ -372,7 +376,8 @@ public class SettingsManager
             }
             else if (existingEntry == null)
             {
-                await context.Settings.AddAsync(entry);
+                var insertEntry = new SettingsEntry(entry);
+                await context.Settings.AddAsync(insertEntry);
             }
         }
 
@@ -399,7 +404,8 @@ public class SettingsManager
             }
             else if (existingEntry == null)
             {
-                await context.FilterEntries.AddAsync(entry);
+                var insertEntry = new FilterEntry(entry);
+                await context.FilterEntries.AddAsync(insertEntry);
             }
         }
 

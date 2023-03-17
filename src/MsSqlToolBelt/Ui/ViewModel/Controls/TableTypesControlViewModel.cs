@@ -154,10 +154,12 @@ internal class TableTypesControlViewModel : ViewModelBase, IConnection
         TableTypes = new ObservableCollection<TableTypeEntry>();
         Columns = new ObservableCollection<ColumnEntry>();
 
+        // Reset the manager
         _manager?.Dispose();
-        _dataLoaded = false;
-
         _manager = new TableTypeManager(dataSource, database);
+
+        // Reset the data loaded value
+        _dataLoaded = false;
     }
 
     /// <inheritdoc />
