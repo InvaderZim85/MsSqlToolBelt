@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Text;
-using MsSqlToolBelt.Common.Enums;
+﻿using MsSqlToolBelt.Common.Enums;
+using System.IO;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 

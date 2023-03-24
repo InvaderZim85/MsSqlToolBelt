@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MsSqlToolBelt.Data;
+using MsSqlToolBelt.DataObjects.TableType;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MsSqlToolBelt.Data;
-using MsSqlToolBelt.DataObjects.TableType;
 
 namespace MsSqlToolBelt.Business;
 

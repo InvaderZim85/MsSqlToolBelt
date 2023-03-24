@@ -1,13 +1,13 @@
-﻿using System;
+﻿using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common.Enums;
+using Newtonsoft.Json;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using MsSqlToolBelt.Business;
-using MsSqlToolBelt.Common.Enums;
-using Newtonsoft.Json;
-using Serilog;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Common;
@@ -143,9 +143,9 @@ internal static class ExportHelper
     {
         try
         {
-            var settingsManager = new SettingsManager();
             var exportType =
-                (ExportType)await settingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
+                (ExportType) await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat,
+                    DefaultEntries.CopyToClipboardFormat);
 
             var content = exportType switch
             {

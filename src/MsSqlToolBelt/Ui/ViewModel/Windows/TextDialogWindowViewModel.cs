@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.DataObjects.Common;
+using System;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 

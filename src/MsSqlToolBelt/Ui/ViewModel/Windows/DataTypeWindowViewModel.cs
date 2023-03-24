@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
@@ -12,6 +6,11 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;

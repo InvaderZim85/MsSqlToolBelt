@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Dapper;
+using MsSqlToolBelt.DataObjects.Common;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
-using MsSqlToolBelt.DataObjects.Common;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Data;

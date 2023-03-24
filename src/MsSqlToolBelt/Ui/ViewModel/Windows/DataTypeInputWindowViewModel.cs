@@ -1,11 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MsSqlToolBelt.DataObjects.ClassGen;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using MsSqlToolBelt.DataObjects.ClassGen;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 

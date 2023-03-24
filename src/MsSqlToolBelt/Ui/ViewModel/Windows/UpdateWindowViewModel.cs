@@ -1,15 +1,15 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.DataObjects.Updater;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
-using MsSqlToolBelt.Common;
-using MsSqlToolBelt.DataObjects.Updater;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 

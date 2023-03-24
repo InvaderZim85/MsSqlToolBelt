@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.DataObjects.Common;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.TableType;

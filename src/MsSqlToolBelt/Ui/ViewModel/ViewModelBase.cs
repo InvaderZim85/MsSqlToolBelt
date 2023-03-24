@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel;
@@ -166,7 +166,7 @@ internal class ViewModelBase : ObservableObject
     /// Copies the content to the clipboard
     /// </summary>
     /// <param name="content">The content which should be copied</param>
-    protected void CopyToClipboard(string content)
+    protected static void CopyToClipboard(string content)
     {
         Clipboard.SetText(content);
     }

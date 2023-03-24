@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
@@ -17,6 +10,12 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -187,7 +186,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
             // Load the colors
             ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
-            var themeName = await _manager!.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
+            var themeName = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
             // Load the server
@@ -199,10 +198,10 @@ internal partial class SettingsControlViewModel : ViewModelBase
             // Set the various data
             var exportList = Helper.CreateExportTypeList(ExportDataType.List);
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
-            var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
+            var exportType = await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
 
-            SearchHistoryCount = await _manager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
+            SearchHistoryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
         }
         catch (Exception ex)
         {
@@ -224,7 +223,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager!.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
         }
         catch (Exception ex)
         {
@@ -312,7 +311,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
         // Update the server
         try
         {
-            await _manager!.UpdateServerAsync(SelectedServer);
+            await SettingsManager.UpdateServerAsync(SelectedServer);
 
             SetServerList(SelectedServer);
         }
@@ -363,7 +362,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager!.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
+            await SettingsManager.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
             SetMovementButtons(SelectedServer);
 
@@ -500,7 +499,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
                 {SettingsKey.SearchHistoryEntryCount, SearchHistoryCount}
             };
 
-            await _manager!.SaveSettingsValuesAsync(saveList);
+            await SettingsManager.SaveSettingsValuesAsync(saveList);
         }
         catch (Exception ex)
         {
@@ -532,7 +531,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.ExportSettingsAsync(dialog.FileName);
+            await SettingsManager.ExportSettingsAsync(dialog.FileName);
         }
         catch (Exception ex)
         {
@@ -566,7 +565,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
         var controller = await ShowProgressAsync("Import", "Please wait while importing the settings...");
         try
         {
-            await _manager.ImportSettingsAsync(dialog.FileName, ImportOverride);
+            await SettingsManager.ImportSettingsAsync(dialog.FileName, ImportOverride);
         }
         catch (Exception ex)
         {

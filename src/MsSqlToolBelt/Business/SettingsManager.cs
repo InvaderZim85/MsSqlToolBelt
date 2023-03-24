@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
 using Newtonsoft.Json;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
@@ -18,11 +18,6 @@ namespace MsSqlToolBelt.Business;
 /// </summary>
 public class SettingsManager
 {
-    /// <summary>
-    /// The app context
-    /// </summary>
-    private readonly AppDbContext _context;
-
     /// <summary>
     /// Gets the list with the servers
     /// </summary>
@@ -38,14 +33,8 @@ public class SettingsManager
     /// </summary>
     public SettingsManager()
     {
-        _context = new AppDbContext();
-
-        // Create / update the database if needed
-        var databaseCreated = _context.Database.EnsureCreated();
-
-        // If the database was already created, start the migration
-        if (!databaseCreated)
-            _context.Database.Migrate();
+        using var context = new AppDbContext();
+        context.Database.Migrate();
     }
 
     #region Settings
@@ -56,7 +45,7 @@ public class SettingsManager
     /// <param name="key">The desired key</param>
     /// <param name="fallback">The desired fallback</param>
     /// <returns>The value</returns>
-    public async Task<T> LoadSettingsValueAsync<T>(SettingsKey key, T? fallback = default)
+    public static async Task<T> LoadSettingsValueAsync<T>(SettingsKey key, T? fallback = default)
     {
         await using var context = new AppDbContext();
         var value = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
@@ -80,7 +69,7 @@ public class SettingsManager
     /// <param name="key">The desired key</param>
     /// <param name="value">The value which should be saved</param>
     /// <returns>The awaitable task</returns>
-    public async Task SaveSettingsValueAsync(SettingsKey key, object value)
+    public static async Task SaveSettingsValueAsync(SettingsKey key, object value)
     {
         await using var context = new AppDbContext();
         var tmpValue = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
@@ -90,14 +79,14 @@ public class SettingsManager
         }
         else
         {
-            await _context.Settings.AddAsync(new SettingsEntry
+            await context.Settings.AddAsync(new SettingsEntry
             {
                 KeyId = (int) key,
                 Value = value.ToString() ?? ""
             });
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -105,7 +94,7 @@ public class SettingsManager
     /// </summary>
     /// <param name="values">The list with the data</param>
     /// <returns>The awaitable task</returns>
-    public async Task SaveSettingsValuesAsync(SortedList<SettingsKey, object> values)
+    public static async Task SaveSettingsValuesAsync(SortedList<SettingsKey, object> values)
     {
         foreach (var value in values)
         {
@@ -156,7 +145,7 @@ public class SettingsManager
     /// </summary>
     /// <param name="server">The server which should be updated</param>
     /// <returns>The awaitable task</returns>
-    public async Task UpdateServerAsync(ServerEntry server)
+    public static async Task UpdateServerAsync(ServerEntry server)
     {
         await using var context = new AppDbContext();
 
@@ -187,7 +176,7 @@ public class SettingsManager
     /// <param name="server">The server which should be moved</param>
     /// <param name="moveUp">true to move the server "up", otherwise false</param>
     /// <returns>The awaitable task</returns>
-    public async Task MoveServerOrderAsync(ServerEntry server, bool moveUp)
+    public static async Task MoveServerOrderAsync(ServerEntry server, bool moveUp)
     {
         await using var context = new AppDbContext();
 
@@ -271,7 +260,7 @@ public class SettingsManager
     /// </summary>
     /// <param name="filepath">The path of the destination</param>
     /// <returns>The awaitable task</returns>
-    public async Task ExportSettingsAsync(string filepath)
+    public static async Task ExportSettingsAsync(string filepath)
     {
         await using var context = new AppDbContext();
 
@@ -297,7 +286,7 @@ public class SettingsManager
     /// <param name="filepath">The path of the settings file</param>
     /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
     /// <returns>The awaitable task</returns>
-    public async Task ImportSettingsAsync(string filepath, bool overrideSettings)
+    public static async Task ImportSettingsAsync(string filepath, bool overrideSettings)
     {
         if (!File.Exists(filepath)) 
             return;
@@ -329,7 +318,7 @@ public class SettingsManager
     /// <param name="server">The list with the server</param>
     /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
     /// <returns>The awaitable task</returns>
-    private async Task ImportServerAsync(List<ServerEntry> server, bool overrideSettings)
+    private static async Task ImportServerAsync(List<ServerEntry> server, bool overrideSettings)
     {
         await using var context = new AppDbContext();
 
@@ -363,7 +352,7 @@ public class SettingsManager
     /// <param name="settings">The list with the settings</param>
     /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
     /// <returns>The awaitable task</returns>
-    private async Task ImportSettingsAsync(List<SettingsEntry> settings, bool overrideSettings)
+    private static async Task ImportSettingsAsync(List<SettingsEntry> settings, bool overrideSettings)
     {
         await using var context = new AppDbContext();
 
@@ -390,7 +379,7 @@ public class SettingsManager
     /// <param name="filter">The list with the filters</param>
     /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
     /// <returns>The awaitable task</returns>
-    private async Task ImportFilterAsync(List<FilterEntry> filter, bool overrideSettings)
+    private static async Task ImportFilterAsync(List<FilterEntry> filter, bool overrideSettings)
     {
         await using var context = new AppDbContext();
 

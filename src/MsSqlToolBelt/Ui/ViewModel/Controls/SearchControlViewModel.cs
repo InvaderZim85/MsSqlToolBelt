@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -16,7 +17,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -281,7 +281,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         try
         {
-            AddWildcardAutomatically = await _settingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
+            AddWildcardAutomatically = await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
         }
         catch (Exception ex)
         {
@@ -438,7 +438,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         try
         {
-            await _settingsManager.SaveSettingsValueAsync(SettingsKey.AutoWildcard, AddWildcardAutomatically);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.AutoWildcard, AddWildcardAutomatically);
         }
         catch (Exception ex)
         {

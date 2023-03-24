@@ -1,12 +1,10 @@
-﻿using System;
-using System.Reflection;
-using System.Text.Json;
-using System.Threading.Tasks;
-using MsSqlToolBelt.DataObjects.Updater;
+﻿using MsSqlToolBelt.DataObjects.Updater;
 using RestSharp;
-using RestSharp.Serializers.Json;
 using RestSharp.Serializers.NewtonsoftJson;
 using Serilog;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 

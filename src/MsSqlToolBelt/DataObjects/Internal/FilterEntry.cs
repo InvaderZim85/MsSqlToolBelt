@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
+﻿using MsSqlToolBelt.Common.Enums;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.DataObjects.Internal;

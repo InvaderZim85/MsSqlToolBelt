@@ -119,7 +119,7 @@ public partial class MainWindow : MetroWindow
     {
         try
         {
-            var scheme = await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
+            var scheme = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             Helper.SetColorTheme(scheme);
 
             // Stops the info timer (only if needed)

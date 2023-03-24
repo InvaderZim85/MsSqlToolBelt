@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using MsSqlToolBelt.DataObjects.Common;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using MsSqlToolBelt.DataObjects.Common;
 
 namespace MsSqlToolBelt.Data;
 

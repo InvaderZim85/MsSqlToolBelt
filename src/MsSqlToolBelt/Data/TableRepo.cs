@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Data;
 
@@ -98,7 +99,7 @@ internal class TableRepo : BaseRepo
 
         var result = await QueryAsListAsync<ColumnEntry>(query, table);
 
-        table.Columns = result;
+        table.Columns = result.OrderBy(o => o.Order).ToList();
     }
 
     /// <summary>
