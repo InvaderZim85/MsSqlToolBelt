@@ -8,7 +8,7 @@ namespace MsSqlToolBelt.DataObjects.DefinitionExport;
 /// <summary>
 /// Represents an <see cref="ObjectEntry"/> for the definition export grid
 /// </summary>
-internal class ObjectDto : ObservableObject
+internal class DefinitionExportObject : ObservableObject
 {
     /// <summary>
     /// Backing field for <see cref="Export"/>
@@ -44,16 +44,37 @@ internal class ObjectDto : ObservableObject
     public ObjectEntry OriginalObject { get; init; } = new();
 
     /// <summary>
-    /// Converts a <see cref="ObjectEntry"/> into an <see cref="ObjectDto"/>
+    /// Gets or sets the original table
+    /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
+    public TableEntry OriginalTable { get; init; } = new();
+
+    /// <summary>
+    /// Converts a <see cref="ObjectEntry"/> into an <see cref="DefinitionExportObject"/>
     /// </summary>
     /// <param name="obj">The object which should be converted</param>
-    public static explicit operator ObjectDto(ObjectEntry obj)
+    public static explicit operator DefinitionExportObject(ObjectEntry obj)
     {
-        return new ObjectDto
+        return new DefinitionExportObject
         {
             Name = obj.Name,
             Type = obj.TypeName,
             OriginalObject = obj
+        };
+    }
+
+    /// <summary>
+    /// Converts a <see cref="TableEntry"/> into an <see cref="DefinitionExportObject"/>
+    /// </summary>
+    /// <param name="entry">The table which should be converted</param>
+
+    public static explicit operator DefinitionExportObject(TableEntry entry)
+    {
+        return new DefinitionExportObject
+        {
+            Name = entry.Name,
+            OriginalTable = entry
         };
     }
 }

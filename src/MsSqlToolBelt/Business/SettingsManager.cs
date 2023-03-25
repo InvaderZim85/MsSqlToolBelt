@@ -210,7 +210,7 @@ public class SettingsManager
     {
         await using var context = new AppDbContext();
 
-        FilterList =  withTracking
+        FilterList = withTracking
             ? await context.FilterEntries.ToListAsync()
             : await context.FilterEntries.AsNoTracking().ToListAsync();
     }

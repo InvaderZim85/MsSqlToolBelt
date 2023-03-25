@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Search history"
-    Width="400"
+    Width="500"
     Height="450"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
@@ -46,6 +46,10 @@
                     Width="Auto"
                     Binding="{Binding DateTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}"
                     Header="Date" />
+                <DataGridTextColumn
+                    Width="Auto"
+                    Binding="{Binding SearchCount}"
+                    Header="Count" />
             </DataGrid.Columns>
         </DataGrid>
 

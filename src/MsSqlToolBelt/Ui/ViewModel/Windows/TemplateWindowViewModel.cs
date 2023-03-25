@@ -86,7 +86,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
 
         try
         {
-            _manager.UpdateTemplate(SelectedTemplate);
+            TemplateManager.UpdateTemplate(SelectedTemplate);
         }
         catch (Exception ex)
         {
@@ -121,7 +121,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
 
         try
         {
-            _manager.CreateBackup(SelectedTemplate, dialog.FileName);
+            TemplateManager.CreateBackup(SelectedTemplate, dialog.FileName);
         }
         catch (Exception ex)
         {
@@ -155,7 +155,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
 
         try
         {
-            _manager.LoadBackup(SelectedTemplate, dialog.FileName);
+            TemplateManager.LoadBackup(SelectedTemplate, dialog.FileName);
 
             _setCodeEditorText?.Invoke(SelectedTemplate.Content);
         }

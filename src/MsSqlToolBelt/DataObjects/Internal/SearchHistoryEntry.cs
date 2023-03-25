@@ -24,7 +24,12 @@ public class SearchHistoryEntry
     /// <summary>
     /// Gets or sets the date / time of the search entry
     /// </summary>
-    public DateTime DateTime { get; set; } = new();
+    public DateTime DateTime { get; set; }
+
+    /// <summary>
+    /// Gets or sets the search count
+    /// </summary>
+    public int SearchCount { get; set; } = 1;
 
     /// <summary>
     /// Creates a new empty instance of the <see cref="SearchHistoryEntry"/>

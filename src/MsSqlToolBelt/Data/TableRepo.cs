@@ -14,7 +14,7 @@ internal class TableRepo : BaseRepo
     /// <summary>
     /// Creates a new instance of the <see cref="TableRepo"/>
     /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL database</param>
+    /// <param name="dataSource">The name / path of the MSSQL server</param>
     /// <param name="database">The name of the database</param>
     public TableRepo(string dataSource, string database) : base(dataSource, database) { }
 

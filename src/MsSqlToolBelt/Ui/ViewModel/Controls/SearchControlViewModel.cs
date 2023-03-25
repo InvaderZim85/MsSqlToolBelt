@@ -55,6 +55,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private string _sqlText = string.Empty;
 
+    /// <summary>
+    /// The value which indicates if the connection is setting / resetting
+    /// </summary>
+    private bool _resettingConnection;
+
     #region View properties
 
     #region Search
@@ -129,7 +134,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedObjectType;
         set
         {
-            if (SetProperty(ref _selectedObjectType, value))
+            if (SetProperty(ref _selectedObjectType, value) && !_resettingConnection)
                 FilterResult();
         }
     }
@@ -277,7 +282,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         _setSqlText = setSqlText;
         _setCmdText = setCmdText;
 
-        _searchHistoryManager = new SearchHistoryManager(settingsManager);
+        _searchHistoryManager = new SearchHistoryManager();
 
         try
         {
@@ -292,14 +297,18 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
+        _resettingConnection = true;
+
         // Clear the old search result
-        ClearResult();
+        ResetSearch(true);
 
         // Dispose the old instance
         _manager?.Dispose();
 
         // Create a new instance
         _manager = new SearchManager(dataSource, database);
+
+        _resettingConnection = false;
     }
 
     /// <inheritdoc />
@@ -309,12 +318,39 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Clears the last search result
+    /// Resets the last search result
     /// </summary>
-    private void ClearResult()
+    /// <param name="completeReset"><see langword="true"/> to perform a complete reset, otherwise <see langword="false"/></param>
+    private void ResetSearch(bool completeReset = false)
     {
+        // Remove the search result
         SearchResults.Clear();
         SelectedResult = null;
+
+        // Remove the texts
+        _setCmdText?.Invoke(string.Empty);
+        _setSqlText?.Invoke(string.Empty);
+
+        // Only continue when a complete reset is wanted
+        if (!completeReset)
+            return;
+
+        // Remove the columns
+        Columns.Clear();
+
+        // Reset the header
+        HeaderResult = "Result";
+
+        // Reset the buttons
+        ButtonShowIndexEnabled = false;
+
+        // Reset the job steps
+        JobSteps.Clear();
+        SelectedJobStep = null;
+
+        // Reset the object types
+        ObjectTypes.Clear();
+        SelectedObjectType = string.Empty;
     }
 
     /// <summary>
@@ -327,7 +363,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (_manager == null)
             return;
 
-        ClearResult();
+        ResetSearch();
 
         if (string.IsNullOrEmpty(SearchString))
             return;
@@ -341,7 +377,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         {
             // Add the search entry to the history
             if (_searchHistoryManager != null)
-                await _searchHistoryManager.AddSearchEntryAsync(SearchString);
+                await SearchHistoryManager.AddSearchEntryAsync(SearchString);
 
             // Load the ignore list
             if (_settingsManager != null)
@@ -352,8 +388,10 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
-            // Filter and show the result
-            FilterResult();
+            // Note: 
+            // Actually, at this point the result was set with the help of the "FilterResult" method.
+            // But this does not have to be done, because the method is called automatically when
+            // the "SelectedObjectType" is changed, which happens in the line before.
         }
         catch (Exception ex)
         {
@@ -370,7 +408,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private void FilterResult()
     {
-        ClearResult();
+        ResetSearch();
 
         var result = SelectedObjectType.Equals("All")
             ? _manager!.SearchResults
@@ -433,9 +471,6 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private async void SaveWildcardValue()
     {
-        if (_settingsManager == null)
-            return;
-
         try
         {
             await SettingsManager.SaveSettingsValueAsync(SettingsKey.AutoWildcard, AddWildcardAutomatically);
@@ -493,8 +528,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     [RelayCommand]
     private async Task ShowHistoryAsync()
     {
-        _settingsManager ??= new SettingsManager();
-        _searchHistoryManager ??= new SearchHistoryManager(_settingsManager);
+        _searchHistoryManager ??= new SearchHistoryManager();
         var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
 
         if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))

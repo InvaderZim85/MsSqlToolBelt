@@ -1,11 +1,10 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
-using MsSqlToolBelt.Business;
+﻿using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.Ui.Common;
-using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
@@ -89,7 +88,7 @@ public partial class DefinitionExportControl : UserControl, IUserControl
     /// <param name="e">The event arguments</param>
     private void ObjectGrid_OnExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        DataGridObject.CopyToClipboard<ObjectDto>();
+        DataGridObject.CopyToClipboard<DefinitionExportObject>();
     }
 
     /// <summary>
