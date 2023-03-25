@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MsSqlToolBelt.Data;
+using System;
 using System.Diagnostics;
-using MsSqlToolBelt.Data;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 

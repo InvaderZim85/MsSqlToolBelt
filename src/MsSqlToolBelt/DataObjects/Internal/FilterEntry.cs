@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
+﻿using MsSqlToolBelt.Common.Enums;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.DataObjects.Internal;
@@ -50,5 +50,20 @@ public class FilterEntry
     public string GetInfo()
     {
         return $"{FilterType} '{Value}'";
+    }
+
+    /// <summary>
+    /// Creates a new empty instance of the <see cref="FilterEntry"/>
+    /// </summary>
+    public FilterEntry() { }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="FilterEntry"/>
+    /// </summary>
+    /// <param name="entry">The "old" entry</param>
+    public FilterEntry(FilterEntry entry)
+    {
+        FilterTypeId = entry.FilterTypeId;
+        Value = entry.Value;
     }
 }

@@ -11,11 +11,6 @@ internal enum FlyOutType
     Settings,
 
     /// <summary>
-    /// The data type fly out
-    /// </summary>
-    DataTypes,
-
-    /// <summary>
     /// The info fly out
     /// </summary>
     Info

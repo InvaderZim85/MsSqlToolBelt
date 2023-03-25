@@ -143,11 +143,11 @@
                 Content="Close" />
             <Button
                 Width="120"
-                Command="{Binding DownloadCommand}"
+                Command="{Binding StartDownloadCommand}"
                 Content="Download" />
             <Button
                 Width="120"
-                Command="{Binding OpenGitCommand}"
+                Command="{Binding OpenGithubCommand}"
                 Content="Open on GitHub" />
             <Button
                 Width="120"

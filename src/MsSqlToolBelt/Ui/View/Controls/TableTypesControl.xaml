@@ -67,7 +67,7 @@
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
 

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
@@ -15,16 +15,6 @@ namespace MsSqlToolBelt.Business;
 /// </summary>
 public class SearchHistoryManager
 {
-    /// <summary>
-    /// The app context
-    /// </summary>
-    private readonly AppDbContext _context;
-
-    /// <summary>
-    /// The instance for the interaction with the settings
-    /// </summary>
-    private readonly SettingsManager _settingsManager;
-
     /// <summary>
     /// Gets the list with the search history
     /// </summary>
@@ -38,13 +28,10 @@ public class SearchHistoryManager
     /// <summary>
     /// Creates a new instance of the <see cref="SearchHistoryManager"/>
     /// </summary>
-    /// <param name="settingsManager">The instance for the interaction with the settings</param>
-    public SearchHistoryManager(SettingsManager settingsManager)
+    public SearchHistoryManager()
     {
-        _context = new AppDbContext();
-        _context.Database.EnsureCreated();
-
-        _settingsManager = settingsManager;
+        using var context = new AppDbContext();
+        context.Database.Migrate();
     }
 
     /// <summary>
@@ -53,7 +40,8 @@ public class SearchHistoryManager
     /// <returns>The awaitable task</returns>
     public async Task LoadSearchHistoryAsync()
     {
-        SearchHistory = await _context.SearchHistory.ToListAsync();
+        await using var context = new AppDbContext();
+        SearchHistory = await context.SearchHistory.ToListAsync();
     }
 
     /// <summary>
@@ -61,38 +49,43 @@ public class SearchHistoryManager
     /// </summary>
     /// <param name="entry">The entry which should be added</param>
     /// <returns>The awaitable task</returns>
-    public async Task AddSearchEntryAsync(string entry)
+    public static async Task AddSearchEntryAsync(string entry)
     {
+        await using var context = new AppDbContext();
+
         await CheckEntryCountAsync();
 
         var tmpEntry =
-            await _context.SearchHistory.FirstOrDefaultAsync(f => f.SearchEntry.ToLower().Equals(entry.ToLower()));
+            await context.SearchHistory.FirstOrDefaultAsync(f => f.SearchEntry.ToLower().Equals(entry.ToLower()));
 
         if (tmpEntry == null)
         {
-            await _context.SearchHistory.AddAsync(new SearchHistoryEntry(entry));
+            await context.SearchHistory.AddAsync(new SearchHistoryEntry(entry));
         }
         else
         {
             tmpEntry.DateTime = DateTime.Now;
-            _context.SearchHistory.Update(tmpEntry);
+            tmpEntry.SearchCount++; // Update the search count
+            context.SearchHistory.Update(tmpEntry);
         }
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
     /// Checks the entry count and removes an entry if needed
     /// </summary>
     /// <returns>The awaitable task</returns>
-    private async Task CheckEntryCountAsync()
+    private static async Task CheckEntryCountAsync()
     {
-        var entryCount = await _settingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount,
+        await using var context = new AppDbContext();
+
+        var entryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount,
             DefaultEntries.SearchHistoryCount);
         if (entryCount == 0) // 0 = infinity
             return;
 
-        var historyCount = await _context.SearchHistory.AsNoTracking().CountAsync();
+        var historyCount = await context.SearchHistory.AsNoTracking().CountAsync();
         if (historyCount < entryCount)
             return;
 
@@ -101,13 +94,13 @@ public class SearchHistoryManager
         for (var i = 0; i < deleteCount; i++)
         {
             // Get the last entry
-            var lastEntry = await _context.SearchHistory.OrderBy(o => o.DateTime).FirstOrDefaultAsync();
+            var lastEntry = await context.SearchHistory.OrderBy(o => o.DateTime).FirstOrDefaultAsync();
             if (lastEntry == null)
                 continue;
 
-            _context.SearchHistory.Remove(lastEntry);
+            context.SearchHistory.Remove(lastEntry);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 
@@ -120,11 +113,13 @@ public class SearchHistoryManager
         if (SelectedEntry == null)
             return;
 
-        _context.SearchHistory.Remove(SelectedEntry);
+        await using var context = new AppDbContext();
+
+        context.SearchHistory.Remove(SelectedEntry);
         SearchHistory.Remove(SelectedEntry);
         SelectedEntry = null;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -133,8 +128,10 @@ public class SearchHistoryManager
     /// <returns>The awaitable task</returns>
     public async Task ClearHistoryAsync()
     {
-        _context.SearchHistory.RemoveRange(_context.SearchHistory);
-        await _context.SaveChangesAsync();
+        await using var context = new AppDbContext();
+
+        context.SearchHistory.RemoveRange(context.SearchHistory);
+        await context.SaveChangesAsync();
 
         SearchHistory.Clear();
         SelectedEntry = null;

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Data;
 
@@ -13,7 +14,7 @@ internal class TableRepo : BaseRepo
     /// <summary>
     /// Creates a new instance of the <see cref="TableRepo"/>
     /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL database</param>
+    /// <param name="dataSource">The name / path of the MSSQL server</param>
     /// <param name="database">The name of the database</param>
     public TableRepo(string dataSource, string database) : base(dataSource, database) { }
 
@@ -98,7 +99,7 @@ internal class TableRepo : BaseRepo
 
         var result = await QueryAsListAsync<ColumnEntry>(query, table);
 
-        table.Columns = result;
+        table.Columns = result.OrderBy(o => o.Order).ToList();
     }
 
     /// <summary>

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;

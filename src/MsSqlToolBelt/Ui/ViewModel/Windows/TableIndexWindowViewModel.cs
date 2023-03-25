@@ -1,40 +1,26 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using System.Collections.ObjectModel;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.TableIndexWindow"/>
 /// </summary>
-internal class TableIndexWindowViewModel : ViewModelBase
+internal partial class TableIndexWindowViewModel : ViewModelBase
 {
     /// <summary>
-    /// Backing field for <see cref="Header"/>
+    /// The header
     /// </summary>
+    [ObservableProperty]
     private string _header = "Table";
 
     /// <summary>
-    /// Gets or sets the header
+    /// The list with the indexes
     /// </summary>
-    public string Header
-    {
-        get => _header;
-        private set => SetProperty(ref _header, value);
-    }
-    /// <summary>
-    /// Backing field for <see cref="Indexes"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IndexEntry> _indexes = new();
-
-    /// <summary>
-    /// Gets or sets the list with the indexes
-    /// </summary>
-    public ObservableCollection<IndexEntry> Indexes
-    {
-        get => _indexes;
-        private set => SetProperty(ref _indexes, value);
-    }
 
     /// <summary>
     /// Init the view model

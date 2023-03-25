@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.ClassGen;

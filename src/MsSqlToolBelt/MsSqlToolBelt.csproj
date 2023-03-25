@@ -13,30 +13,31 @@
     <Resource Include="MsSqlToolBelt.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.2.0.78" />
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="4.11.0" />
-    <PackageReference Include="Markdig" Version="0.30.4" />
+    <PackageReference Include="Markdig" Version="0.31.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="160.22524.0" />
+    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="170.7.0" />
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.13.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.5.22" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="RestSharp" Version="108.0.3" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="108.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="109.0.1" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="109.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.SQLite" Version="5.5.0" />
-    <PackageReference Include="ZimLabs.CoreLib" Version="2.2.0" />
-    <PackageReference Include="ZimLabs.Database.MsSql" Version="1.2.2" />
+    <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
+    <PackageReference Include="ZimLabs.Database.MsSql" Version="1.2.4" />
     <PackageReference Include="ZimLabs.Mapper" Version="1.1.0" />
-    <PackageReference Include="ZimLabs.TableCreator" Version="1.4.1" />
+    <PackageReference Include="ZimLabs.TableCreator" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Themes\" />

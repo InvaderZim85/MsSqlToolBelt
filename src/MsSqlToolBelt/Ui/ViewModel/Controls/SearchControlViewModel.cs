@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
@@ -15,13 +10,20 @@ using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.SettingsControl"/>
 /// </summary>
-internal class SearchControlViewModel : ViewModelBase, IConnection
+internal partial class SearchControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the search
@@ -53,36 +55,25 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private string _sqlText = string.Empty;
 
+    /// <summary>
+    /// The value which indicates if the connection is setting / resetting
+    /// </summary>
+    private bool _resettingConnection;
+
     #region View properties
 
     #region Search
     /// <summary>
-    /// Backing field for <see cref="SearchString"/>
+    /// The search string
     /// </summary>
+    [ObservableProperty]
     private string _searchString = string.Empty;
 
     /// <summary>
-    /// Gets or sets the search string
+    /// The search result
     /// </summary>
-    public string SearchString
-    {
-        get => _searchString;
-        set => SetProperty(ref _searchString, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SearchResults"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<SearchResult> _searchResults = new();
-
-    /// <summary>
-    /// Gets or sets the search result
-    /// </summary>
-    public ObservableCollection<SearchResult> SearchResults
-    {
-        get => _searchResults;
-        private set => SetProperty(ref _searchResults, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedResult"/>
@@ -125,18 +116,10 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="ObjectTypes"/>
+    /// The list with the result types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _objectTypes = new();
-
-    /// <summary>
-    /// Gets or sets the list with the result types
-    /// </summary>
-    public ObservableCollection<string> ObjectTypes
-    {
-        get => _objectTypes;
-        private set => SetProperty(ref _objectTypes, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedObjectType"/>
@@ -151,7 +134,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedObjectType;
         set
         {
-            if (SetProperty(ref _selectedObjectType, value))
+            if (SetProperty(ref _selectedObjectType, value) && !_resettingConnection)
                 FilterResult();
         }
     }
@@ -175,53 +158,29 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="HeaderResult"/>
+    /// The result header
     /// </summary>
+    [ObservableProperty]
     private string _headerResult = "Result";
-
-    /// <summary>
-    /// Gets or sets the header of the result
-    /// </summary>
-    public string HeaderResult
-    {
-        get => _headerResult;
-        private set => SetProperty(ref _headerResult, value);
-    }
 
     #endregion
 
     #region Table grid
 
     /// <summary>
-    /// Backing field for <see cref="Columns"/>
+    /// The list with the table columns
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ColumnEntry> _columns = new();
-
-    /// <summary>
-    /// Gets or sets the list with the table columns
-    /// </summary>
-    public ObservableCollection<ColumnEntry> Columns
-    {
-        get => _columns;
-        private set => SetProperty(ref _columns, value);
-    }
     #endregion
 
     #region Job grid
 
     /// <summary>
-    /// Backing field for <see cref="JobSteps"/>
+    /// The list with the job steps
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<JobStepEntry> _jobSteps = new();
-
-    /// <summary>
-    /// Gets or sets the list with the job steps
-    /// </summary>
-    public ObservableCollection<JobStepEntry> JobSteps
-    {
-        get => _jobSteps;
-        private set => SetProperty(ref _jobSteps, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedJobStep"/>
@@ -246,18 +205,10 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #region Buttons
 
     /// <summary>
-    /// Backing field for <see cref="ButtonShowIndexEnabled"/>
+    /// The value which indicates if the show indices button is enabled
     /// </summary>
+    [ObservableProperty]
     private bool _buttonShowIndexEnabled;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the show indexes button is enabled
-    /// </summary>
-    public bool ButtonShowIndexEnabled
-    {
-        get => _buttonShowIndexEnabled;
-        set => SetProperty(ref _buttonShowIndexEnabled, value);
-    }
     #endregion
 
     #endregion
@@ -265,46 +216,22 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #region View Properties - Bottom view
 
     /// <summary>
-    /// Backing field for <see cref="ShowSql"/>
+    /// The value which indicates if the sql editor should be shown
     /// </summary>
+    [ObservableProperty]
     private bool _showSql = true;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the sql editor should be shown
+    /// The value which indicates if the table grid should be shown
     /// </summary>
-    public bool ShowSql
-    {
-        get => _showSql;
-        set => SetProperty(ref _showSql, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowTableGrid"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showTableGrid;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the table grid should be shown
+    /// The value which indicates if the job grid should be shown
     /// </summary>
-    public bool ShowTableGrid
-    {
-        get => _showTableGrid;
-        set => SetProperty(ref _showTableGrid, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ShowJobGrid"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _showJobGrid;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the job grid should be shown
-    /// </summary>
-    public bool ShowJobGrid
-    {
-        get => _showJobGrid;
-        set => SetProperty(ref _showJobGrid, value);
-    }
 
     /// <summary>
     /// Sets the visibility of the specified type
@@ -336,35 +263,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     #endregion
 
     #region Commands
-    /// <summary>
-    /// The command to 
-    /// </summary>
-    public ICommand SearchCommand => new RelayCommand(ExecuteSearch);
 
     /// <summary>
     /// The command to copy the sql text
     /// </summary>
     public ICommand CopySqlCommand => new RelayCommand(() => CopyToClipboard(_sqlText));
-
-    /// <summary>
-    /// The command to copy / export the table data
-    /// </summary>
-    public ICommand CopyExportTableCommand => new RelayCommand(CopyExportTable);
-
-    /// <summary>
-    /// The command to copy / export the job
-    /// </summary>
-    public ICommand CopyExportJobCommand => new RelayCommand(CopyExportJob);
-
-    /// <summary>
-    /// The command to show the index window
-    /// </summary>
-    public ICommand ShowIndexesCommand => new RelayCommand(ShowTableIndexes);
-
-    /// <summary>
-    /// The command to show the history
-    /// </summary>
-    public ICommand ShowHistoryCommand => new RelayCommand(ShowHistory);
     #endregion
 
     /// <summary>
@@ -379,11 +282,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         _setSqlText = setSqlText;
         _setCmdText = setCmdText;
 
-        _searchHistoryManager = new SearchHistoryManager(settingsManager);
+        _searchHistoryManager = new SearchHistoryManager();
 
         try
         {
-            AddWildcardAutomatically = await _settingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
+            AddWildcardAutomatically = await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
         }
         catch (Exception ex)
         {
@@ -394,14 +297,18 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
+        _resettingConnection = true;
+
         // Clear the old search result
-        ClearResult();
+        ResetSearch(true);
 
         // Dispose the old instance
         _manager?.Dispose();
 
         // Create a new instance
         _manager = new SearchManager(dataSource, database);
+
+        _resettingConnection = false;
     }
 
     /// <inheritdoc />
@@ -411,23 +318,52 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Clears the last search result
+    /// Resets the last search result
     /// </summary>
-    private void ClearResult()
+    /// <param name="completeReset"><see langword="true"/> to perform a complete reset, otherwise <see langword="false"/></param>
+    private void ResetSearch(bool completeReset = false)
     {
+        // Remove the search result
         SearchResults.Clear();
         SelectedResult = null;
+
+        // Remove the texts
+        _setCmdText?.Invoke(string.Empty);
+        _setSqlText?.Invoke(string.Empty);
+
+        // Only continue when a complete reset is wanted
+        if (!completeReset)
+            return;
+
+        // Remove the columns
+        Columns.Clear();
+
+        // Reset the header
+        HeaderResult = "Result";
+
+        // Reset the buttons
+        ButtonShowIndexEnabled = false;
+
+        // Reset the job steps
+        JobSteps.Clear();
+        SelectedJobStep = null;
+
+        // Reset the object types
+        ObjectTypes.Clear();
+        SelectedObjectType = string.Empty;
     }
 
     /// <summary>
     /// Executes the search
     /// </summary>
-    private async void ExecuteSearch()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExecuteSearchAsync()
     {
         if (_manager == null)
             return;
 
-        ClearResult();
+        ResetSearch();
 
         if (string.IsNullOrEmpty(SearchString))
             return;
@@ -435,13 +371,13 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (AddWildcardAutomatically && !SearchString.Contains('*') && !SearchString.Contains('%'))
             SearchString = $"*{SearchString}*";
 
-        await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
+        var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
 
         try
         {
             // Add the search entry to the history
             if (_searchHistoryManager != null)
-                await _searchHistoryManager.AddSearchEntryAsync(SearchString);
+                await SearchHistoryManager.AddSearchEntryAsync(SearchString);
 
             // Load the ignore list
             if (_settingsManager != null)
@@ -452,8 +388,10 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
-            // Filter and show the result
-            FilterResult();
+            // Note: 
+            // Actually, at this point the result was set with the help of the "FilterResult" method.
+            // But this does not have to be done, because the method is called automatically when
+            // the "SelectedObjectType" is changed, which happens in the line before.
         }
         catch (Exception ex)
         {
@@ -461,7 +399,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -470,7 +408,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private void FilterResult()
     {
-        ClearResult();
+        ResetSearch();
 
         var result = SelectedObjectType.Equals("All")
             ? _manager!.SearchResults
@@ -496,7 +434,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedResult == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
 
         try
         {
@@ -524,7 +462,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -533,12 +471,9 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private async void SaveWildcardValue()
     {
-        if (_settingsManager == null)
-            return;
-
         try
         {
-            await _settingsManager.SaveSettingsValueAsync(SettingsKey.AutoWildcard, AddWildcardAutomatically);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.AutoWildcard, AddWildcardAutomatically);
         }
         catch (Exception ex)
         {
@@ -549,6 +484,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Copies / Exports the table information
     /// </summary>
+    [RelayCommand]
     private void CopyExportTable()
     {
         if (SelectedResult == null)
@@ -560,6 +496,7 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Copies / Exports the job information
     /// </summary>
+    [RelayCommand]
     private void CopyExportJob()
     {
         if (SelectedJobStep == null)
@@ -571,7 +508,8 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the window with the table indexes
     /// </summary>
-    private void ShowTableIndexes()
+    [RelayCommand]
+    private void ShowTableIndices()
     {
         if (SelectedResult is not {BoundItem: TableEntry table})
             return;
@@ -586,10 +524,11 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the search history
     /// </summary>
-    private void ShowHistory()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowHistoryAsync()
     {
-        _settingsManager ??= new SettingsManager();
-        _searchHistoryManager ??= new SearchHistoryManager(_settingsManager);
+        _searchHistoryManager ??= new SearchHistoryManager();
         var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
 
         if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
@@ -597,6 +536,6 @@ internal class SearchControlViewModel : ViewModelBase, IConnection
 
         SearchString = window.SelectedEntry;
 
-        ExecuteSearch();
+        await ExecuteSearchAsync();
     }
 }

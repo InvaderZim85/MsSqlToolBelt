@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.ExportWindow"/>
 /// </summary>
-internal class ExportWindowViewModel : ViewModelBase
+internal partial class ExportWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// Contains the default name
@@ -31,37 +32,16 @@ internal class ExportWindowViewModel : ViewModelBase
     public string Filename { get; set; } = string.Empty;
 
     /// <summary>
-    /// Backing field for <see cref="ExportTypes"/>
+    /// The list with the export types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IdTextEntry> _exportTypes = new();
 
     /// <summary>
-    /// Gets or sets the list with the export types
+    /// The selected export type
     /// </summary>
-    public ObservableCollection<IdTextEntry> ExportTypes
-    {
-        get => _exportTypes;
-        private set => SetProperty(ref _exportTypes, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedExportType"/>
-    /// </summary>
+    [ObservableProperty]
     private IdTextEntry? _selectedExportType;
-
-    /// <summary>
-    /// Gets or sets the selected export type
-    /// </summary>
-    public IdTextEntry? SelectedExportType
-    {
-        get => _selectedExportType;
-        set => SetProperty(ref _selectedExportType, value);
-    }
-
-    /// <summary>
-    /// The command to export the data
-    /// </summary>
-    public ICommand ExportCommand => new RelayCommand(ExportData);
 
     /// <summary>
     /// Init the view model
@@ -81,7 +61,9 @@ internal class ExportWindowViewModel : ViewModelBase
     /// <summary>
     /// Exports the data
     /// </summary>
-    private async void ExportData()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExportDataAsync()
     {
         if (SelectedExportType is not {BoundItem: ExportTypeDescriptionAttribute attribute})
             return;

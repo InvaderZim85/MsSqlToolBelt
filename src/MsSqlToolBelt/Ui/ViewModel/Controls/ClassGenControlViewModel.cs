@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
@@ -15,6 +10,13 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -22,7 +24,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.ClassGenControl"/>
 /// </summary>
-internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
+internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
 {
     /// <summary>
     /// The instance for the interaction with the class generator
@@ -57,18 +59,10 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     #region View properties
 
     /// <summary>
-    /// Backing field for <see cref="Tables"/>
+    /// The list with the tables
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<TableDto> _tables = new();
-
-    /// <summary>
-    /// Gets or sets the list with the tables
-    /// </summary>
-    public ObservableCollection<TableDto> Tables
-    {
-        get => _tables;
-        private set => SetProperty(ref _tables, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedTable"/>
@@ -105,18 +99,10 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="Columns"/>
+    /// The list with the columns of the selected table
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ColumnDto> _columns = new();
-
-    /// <summary>
-    /// Gets or sets the list with the columns
-    /// </summary>
-    public ObservableCollection<ColumnDto> Columns
-    {
-        get => _columns;
-        private set => SetProperty(ref _columns, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -138,18 +124,10 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="TypeList"/>
+    /// The list with the different types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IdTextEntry> _typeList = new();
-
-    /// <summary>
-    /// Gets or sets the list with the types
-    /// </summary>
-    public ObservableCollection<IdTextEntry> TypeList
-    {
-        get => _typeList;
-        private set => SetProperty(ref _typeList, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedType"/>
@@ -170,178 +148,78 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="HeaderList"/>
+    /// The header for the table list
     /// </summary>
+    [ObservableProperty]
     private string _headerList = "Tables";
 
     /// <summary>
-    /// Gets or sets the header for the list
+    /// The header for the column list
     /// </summary>
-    public string HeaderList
-    {
-        get => _headerList;
-        private set => SetProperty(ref _headerList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="HeaderColumns"/>
-    /// </summary>
+    [ObservableProperty]
     private string _headerColumns = "Columns";
-
-    /// <summary>
-    /// Gets or sets the column header
-    /// </summary>
-    public string HeaderColumns
-    {
-        get => _headerColumns;
-        private set => SetProperty(ref _headerColumns, value);
-    }
 
     #region Options
 
     /// <summary>
-    /// Backing field for <see cref="ModifierList"/>
+    /// The list with the different modifiers
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _modifierList = new();
 
     /// <summary>
-    /// Gets or sets the list with the modifier
+    /// The selected modifier
     /// </summary>
-    public ObservableCollection<string> ModifierList
-    {
-        get => _modifierList;
-        private set => SetProperty(ref _modifierList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedModifier"/>
-    /// </summary>
+    [ObservableProperty]
     private string _selectedModifier = "public";
 
     /// <summary>
-    /// Gets or sets the selected modifier
+    /// The desired class name
     /// </summary>
-    public string SelectedModifier
-    {
-        get => _selectedModifier;
-        set => SetProperty(ref _selectedModifier, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ClassName"/>
-    /// </summary>
+    [ObservableProperty]
     private string _className = string.Empty;
 
     /// <summary>
-    /// Gets or sets the name of the class
+    /// The value which indicates if the class should be "sealed"
     /// </summary>
-    public string ClassName
-    {
-        get => _className;
-        set => SetProperty(ref _className, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionSealedClass"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionSealedClass;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a sealed class should be created
+    /// The value which indicates if a EF Core class should be created
     /// </summary>
-    public bool OptionSealedClass
-    {
-        get => _optionSealedClass;
-        set => SetProperty(ref _optionSealedClass, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionDbModel"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionDbModel;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a DB model should be created
+    /// The value which indicates if a backing field should be created
     /// </summary>
-    public bool OptionDbModel
-    {
-        get => _optionDbModel;
-        set => SetProperty(ref _optionDbModel, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionBackingField"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionBackingField;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a backing field should be created
+    /// The value which indicates if a summery should be created
     /// </summary>
-    public bool OptionBackingField
-    {
-        get => _optionBackingField;
-        set
-        {
-            if (SetProperty(ref _optionBackingField, value) && !value)
-                OptionSetField = false;
-        }
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionSummary"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionSummary;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a summary should be added
+    /// The value which indicates if the "nullable" feature should be used
     /// </summary>
-    public bool OptionSummary
-    {
-        get => _optionSummary;
-        set => SetProperty(ref _optionSummary, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionNullable"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionNullable;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the nullable property (.NET 6) should be used
+    /// The value which indicates if the ef key code button is enabled
     /// </summary>
-    public bool OptionNullable
-    {
-        get => _optionNullable;
-        set => SetProperty(ref _optionNullable, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ButtonEfKeyCodeEnabled"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _buttonEfKeyCodeEnabled;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the ef key code button is enabled
+    /// The value which indicates if the table options are enabled
     /// </summary>
-    public bool ButtonEfKeyCodeEnabled
-    {
-        get => _buttonEfKeyCodeEnabled;
-        set => SetProperty(ref _buttonEfKeyCodeEnabled, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="TableOptionEnabled"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _tableOptionEnabled;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the table option is enabled or not
-    /// </summary>
-    public bool TableOptionEnabled
-    {
-        get => _tableOptionEnabled;
-        set => SetProperty(ref _tableOptionEnabled, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="OptionSetField"/>
@@ -364,28 +242,17 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
-    /// Backing field for <see cref="Namespace"/>
+    /// The desired namespace of the class
     /// </summary>
+    [ObservableProperty]
     private string _namespace = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the desired namespace
-    /// </summary>
-    public string Namespace
-    {
-        get => _namespace;
-        set => SetProperty(ref _namespace, value);
-    }
 
     #endregion
 
     #endregion
 
     #region Commands
-    /// <summary>
-    /// The command to filter the table types
-    /// </summary>
-    public ICommand FilterCommand => new RelayCommand(FilterList);
+    // Note: This are not all commands! The other commands are provided via the "RelayCommand" attribute!
 
     /// <summary>
     /// The command to reload the table types
@@ -395,31 +262,6 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         _dataLoaded = false;
         LoadData();
     });
-
-    /// <summary>
-    /// The command to select / unselect the columns
-    /// </summary>
-    public ICommand SelectCommand => new RelayCommand<SelectionType>(SelectColumns);
-
-    /// <summary>
-    /// The command to remove the alias from every entry
-    /// </summary>
-    public ICommand ClearAliasCommand => new RelayCommand(ClearAlias);
-
-    /// <summary>
-    /// The command to clear the code
-    /// </summary>
-    public ICommand ClearCodeCommand => new RelayCommand<CodeType>(ClearCode);
-
-    /// <summary>
-    /// The command to copy the code
-    /// </summary>
-    public ICommand CopyCodeCommand => new RelayCommand<CodeType>(CopyCode);
-
-    /// <summary>
-    /// The command to generate the class
-    /// </summary>
-    public ICommand GenerateCommand => new RelayCommand(GenerateClass);
 
     /// <summary>
     /// The command to show the ef key code
@@ -454,16 +296,6 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         var exportDialog = new ClassGenWindow(_manager) {Owner = Application.Current.MainWindow};
         exportDialog.ShowDialog();
     });
-
-    /// <summary>
-    /// The command to generate a class from a query
-    /// </summary>
-    public ICommand FromQueryCommand => new RelayCommand(GenerateCodeFromQuery);
-
-    /// <summary>
-    /// The command which occurs when the user hits the show info menu item (context menu of the set field option)
-    /// </summary>
-    public ICommand ShowSetFieldInfoCommand => new RelayCommand(ShowSetFieldInfo);
 
     #endregion
 
@@ -524,11 +356,11 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_dataLoaded || _manager == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the tables...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the tables...");
 
         try
         {
-            ModifierList = _manager.GetModifierList();
+            ModifierList = ClassGenManager.GetModifierList();
 
             await _manager.LoadTablesAsync();
 
@@ -542,7 +374,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -554,7 +386,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager?.SelectedTable == null)
             return;
 
-        await ShowProgressAsync("Loading", "Please wait while loading the columns...");
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the columns...");
 
         try
         {
@@ -569,13 +401,14 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
     /// <summary>
     /// Filters the result
     /// </summary>
+    [RelayCommand]
     private void FilterList()
     {
         if (_manager == null)
@@ -613,6 +446,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Clears the aliases and removes the selection
     /// </summary>
+    [RelayCommand]
     private void ClearAlias()
     {
         if (!Columns.Any())
@@ -630,6 +464,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Selects / Deselects the columns
     /// </summary>
     /// <param name="type">The selection type</param>
+    [RelayCommand]
     private void SelectColumns(SelectionType type)
     {
         if (!Columns.Any())
@@ -644,7 +479,9 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Generates the class
     /// </summary>
-    private async void GenerateClass()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task GenerateClassAsync()
     {
         if (_manager?.SelectedTable == null)
             return;
@@ -656,7 +493,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
             return;
         }
 
-        await ShowProgressAsync("Generating", "Please wait while generating the class...");
+        var controller = await ShowProgressAsync("Generating", "Please wait while generating the class...");
 
         try
         {
@@ -672,7 +509,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -699,7 +536,9 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Generates a class from the inserted query
     /// </summary>
-    private async void GenerateCodeFromQuery()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task GenerateCodeFromQueryAsync()
     {
         if (_manager == null)
             return;
@@ -729,7 +568,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         if (string.IsNullOrEmpty(dialog.Code))
             return;
 
-        await ShowProgressAsync("Generating", "Please wait while generating the class...");
+        var controller = await ShowProgressAsync("Generating", "Please wait while generating the class...");
 
         try
         {
@@ -750,7 +589,7 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
     #endregion
@@ -760,6 +599,8 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Clears the code
     /// </summary>
     /// <param name="type">The desired code type</param>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
     private void ClearCode(CodeType type)
     {
         _classGenResult = new ClassGenResult();
@@ -781,6 +622,8 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Copies the code to the clipboard
     /// </summary>
     /// <param name="type">The desired code type</param>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
     private void CopyCode(CodeType type)
     {
         var content = type == CodeType.CSharp ? _classGenResult.ClassCode : _classGenResult.SqlQuery;
@@ -824,7 +667,9 @@ internal sealed class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Shows the info of the set field option
     /// </summary>
-    private async void ShowSetFieldInfo()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowSetFieldInfoAsync()
     {
         var result = await ShowQuestionAsync("Info",
             "The 'SetProperty' option uses a template that requires the 'ObservableObject' class which is a part of the \"CommunityToolkit.MVVM\" package (available via NuGet).",

@@ -80,7 +80,7 @@
                     Grid.Row="2"
                     Grid.Column="6"
                     Width="40"
-                    Command="{Binding BrowseCommand}"
+                    Command="{Binding BrowseExportDirCommand}"
                     Content="..." />
                 <CheckBox
                     Grid.Row="3"
@@ -223,7 +223,7 @@
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding FilterCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
 
@@ -240,13 +240,13 @@
                 <StackPanel Grid.Row="8" Orientation="Horizontal">
                     <Button
                         Width="80"
-                        Command="{Binding SelectCommand}"
+                        Command="{Binding SelectTablesCommand}"
                         CommandParameter="{x:Static enums:SelectionType.All}"
                         Content="Select all"
                         ToolTip="Checks all entries" />
                     <Button
                         Width="80"
-                        Command="{Binding SelectCommand}"
+                        Command="{Binding SelectTablesCommand}"
                         CommandParameter="{x:Static enums:SelectionType.None}"
                         Content="Select none"
                         ToolTip="Uncheck all entries" />

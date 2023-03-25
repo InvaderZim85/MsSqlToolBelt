@@ -47,7 +47,7 @@ public partial class App : Application
             _mainWindow.Show();
 
             // Set the color theme
-            Helper.SetColorTheme(await _settingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme));
+            Helper.SetColorTheme(await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme));
 
             Log.Information("Application startet.");
         }
@@ -92,11 +92,11 @@ public partial class App : Application
 
         try
         {
-            var upTime = await _settingsManager.LoadSettingsValueAsync<long>(SettingsKey.UpTime);
+            var upTime = await SettingsManager.LoadSettingsValueAsync<long>(SettingsKey.UpTime);
 
             upTime += duration.Ticks;
 
-            await _settingsManager.SaveSettingsValueAsync(SettingsKey.UpTime, upTime);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.UpTime, upTime);
         }
         catch (Exception ex)
         {

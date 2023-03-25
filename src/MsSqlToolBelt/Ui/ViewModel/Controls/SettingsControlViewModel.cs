@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
@@ -16,13 +10,19 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.SettingsControl"/>
 /// </summary>
-internal class SettingsControlViewModel : ViewModelBase
+internal partial class SettingsControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the settings
@@ -33,18 +33,10 @@ internal class SettingsControlViewModel : ViewModelBase
 
     #region Color scheme
     /// <summary>
-    /// Backing field for <see cref="ColorThemeList"/>
+    /// The list with the color themes
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _colorThemeList = new();
-
-    /// <summary>
-    /// Gets or sets the list with the color themes
-    /// </summary>
-    public ObservableCollection<string> ColorThemeList
-    {
-        get => _colorThemeList;
-        private set => SetProperty(ref _colorThemeList, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedColorTheme"/>
@@ -67,18 +59,10 @@ internal class SettingsControlViewModel : ViewModelBase
 
     #region Server
     /// <summary>
-    /// Backing field for <see cref="ServerList"/>
+    /// The list with the server
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ServerEntry> _serverList = new();
-
-    /// <summary>
-    /// Gets or sets the list with the server
-    /// </summary>
-    public ObservableCollection<ServerEntry> ServerList
-    {
-        get => _serverList;
-        private set => SetProperty(ref _serverList, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedServer"/>
@@ -105,218 +89,78 @@ internal class SettingsControlViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="ButtonMoveUpEnabled"/>
+    /// The value which indicates if the move up button is enabled
     /// </summary>
+    [ObservableProperty]
     private bool _buttonMoveUpEnabled;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the move up button is enabled
+    /// The value which indicates if the move down button is enabled
     /// </summary>
-    public bool ButtonMoveUpEnabled
-    {
-        get => _buttonMoveUpEnabled;
-        set => SetProperty(ref _buttonMoveUpEnabled, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ButtonMoveDownEnabled"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _buttonMoveDownEnabled;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the move down button is enabled
+    /// The value which indicates if the values should be overwritten during the import
     /// </summary>
-    public bool ButtonMoveDownEnabled
-    {
-        get => _buttonMoveDownEnabled;
-        set => SetProperty(ref _buttonMoveDownEnabled, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ImportOverride"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _importOverride;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the values should be overwritten during the import
-    /// </summary>
-    public bool ImportOverride
-    {
-        get => _importOverride;
-        set => SetProperty(ref _importOverride, value);
-    }
 
     #endregion
 
     #region Filter
     /// <summary>
-    /// Backing field for <see cref="FilterList"/>
+    /// The list with the filters
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<FilterEntry> _filterList = new();
 
     /// <summary>
-    /// Gets or sets the list with the filters
+    /// The selected filter
     /// </summary>
-    public ObservableCollection<FilterEntry> FilterList
-    {
-        get => _filterList;
-        private set => SetProperty(ref _filterList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedFilter"/>
-    /// </summary>
+    [ObservableProperty]
     private FilterEntry? _selectedFilter;
 
     /// <summary>
-    /// Gets or sets the selected filter
+    /// The list with the filter types
     /// </summary>
-    public FilterEntry? SelectedFilter
-    {
-        get => _selectedFilter;
-        set => SetProperty(ref _selectedFilter, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="FilterTypeList"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IdTextEntry> _filterTypeList = new();
 
     /// <summary>
-    /// Gets or sets the list with the filter types
+    /// The selected filter type
     /// </summary>
-    public ObservableCollection<IdTextEntry> FilterTypeList
-    {
-        get => _filterTypeList;
-        private set => SetProperty(ref _filterTypeList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedFilterType"/>
-    /// </summary>
+    [ObservableProperty]
     private IdTextEntry? _selectedFilterType;
 
     /// <summary>
-    /// Gets or sets the selected filter type
+    /// The filter value
     /// </summary>
-    public IdTextEntry? SelectedFilterType
-    {
-        get => _selectedFilterType;
-        set => SetProperty(ref _selectedFilterType, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="FilterValue"/>
-    /// </summary>
+    [ObservableProperty]
     private string _filterValue = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the filter value
-    /// </summary>
-    public string FilterValue
-    {
-        get => _filterValue;
-        set => SetProperty(ref _filterValue, value);
-    }
     #endregion
 
     #region Various
 
     /// <summary>
-    /// Backing field for <see cref="ExportTypes"/>
+    /// The list with the export types
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<IdTextEntry> _exportTypes = new();
 
     /// <summary>
-    /// Gets or sets the list with the export types
+    /// The selected export type
     /// </summary>
-    public ObservableCollection<IdTextEntry> ExportTypes
-    {
-        get => _exportTypes;
-        private set => SetProperty(ref _exportTypes, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedExportType"/>
-    /// </summary>
+    [ObservableProperty]
     private IdTextEntry? _selectedExportType;
 
     /// <summary>
-    /// Gets or sets the selected export type
+    /// The search history count
     /// </summary>
-    public IdTextEntry? SelectedExportType
-    {
-        get => _selectedExportType;
-        set => SetProperty(ref _selectedExportType, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SearchHistoryCount"/>
-    /// </summary>
+    [ObservableProperty]
     private int _searchHistoryCount = 50;
-
-    /// <summary>
-    /// Gets or sets the search history count
-    /// </summary>
-    public int SearchHistoryCount
-    {
-        get => _searchHistoryCount;
-        set => SetProperty(ref _searchHistoryCount, value);
-    }
     #endregion
 
-    #endregion
-
-    #region Commands
-    /// <summary>
-    /// The command to save the theme
-    /// </summary>
-    public ICommand SaveThemeCommand => new RelayCommand(SaveTheme);
-
-    /// <summary>
-    /// The command to add a new server
-    /// </summary>
-    public ICommand AddServerCommand => new RelayCommand(AddServer);
-
-    /// <summary>
-    /// The command to edit the selected server
-    /// </summary>
-    public ICommand EditServerCommand => new RelayCommand(EditServer);
-
-    /// <summary>
-    /// The command to delete the selected server
-    /// </summary>
-    public ICommand DeleteServerCommand => new RelayCommand(DeleteServer);
-
-    /// <summary>
-    /// The command to move the serer up / down
-    /// </summary>
-    public ICommand MoveServerCommand => new RelayCommand<MoveDirection>(MoveServer);
-
-    /// <summary>
-    /// The command to add a new filter
-    /// </summary>
-    public ICommand AddFilterCommand => new RelayCommand(AddFilter);
-
-    /// <summary>
-    /// The command to delete the selected filter
-    /// </summary>
-    public ICommand DeleteFilterCommand => new RelayCommand(DeleteFilter);
-
-    /// <summary>
-    /// The command to save the various settings
-    /// </summary>
-    public ICommand SaveVariousCommand => new RelayCommand(SaveVariousSettings);
-
-    /// <summary>
-    /// The command which occurs when the user hits the export button
-    /// </summary>
-    public ICommand ExportCommand => new RelayCommand(ExportSettings);
-
-    /// <summary>
-    /// The command which occurs when the user hits the import button
-    /// </summary>
-    public ICommand ImportCommand => new RelayCommand(ImportSettings);
     #endregion
     
     /// <summary>
@@ -342,7 +186,7 @@ internal class SettingsControlViewModel : ViewModelBase
 
             // Load the colors
             ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
-            var themeName = await _manager!.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
+            var themeName = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
             SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
             // Load the server
@@ -354,10 +198,10 @@ internal class SettingsControlViewModel : ViewModelBase
             // Set the various data
             var exportList = Helper.CreateExportTypeList(ExportDataType.List);
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
-            var exportType = await _manager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
+            var exportType = await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
 
-            SearchHistoryCount = await _manager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
+            SearchHistoryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
         }
         catch (Exception ex)
         {
@@ -369,16 +213,17 @@ internal class SettingsControlViewModel : ViewModelBase
     /// Saves the current theme
     /// </summary>
     /// <returns>The awaitable task</returns>
-    private async void SaveTheme()
+    [RelayCommand]
+    private async Task SaveThemeAsync()
     {
         if (string.IsNullOrEmpty(SelectedColorTheme))
             return;
 
-        await ShowProgressAsync("Save", "Please wait while saving the theme...");
+        var controller = await ShowProgressAsync("Save", "Please wait while saving the theme...");
 
         try
         {
-            await _manager!.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
         }
         catch (Exception ex)
         {
@@ -386,7 +231,7 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
@@ -416,7 +261,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Adds a new server
     /// </summary>
-    private async void AddServer()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task AddServerAsync()
     {
         var dialog = new EditServerWindow { Owner = Application.Current.MainWindow };
         if (dialog.ShowDialog() == false)
@@ -446,7 +293,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Edits the selected server
     /// </summary>
-    private async void EditServer()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task EditServerAsync()
     {
         if (SelectedServer == null)
             return;
@@ -462,7 +311,7 @@ internal class SettingsControlViewModel : ViewModelBase
         // Update the server
         try
         {
-            await _manager!.UpdateServerAsync(SelectedServer);
+            await SettingsManager.UpdateServerAsync(SelectedServer);
 
             SetServerList(SelectedServer);
         }
@@ -475,7 +324,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Deletes the selected server
     /// </summary>
-    private async void DeleteServer()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task DeleteServerAsync()
     {
         if (SelectedServer == null)
             return;
@@ -502,14 +353,16 @@ internal class SettingsControlViewModel : ViewModelBase
     /// Moves the selected server up or down
     /// </summary>
     /// <param name="direction">The desired direction</param>
-    private async void MoveServer(MoveDirection direction)
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task MoveServerAsync(MoveDirection direction)
     {
         if (SelectedServer == null)
             return;
 
         try
         {
-            await _manager!.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
+            await SettingsManager.MoveServerOrderAsync(SelectedServer, direction == MoveDirection.Up);
 
             SetMovementButtons(SelectedServer);
 
@@ -568,7 +421,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Saves the current filter
     /// </summary>
-    private async void AddFilter()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task AddFilterAsync()
     {
         if (SelectedFilterType == null || string.IsNullOrEmpty(FilterValue))
             return;
@@ -598,7 +453,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Deletes the selected filter
     /// </summary>
-    private async void DeleteFilter()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task DeleteFilterAsync()
     {
         if (SelectedFilter == null)
             return;
@@ -627,7 +484,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Saves the various settings
     /// </summary>
-    private async void SaveVariousSettings()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task SaveVariousSettingsAsync()
     {
         if (SelectedExportType == null)
             return;
@@ -640,7 +499,7 @@ internal class SettingsControlViewModel : ViewModelBase
                 {SettingsKey.SearchHistoryEntryCount, SearchHistoryCount}
             };
 
-            await _manager!.SaveSettingsValuesAsync(saveList);
+            await SettingsManager.SaveSettingsValuesAsync(saveList);
         }
         catch (Exception ex)
         {
@@ -651,7 +510,9 @@ internal class SettingsControlViewModel : ViewModelBase
     /// <summary>
     /// Exports the settings as JSON file
     /// </summary>
-    private async void ExportSettings()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExportSettingsAsync()
     {
         if (_manager == null)
             return;
@@ -666,10 +527,11 @@ internal class SettingsControlViewModel : ViewModelBase
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        await ShowProgressAsync("Export", "Please wait while exporting the settings...");
+        var controller = await ShowProgressAsync("Export", "Please wait while exporting the settings...");
+
         try
         {
-            await _manager.ExportSettingsAsync(dialog.FileName);
+            await SettingsManager.ExportSettingsAsync(dialog.FileName);
         }
         catch (Exception ex)
         {
@@ -677,14 +539,16 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
     /// <summary>
     /// Imports the selected settings (JSON file)
     /// </summary>
-    private async void ImportSettings()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ImportSettingsAsync()
     {
         if (_manager == null)
             return;
@@ -698,10 +562,10 @@ internal class SettingsControlViewModel : ViewModelBase
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        await ShowProgressAsync("Import", "Please wait while importing the settings...");
+        var controller = await ShowProgressAsync("Import", "Please wait while importing the settings...");
         try
         {
-            await _manager.ImportSettingsAsync(dialog.FileName, ImportOverride);
+            await SettingsManager.ImportSettingsAsync(dialog.FileName, ImportOverride);
         }
         catch (Exception ex)
         {
@@ -709,8 +573,8 @@ internal class SettingsControlViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
     #endregion
-}
+} // 717

@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Templates;
 using MsSqlToolBelt.Ui.Common;
+using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.TemplateWindow"/>
 /// </summary>
-internal sealed class TemplateWindowViewModel : ViewModelBase
+internal partial class TemplateWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the templates
@@ -32,36 +34,16 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
     #region View properties
 
     /// <summary>
-    /// Backing field for <see cref="Templates"/>
+    /// The list with the templates
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<TemplateEntry> _templates = new();
-
-    /// <summary>
-    /// Gets or sets the list with the templates
-    /// </summary>
-    public ObservableCollection<TemplateEntry> Templates
-    {
-        get => _templates;
-        set => SetProperty(ref _templates, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="SelectedTemplate"/>
     /// </summary>
+    [ObservableProperty]
     private TemplateEntry? _selectedTemplate;
-
-    /// <summary>
-    /// Gets or sets the selected template
-    /// </summary>
-    public TemplateEntry? SelectedTemplate
-    {
-        get => _selectedTemplate;
-        set
-        {
-            if (SetProperty(ref _selectedTemplate, value) && value != null)
-                _setCodeEditorText?.Invoke(value.Content);
-        }
-    }
 
     #endregion
 
@@ -71,21 +53,6 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
     /// The command occurs when the user hits the copy button
     /// </summary>
     public ICommand CopyCommand => new RelayCommand(() => CopyToClipboard(_getCodeEditorText?.Invoke() ?? ""));
-
-    /// <summary>
-    /// The command occurs when the user hits the save button
-    /// </summary>
-    public ICommand SaveCommand => new RelayCommand(SaveChanges);
-
-    /// <summary>
-    /// The command occurs when the user hits the backup button
-    /// </summary>
-    public ICommand BackupCommand => new RelayCommand(CreateBackup);
-
-    /// <summary>
-    /// The command occurs when the user hits the load backup button
-    /// </summary>
-    public ICommand LoadBackupCommand => new RelayCommand(LoadBackup);
     #endregion
 
     /// <summary>
@@ -105,7 +72,9 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
     /// <summary>
     /// Saves the changes of the current template
     /// </summary>
-    private async void SaveChanges()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task SaveChangesAsync()
     {
         if (SelectedTemplate == null)
             return;
@@ -113,11 +82,11 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         // Get the content
         SelectedTemplate.Content = _getCodeEditorText?.Invoke() ?? string.Empty;
 
-        await ShowProgressAsync("Please wait", "Please wait while saving the changes...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while saving the changes...");
 
         try
         {
-            _manager.UpdateTemplate(SelectedTemplate);
+            TemplateManager.UpdateTemplate(SelectedTemplate);
         }
         catch (Exception ex)
         {
@@ -125,14 +94,16 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
     /// <summary>
     /// Creates a backup of the selected template
     /// </summary>
-    private async void CreateBackup()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task CreateBackupAsync()
     {
         if (SelectedTemplate == null)
             return;
@@ -146,11 +117,11 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         if (dialog.ShowDialog() != true)
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while saving the backup...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while saving the backup...");
 
         try
         {
-            _manager.CreateBackup(SelectedTemplate, dialog.FileName);
+            TemplateManager.CreateBackup(SelectedTemplate, dialog.FileName);
         }
         catch (Exception ex)
         {
@@ -158,14 +129,16 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
     /// <summary>
     /// Loads the backup and stores it into the selected template
     /// </summary>
-    private async void LoadBackup()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task LoadBackupAsync()
     {
         if (SelectedTemplate == null)
             return;
@@ -178,11 +151,11 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         if (dialog.ShowDialog() != true)
             return;
 
-        await ShowProgressAsync("Please wait", "Please wait while loading the backup...");
+        var controller = await ShowProgressAsync("Please wait", "Please wait while loading the backup...");
 
         try
         {
-            _manager.LoadBackup(SelectedTemplate, dialog.FileName);
+            TemplateManager.LoadBackup(SelectedTemplate, dialog.FileName);
 
             _setCodeEditorText?.Invoke(SelectedTemplate.Content);
         }
@@ -192,7 +165,7 @@ internal sealed class TemplateWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 }

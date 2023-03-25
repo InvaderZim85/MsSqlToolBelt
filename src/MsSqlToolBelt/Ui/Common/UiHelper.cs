@@ -1,4 +1,9 @@
-﻿using System;
+﻿using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -6,11 +11,6 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
-using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using MsSqlToolBelt.Common;
-using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.Common;

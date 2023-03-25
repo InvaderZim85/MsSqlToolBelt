@@ -1,4 +1,10 @@
-﻿using System;
+﻿using ControlzEx.Theming;
+using Markdig;
+using Microsoft.WindowsAPICodePack.Taskbar;
+using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,12 +13,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
-using ControlzEx.Theming;
-using Markdig;
-using Microsoft.WindowsAPICodePack.Taskbar;
-using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.DataObjects.Common;
-using Serilog;
 using ZimLabs.CoreLib;
 using ZimLabs.Mapper;
 

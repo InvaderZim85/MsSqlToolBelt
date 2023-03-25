@@ -5,6 +5,7 @@ namespace MsSqlToolBelt.Common;
 /// <summary>
 /// Represents an export type description
 /// </summary>
+[AttributeUsage(AttributeTargets.Field)]
 internal class ExportTypeDescriptionAttribute : Attribute
 {
     /// <summary>

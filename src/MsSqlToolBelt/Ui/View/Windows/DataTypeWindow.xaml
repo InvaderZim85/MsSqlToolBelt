@@ -58,15 +58,15 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Button
                 Width="60"
-                Command="{Binding AddCommand}"
+                Command="{Binding AddEntryCommand}"
                 Content="Add" />
             <Button
                 Width="60"
-                Command="{Binding EditCommand}"
+                Command="{Binding EditEntryCommand}"
                 Content="Edit" />
             <Button
                 Width="60"
-                Command="{Binding DeleteCommand}"
+                Command="{Binding DeleteEntryCommand}"
                 Content="Delete" />
         </StackPanel>
 

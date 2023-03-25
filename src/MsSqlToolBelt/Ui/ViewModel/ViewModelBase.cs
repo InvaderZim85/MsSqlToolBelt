@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel;
@@ -23,11 +23,6 @@ internal class ViewModelBase : ObservableObject
     /// The instance of the mah apps dialog coordinator
     /// </summary>
     private readonly IDialogCoordinator _dialogCoordinator;
-
-    /// <summary>
-    /// The controller of the progress dialog
-    /// </summary>
-    private ProgressDialogController? _progressDialogController;
 
     /// <summary>
     /// Gets or sets the value which indicates if there is any error (only needed for the input validation)
@@ -135,47 +130,26 @@ internal class ViewModelBase : ObservableObject
     /// <param name="title">The title of the dialog</param>
     /// <param name="message">The message of the dialog</param>
     /// <param name="ctSource">The cancellation token source (optional)</param>
-    /// <returns>The awaitable task</returns>
-    protected async Task ShowProgressAsync(string title, string message, CancellationTokenSource? ctSource = default)
+    /// <returns>The dialog controller</returns>
+    protected async Task<ProgressDialogController> ShowProgressAsync(string title, string message, CancellationTokenSource? ctSource = default)
     {
-        // Close the dialog before a new one will be created
-        await CloseProgressAsync();
-
         Helper.SetTaskbarIndeterminate(true);
 
-        _progressDialogController = await _dialogCoordinator.ShowProgressAsync(this, title, message, ctSource != null);
-        _progressDialogController.SetIndeterminate();
+        var controller = await _dialogCoordinator.ShowProgressAsync(this, title, message, ctSource != null);
+        controller.SetIndeterminate();
 
         if (ctSource != null)
         {
-            _progressDialogController.Canceled += (_, _) => ctSource.Cancel();
+            controller.Canceled += (_, _) => ctSource.Cancel();
         }
-    }
 
-    /// <summary>
-    /// Closes the progress
-    /// </summary>
-    /// <returns>The awaitable task</returns>
-    protected async Task CloseProgressAsync()
-    {
-        if (_progressDialogController == null)
-            return;
+        controller.Closed += (_, _) =>
+        {
+            // Reset the taskbar when the controller was closed
+            Helper.SetTaskbarIndeterminate(false);
+        };
 
-        Helper.SetTaskbarIndeterminate(false);
-
-        await _progressDialogController.CloseAsync();
-
-        // Remove the old dialog
-        _progressDialogController = null;
-    }
-
-    /// <summary>
-    /// Sets the message of the progress dialog (if available)
-    /// </summary>
-    /// <param name="message">The message which should be set</param>
-    protected void SetProgressMessage(string message)
-    {
-        _progressDialogController?.SetMessage(message);
+        return controller;
     }
 
     /// <summary>
@@ -192,7 +166,7 @@ internal class ViewModelBase : ObservableObject
     /// Copies the content to the clipboard
     /// </summary>
     /// <param name="content">The content which should be copied</param>
-    protected void CopyToClipboard(string content)
+    protected static void CopyToClipboard(string content)
     {
         Clipboard.SetText(content);
     }
@@ -254,7 +228,7 @@ internal class ViewModelBase : ObservableObject
         ProgressDialogController? controller = null;
         try
         {
-            var dialog = new ExportWindow(defaultName, ExportDataType.List);
+            var dialog = new ExportWindow(defaultName, ExportDataType.List) {Owner = Application.Current.MainWindow};
             if (dialog.ShowDialog() != true)
                 return;
 

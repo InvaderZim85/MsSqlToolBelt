@@ -82,7 +82,7 @@ internal sealed class TemplateManager
     /// Updates an existing template
     /// </summary>
     /// <param name="template">The template with the new content</param>
-    public void UpdateTemplate(TemplateEntry template)
+    public static void UpdateTemplate(TemplateEntry template)
     {
         // Save the file
         File.WriteAllText(template.FilePath, template.Content, Encoding.UTF8);
@@ -96,7 +96,7 @@ internal sealed class TemplateManager
     /// </summary>
     /// <param name="template">The template</param>
     /// <param name="backupPath">The path of the backup</param>
-    public void CreateBackup(TemplateEntry template, string backupPath)
+    public static void CreateBackup(TemplateEntry template, string backupPath)
     {
         File.WriteAllText(backupPath, template.Content, Encoding.UTF8);
     }
@@ -106,7 +106,7 @@ internal sealed class TemplateManager
     /// </summary>
     /// <param name="template">The template</param>
     /// <param name="backupPath">The path of the backup</param>
-    public void LoadBackup(TemplateEntry template, string backupPath)
+    public static void LoadBackup(TemplateEntry template, string backupPath)
     {
         if (!File.Exists(backupPath))
             return;

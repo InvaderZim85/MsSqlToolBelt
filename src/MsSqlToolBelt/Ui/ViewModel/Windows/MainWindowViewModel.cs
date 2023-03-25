@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.VisualStudio.Threading;
 using MsSqlToolBelt.Business;
@@ -15,6 +10,13 @@ using MsSqlToolBelt.DataObjects.Updater;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 using ZimLabs.CoreLib;
 using Timer = System.Timers.Timer;
 
@@ -23,7 +25,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 /// <summary>
 /// Provides the logic for the <see cref="View.Windows.MainWindow"/>
 /// </summary>
-internal class MainWindowViewModel : ViewModelBase
+internal partial class MainWindowViewModel : ViewModelBase
 {
     #region Actions
     /// <summary>
@@ -118,32 +120,16 @@ internal class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="ServerList"/>
+    /// The list with the available server
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<ServerEntry> _serverList = new();
 
     /// <summary>
-    /// Gets or sets the list with the available server
+    /// The selected server
     /// </summary>
-    public ObservableCollection<ServerEntry> ServerList
-    {
-        get => _serverList;
-        private set => SetProperty(ref _serverList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedServer"/>
-    /// </summary>
+    [ObservableProperty]
     private ServerEntry? _selectedServer;
-
-    /// <summary>
-    /// Gets or sets the selected server
-    /// </summary>
-    public ServerEntry? SelectedServer
-    {
-        get => _selectedServer;
-        set => SetProperty(ref _selectedServer, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="DatabaseList"/>
@@ -164,46 +150,22 @@ internal class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="SelectedDatabase"/>
+    /// The selected database
     /// </summary>
+    [ObservableProperty]
     private string _selectedDatabase = string.Empty;
 
     /// <summary>
-    /// Gets or sets the selected database
+    /// The value which indicates if a server connection is established
     /// </summary>
-    public string SelectedDatabase
-    {
-        get => _selectedDatabase;
-        set => SetProperty(ref _selectedDatabase, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ConnectedToServer"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _connectedToServer;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a server connection is established
+    /// The value which indicates if the connection was established
     /// </summary>
-    public bool ConnectedToServer
-    {
-        get => _connectedToServer;
-        set => SetProperty(ref _connectedToServer, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ConnectionEstablished"/>
-    /// </summary>
+    [ObservableProperty] 
     private bool _connectionEstablished;
-
-    /// <summary>
-    /// Gets or sets the value which indicates if the connection was established
-    /// </summary>
-    public bool ConnectionEstablished
-    {
-        get => _connectionEstablished;
-        set => SetProperty(ref _connectionEstablished, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="TabIndex"/>
@@ -224,74 +186,34 @@ internal class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="ConnectionInfo"/>
+    /// The connection info
     /// </summary>
+    [ObservableProperty]
     private string _connectionInfo = "Not connected";
 
     /// <summary>
-    /// Gets or sets the connection info
+    /// The memory usage of the program
     /// </summary>
-    public string ConnectionInfo
-    {
-        get => _connectionInfo;
-        private set => SetProperty(ref _connectionInfo, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="MemoryUsage"/>
-    /// </summary>
+    [ObservableProperty]
     private string _memoryUsage = string.Empty;
 
     /// <summary>
-    /// Gets or sets the memory usage of the program
+    /// The build information
     /// </summary>
-    public string MemoryUsage
-    {
-        get => _memoryUsage;
-        private set => SetProperty(ref _memoryUsage, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="BuildInfo"/>
-    /// </summary>
+    [ObservableProperty]
     private string _buildInfo = "Build info";
 
     /// <summary>
-    /// Gets or sets the build information
+    /// The app header
     /// </summary>
-    public string BuildInfo
-    {
-        get => _buildInfo;
-        private set => SetProperty(ref _buildInfo, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="HeaderApp"/>
-    /// </summary>
+    [ObservableProperty]
     private string _headerApp = "MsSqlToolBelt";
 
     /// <summary>
-    /// Gets or sets the app header
+    /// The visibility value of the update button
     /// </summary>
-    public string HeaderApp
-    {
-        get => _headerApp;
-        private set => SetProperty(ref _headerApp, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ButtonUpdateVisible"/>
-    /// </summary>
+    [ObservableProperty]
     private Visibility _buttonUpdateVisible = Visibility.Hidden;
-
-    /// <summary>
-    /// Gets or sets the visibility value of the update button
-    /// </summary>
-    public Visibility ButtonUpdateVisible
-    {
-        get => _buttonUpdateVisible;
-        set => SetProperty(ref _buttonUpdateVisible, value);
-    }
 
     #endregion
 
@@ -305,16 +227,6 @@ internal class MainWindowViewModel : ViewModelBase
     /// The command to show the info
     /// </summary>
     public ICommand InfoCommand => new RelayCommand(() => InfoOpen = !InfoOpen);
-
-    /// <summary>
-    /// The command to connect to the server
-    /// </summary>
-    public ICommand ConnectServerCommand => new RelayCommand(ConnectServer);
-
-    /// <summary>
-    /// The command to set the database
-    /// </summary>
-    public ICommand ConnectDatabaseCommand => new RelayCommand(ConnectDatabase);
 
     /// <summary>
     /// The command to show the update window
@@ -430,14 +342,16 @@ internal class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Creates a connection to the selected server
     /// </summary>
-    private async void ConnectServer()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ConnectServerAsync()
     {
         if (SelectedServer == null)
             return;
 
         ConnectionEstablished = false;
 
-        await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
+        var controller = await ShowProgressAsync("Connect", "Please wait while the connection to the server is established...");
 
         try
         {
@@ -469,19 +383,21 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 
     /// <summary>
     /// Selects the desired database
     /// </summary>
-    private async void ConnectDatabase()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ConnectDatabaseAsync()
     {
         if (_baseRepo == null || SelectedServer == null || string.IsNullOrEmpty(SelectedDatabase))
             return;
 
-        await ShowProgressAsync("Please wait",
+        var controller = await ShowProgressAsync("Please wait",
             "Please wait while the connection to the database is established...");
 
         try
@@ -494,7 +410,7 @@ internal class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
 

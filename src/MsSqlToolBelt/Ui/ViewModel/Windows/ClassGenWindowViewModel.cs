@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
@@ -12,6 +7,12 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -19,7 +20,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 /// <summary>
 /// Provides the functions for <see cref="ClassGenWindow"/>
 /// </summary>
-internal class ClassGenWindowViewModel : ViewModelBase
+internal partial class ClassGenWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the class generator
@@ -29,91 +30,43 @@ internal class ClassGenWindowViewModel : ViewModelBase
     #region View properties
 
     /// <summary>
-    /// Backing field for <see cref="Tables"/>
+    /// The list with the tables
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<TableDto> _tables = new();
 
     /// <summary>
-    /// Gets or sets the list with the tables
+    /// The info
     /// </summary>
-    public ObservableCollection<TableDto> Tables
-    {
-        get => _tables;
-        private set => SetProperty(ref _tables, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="InfoList"/>
-    /// </summary>
+    [ObservableProperty]
     private string _infoList = string.Empty;
 
     /// <summary>
-    /// Gets or sets the info
+    /// The list with the modifier
     /// </summary>
-    public string InfoList
-    {
-        get => _infoList;
-        set => SetProperty(ref _infoList, value);
-    }
-    
-    /// <summary>
-    /// Backing field for <see cref="ModifierList"/>
-    /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _modifierList = new();
 
     /// <summary>
-    /// Gets or sets the list with the modifier
+    /// The selected modifier
     /// </summary>
-    public ObservableCollection<string> ModifierList
-    {
-        get => _modifierList;
-        private set => SetProperty(ref _modifierList, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="SelectedModifier"/>
-    /// </summary>
+    [ObservableProperty]
     private string _selectedModifier = "public";
 
     /// <summary>
-    /// Gets or sets the selected modifier
+    /// The value which indicates if a sealed class should be created
     /// </summary>
-    public string SelectedModifier
-    {
-        get => _selectedModifier;
-        set => SetProperty(ref _selectedModifier, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionSealedClass"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionSealedClass;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a sealed class should be created
+    /// The value which indicates if a DB model should be created
     /// </summary>
-    public bool OptionSealedClass
-    {
-        get => _optionSealedClass;
-        set => SetProperty(ref _optionSealedClass, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionDbModel"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionDbModel;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a DB model should be created
-    /// </summary>
-    public bool OptionDbModel
-    {
-        get => _optionDbModel;
-        set => SetProperty(ref _optionDbModel, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionBackingField"/>
+    /// The value which indicates if a backing field should be created
     /// </summary>
     private bool _optionBackingField;
 
@@ -151,88 +104,40 @@ internal class ClassGenWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Backing field for <see cref="OptionSummary"/>
+    /// The value which indicates if a summary should be added
     /// </summary>
+    [ObservableProperty]
     private bool _optionSummary;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a summary should be added
+    /// The value which indicates if the nullable property (.NET 6) should be used
     /// </summary>
-    public bool OptionSummary
-    {
-        get => _optionSummary;
-        set => SetProperty(ref _optionSummary, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionNullable"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _optionNullable;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the nullable property (.NET 6) should be used
+    /// The desired namespace
     /// </summary>
-    public bool OptionNullable
-    {
-        get => _optionNullable;
-        set => SetProperty(ref _optionNullable, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="Namespace"/>
-    /// </summary>
+    [ObservableProperty]
     private string _namespace = string.Empty;
 
     /// <summary>
-    /// Gets or sets the desired namespace
+    /// The path of the export directory
     /// </summary>
-    public string Namespace
-    {
-        get => _namespace;
-        set => SetProperty(ref _namespace, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="ExportDir"/>
-    /// </summary>
+    [ObservableProperty]
     private string _exportDir = string.Empty;
 
     /// <summary>
-    /// Gets or sets the path of the export directory
+    /// The value which indicates if the export directory should be cleared before export
     /// </summary>
-    public string ExportDir
-    {
-        get => _exportDir;
-        set => SetProperty(ref _exportDir, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="EmptyDirBeforeExport"/>
-    /// </summary>
+    [ObservableProperty]
     private bool _emptyDirBeforeExport;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the export directory should be cleared before export
+    /// The header for the list
     /// </summary>
-    public bool EmptyDirBeforeExport
-    {
-        get => _emptyDirBeforeExport;
-        set => SetProperty(ref _emptyDirBeforeExport, value);
-    }
-
-    /// <summary>
-    /// Backing field for <see cref="HeaderTables"/>
-    /// </summary>
+    [ObservableProperty]
     private string _headerTables = "Tables";
-
-    /// <summary>
-    /// Gets or sets the header for the list
-    /// </summary>
-    public string HeaderTables
-    {
-        get => _headerTables;
-        private set => SetProperty(ref _headerTables, value);
-    }
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -255,40 +160,6 @@ internal class ClassGenWindowViewModel : ViewModelBase
 
     #endregion
 
-    #region Commands
-
-    /// <summary>
-    /// The command to browse for the export directory
-    /// </summary>
-    public ICommand BrowseCommand => new RelayCommand(BrowseExportDir);
-
-    /// <summary>
-    /// The command to remove the alias from every entry
-    /// </summary>
-    public ICommand ClearAliasCommand => new RelayCommand(ClearAlias);
-
-    /// <summary>
-    /// The command to select / unselect the columns
-    /// </summary>
-    public ICommand SelectCommand => new RelayCommand<SelectionType>(SelectTables);
-
-    /// <summary>
-    /// The command which occurs when the user hits the show info menu item (context menu of the set field option)
-    /// </summary>
-    public ICommand ShowSetFieldInfoCommand => new RelayCommand(ShowSetFieldInfo);
-
-    /// <summary>
-    /// The command which occurs when the user hits the generate button
-    /// </summary>
-    public ICommand GenerateClassesCommand => new RelayCommand(GenerateClasses);
-
-    /// <summary>
-    /// The command to filter the list
-    /// </summary>
-    public ICommand FilterCommand => new RelayCommand(FilterList);
-
-    #endregion
-
     /// <summary>
     /// Init the view model
     /// </summary>
@@ -299,21 +170,15 @@ internal class ClassGenWindowViewModel : ViewModelBase
 
         FilterList();
 
-        ModifierList = _manager.GetModifierList();
+        ModifierList = ClassGenManager.GetModifierList();
         SelectedModifier = "public";
-
-        // Add the info event
-        _manager.Progress += (_, msg) =>
-        {
-            InfoList += $"{DateTime.Now:HH:mm:ss} | {msg}{Environment.NewLine}";
-            SetProgressMessage(msg);
-        };
     }
 
     #region Class gen
     /// <summary>
     /// Clears the aliases and removes the selection
     /// </summary>
+    [RelayCommand]
     private void ClearAlias()
     {
         if (!Tables.Any())
@@ -329,6 +194,7 @@ internal class ClassGenWindowViewModel : ViewModelBase
     /// Selects / Deselects the tables
     /// </summary>
     /// <param name="type">The selection type</param>
+    [RelayCommand]
     private void SelectTables(SelectionType type)
     {
         if (!Tables.Any())
@@ -343,7 +209,9 @@ internal class ClassGenWindowViewModel : ViewModelBase
     /// <summary>
     /// Generates the classes for the selected tables
     /// </summary>
-    private async void GenerateClasses()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task GenerateClassesAsync()
     {
         InfoList = string.Empty;
 
@@ -360,11 +228,13 @@ internal class ClassGenWindowViewModel : ViewModelBase
         }
 
         var ctSource = new CancellationTokenSource();
-        await ShowProgressAsync("Please wait", "Please wait while creating the classes...", ctSource);
+        var controller = await ShowProgressAsync("Please wait", "Please wait while creating the classes...", ctSource);
 
         try
         {
             var options = GetOptions();
+
+            _manager.Progress += (_, msg) => controller.SetMessage(msg);
 
             await _manager.GenerateClassesAsync(options, Tables.ToList(), ctSource.Token);
         }
@@ -374,7 +244,7 @@ internal class ClassGenWindowViewModel : ViewModelBase
         }
         finally
         {
-            await CloseProgressAsync();
+            await controller.CloseAsync();
         }
     }
     
@@ -399,10 +269,11 @@ internal class ClassGenWindowViewModel : ViewModelBase
             Namespace = Namespace
         };
     }
-    
+
     /// <summary>
     /// Filters the list
     /// </summary>
+    [RelayCommand]
     private void FilterList()
     {
         var tmpResult = string.IsNullOrEmpty(Filter)
@@ -418,7 +289,9 @@ internal class ClassGenWindowViewModel : ViewModelBase
     /// <summary>
     /// Shows the info of the set field option
     /// </summary>
-    private async void ShowSetFieldInfo()
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowSetFieldInfoAsync()
     {
         var result = await ShowQuestionAsync("Info",
             "The 'SetProperty' option uses a template that requires the 'ObservableObject' class which is a part of the \"CommunityToolkit.MVVM\" package (available via NuGet).",
@@ -435,6 +308,7 @@ internal class ClassGenWindowViewModel : ViewModelBase
     /// <summary>
     /// Browse for the export directory
     /// </summary>
+    [RelayCommand]
     private void BrowseExportDir()
     {
         var dialog = new FolderBrowserDialog
