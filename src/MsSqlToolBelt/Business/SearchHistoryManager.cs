@@ -26,15 +26,6 @@ public class SearchHistoryManager
     public SearchHistoryEntry? SelectedEntry { get; set; }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="SearchHistoryManager"/>
-    /// </summary>
-    public SearchHistoryManager()
-    {
-        using var context = new AppDbContext();
-        context.Database.Migrate();
-    }
-
-    /// <summary>
     /// Loads the search history and stores them into <see cref="SearchHistory"/>
     /// </summary>
     /// <returns>The awaitable task</returns>

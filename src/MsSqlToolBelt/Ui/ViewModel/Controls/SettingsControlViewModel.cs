@@ -566,6 +566,9 @@ internal partial class SettingsControlViewModel : ViewModelBase
         try
         {
             await SettingsManager.ImportSettingsAsync(dialog.FileName, ImportOverride);
+
+            // Reload the settings
+            LoadSettings();
         }
         catch (Exception ex)
         {

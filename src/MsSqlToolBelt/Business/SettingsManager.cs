@@ -28,15 +28,6 @@ public class SettingsManager
     /// </summary>
     public List<FilterEntry> FilterList { get; private set; } = new();
 
-    /// <summary>
-    /// Creates a new instance of the <see cref="SettingsManager"/>
-    /// </summary>
-    public SettingsManager()
-    {
-        using var context = new AppDbContext();
-        context.Database.Migrate();
-    }
-
     #region Settings
     /// <summary>
     /// Loads the specified settings value
@@ -322,24 +313,36 @@ public class SettingsManager
     {
         await using var context = new AppDbContext();
 
-        var currentOrder = await context.ServerEntries.AsNoTracking().MaxAsync(m => m.Order);
-        foreach (var entry in server)
+        // Check if there is already an entry
+        if (await context.ServerEntries.AsNoTracking().AnyAsync())
         {
-            var existingEntry = await context.ServerEntries.FirstOrDefaultAsync(f => f.Name.ToLower().Equals(entry.Name.ToLower()));
-            if (existingEntry != null && overrideSettings)
+            var currentOrder = await context.ServerEntries.AsNoTracking().MaxAsync(m => m.Order);
+            foreach (var entry in server)
             {
-                existingEntry.AutoConnect = entry.AutoConnect;
-                existingEntry.DefaultDatabase = entry.DefaultDatabase;
-                existingEntry.Description = entry.Description;
-            }
-            else if (existingEntry == null)
-            {
-                var insertEntry = new ServerEntry(entry)
+                var existingEntry = await context.ServerEntries.FirstOrDefaultAsync(f => f.Name.ToLower().Equals(entry.Name.ToLower()));
+                if (existingEntry != null && overrideSettings)
                 {
-                    Order = ++currentOrder
-                };
+                    existingEntry.AutoConnect = entry.AutoConnect;
+                    existingEntry.DefaultDatabase = entry.DefaultDatabase;
+                    existingEntry.Description = entry.Description;
+                }
+                else if (existingEntry == null)
+                {
+                    var insertEntry = new ServerEntry(entry)
+                    {
+                        Order = ++currentOrder
+                    };
 
-                await context.ServerEntries.AddAsync(insertEntry);
+                    await context.ServerEntries.AddAsync(insertEntry);
+                }
+            }
+        }
+        else
+        {
+            // Add the new entries
+            foreach (var entry in server)
+            {
+                await context.ServerEntries.AddAsync(new ServerEntry(entry));
             }
         }
 

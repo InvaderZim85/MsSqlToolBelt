@@ -11,13 +11,14 @@ using MsSqlToolBelt.Data.Internal;
 namespace MsSqlToolBelt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220731111537_RemoveTest")]
-    partial class RemoveTest
+    [Migration("20230326105558_InitialMigration")]
+    partial class InitialMigration
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
 
             modelBuilder.Entity("MsSqlToolBelt.DataObjects.Internal.FilterEntry", b =>
                 {
@@ -45,6 +46,9 @@ namespace MsSqlToolBelt.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SearchCount")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("SearchEntry")
                         .IsRequired()

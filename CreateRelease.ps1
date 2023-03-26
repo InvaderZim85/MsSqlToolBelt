@@ -103,6 +103,9 @@ function ChangeProjectFile($filePath, $newVersion) {
 
     # File Version
     ChangeXmlNode $filePath "//FileVersion" $newVersion
+
+    # Version
+    ChangeXmlNode $filePath "//Version" $newVersion
 }
 
 # ===========================

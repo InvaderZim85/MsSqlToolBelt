@@ -1,7 +1,9 @@
 ﻿using ControlzEx.Theming;
 using Markdig;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Common;
 using Serilog;
 using System;
@@ -33,6 +35,7 @@ internal static class Helper
     /// </summary>
     public static void InitHelper()
     {
+        // Init the logger
         const string template = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
         Log.Logger = new LoggerConfiguration()
@@ -40,8 +43,14 @@ internal static class Helper
             .WriteTo.File("logs/log_.log", rollingInterval: RollingInterval.Day, outputTemplate: template)
             .CreateLogger();
 
+        // Init the taskbar
         if (TaskbarManager.IsPlatformSupported)
             _taskbarInstance = TaskbarManager.Instance;
+
+        // Init the settings database
+        using var context = new AppDbContext();
+        var pendingMigrations = context.Database.GetPendingMigrations();
+        context.Database.Migrate();
     }
 
     /// <summary>

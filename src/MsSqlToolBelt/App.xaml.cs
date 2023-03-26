@@ -1,11 +1,13 @@
-﻿using System;
-using System.Windows;
+﻿using Microsoft.Data.Sqlite;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
+using System;
+using System.Text;
+using System.Windows;
 
 namespace MsSqlToolBelt;
 
@@ -37,19 +39,34 @@ public partial class App : Application
     private async void App_OnStartup(object sender, StartupEventArgs e)
     {
         _startUp = DateTime.Now;
-        Helper.InitHelper();
 
         try
         {
+            Helper.InitHelper();
+
             _settingsManager ??= new SettingsManager();
 
             _mainWindow = new MainWindow(_startUp, _settingsManager);
             _mainWindow.Show();
 
             // Set the color theme
-            Helper.SetColorTheme(await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme));
+            Helper.SetColorTheme(
+                await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme));
 
             Log.Information("Application startet.");
+        }
+        catch (SqliteException ex)
+        {
+            Log.Fatal(ex, "An fatal error has occurred.");
+
+            var message = new StringBuilder()
+                .AppendLine("An error has occurred within the settings database.")
+                .AppendLine()
+                .AppendLine("You can fix the error by removing the 'MsSqlToolBelt.Settings.db' file, which is located in the same folder as the application.")
+                .AppendLine()
+                .AppendLine("Note: Before you remove / delete the file, create a backup!");
+
+            MessageBox.Show(message.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception ex)
         {
