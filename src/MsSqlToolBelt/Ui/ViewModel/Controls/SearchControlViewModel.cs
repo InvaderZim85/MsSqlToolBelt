@@ -388,10 +388,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
-            // Note: 
-            // Actually, at this point the result was set with the help of the "FilterResult" method.
-            // But this does not have to be done, because the method is called automatically when
-            // the "SelectedObjectType" is changed, which happens in the line before.
+            FilterResult();
         }
         catch (Exception ex)
         {

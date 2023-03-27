@@ -6,9 +6,9 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>23.85.1.699</AssemblyVersion>
-    <FileVersion>23.85.1.699</FileVersion>
-    <Version>23.85.1.699</Version>
+    <AssemblyVersion>23.86.0.516</AssemblyVersion>
+    <FileVersion>23.86.0.516</FileVersion>
+    <Version>23.86.0.516</Version>
     <Copyright>(c) 2023 by Andreas Pouwels</Copyright>
   </PropertyGroup>
   <ItemGroup>
