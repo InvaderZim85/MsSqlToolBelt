@@ -521,7 +521,7 @@ public sealed class ClassGenManager : IDisposable
         var columnAttributes = new List<string>();
         if (!string.IsNullOrEmpty(column.Alias) && !column.Name.EqualsIgnoreCase(column.Alias))
         {
-            columnAttributes.Add($"[Column[\"{column.Name}\")]");
+            columnAttributes.Add($"[Column(\"{column.Name}\")]");
         }
 
         if (column.DataType.EqualsIgnoreCase("date"))
