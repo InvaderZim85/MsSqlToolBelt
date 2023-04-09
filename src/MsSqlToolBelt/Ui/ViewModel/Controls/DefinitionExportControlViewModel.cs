@@ -230,7 +230,12 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
     public string FilterTable
     {
         get => _filterTable;
-        set => SetProperty(ref _filterTable, value);
+        set
+        {
+            SetProperty(ref _filterTable, value);
+            if (string.IsNullOrEmpty(value))
+                FilterTableList();
+        }
     }
 
     /// <summary>
