@@ -12,8 +12,8 @@ Microsoft.SqlServer.Management.SqlParser;170.7.0
 Microsoft.SqlServer.SqlManagementObjects;170.13.0
 Microsoft.VisualStudio.Threading;17.5.22
 Newtonsoft.Json;13.0.3
-RestSharp;109.0.1
-RestSharp.Serializers.NewtonsoftJson;109.0.1
+RestSharp;110.1.0
+RestSharp.Serializers.NewtonsoftJson;110.1.0
 Serilog.Sinks.File;5.0.0
 Serilog.Sinks.SQLite;5.5.0
 ZimLabs.CoreLib;2.3.0
