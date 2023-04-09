@@ -80,6 +80,8 @@ internal partial class ExportWindowViewModel : ViewModelBase
             if (dialog.ShowDialog() != true)
                 return;
 
+            Filename = dialog.FileName;
+
             _closeWindow?.Invoke(true, true);
         }
         catch (Exception ex)

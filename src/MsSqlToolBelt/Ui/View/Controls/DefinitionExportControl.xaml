@@ -270,7 +270,11 @@
                             Grid.Row="4"
                             mah:TextBoxHelper.Watermark="Filter..."
                             Style="{StaticResource TextBoxFilter}"
-                            Text="{Binding FilterTable}" />
+                            Text="{Binding FilterTable, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding FilterTableListCommand}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
 
                         <Separator Grid.Row="5" />
 
