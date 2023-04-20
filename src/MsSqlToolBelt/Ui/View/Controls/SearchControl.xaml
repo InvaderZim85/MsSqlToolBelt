@@ -164,6 +164,10 @@
                         Command="{Binding ShowTableIndicesCommand}"
                         Content="Show indexes"
                         IsEnabled="{Binding ButtonShowIndexEnabled}" />
+                    <Button
+                        Command="{Binding OpenQueryWindowCommand}"
+                        Content="Open query window"
+                        IsEnabled="{Binding ButtonQueryWindowEnabled}" />
                 </StackPanel>
             </Grid>
         </Border>

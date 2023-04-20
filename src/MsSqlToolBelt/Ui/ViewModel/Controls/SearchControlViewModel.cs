@@ -56,6 +56,16 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private string _sqlText = string.Empty;
 
     /// <summary>
+    /// The name / path of the MS SQL database
+    /// </summary>
+    private string _dataSource = string.Empty;
+
+    /// <summary>
+    /// The name of the database
+    /// </summary>
+    private string _database = string.Empty;
+
+    /// <summary>
     /// The value which indicates if the connection is setting / resetting
     /// </summary>
     private bool _resettingConnection;
@@ -93,6 +103,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
             _manager.SelectedResult = value;
 
+            ButtonQueryWindowEnabled = false;
+
             if (value == null)
                 return;
 
@@ -101,6 +113,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
                 case "Table":
                     SetVisibility(SearchViewType.Table);
                     EnhanceData();
+                    ButtonQueryWindowEnabled = true;
                     break;
                 case "Job":
                     SetVisibility(SearchViewType.Job);
@@ -162,6 +175,12 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     [ObservableProperty]
     private string _headerResult = "Result";
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the query window button is enabled
+    /// </summary>
+    [ObservableProperty]
+    private bool _buttonQueryWindowEnabled = false;
 
     #endregion
 
@@ -297,6 +316,9 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// <inheritdoc />
     public void SetConnection(string dataSource, string database)
     {
+        _dataSource = dataSource;
+        _database = database;
+
         _resettingConnection = true;
 
         // Clear the old search result
@@ -534,5 +556,18 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         SearchString = window.SelectedEntry;
 
         await ExecuteSearchAsync();
+    }
+
+    /// <summary>
+    /// Opens the table query window
+    /// </summary>
+    [RelayCommand]
+    private void OpenQueryWindow()
+    {
+        if (SelectedResult?.BoundItem is not TableEntry table)
+            return;
+
+        var window = new LoadTableWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
     }
 }

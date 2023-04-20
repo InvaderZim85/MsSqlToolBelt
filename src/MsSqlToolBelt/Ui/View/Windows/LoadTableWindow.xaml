@@ -1,0 +1,90 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.Ui.View.Windows.LoadTableWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Windows"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
+    Title="Load table content"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    Loaded="LoadTableWindow_OnLoaded"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <windows:LoadTableWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label
+            Grid.Row="0"
+            Content="{Binding TableName}"
+            Style="{StaticResource Headline}" />
+
+        <Separator Grid.Row="1" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Label Content="Limit:" />
+            <ComboBox
+                Width="200"
+                ItemsSource="{Binding LimitValues}"
+                SelectedItem="{Binding SelectedLimit}" />
+            <Button Command="{Binding ExecuteQueryCommand}" Content="Execute query" />
+            <Label Content="{Binding LoadInfo}" />
+        </StackPanel>
+
+        <avalonedit:TextEditor
+            Name="CodeEditor"
+            Grid.Row="3"
+            Margin="3"
+            BorderBrush="Black"
+            BorderThickness="1"
+            FontFamily="Hack,Consolas"
+            FontSize="12"
+            IsReadOnly="True"
+            ShowLineNumbers="True" />
+
+        <Separator Grid.Row="4" />
+
+        <Button
+            Grid.Row="5"
+            Width="75"
+            HorizontalAlignment="Left"
+            Command="{Binding CopyContentCommand}"
+            Content="Copy" />
+
+        <Separator Grid.Row="6" />
+
+        <DataGrid
+            Grid.Row="7"
+            AutoGenerateColumns="True"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            ItemsSource="{Binding View}" />
+
+        <Separator Grid.Row="8" />
+
+        <!--  Copy button here...  -->
+    </Grid>
+</mah:MetroWindow>

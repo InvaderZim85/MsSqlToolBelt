@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ZimLabs.CoreLib;
 
@@ -167,13 +168,14 @@ internal class DefinitionExportManager : IDisposable
     /// </summary>
     /// <param name="tables">The list with the export entries</param>
     /// <param name="exportDir">The export directory</param>
+    /// <param name="ct">The cancellation token</param>
     /// <returns>The awaitable task</returns>
-    public async Task ExportTablesAsync(List<DefinitionExportObject> tables, string exportDir)
+    public async Task ExportTablesAsync(List<DefinitionExportObject> tables, string exportDir, CancellationToken ct)
     {
         _repo.Progress += Progress;
 
         // Load the definitions
-        var definitions = await _repo.LoadTableDefinitionAsync(tables.Where(w => w.Export).ToList());
+        var definitions = await _repo.LoadTableDefinitionAsync(tables.Where(w => w.Export).ToList(), ct);
 
         // export the definitions
         var count = 1;
@@ -184,7 +186,7 @@ internal class DefinitionExportManager : IDisposable
 
             var path = Path.Combine(exportDir, $"{definition.Name}.sql");
 
-            await File.WriteAllTextAsync(path, definition.Definition);
+            await File.WriteAllTextAsync(path, definition.Definition, ct);
         }
 
         _repo.Progress -= Progress;

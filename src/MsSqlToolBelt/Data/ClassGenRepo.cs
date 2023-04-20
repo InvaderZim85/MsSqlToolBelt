@@ -37,7 +37,7 @@ internal sealed class ClassGenRepo : BaseRepo
         if (!query.ContainsIgnoreCase("WHERE"))
             query += " WHERE 0 = 1"; // Add this to force an "empty" result
 
-        await using var reader = await _connector.Connection.ExecuteReaderAsync(query);
+        await using var reader = await Connector.Connection.ExecuteReaderAsync(query);
         var schemaTable = await reader.GetSchemaTableAsync();
 
         if (schemaTable == null || schemaTable.Rows.Count == 0)
