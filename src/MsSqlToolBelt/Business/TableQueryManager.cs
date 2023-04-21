@@ -26,23 +26,28 @@ internal class TableQueryManager : IDisposable
     private readonly TableQueryRepo _repo;
 
     /// <summary>
+    /// Gets the result table
+    /// </summary>
+    public DataTable ResultTable { get; private set; } = new();
+
+    /// <summary>
     /// Gets the list with the limit values
     /// </summary>
-    public List<IdTextEntry> LimitList => new List<IdTextEntry>
+    public List<IdTextEntry> LimitList => new()
     {
-        new(0, "Don't limit"),
-        new(10, "Limit to 10 rows"),
-        new(50, "Limit to 50 rows"),
-        new(100, "Limit to 100 rows"),
-        new(200, "Limit to 200 rows"),
-        new(300, "Limit to 300 rows"),
-        new(400, "Limit to 400 rows"),
-        new(500, "Limit to 500 rows"),
-        new(1000, "Limit to 1.000 rows"),
-        new(2000, "Limit to 2.000 rows"),
-        new(5000, "Limit to 5.000 rows"),
-        new(10000, "Limit to 10.000 rows"),
-        new(50000, "Limit to 50.000 rows")
+        new IdTextEntry(0, "Don't limit"),
+        new IdTextEntry(10, "Limit to 10 rows"),
+        new IdTextEntry(50, "Limit to 50 rows"),
+        new IdTextEntry(100, "Limit to 100 rows"),
+        new IdTextEntry(200, "Limit to 200 rows"),
+        new IdTextEntry(300, "Limit to 300 rows"),
+        new IdTextEntry(400, "Limit to 400 rows"),
+        new IdTextEntry(500, "Limit to 500 rows"),
+        new IdTextEntry(1000, "Limit to 1.000 rows"),
+        new IdTextEntry(2000, "Limit to 2.000 rows"),
+        new IdTextEntry(5000, "Limit to 5.000 rows"),
+        new IdTextEntry(10000, "Limit to 10.000 rows"),
+        new IdTextEntry(50000, "Limit to 50.000 rows")
     };
 
     /// <summary>
@@ -60,8 +65,9 @@ internal class TableQueryManager : IDisposable
     /// </summary>
     /// <param name="table">The table</param>
     /// <param name="limit">The limit value</param>
+    /// <param name="addRowNumber"><see langword="true" /> to add a row number, otherwise <see langword="false"/></param>
     /// <returns>The query</returns>
-    public string CreateQuery(TableEntry table, IdTextEntry limit)
+    public string CreateQuery(TableEntry table, IdTextEntry limit, bool addRowNumber = false)
     {
         var spacer = new string(' ', 4);
         // Generate the query
@@ -69,6 +75,12 @@ internal class TableQueryManager : IDisposable
 
         // Add the select with the limit aka TOP
         query.AppendLine(limit.Id == 0 ? "SELECT" : $"SELECT TOP ({limit.Id})");
+
+        if (addRowNumber)
+        {
+            var pkColumn = table.Columns.FirstOrDefault(f => f.IsPrimaryKey) ?? table.Columns.FirstOrDefault();
+            query.Append($"{spacer}ROW_NUMBER() OVER(ORDER BY [{pkColumn!.Name}]) AS Row,");
+        }
 
         // Add the columns
         var count = 1;
@@ -88,21 +100,23 @@ internal class TableQueryManager : IDisposable
     }
 
     /// <summary>
-    /// Loads the table data
+    /// Loads the table data and stores the result into <see cref="ResultTable"/>
     /// </summary>
     /// <param name="table">The desired table</param>
     /// <param name="limit">The limit</param>
-    /// <returns>The data table</returns>
-    public async Task<(DataTable Table, TimeSpan Duration, int Rows)> LoadTableDataAsync(TableEntry table, IdTextEntry limit)
+    /// <returns>Some additional information</returns>
+    public async Task<(TimeSpan Duration, int Rows)> LoadTableDataAsync(TableEntry table, IdTextEntry limit)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var result = await _repo.LoadTableDataAsync(CreateQuery(table, limit), table.Name);
+        var result = await _repo.LoadTableDataAsync(CreateQuery(table, limit, true), table.Name);
 
         stopwatch.Stop();
 
-        return (result, stopwatch.Elapsed, result.Rows.Count);
+        ResultTable = result;
+
+        return (stopwatch.Elapsed, result.Rows.Count);
     }
 
     /// <summary>

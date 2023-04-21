@@ -10,7 +10,7 @@
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Load table content"
     Width="800"
-    Height="450"
+    Height="600"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
@@ -31,9 +31,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -65,25 +63,21 @@
             IsReadOnly="True"
             ShowLineNumbers="True" />
 
-        <Separator Grid.Row="4" />
-
         <Button
-            Grid.Row="5"
+            Grid.Row="4"
             Width="75"
             HorizontalAlignment="Left"
             Command="{Binding CopyContentCommand}"
             Content="Copy" />
 
-        <Separator Grid.Row="6" />
+        <Separator Grid.Row="5" />
 
         <DataGrid
-            Grid.Row="7"
+            Grid.Row="6"
             AutoGenerateColumns="True"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
             ItemsSource="{Binding View}" />
-
-        <Separator Grid.Row="8" />
 
         <!--  Copy button here...  -->
     </Grid>

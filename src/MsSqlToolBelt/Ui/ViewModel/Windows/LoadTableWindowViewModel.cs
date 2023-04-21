@@ -125,7 +125,7 @@ internal partial class LoadTableWindowViewModel : ViewModelBase
 
             LoadInfo = $"{result.Rows:N0} row(s) in {result.Duration}";
 
-            View = result.Table.DefaultView;
+            View = _manager.ResultTable.DefaultView;
         }
         catch (Exception ex)
         {
