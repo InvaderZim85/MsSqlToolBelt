@@ -17,6 +17,7 @@ public class ClassGenTypeEntry : ObservableObject
     /// <summary>
     /// Gets or sets the id (hash code of the value, auto generated, only for internal purpose)
     /// </summary>
+    [Appearance(Ignore = true)]
     [JsonIgnore]
     public int Id
     {
@@ -76,6 +77,7 @@ public class ClassGenTypeEntry : ObservableObject
     /// <summary>
     /// Gets or sets the is nullable value
     /// </summary>
+    [Appearance(Name = "Nullable")]
     public bool IsNullable
     {
         get => _isNullable;

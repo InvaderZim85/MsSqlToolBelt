@@ -33,7 +33,7 @@ internal class TableQueryManager : IDisposable
     /// <summary>
     /// Gets the list with the limit values
     /// </summary>
-    public List<IdTextEntry> LimitList => new()
+    public static List<IdTextEntry> LimitList => new()
     {
         new IdTextEntry(0, "Don't limit"),
         new IdTextEntry(10, "Limit to 10 rows"),
@@ -67,7 +67,7 @@ internal class TableQueryManager : IDisposable
     /// <param name="limit">The limit value</param>
     /// <param name="addRowNumber"><see langword="true" /> to add a row number, otherwise <see langword="false"/></param>
     /// <returns>The query</returns>
-    public string CreateQuery(TableEntry table, IdTextEntry limit, bool addRowNumber = false)
+    public static string CreateQuery(TableEntry table, IdTextEntry limit, bool addRowNumber = false)
     {
         var spacer = new string(' ', 4);
         // Generate the query
@@ -104,13 +104,14 @@ internal class TableQueryManager : IDisposable
     /// </summary>
     /// <param name="table">The desired table</param>
     /// <param name="limit">The limit</param>
+    /// <param name="addRowNumber"><see langword="true" /> to add a row number, otherwise <see langword="false"/></param>
     /// <returns>Some additional information</returns>
-    public async Task<(TimeSpan Duration, int Rows)> LoadTableDataAsync(TableEntry table, IdTextEntry limit)
+    public async Task<(TimeSpan Duration, int Rows)> LoadTableDataAsync(TableEntry table, IdTextEntry limit, bool addRowNumber)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var result = await _repo.LoadTableDataAsync(CreateQuery(table, limit, true), table.Name);
+        var result = await _repo.LoadTableDataAsync(CreateQuery(table, limit, addRowNumber), table.Name);
 
         stopwatch.Stop();
 

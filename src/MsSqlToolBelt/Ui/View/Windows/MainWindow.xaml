@@ -91,11 +91,25 @@
 
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Program">
-                <MenuItem Click="MainMenuClose_Click" Header="Close" />
+                <MenuItem Command="{Binding ShowTemplateManagerCommand}" Header="Template editor">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconPixelartIcons Kind="ArticleMultiple" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Click="MainMenuClose_Click" Header="Close">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconPixelartIcons Kind="Close" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
-            <MenuItem Header="Class generator">
-                <MenuItem Command="{Binding ShowTemplateManagerCommand}" Header="Template editor" />
-                <MenuItem Command="{Binding ShowDataTypeCommand}" Header="Data types" />
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <MenuItem Header="Help">
+                <MenuItem Command="{Binding ShowDataTypeCommand}" Header="Data types">
+                    <MenuItem.Icon>
+                        <iconPacks:PackIconPixelartIcons Kind="Checklist" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

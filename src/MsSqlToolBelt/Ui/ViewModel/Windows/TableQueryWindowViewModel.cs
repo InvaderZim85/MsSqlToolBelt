@@ -88,6 +88,12 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool _contentLoaded;
 
+    /// <summary>
+    /// Gets or sets the value which whether a row number should be added or not
+    /// </summary>
+    [ObservableProperty]
+    private bool _addRowNumber = true;
+
     #endregion
 
     /// <summary>
@@ -105,13 +111,13 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
 
         _selectedTable = selectedTable;
 
-        TableName = $"{selectedTable.Schema}.{selectedTable.Name}";
+        TableName = $"Table: {selectedTable.Schema}.{selectedTable.Name}";
 
         // Set the limit values
-        LimitValues = _manager.LimitList.ToObservableCollection();
+        LimitValues = TableQueryManager.LimitList.ToObservableCollection();
         SelectedLimit = LimitValues.FirstOrDefault(f => f.Id == 1000);
 
-        _sql = _manager.CreateQuery(selectedTable, SelectedLimit ?? new IdTextEntry(1000, string.Empty));
+        _sql = TableQueryManager.CreateQuery(selectedTable, SelectedLimit ?? new IdTextEntry(1000, string.Empty));
         _setSqlText?.Invoke(_sql);
     }
 
@@ -143,7 +149,7 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
         try
         {
             var result =
-                await _manager.LoadTableDataAsync(_selectedTable, SelectedLimit ?? new IdTextEntry(1000, string.Empty));
+                await _manager.LoadTableDataAsync(_selectedTable, SelectedLimit ?? new IdTextEntry(1000, string.Empty), AddRowNumber);
 
             LoadInfo = $"{result.Rows:N0} row(s) in {result.Duration}";
 
@@ -192,7 +198,7 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
         if (_manager == null || _selectedTable == null)
             return;
 
-        _sql = _manager.CreateQuery(_selectedTable, value ?? new IdTextEntry(1000, string.Empty));
+        _sql = TableQueryManager.CreateQuery(_selectedTable, value ?? new IdTextEntry(1000, string.Empty));
         _setSqlText?.Invoke(_sql);
     }
 }

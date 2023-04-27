@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
@@ -63,5 +65,16 @@ public partial class TableQueryWindow : MetroWindow
 
         if (DataContext is TableQueryWindowViewModel viewModel)
             viewModel.InitViewModel(_dataSource, _database, _selectedTable, SetSqlText);
+    }
+
+    /// <summary>
+    /// Occurs when the columns of the grid are generating
+    /// </summary>
+    /// <param name="sender">The data grid</param>
+    /// <param name="e">The event arguments</param>
+    private void DataGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        if (e.PropertyType == typeof(DateTime) && e.Column is DataGridTextColumn textColumn)
+            textColumn.Binding.StringFormat = "yyyy-MM-dd HH:mm:ss";
     }
 }

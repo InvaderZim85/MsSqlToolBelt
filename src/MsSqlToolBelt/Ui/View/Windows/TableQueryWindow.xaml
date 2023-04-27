@@ -26,67 +26,94 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label
-            Grid.Row="0"
-            Content="{Binding TableName}"
-            Style="{StaticResource Headline}" />
+        <Border Grid.Row="0" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-        <Separator Grid.Row="1" />
+                <TextBlock
+                    Grid.Row="0"
+                    Style="{StaticResource HeadlineBlock}"
+                    Text="{Binding TableName}" />
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Label Content="Limit:" />
-            <ComboBox
-                Width="200"
-                ItemsSource="{Binding LimitValues}"
-                SelectedItem="{Binding SelectedLimit}" />
-            <Button Command="{Binding ExecuteQueryCommand}" Content="Execute query" />
-            <Label Content="{Binding LoadInfo}" />
-        </StackPanel>
+                <Separator Grid.Row="1" />
 
-        <avalonedit:TextEditor
-            Name="CodeEditor"
-            Grid.Row="3"
-            Margin="3"
-            BorderBrush="Black"
-            BorderThickness="1"
-            FontFamily="Hack,Consolas"
-            FontSize="12"
-            IsReadOnly="True"
-            ShowLineNumbers="True" />
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <Label Content="Limit:" />
+                    <ComboBox
+                        Width="200"
+                        ItemsSource="{Binding LimitValues}"
+                        SelectedItem="{Binding SelectedLimit}" />
+                    <CheckBox Content="Add row number" IsChecked="{Binding AddRowNumber}" />
+                    <Button Command="{Binding ExecuteQueryCommand}" Content="Execute query" />
+                    <Label Content="{Binding LoadInfo}" />
+                </StackPanel>
 
-        <Button
-            Grid.Row="4"
-            Width="75"
-            HorizontalAlignment="Left"
-            Command="{Binding CopyContentCommand}"
-            Content="Copy" />
+                <avalonedit:TextEditor
+                    Name="CodeEditor"
+                    Grid.Row="3"
+                    Margin="3"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    FontFamily="Hack,Consolas"
+                    FontSize="12"
+                    IsReadOnly="True"
+                    ShowLineNumbers="True" />
 
-        <Separator Grid.Row="5" />
+                <Button
+                    Grid.Row="4"
+                    Width="75"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CopyContentCommand}"
+                    Content="Copy" />
+            </Grid>
+        </Border>
 
-        <DataGrid
-            Grid.Row="6"
-            AutoGenerateColumns="True"
-            CanUserAddRows="False"
-            CanUserDeleteRows="False"
-            IsEnabled="{Binding ContentLoaded}"
-            ItemsSource="{Binding View}" />
+        <GridSplitter Grid.Row="1" Style="{StaticResource HorizontalSplitter}" />
 
-        <Button
-            Grid.Row="7"
-            Width="75"
-            HorizontalAlignment="Left"
-            Command="{Binding ExportContentCommand}"
-            Content="Export"
-            IsEnabled="{Binding ContentLoaded}" />
+        <Border Grid.Row="2" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="Content"
+                    Style="{StaticResource Headline}" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid
+                    Grid.Row="2"
+                    AutoGenerateColumns="True"
+                    AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    IsEnabled="{Binding ContentLoaded}"
+                    ItemsSource="{Binding View}" />
+
+                <Button
+                    Grid.Row="3"
+                    Width="75"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ExportContentCommand}"
+                    Content="Export"
+                    IsEnabled="{Binding ContentLoaded}" />
+            </Grid>
+        </Border>
     </Grid>
 </mah:MetroWindow>
