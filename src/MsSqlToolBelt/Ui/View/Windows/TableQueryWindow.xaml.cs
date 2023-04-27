@@ -8,9 +8,9 @@ using MsSqlToolBelt.Ui.ViewModel.Windows;
 namespace MsSqlToolBelt.Ui.View.Windows;
 
 /// <summary>
-/// Interaction logic for LoadTableWindow.xaml
+/// Interaction logic for TableQueryWindow.xaml
 /// </summary>
-public partial class LoadTableWindow : MetroWindow
+public partial class TableQueryWindow : MetroWindow
 {
     /// <summary>
     /// Contains the selected table
@@ -28,12 +28,12 @@ public partial class LoadTableWindow : MetroWindow
     private readonly string _database;
 
     /// <summary>
-    /// Creates a new instance of the <see cref="LoadTableWindow"/>
+    /// Creates a new instance of the <see cref="TableQueryWindow"/>
     /// </summary>
     /// <param name="dataSource">The name / path of the MS SQL database</param>
     /// <param name="database">The name of the database</param>
     /// <param name="selectedTable">The selected table</param>
-    public LoadTableWindow(string dataSource, string database, TableEntry selectedTable)
+    public TableQueryWindow(string dataSource, string database, TableEntry selectedTable)
     {
         InitializeComponent();
 
@@ -55,13 +55,13 @@ public partial class LoadTableWindow : MetroWindow
     /// <summary>
     /// Occurs when the window was loaded
     /// </summary>
-    /// <param name="sender">The <see cref="LoadTableWindow"/></param>
+    /// <param name="sender">The <see cref="TableQueryWindow"/></param>
     /// <param name="e">The event arguments</param>
-    private void LoadTableWindow_OnLoaded(object sender, RoutedEventArgs e)
+    private void TableQueryWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         CodeEditor.InitAvalonEditor(CodeType.Sql);
 
-        if (DataContext is LoadTableWindowViewModel viewModel)
+        if (DataContext is TableQueryWindowViewModel viewModel)
             viewModel.InitViewModel(_dataSource, _database, _selectedTable, SetSqlText);
     }
 }

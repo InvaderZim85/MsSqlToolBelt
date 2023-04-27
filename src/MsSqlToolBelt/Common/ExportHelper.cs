@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,7 +79,18 @@ internal static class ExportHelper
     /// <returns>The content</returns>
     public static string CreateListContent<T>(IEnumerable<T> list, ExportType type) where T : class
     {
-        return list.CreateTable(ConvertToOutputType(type));
+        return type == ExportType.Json ? CreateJsonContent(list) : list.CreateTable(ConvertToOutputType(type));
+    }
+
+    /// <summary>
+    /// Creates the export / copy content of the list
+    /// </summary>
+    /// <param name="table">The data table</param>
+    /// <param name="type">The desired export type</param>
+    /// <returns>The content</returns>
+    public static string CreateDataTableContent(DataTable table, ExportType type)
+    {
+        return type == ExportType.Json ? CreateJsonContent(table) : table.CreateTable(ConvertToOutputType(type));
     }
 
     /// <summary>
@@ -107,7 +119,7 @@ internal static class ExportHelper
     /// <param name="list">The list which should be exported</param>
     /// <param name="filepath">The path of the file</param>
     /// <param name="type">The desired export type</param>
-    /// <returns></returns>
+    /// <returns>The awaitable task</returns>
     public static async Task ExportListAsync<T>(IEnumerable<T> list, string filepath, ExportType type) where T : class
     {
         if (type == ExportType.Json)
@@ -116,9 +128,35 @@ internal static class ExportHelper
             return;
         }
 
-        var content = CreateListContent(list, type);
+        await list.SaveTableAsync(filepath, Encoding.UTF8, ConvertToOutputType(type));
+    }
 
-        await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
+    /// <summary>
+    /// Exports a data table
+    /// </summary>
+    /// <param name="table">The data table which should be exported</param>
+    /// <param name="filepath">The path of the file</param>
+    /// <param name="type">The desired export type</param>
+    /// <returns>The awaitable task</returns>
+    public static async Task ExportDataTableAsync(DataTable table, string filepath, ExportType type)
+    {
+        if (type == ExportType.Json)
+        {
+            await ExportAsJsonAsync(table, filepath);
+            return;
+        }
+
+        await table.SaveTableAsync(filepath, Encoding.UTF8, ConvertToOutputType(type));
+    }
+
+    /// <summary>
+    /// Converts the object into a JSON formatted string
+    /// </summary>
+    /// <param name="value">The value which should be exported</param>
+    /// <returns>The content as JSON formatted string</returns>
+    private static string CreateJsonContent(object value)
+    {
+        return JsonConvert.SerializeObject(value, Formatting.Indented);
     }
 
     /// <summary>
@@ -129,7 +167,7 @@ internal static class ExportHelper
     /// <returns>The awaitable task</returns>
     private static async Task ExportAsJsonAsync(object value, string filepath)
     {
-        var content = JsonConvert.SerializeObject(value, Formatting.Indented);
+        var content = CreateJsonContent(value);
 
         await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
     }

@@ -567,7 +567,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (SelectedResult?.BoundItem is not TableEntry table)
             return;
 
-        var window = new LoadTableWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
+        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
         window.ShowDialog();
     }
 }

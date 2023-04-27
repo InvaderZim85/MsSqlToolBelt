@@ -6,6 +6,7 @@ using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -246,6 +247,52 @@ internal class ViewModelBase : ObservableObject
             else
             {
                 var content = ExportHelper.CreateListContent(data, dialog.ExportType);
+                CopyToClipboard(content);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex);
+        }
+        finally
+        {
+            if (controller != null)
+            {
+                await controller.CloseAsync();
+                Helper.SetTaskbarIndeterminate(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Exports the desired data table
+    /// </summary>
+    /// <param name="table">The table with the data</param>
+    /// <param name="defaultName">The default name of the file</param>
+    /// <returns>The awaitable task</returns>
+    protected async Task ExportDataTableAsync(DataTable table, string defaultName)
+    {
+        ProgressDialogController? controller = null;
+        try
+        {
+            var dialog = new ExportWindow(defaultName, ExportDataType.List) { Owner = Application.Current.MainWindow };
+            if (dialog.ShowDialog() != true)
+                return;
+
+            if (dialog.Export)
+            {
+                Helper.SetTaskbarIndeterminate(true);
+
+                controller =
+                    await _dialogCoordinator.ShowProgressAsync(this, "Please wait",
+                        "Please wait while export the data...");
+                controller.SetIndeterminate();
+
+                await ExportHelper.ExportDataTableAsync(table, dialog.FileName, dialog.ExportType);
+            }
+            else
+            {
+                var content = ExportHelper.CreateDataTableContent(table, dialog.ExportType);
                 CopyToClipboard(content);
             }
         }

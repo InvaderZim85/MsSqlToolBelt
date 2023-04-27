@@ -2,20 +2,24 @@
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.Ui.Common;
+using MsSqlToolBelt.Ui.View.Windows;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using MsSqlToolBelt.Ui.Common;
+using MahApps.Metro.Controls.Dialogs;
+using MsSqlToolBelt.Common.Enums;
+using ZimLabs.CoreLib;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
-/// Provides the functions for <see cref="View.Windows.LoadTableWindow"/>
+/// Provides the functions for <see cref="TableQueryWindow"/>
 /// </summary>
-internal partial class LoadTableWindowViewModel : ViewModelBase
+internal partial class TableQueryWindowViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the tables
@@ -79,6 +83,13 @@ internal partial class LoadTableWindowViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private string _tableName = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the content was loaded
+    /// </summary>
+    [ObservableProperty]
+    private bool _contentLoaded;
+
     #endregion
 
     /// <summary>
@@ -116,8 +127,21 @@ internal partial class LoadTableWindowViewModel : ViewModelBase
         if (_manager == null || _selectedTable == null)
             return;
 
-        var controller = await ShowProgressAsync("Executing", "Please wait while executing the query...");
+        var limit = SelectedLimit ?? new IdTextEntry(1000, string.Empty);
 
+        var message =
+            Core.CombineString(
+                "You want to load the data of the table without limit. Are you really sure? If you continue without limit, " +
+                "the loading may take some time (depending on the number of records).",
+                "", "Continue anyway?");
+
+        if (limit.Id == 0 && await ShowQuestionAsync("Limit", message) != MessageDialogResult.Affirmative)
+        {
+            return;
+        }
+
+        var controller = await ShowProgressAsync("Executing", "Please wait while executing the query...");
+        ContentLoaded = false;
         try
         {
             var result =
@@ -126,6 +150,8 @@ internal partial class LoadTableWindowViewModel : ViewModelBase
             LoadInfo = $"{result.Rows:N0} row(s) in {result.Duration}";
 
             View = _manager.ResultTable.DefaultView;
+
+            ContentLoaded = true;
         }
         catch (Exception ex)
         {
@@ -135,6 +161,19 @@ internal partial class LoadTableWindowViewModel : ViewModelBase
         {
             await controller.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Exports the content of the table
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExportContentAsync()
+    {
+        if (!ContentLoaded || _manager == null)
+            return;
+
+        await ExportDataTableAsync(_manager.ResultTable, $"{TableName}_Content");
     }
 
     /// <summary>
