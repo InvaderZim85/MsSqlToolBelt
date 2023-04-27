@@ -108,7 +108,7 @@ internal class JobStepEntry
     public int LastRunRetries { get; set; }
 
     /// <summary>
-    /// Gets or sets the last run date (format is yymmdd)
+    /// Gets or sets the last run date (format is yyyymmdd)
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]

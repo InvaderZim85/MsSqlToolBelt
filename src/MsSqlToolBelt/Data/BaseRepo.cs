@@ -21,12 +21,12 @@ internal class BaseRepo : IDisposable
     /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
-    protected readonly Connector _connector;
+    protected readonly Connector Connector;
 
     /// <summary>
     /// Gets the sql connection
     /// </summary>
-    public SqlConnection Connection => _connector.Connection;
+    protected SqlConnection Connection => Connector.Connection;
 
     /// <summary>
     /// Creates a new instance of the <see cref="BaseRepo"/>
@@ -34,7 +34,7 @@ internal class BaseRepo : IDisposable
     /// <param name="dataSource">The name / path of the MSSQL server</param>
     public BaseRepo(string dataSource)
     {
-        _connector = new Connector(dataSource);
+        Connector = new Connector(dataSource);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ internal class BaseRepo : IDisposable
     /// <param name="database">The name of the database</param>
     protected BaseRepo(string dataSource, string database)
     {
-        _connector = new Connector(dataSource, database);
+        Connector = new Connector(dataSource, database);
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ internal class BaseRepo : IDisposable
         if (string.IsNullOrWhiteSpace(query))
             return new List<T>();
 
-        var result = await _connector.Connection.QueryAsync<T>(query, parameters);
+        var result = await Connector.Connection.QueryAsync<T>(query, parameters);
 
         return result.ToList();
     }
@@ -82,7 +82,7 @@ internal class BaseRepo : IDisposable
         if (string.IsNullOrWhiteSpace(database))
             return;
 
-        _connector.SwitchDatabase(database);
+        Connector.SwitchDatabase(database);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ internal class BaseRepo : IDisposable
         if (_disposed)
             return;
 
-        _connector.Dispose();
+        Connector.Dispose();
 
         _disposed = true;
     }

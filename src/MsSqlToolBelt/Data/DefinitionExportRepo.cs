@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Management.Smo;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
@@ -70,8 +71,9 @@ internal class DefinitionExportRepo : BaseRepo
     /// Loads the definition of the desired tables
     /// </summary>
     /// <param name="tables">The list with the tables</param>
+    /// <param name="ct">The cancellation token</param>
     /// <returns>The list with the table definitions</returns>
-    public async Task<List<TableDefinition>> LoadTableDefinitionAsync(List<DefinitionExportObject> tables)
+    public async Task<List<TableDefinition>> LoadTableDefinitionAsync(List<DefinitionExportObject> tables, CancellationToken ct)
     {
         var server = new Server(_dataSource);
         var database = server.Databases[_database];
@@ -119,7 +121,7 @@ internal class DefinitionExportRepo : BaseRepo
 
             Progress?.Invoke(this, $"{count++} of {totalCount} > Load '{table.Name}' definition...");
 
-            var script = await Task.Run(() => scripter.Script(new[] { table.Urn }));
+            var script = await Task.Run(() => scripter.Script(new[] { table.Urn }), ct);
             var content = new StringBuilder();
             
             AddNote(content);

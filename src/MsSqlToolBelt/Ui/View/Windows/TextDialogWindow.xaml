@@ -69,7 +69,7 @@
             Grid.Row="4"
             Width="75"
             HorizontalAlignment="Left"
-            Command="{Binding CopyCommand}"
+            Command="{Binding CopyContentCommand}"
             Content="Copy" />
 
         <Label
@@ -85,7 +85,7 @@
             Width="75"
             Margin="3,3,80,3"
             HorizontalAlignment="Right"
-            Command="{Binding ValidateCommand}"
+            Command="{Binding ExecuteValidationCommand}"
             Content="Validate"
             Visibility="{Binding ValidateButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
@@ -93,7 +93,7 @@
             Grid.Row="4"
             Width="75"
             HorizontalAlignment="Right"
-            Command="{Binding CloseCommand}"
+            Command="{Binding CloseWindowCommand}"
             Content="Close" />
     </Grid>
 </mah:MetroWindow>

@@ -10,6 +10,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ZimLabs.CoreLib;
@@ -508,13 +509,14 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
             return;
         }
 
-        var controller = await ShowProgressAsync("Please wait", "Please wait while exporting the definitions...");
+        var cts = new CancellationTokenSource();
+        var controller = await ShowProgressAsync("Please wait", "Please wait while exporting the definitions...", cts);
 
         try
         {
             _setControllerMessage = controller.SetMessage;
 
-            await _manager.ExportTablesAsync(Tables.ToList(), ExportDir);
+            await _manager.ExportTablesAsync(Tables.ToList(), ExportDir, cts.Token);
 
             _setControllerMessage = null;
         }
