@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.Common;
@@ -9,10 +10,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using MahApps.Metro.Controls.Dialogs;
-using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
-using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
