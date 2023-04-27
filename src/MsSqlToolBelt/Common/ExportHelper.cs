@@ -24,7 +24,7 @@ internal static class ExportHelper
     /// <param name="type">The export type</param>
     /// <param name="fallback">The fallback (optional)</param>
     /// <returns>The output type</returns>
-    public static OutputType ConvertToOutputType(ExportType type, OutputType fallback = OutputType.Default)
+    private static OutputType ConvertToOutputType(ExportType type, OutputType fallback = OutputType.Default)
     {
         return type switch
         {
