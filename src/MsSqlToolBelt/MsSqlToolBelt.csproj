@@ -35,7 +35,7 @@
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Sinks.SQLite" Version="5.5.0" />
+    <PackageReference Include="Serilog.Sinks.SQLite" Version="6.0.0" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
     <PackageReference Include="ZimLabs.Database.MsSql" Version="1.2.4" />
     <PackageReference Include="ZimLabs.Mapper" Version="1.1.0" />
