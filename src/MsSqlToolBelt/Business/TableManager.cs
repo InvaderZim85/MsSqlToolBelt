@@ -82,7 +82,7 @@ internal class TableManager : IDisposable
         }).ToList();
 
         // Update the columns
-        foreach (var column in table.Columns)
+        foreach (var column in table.Columns.Where(w => !w.InIndex))
         {
             column.InIndex = indizes.Any(a => a.Column.Equals(column.Name));
         }
@@ -106,7 +106,7 @@ internal class TableManager : IDisposable
         }));
 
         // Update the columns
-        foreach (var column in table.Columns)
+        foreach (var column in table.Columns.Where(w => !w.InIndex))
         {
             column.InIndex = foreignKeys.Any(a => a.ColumnName.Equals(column.Name));
         }
