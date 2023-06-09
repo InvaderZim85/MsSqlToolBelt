@@ -168,4 +168,16 @@ internal partial class TemplateWindowViewModel : ViewModelBase
             await controller.CloseAsync();
         }
     }
+
+    /// <summary>
+    /// Occurs when the user selects another template
+    /// </summary>
+    /// <param name="value">The selected template</param>
+    partial void OnSelectedTemplateChanged(TemplateEntry? value)
+    {
+        if (value == null)
+            return;
+
+        _setCodeEditorText?.Invoke(value.Content);
+    }
 }
