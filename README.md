@@ -16,11 +16,13 @@
 
 <!-- /TOC -->
 
-
 ## General
 The program *MsSqlToolBelt* is a little helper tool which provides a search, a list of all custom table types of a MSSQL database and a C# class generator
 
 ## Usage
+
+❗ **NOTE**: The *Usage* part of the readme is not up to date. I'll try to update it in the next weeks.
+
 When you've started the program enter the name / path of the desired SQL server and hit *Connect*. After that you can selected the desired database. When you've selected the database hit *Select*.
 
 Now you can start your search, discover the available table types or generate a C# class.
