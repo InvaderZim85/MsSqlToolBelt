@@ -20,6 +20,11 @@ internal class SearchManager : IDisposable
     private bool _disposed;
 
     /// <summary>
+    /// Occurs when progress was made
+    /// </summary>
+    public event EventHandler<string>? ProgressEvent; 
+
+    /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
     private readonly SearchRepo _repo;
@@ -45,6 +50,11 @@ internal class SearchManager : IDisposable
     public SearchResult? SelectedResult { get; set; }
 
     /// <summary>
+    /// Gets the value which indicates if there was an error while search jobs
+    /// </summary>
+    public bool HasJobSearchError { get; private set; }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="SearchManager"/>
     /// </summary>
     /// <param name="dataSource">The name / path of the SQL server</param>
@@ -63,12 +73,20 @@ internal class SearchManager : IDisposable
     /// <returns>The awaitable task</returns>
     public async Task SearchAsync(string search, List<FilterEntry> ignoreList)
     {
+        void AddToResultList(List<SearchResult> resultList, List<SearchResult> searchResult)
+        {
+            resultList.AddRange(ignoreList.Any() ? searchResult.Where(w => w.Name.IsValid(ignoreList)) : searchResult);
+        }
+
         if (search.Contains('*'))
             search = search.Replace("*", "%");
+
+        var cleanSearchValue = search.Replace("%", "");
 
         var result = new List<SearchResult>();
         
         // Load the tables
+        ProgressEvent?.Invoke(this, $"Scanning tables for '{cleanSearchValue}'...");
         var tables = await _tableManager.LoadTablesAsync(search);
 
         // Add the tables
@@ -76,11 +94,16 @@ internal class SearchManager : IDisposable
             ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
             : tables.Select(s => (SearchResult) s));
 
-        // Load the other objects (procedures, jobs, etc.)
-        var searchResult = await _repo.SearchAsync(search);
-        result.AddRange(ignoreList.Any()
-            ? searchResult.Where(w => w.Name.IsValid(ignoreList))
-            : searchResult);
+        // Load the other objects (procedures, etc.)
+        ProgressEvent?.Invoke(this, $"Scanning objects (procedures, views, etc.) for '{cleanSearchValue}'...");
+        var objectResult = await _repo.SearchObjectsAsync(search);
+        AddToResultList(result, objectResult);
+
+        // Load the jobs (this maybe will fail if you don't have access to the MSDB database)
+        ProgressEvent?.Invoke(this, $"Scanning jobs for '{cleanSearchValue}'...");
+        var (jobResult, hasError) = await _repo.SearchJobsAsync(search);
+        AddToResultList(result, jobResult);
+        HasJobSearchError = hasError;
 
         SearchResults = result;
 

@@ -240,7 +240,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Generate);
         }
         finally
         {

@@ -1,8 +1,10 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
+﻿using System;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace MsSqlToolBelt.Data;
 
@@ -37,24 +39,39 @@ internal sealed class SearchRepo : BaseRepo
 
     #region Search
     /// <summary>
-    /// Executes the search
+    /// Executes the search and checks the objects
     /// </summary>
     /// <param name="search">The search string</param>
     /// <returns>The list with the results</returns>
-    public async Task<List<SearchResult>> SearchAsync(string search)
+    public async Task<List<SearchResult>> SearchObjectsAsync(string search)
     {
         // NOTE: The tables will be added in the manager...
-        var result = new List<SearchResult>();
-        
-        // Step 1: Objects (procedures, views, etc.)
         var objects = await LoadObjectsAsync(search);
-        result.AddRange(objects.Select(s => (SearchResult) s));
+        return objects.Select(s => (SearchResult)s).ToList();
+    }
 
-        // Step 2: Jobs
-        var jobs = await LoadJobsAsync(search);
-        result.AddRange(jobs.Select(s => (SearchResult) s));
+    /// <summary>
+    /// Executes the search and checks the jobs
+    /// </summary>
+    /// <param name="search">The search string</param>
+    /// <returns>The list with the results</returns>
+    public async Task<(List<SearchResult> searchResult, bool hasError)> SearchJobsAsync(string search)
+    {
+        try
+        {
+            // NOTE: The tables will be added in the manager...
+            var jobs = await LoadJobsAsync(search);
+            return (jobs.Select(s => (SearchResult)s).ToList(), false);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "An error has occurred while the jobs were being search.");
 
-        return result;
+            // Note, we have to switch back to the "normal" database
+            SwitchDatabase(false);
+
+            return (new List<SearchResult>(), true);
+        }
     }
 
     /// <summary>

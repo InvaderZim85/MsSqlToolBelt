@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -180,7 +181,13 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// Gets or sets the value which indicates if the query window button is enabled
     /// </summary>
     [ObservableProperty]
-    private bool _buttonQueryWindowEnabled = false;
+    private bool _buttonQueryWindowEnabled;
+
+    /// <summary>
+    /// The value which indicates if the msdb violation message should be shown or not
+    /// </summary>
+    [ObservableProperty]
+    private bool _hideMsdbViolationMessage;
 
     #endregion
 
@@ -395,6 +402,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
 
+        void ProgressEvent(object? sender, string message)
+        {
+            controller.SetMessage(message);
+        }
+
         try
         {
             // Add the search entry to the history
@@ -405,19 +417,30 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             if (_settingsManager != null)
                 await _settingsManager.LoadFilterAsync();
 
+            // Add the event
+            _manager.ProgressEvent += ProgressEvent;
+
             // Execute the search
             await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
             FilterResult();
+
+            if (_manager.HasJobSearchError && !HideMsdbViolationMessage)
+            {
+                var result = await ShowMessageWithOptionAsync(MessageHelper.SearchMsdbAccessViolation);
+                HideMsdbViolationMessage = result == MessageDialogResult.Negative;
+            }
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
+            // Remove the event
+            _manager.ProgressEvent -= ProgressEvent;
             await controller.CloseAsync();
         }
     }
@@ -477,7 +500,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
