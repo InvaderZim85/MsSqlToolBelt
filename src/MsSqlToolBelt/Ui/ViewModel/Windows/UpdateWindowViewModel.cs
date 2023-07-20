@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using MsSqlToolBelt.Common.Enums;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -133,7 +134,7 @@ internal partial class UpdateWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Complex);
         }
         finally
         {

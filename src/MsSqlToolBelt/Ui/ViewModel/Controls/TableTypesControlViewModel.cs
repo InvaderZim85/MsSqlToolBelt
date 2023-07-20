@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -152,7 +153,7 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
@@ -196,7 +197,7 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {

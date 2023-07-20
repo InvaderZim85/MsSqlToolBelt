@@ -8,6 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using MsSqlToolBelt.Common.Enums;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -90,7 +91,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {
@@ -125,7 +126,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {
@@ -161,7 +162,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {

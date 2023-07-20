@@ -370,7 +370,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
@@ -397,7 +397,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
@@ -488,8 +488,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
 
         if (!ClassGenManager.ClassNameValid(ClassName))
         {
-            await ShowMessageAsync("Class generator",
-                "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+            await ShowMessageAsync(MessageHelper.ClassGenValidName);
             return;
         }
 
@@ -505,7 +504,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Generate);
         }
         finally
         {
@@ -545,8 +544,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
 
         if (!ClassGenManager.ClassNameValid(ClassName))
         {
-            await ShowMessageAsync("Class generator",
-                "Please enter a valid class name.\r\n\r\nHint: Must not start with a number and must not be empty");
+            await ShowMessageAsync(MessageHelper.ClassGenValidName);
             return;
         }
 
@@ -585,7 +583,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Generate);
         }
         finally
         {

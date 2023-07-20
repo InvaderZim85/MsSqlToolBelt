@@ -86,7 +86,7 @@ internal partial class ExportWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
     }
 }

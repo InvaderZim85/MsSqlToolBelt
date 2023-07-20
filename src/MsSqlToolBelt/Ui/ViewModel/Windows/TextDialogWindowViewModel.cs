@@ -4,6 +4,8 @@ using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.DataObjects.Common;
 using System;
 using System.Threading.Tasks;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -132,20 +134,18 @@ internal partial class TextDialogWindowViewModel : ViewModelBase
             if (valid)
             {
                 CodeValid = true;
-                await ShowMessageAsync("Validation", "Inserted SQL query is valid." +
-                                                     "\r\n\r\nNote: Even if the SQL query has been validated successfully, " +
-                                                     "it may not be possible to execute the query if, for example, " +
-                                                     "a column or table does not exist or is misspelled.");
+                await ShowMessageAsync(MessageHelper.ValidationValidNote);
             }
             else
             {
                 CodeValid = false;
-                await ShowMessageAsync("Validation", $"The inserted SQL query is not valid:\r\n{message}");
+                await ShowMessageAsync(new MessageEntry("Validation",
+                    "The inserted SQL query / statement is not valid.", "", $"Message: {message}"));
             }
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Complex);
         }
         finally
         {

@@ -5,6 +5,7 @@ using MsSqlToolBelt.DataObjects.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -75,18 +76,18 @@ internal partial class EditServerWindowViewModel : ViewModelBase
     /// Init the view model
     /// </summary>
     /// <param name="closeWindow">The action to close the window with the desired dialog result</param>
-    public void InitViewModel(Action<bool> closeWindow)
+    public async void InitViewModel(Action<bool> closeWindow)
     {
         _closeWindow = closeWindow;
 
-        Connect();
+        await ConnectAsync();
     }
 
     /// <summary>
     /// Creates a connection to the MSSQL server and loads the available databases
     /// </summary>
     [RelayCommand]
-    private async void Connect()
+    private async Task ConnectAsync()
     {
         if (string.IsNullOrWhiteSpace(SelectedServer.Name))
             return;

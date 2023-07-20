@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -159,7 +160,7 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Complex);
         }
         finally
         {

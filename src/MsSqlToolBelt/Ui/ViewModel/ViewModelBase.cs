@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using MsSqlToolBelt.DataObjects.Common;
 using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel;
@@ -75,6 +76,37 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
+    /// Shows a message dialog
+    /// </summary>
+    /// <param name="entry">The message (header and message)</param>
+    /// <returns>The awaitable task</returns>
+    protected async Task ShowMessageAsync(MessageEntry entry)
+    {
+        await _dialogCoordinator.ShowMessageAsync(this, entry.Header, entry.Message);
+    }
+
+    /// <summary>
+    /// Shows a message dialog where the user can accept or decline an option
+    /// </summary>
+    /// <param name="entry">The message (header and message)</param>
+    /// <returns>The dialog result</returns>
+    protected async Task<MessageDialogResult> ShowMessageWithOptionAsync(MessageEntry entry)
+    {
+        Helper.SetTaskbarPause(true);
+
+        var result = await _dialogCoordinator.ShowMessageAsync(this, entry.Header, entry.Message,
+            MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings
+            {
+                AffirmativeButtonText = "Yes",
+                NegativeButtonText = "No"
+            });
+
+        Helper.SetTaskbarPause(false);
+
+        return result;
+    }
+
+    /// <summary>
     /// Shows a question dialog with two buttons
     /// </summary>
     /// <param name="title">The title of the dialog</param>
@@ -100,17 +132,20 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
-    /// Shows an error message
+    /// Shows an error message and logs the exception
     /// </summary>
     /// <param name="ex">The exception which was thrown</param>
+    /// <param name="messageType">The desired message type</param>
     /// <param name="caller">The name of the method, which calls this method. Value will be filled automatically</param>
     /// <returns>The awaitable task</returns>
-    protected async Task ShowErrorAsync(Exception ex, [CallerMemberName] string caller = "")
+    protected async Task ShowErrorAsync(Exception ex, ErrorMessageType messageType,
+        [CallerMemberName] string caller = "")
     {
         Helper.SetTaskbarError(true);
 
         LogError(ex, caller);
-        await _dialogCoordinator.ShowMessageAsync(this, "Error", $"An error has occurred: {ex.Message}");
+        var message = MessageHelper.GetErrorMessage(messageType, ex.Message);
+        await _dialogCoordinator.ShowMessageAsync(this, message.Header, message.Message);
 
         Helper.SetTaskbarError(false);
     }
@@ -206,7 +241,7 @@ internal class ViewModelBase : ObservableObject
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {
@@ -252,7 +287,7 @@ internal class ViewModelBase : ObservableObject
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {
@@ -298,7 +333,7 @@ internal class ViewModelBase : ObservableObject
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {

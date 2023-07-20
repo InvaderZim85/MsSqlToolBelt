@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using MsSqlToolBelt.Common.Enums;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -43,7 +44,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
     }
 
@@ -68,7 +69,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
     }
 
@@ -102,7 +103,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
     }
 
@@ -131,7 +132,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
     }
 }

@@ -354,7 +354,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
         }
         finally
         {
@@ -471,7 +471,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {
@@ -522,7 +522,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync(ex);
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
         finally
         {

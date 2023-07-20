@@ -168,6 +168,10 @@
                         Command="{Binding OpenQueryWindowCommand}"
                         Content="Open query window"
                         IsEnabled="{Binding ButtonQueryWindowEnabled}" />
+                    <Label
+                        Content="Attention: No access to the MSDB database. Jobs are not included in the search."
+                        Foreground="Red"
+                        Visibility="{Binding HideMsdbViolationMessage, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </StackPanel>
             </Grid>
         </Border>
