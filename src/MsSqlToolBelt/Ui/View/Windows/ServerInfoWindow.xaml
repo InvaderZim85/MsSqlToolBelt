@@ -1,0 +1,120 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.Ui.View.Windows.ServerInfoWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Windows"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
+    Title="Server / Database information"
+    Width="800"
+    Height="450"
+    mah:DialogParticipation.Register="{Binding}"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    ContentRendered="ServerInfoWindow_OnContentRendered"
+    Loaded="ServerInfoWindow_OnLoaded"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <windows:ServerInfoWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="Information"
+                    Style="{StaticResource Headline}" />
+
+                <TextBox
+                    Grid.Row="1"
+                    Style="{StaticResource TextBoxFilter}"
+                    Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <Separator Grid.Row="2" />
+
+                <DataGrid
+                    Grid.Row="3"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding ServerInfo}"
+                    SelectedItem="{Binding SelectedServerInfo}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Group}"
+                            Header="Group" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Key}"
+                            Header="Key" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Value}"
+                            Header="Value" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Separator Grid.Row="4" />
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="1" Style="{StaticResource HorizontalSplitter}" />
+
+        <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Content="Details"
+                    Style="{StaticResource Headline}" />
+
+                <Separator Grid.Row="1" />
+
+                <DataGrid
+                    Grid.Row="2"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding SubInfoList}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Key}"
+                            Header="Key" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Value}"
+                            Header="Value" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</mah:MetroWindow>

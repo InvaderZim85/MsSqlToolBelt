@@ -18,6 +18,31 @@ internal sealed class TableTypeRepo : BaseRepo
     /// <param name="database">The name of the database</param>
     public TableTypeRepo(string dataSource, string database) : base(dataSource, database) { }
 
+    public async Task<List<TableTypeEntry>> LoadTableTypesAsync(string search)
+    {
+        const string query =
+            @"SELECT DISTINCT
+                tt.type_table_object_id AS Id,
+                tt.[name]
+            FROM
+                sys.table_types AS tt
+
+                INNER JOIN sys.columns AS c
+                ON c.object_id = tt.type_table_object_id
+            WHERE
+                tt.is_user_defined = 1
+                AND
+                (
+                    tt.[name] LIKE @search
+                    OR c.[name] LIKE @search
+                );";
+
+        return await QueryAsListAsync<TableTypeEntry>(query, new
+        {
+            search
+        });
+    }
+
     /// <summary>
     /// Loads all available user defined table types
     /// </summary>

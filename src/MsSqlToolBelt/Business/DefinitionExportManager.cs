@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.TableType;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Business;
@@ -190,6 +192,36 @@ internal class DefinitionExportManager : IDisposable
         }
 
         _repo.Progress -= Progress;
+    }
+
+    /// <summary>
+    /// Loads the definition for a single table
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <returns>The awaitable task</returns>
+    public async Task LoadTableDefinitionAsync(TableEntry table)
+    {
+        var definition = await _repo.LoadTableDefinitionAsync(new List<DefinitionExportObject>
+        {
+            (DefinitionExportObject) table
+        }, new CancellationToken());
+
+        table.Definition = definition.FirstOrDefault()?.Definition ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Loads the definition for a single table type
+    /// </summary>
+    /// <param name="tableType">The table type</param>
+    /// <returns>The awaitable task</returns>
+    public async Task LoadTableTypeDefinitionAsync(TableTypeEntry tableType)
+    {
+        var definition = await _repo.LoadTableDefinitionAsync(new List<DefinitionExportObject>
+        {
+            (DefinitionExportObject) tableType
+        }, new CancellationToken());
+
+        tableType.Definition = definition.FirstOrDefault()?.Definition ?? string.Empty;
     }
     #endregion
 

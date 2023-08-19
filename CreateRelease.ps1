@@ -140,8 +140,8 @@ try {
     ChangeProjectFile $projectFile $newVersion
 
     # ===========================
-    # Extract the packages to 
-    # generate the package file    
+    # Extract the packages to
+    # generate the package file
     $packageScript = ".\ExtractPackages.ps1"
 
     # Run the file
@@ -151,11 +151,14 @@ try {
     # ===========================
     # Create the release
     $dotnet = "C:\Program Files\dotnet\dotnet.exe"
-    $output = Resolve-Path -Path "src\MsSqlToolBelt\bin\"
+    $currentLocation = Get-Location
+    $output = Join-Path -Path $currentLocation -ChildPath "src\MsSqlToolBelt\bin\"
 
     # Clear the previous builds
     Write-Host "Clear output directory $output"
-    Remove-Item "$output\*" -Recurse -Confirm:$false
+    if ([System.IO.Directory]::Exists($output)) {
+        Remove-Item "$output\*" -Recurse -Confirm:$false
+    }    
 
     # Create the release
     & $dotnet publish "src/MsSqlToolBelt.sln" -p:PublishProfile=src/MsSqlToolBelt/Properties/PublishProfiles/FolderProfile

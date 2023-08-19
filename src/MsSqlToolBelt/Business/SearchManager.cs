@@ -5,7 +5,9 @@ using MsSqlToolBelt.DataObjects.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using MsSqlToolBelt.DataObjects.TableType;
 
 namespace MsSqlToolBelt.Business;
 
@@ -35,6 +37,16 @@ internal class SearchManager : IDisposable
     private readonly TableManager _tableManager;
 
     /// <summary>
+    /// The instance for the interaction with the table types
+    /// </summary>
+    private readonly TableTypeManager _tableTypeManager;
+
+    /// <summary>
+    /// The instance for the interaction with the definition export
+    /// </summary>
+    private readonly DefinitionExportManager _definitionManager;
+
+    /// <summary>
     /// Gets the list with the result types
     /// </summary>
     public List<string> ResultTypes { get; private set; } = new();
@@ -57,12 +69,15 @@ internal class SearchManager : IDisposable
     /// <summary>
     /// Creates a new instance of the <see cref="SearchManager"/>
     /// </summary>
+    /// <param name="settingsManager">The instance of the settings manager</param>
     /// <param name="dataSource">The name / path of the SQL server</param>
     /// <param name="database">The name of the database</param>
-    public SearchManager(string dataSource, string database)
+    public SearchManager(SettingsManager settingsManager, string dataSource, string database)
     {
         _repo = new SearchRepo(dataSource, database);
         _tableManager = new TableManager(dataSource, database);
+        _tableTypeManager = new TableTypeManager(dataSource, database);
+        _definitionManager = new DefinitionExportManager(settingsManager, dataSource, database);
     }
 
     /// <summary>
@@ -84,7 +99,7 @@ internal class SearchManager : IDisposable
         var cleanSearchValue = search.Replace("%", "");
 
         var result = new List<SearchResult>();
-        
+
         // Load the tables
         ProgressEvent?.Invoke(this, $"Scanning tables for '{cleanSearchValue}'...");
         var tables = await _tableManager.LoadTablesAsync(search);
@@ -93,6 +108,15 @@ internal class SearchManager : IDisposable
         result.AddRange(ignoreList.Any()
             ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
             : tables.Select(s => (SearchResult) s));
+
+        // Load the table types
+        ProgressEvent?.Invoke(this, $"Scanning table types for '{cleanSearchValue}'...");
+        var tableTypes = await _tableTypeManager.LoadTableTypesAsync(search);
+
+        // Add the table types
+        result.AddRange(ignoreList.Any()
+            ? tableTypes.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
+            : tableTypes.Select(s => (SearchResult) s));
 
         // Load the other objects (procedures, etc.)
         ProgressEvent?.Invoke(this, $"Scanning objects (procedures, views, etc.) for '{cleanSearchValue}'...");
@@ -120,6 +144,7 @@ internal class SearchManager : IDisposable
     public async Task EnrichDataAsync()
     {
         await EnrichTableAsync();
+        await EnrichTableTypeAsync();
         await EnrichJobAsync();
     }
 
@@ -133,10 +158,26 @@ internal class SearchManager : IDisposable
             return;
 
         // Check if the columns are already loaded
-        if (table.Columns.Any())
+        if (table.Columns.Count == 0)
+            await _tableManager.EnrichTableAsync(table);
+
+        await _definitionManager.LoadTableDefinitionAsync(table);
+    }
+
+    /// <summary>
+    /// Enriches the selected table type with additional information
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    private async Task EnrichTableTypeAsync()
+    {
+        if (SelectedResult is not {BoundItem: TableTypeEntry tableType})
             return;
 
-        await _tableManager.EnrichTableAsync(table);
+        // Check if the columns are already loaded
+        if (tableType.Columns.Count == 0)
+            await _tableTypeManager.EnrichTableTypeAsync(tableType);
+
+        await _definitionManager.LoadTableTypeDefinitionAsync(tableType);
     }
 
     /// <summary>

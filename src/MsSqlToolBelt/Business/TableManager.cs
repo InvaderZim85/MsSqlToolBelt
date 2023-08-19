@@ -37,7 +37,7 @@ internal class TableManager : IDisposable
     /// Loads all tables
     /// </summary>
     /// <param name="search">The desired search string (optional, if empty, all user defined table will be loaded)</param>
-    /// <returns>The awaitable task</returns>
+    /// <returns>The list with the tables</returns>
     public async Task<List<TableEntry>> LoadTablesAsync(string search = "")
     {
         var result = await _repo.LoadTablesAsync(search);

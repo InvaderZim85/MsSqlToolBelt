@@ -226,105 +226,147 @@
             Grid.Row="2"
             Style="{StaticResource BorderStyle}"
             Visibility="{Binding ShowTableGrid, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <TabControl>
+                <TabItem Header="Columns">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Table columns"
-                    Style="{StaticResource Headline}" />
+                        <Label
+                            Grid.Row="0"
+                            Content="Table columns"
+                            Style="{StaticResource Headline}" />
 
-                <Separator Grid.Row="1" />
+                        <Separator Grid.Row="1" />
 
-                <DataGrid
-                    Name="DataGridTable"
-                    Grid.Row="2"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Columns}">
-                    <DataGrid.CommandBindings>
-                        <CommandBinding Command="Copy" Executed="DataGridTable_OnExecuted" />
-                    </DataGrid.CommandBindings>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding Order}"
-                            Header="Pos." />
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Name}"
-                            Header="Name" />
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding DataType}"
-                            Header="Type" />
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding MaxLengthView, Mode=OneWay}"
-                            Header="Max. length">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right" />
-                                    <Setter Property="Margin" Value="3" />
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding PrecisionView, Mode=OneWay}"
-                            Header="Precision">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right" />
-                                    <Setter Property="Margin" Value="3" />
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsPrimaryKey}"
-                            Header="PK" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding InIndex}"
-                            Header="Index / FK" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsIdentity}"
-                            Header="Identity" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsNullable}"
-                            Header="Null" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsComputed}"
-                            Header="Computed" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsReplicated}"
-                            Header="Replicated" />
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding DefaultValue}"
-                            Header="Default" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                        <DataGrid
+                            Name="DataGridTable"
+                            Grid.Row="2"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding Columns}">
+                            <DataGrid.CommandBindings>
+                                <CommandBinding Command="Copy" Executed="DataGridTable_OnExecuted" />
+                            </DataGrid.CommandBindings>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    Binding="{Binding Order}"
+                                    Header="Pos." />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding Name}"
+                                    Header="Name" />
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    Binding="{Binding DataType}"
+                                    Header="Type" />
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    Binding="{Binding MaxLengthView, Mode=OneWay}"
+                                    Header="Max. length">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="Margin" Value="3" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    Binding="{Binding PrecisionView, Mode=OneWay}"
+                                    Header="Precision">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                            <Setter Property="Margin" Value="3" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding IsPrimaryKey}"
+                                    Header="PK" />
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding InIndex}"
+                                    Header="Index / FK" />
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding IsIdentity}"
+                                    Header="Identity" />
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding IsNullable}"
+                                    Header="Null" />
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding IsComputed}"
+                                    Header="Computed" />
+                                <DataGridCheckBoxColumn
+                                    Width="Auto"
+                                    Binding="{Binding IsReplicated}"
+                                    Header="Replicated" />
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    Binding="{Binding DefaultValue}"
+                                    Header="Default" />
+                            </DataGrid.Columns>
+                        </DataGrid>
 
-                <Separator Grid.Row="3" />
+                        <Separator Grid.Row="3" />
 
-                <Button
-                    Grid.Row="4"
-                    Width="100"
-                    HorizontalAlignment="Right"
-                    Command="{Binding CopyExportTableCommand}"
-                    Content="Copy / Export" />
-            </Grid>
+                        <Button
+                            Grid.Row="4"
+                            Width="100"
+                            HorizontalAlignment="Right"
+                            Command="{Binding CopyExportTableCommand}"
+                            Content="Copy / Export" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Definition">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label
+                            Grid.Row="0"
+                            Content="Table definition"
+                            Style="{StaticResource Headline}" />
+
+                        <Separator Grid.Row="1" />
+
+                        <avalonedit:TextEditor
+                            Name="TableDefinitionEditor"
+                            Grid.Row="2"
+                            Margin="3"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            FontFamily="Hack,Consolas"
+                            FontSize="12"
+                            IsReadOnly="True"
+                            ShowLineNumbers="True" />
+
+                        <Separator Grid.Row="3" />
+
+                        <Button
+                            Grid.Row="4"
+                            Width="100"
+                            HorizontalAlignment="Right"
+                            Command="{Binding CopyTableDefinitionCommand}"
+                            Content="Copy" />
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Border>
 
         <!--  Job grid  -->
