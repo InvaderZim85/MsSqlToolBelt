@@ -28,10 +28,11 @@ public partial class SearchControl : UserControl, IUserControl
     public void InitControl(SettingsManager manager)
     {
         if (DataContext is SearchControlViewModel viewModel)
-            viewModel.InitViewModel(manager, SetSqlText, SetCmdText);
+            viewModel.InitViewModel(manager, SetSqlText, SetCmdText, SetTableDefinitionText);
 
         SqlEditor.InitAvalonEditor(CodeType.Sql);
         CmdEditor.InitAvalonEditor(CodeType.Sql);
+        TableDefinitionEditor.InitAvalonEditor(CodeType.Sql);
     }
 
     /// <inheritdoc />
@@ -66,6 +67,16 @@ public partial class SearchControl : UserControl, IUserControl
     {
         CmdEditor.Text = text;
         CmdEditor.ScrollToHome();
+    }
+
+    /// <summary>
+    /// Sets the table definition
+    /// </summary>
+    /// <param name="text">The text which should be set</param>
+    private void SetTableDefinitionText(string text)
+    {
+        TableDefinitionEditor.Text = text;
+        TableDefinitionEditor.ScrollToHome();
     }
 
     /// <summary>

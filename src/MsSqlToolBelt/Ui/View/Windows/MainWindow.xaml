@@ -165,6 +165,15 @@
                         Command="{Binding ConnectDatabaseCommand}"
                         Content="Select"
                         IsEnabled="{Binding ConnectedToServer}" />
+
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="3"
+                        HorizontalAlignment="Left"
+                        Command="{Binding ShowServerInfoCommand}"
+                        IsEnabled="{Binding ConnectionEstablished}">
+                        <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
+                    </Button>
                 </Grid>
             </Border>
 

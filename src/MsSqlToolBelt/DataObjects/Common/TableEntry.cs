@@ -67,6 +67,13 @@ public class TableEntry : IdNameBase
     public bool ColumnUniqueError { get; set; }
 
     /// <summary>
+    /// Gets or sets the definition of the table
+    /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
+    public string Definition { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets an info message of the table
     /// </summary>
     /// <returns>The information of the table</returns>

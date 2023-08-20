@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
@@ -16,8 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
+using MsSqlToolBelt.DataObjects.TableType;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -47,6 +47,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private Action<string>? _setSqlText;
 
     /// <summary>
+    /// The action to set the table definition
+    /// </summary>
+    private Action<string>? _setTableDefinitionText;
+
+    /// <summary>
     /// The action to set the CMD text
     /// </summary>
     private Action<string>? _setCmdText;
@@ -55,6 +60,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// Contains the sql text
     /// </summary>
     private string _sqlText = string.Empty;
+
+    /// <summary>
+    /// Contains the table definition text
+    /// </summary>
+    private string _tableDefinitionText = string.Empty;
 
     /// <summary>
     /// The name / path of the MS SQL database
@@ -109,14 +119,14 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             if (value == null)
                 return;
 
-            switch (value.Type)
+            switch (value.EntryType)
             {
-                case "Table":
+                case EntryType.Table:
+                case EntryType.TableType:
                     SetVisibility(SearchViewType.Table);
                     EnhanceData();
-                    ButtonQueryWindowEnabled = true;
                     break;
-                case "Job":
+                case EntryType.Job:
                     SetVisibility(SearchViewType.Job);
                     EnhanceData();
                     break;
@@ -289,11 +299,23 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     #endregion
 
     #region Commands
+    /// <summary>
+    /// Copies the sql text
+    /// </summary>
+    [RelayCommand]
+    private void CopySql()
+    {
+        CopyToClipboard(_sqlText);
+    }
 
     /// <summary>
-    /// The command to copy the sql text
+    /// Copies the table definition to the clip board
     /// </summary>
-    public ICommand CopySqlCommand => new RelayCommand(() => CopyToClipboard(_sqlText));
+    [RelayCommand]
+    private void CopyTableDefinition()
+    {
+        CopyToClipboard(_tableDefinitionText);
+    }
     #endregion
 
     /// <summary>
@@ -302,11 +324,13 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// <param name="settingsManager">The instance of the settings manager</param>
     /// <param name="setSqlText">The action to set the text of the sql control</param>
     /// <param name="setCmdText">The action to set the text of the cmd control</param>
-    public async void InitViewModel(SettingsManager settingsManager, Action<string> setSqlText, Action<string> setCmdText)
+    /// <param name="setTableDefinition">The action to set the text of the table definition control</param>
+    public async void InitViewModel(SettingsManager settingsManager, Action<string> setSqlText, Action<string> setCmdText, Action<string> setTableDefinition)
     {
         _settingsManager = settingsManager;
         _setSqlText = setSqlText;
         _setCmdText = setCmdText;
+        _setTableDefinitionText = setTableDefinition;
 
         _searchHistoryManager = new SearchHistoryManager();
 
@@ -335,7 +359,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         _manager?.Dispose();
 
         // Create a new instance
-        _manager = new SearchManager(dataSource, database);
+        _manager = new SearchManager(_settingsManager!, dataSource, database);
 
         _resettingConnection = false;
     }
@@ -359,6 +383,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         // Remove the texts
         _setCmdText?.Invoke(string.Empty);
         _setSqlText?.Invoke(string.Empty);
+        _setTableDefinitionText?.Invoke(string.Empty);
 
         // Only continue when a complete reset is wanted
         if (!completeReset)
@@ -492,6 +517,16 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
                 case TableEntry table:
                     Columns = table.Columns.ToObservableCollection();
                     ButtonShowIndexEnabled = table.Indexes.Any();
+                    ButtonQueryWindowEnabled = true;
+                    _tableDefinitionText = table.Definition;
+                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
+                    break;
+                case TableTypeEntry tableType:
+                    Columns = tableType.Columns.ToObservableCollection();
+                    ButtonShowIndexEnabled = false;
+                    ButtonQueryWindowEnabled = false;
+                    _tableDefinitionText = tableType.Definition;
+                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
                     break;
                 case JobEntry job:
                     JobSteps = job.JobSteps.ToObservableCollection();

@@ -40,6 +40,17 @@ internal class TableTypeManager : IDisposable
     }
 
     /// <summary>
+    /// Loads all 
+    /// </summary>
+    /// <param name="search">The desired search string (optional, if empty, all user defined table will be loaded)</param>
+    /// <returns>The list with the table types</returns>
+    public async Task<List<TableTypeEntry>> LoadTableTypesAsync(string search)
+    {
+        var result = await _repo.LoadTableTypesAsync(search);
+        return result.OrderBy(o => o.Name).ToList();
+    }
+
+    /// <summary>
     /// Loads all available user defined table types and stores them into <see cref="TableTypes"/>
     /// </summary>
     /// <returns>The awaitable task</returns>

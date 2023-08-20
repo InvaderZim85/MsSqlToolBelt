@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
@@ -37,6 +39,11 @@ internal class DefinitionExportObject : ObservableObject
     public string Type { get; init; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the entry type
+    /// </summary>
+    public EntryType EntryType { get; init; }
+
+    /// <summary>
     /// Gets the original object
     /// </summary>
     [Appearance(Ignore = true)]
@@ -51,6 +58,13 @@ internal class DefinitionExportObject : ObservableObject
     public TableEntry OriginalTable { get; init; } = new();
 
     /// <summary>
+    /// Gets or sets the original table type
+    /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
+    public TableTypeEntry OriginalTableType { get; init; } = new();
+
+    /// <summary>
     /// Converts a <see cref="ObjectEntry"/> into an <see cref="DefinitionExportObject"/>
     /// </summary>
     /// <param name="obj">The object which should be converted</param>
@@ -60,6 +74,7 @@ internal class DefinitionExportObject : ObservableObject
         {
             Name = obj.Name,
             Type = obj.TypeName,
+            EntryType = EntryType.Object,
             OriginalObject = obj
         };
     }
@@ -74,7 +89,23 @@ internal class DefinitionExportObject : ObservableObject
         return new DefinitionExportObject
         {
             Name = entry.Name,
+            EntryType = EntryType.Table,
             OriginalTable = entry
+        };
+    }
+
+    /// <summary>
+    /// Converts a <see cref="TableTypeEntry"/> into an <see cref="DefinitionExportObject"/>
+    /// </summary>
+    /// <param name="entry">The table type which should be converted</param>
+
+    public static explicit operator DefinitionExportObject(TableTypeEntry entry)
+    {
+        return new DefinitionExportObject
+        {
+            Name = entry.Name,
+            EntryType = EntryType.TableType,
+            OriginalTableType = entry
         };
     }
 }

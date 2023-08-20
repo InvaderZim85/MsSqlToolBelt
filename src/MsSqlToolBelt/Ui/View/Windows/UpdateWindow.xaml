@@ -7,7 +7,7 @@
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
-    Title="UpdateWindow"
+    Title="Update"
     Width="800"
     Height="450"
     mah:DialogParticipation.Register="{Binding}"

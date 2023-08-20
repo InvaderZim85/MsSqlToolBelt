@@ -50,7 +50,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// The instance of the base repo
     /// </summary>
-    private BaseRepo? _baseRepo;
+    private BaseManager? _baseManager;
 
     /// <summary>
     /// The instance for the interaction with the settings
@@ -255,6 +255,23 @@ internal partial class MainWindowViewModel : ViewModelBase
         var dialog = new DataTypeWindow {Owner = Application.Current.MainWindow};
         dialog.ShowDialog();
     });
+
+    /// <summary>
+    /// Opens the server info
+    /// </summary>
+    [RelayCommand]
+    private void ShowServerInfo()
+    {
+        if (_baseManager == null)
+            return;
+
+        var serverInfoWindow = new ServerInfoWindow(_baseManager)
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        serverInfoWindow.ShowDialog();
+    }
     #endregion
 
     /// <summary>
@@ -311,7 +328,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     public void CloseViewModel()
     {
         _memoryTimer?.Dispose();
-        _baseRepo?.Dispose();
+        _baseManager?.Dispose();
 
         // Log the max. memory usage
         Log.Information($"Maximal memory usage: {_maxMemUsage.ConvertSize()} ({_maxMemUsage:N0} bytes)");
@@ -356,14 +373,15 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         try
         {
-            _baseRepo = new BaseRepo(SelectedServer.Name);
+            _baseManager = new BaseManager(SelectedServer.Name);
 
             // Load the databases
-            var databases = await _baseRepo.LoadDatabasesAsync();
+            var databases = await _baseManager.LoadDatabasesAsync();
             DatabaseList = new ObservableCollection<string>(databases);
 
             if (_settingsManager == null)
                 return;
+
             // Add the server if it's not in the list
             await _settingsManager.AddServerAsync(SelectedServer);
 
@@ -395,7 +413,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task ConnectDatabaseAsync()
     {
-        if (_baseRepo == null || SelectedServer == null || string.IsNullOrEmpty(SelectedDatabase))
+        if (_baseManager == null || SelectedServer == null || string.IsNullOrEmpty(SelectedDatabase))
             return;
 
         var controller = await ShowProgressAsync("Please wait",
@@ -422,6 +440,8 @@ internal partial class MainWindowViewModel : ViewModelBase
     {
         if (string.IsNullOrEmpty(SelectedDatabase))
             return;
+
+        _baseManager?.SwitchDatabase(SelectedDatabase);
 
         _setConnection?.Invoke(SelectedServer!.Name, SelectedDatabase);
 

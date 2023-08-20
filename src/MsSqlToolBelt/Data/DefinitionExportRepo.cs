@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Management.Smo;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.DataObjects.Table;
 
@@ -30,6 +31,16 @@ internal class DefinitionExportRepo : BaseRepo
     /// The name of the database
     /// </summary>
     private readonly string _database;
+
+    /// <summary>
+    /// The current count (only needed for the progress)
+    /// </summary>
+    private int _count;
+
+    /// <summary>
+    /// The total count (only needed for the progress)
+    /// </summary>
+    private int _totalCount;
 
     /// <summary>
     /// Creates a new instance of the <see cref="DefinitionExportRepo"/>
@@ -70,10 +81,10 @@ internal class DefinitionExportRepo : BaseRepo
     /// <summary>
     /// Loads the definition of the desired tables
     /// </summary>
-    /// <param name="tables">The list with the tables</param>
+    /// <param name="entries">The list with the tables</param>
     /// <param name="ct">The cancellation token</param>
     /// <returns>The list with the table definitions</returns>
-    public async Task<List<TableDefinition>> LoadTableDefinitionAsync(List<DefinitionExportObject> tables, CancellationToken ct)
+    public async Task<List<TableDefinition>> LoadTableDefinitionAsync(List<DefinitionExportObject> entries, CancellationToken ct)
     {
         var server = new Server(_dataSource);
         var database = server.Databases[_database];
@@ -104,26 +115,54 @@ internal class DefinitionExportRepo : BaseRepo
             }
         };
 
-        var count = 1;
-        var totalCount = tables.Count;
+        _count = 1;
+        _totalCount = entries.Count;
 
         var result = new List<TableDefinition>();
 
-        foreach (Table table in database.Tables)
+        var tableEntries = entries.Where(w => w.EntryType == EntryType.Table).ToList();
+        var tableTypeEntries = entries.Where(w => w.EntryType == EntryType.TableType).ToList();
+
+        if (tableEntries.Any())
+        {
+            await LoadTableDefinitionAsync(database.Tables, scripter, result, tableEntries, ct);
+        }
+
+        if (tableTypeEntries.Any())
+        {
+            await LoadTableTypeDefinitionAsync(database.UserDefinedTableTypes, scripter, result, tableTypeEntries, ct);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Loads the table definitions
+    /// </summary>
+    /// <param name="tables">The table collection</param>
+    /// <param name="scripter">The scripter</param>
+    /// <param name="result">The result list</param>
+    /// <param name="entries">The list with the entries which should be exported</param>
+    /// <param name="ct">The cancellation token</param>
+    /// <returns>The awaitable task</returns>
+    private async Task LoadTableDefinitionAsync(TableCollection tables, Scripter scripter, List<TableDefinition> result,
+        List<DefinitionExportObject> entries, CancellationToken ct)
+    {
+        foreach (Table table in tables)
         {
             // We don't want to check system tables
             if (table.IsSystemObject)
                 continue;
 
             // Check if the table should be exported
-            if (!tables.Select(s => s.Name).Contains(table.Name, StringComparer.OrdinalIgnoreCase))
+            if (!entries.Select(s => s.Name).Contains(table.Name, StringComparer.OrdinalIgnoreCase))
                 continue;
 
-            Progress?.Invoke(this, $"{count++} of {totalCount} > Load '{table.Name}' definition...");
+            Progress?.Invoke(this, $"{_count++} of {_totalCount} > Load '{table.Name}' definition...");
 
-            var script = await Task.Run(() => scripter.Script(new[] { table.Urn }), ct);
+            var script = await Task.Run(() => scripter.Script(new[] {table.Urn}), ct);
             var content = new StringBuilder();
-            
+
             AddNote(content);
 
             foreach (var contentLine in script)
@@ -133,8 +172,44 @@ internal class DefinitionExportRepo : BaseRepo
 
             result.Add(new TableDefinition(table.Name, content.ToString()));
         }
+    }
 
-        return result;
+    /// <summary>
+    /// Loads the table definitions
+    /// </summary>
+    /// <param name="tableTypes">The table type collection</param>
+    /// <param name="scripter">The scripter</param>
+    /// <param name="result">The result list</param>
+    /// <param name="entries">The list with the entries which should be exported</param>
+    /// <param name="ct">The cancellation token</param>
+    /// <returns>The awaitable task</returns>
+    private async Task LoadTableTypeDefinitionAsync(UserDefinedTableTypeCollection tableTypes, Scripter scripter,
+        List<TableDefinition> result, List<DefinitionExportObject> entries, CancellationToken ct)
+    {
+        foreach (UserDefinedTableType tableType in tableTypes)
+        {
+            // We don't want to check system tables
+            if (!tableType.IsUserDefined)
+                continue;
+
+            // Check if the table should be exported
+            if (!entries.Select(s => s.Name).Contains(tableType.Name, StringComparer.OrdinalIgnoreCase))
+                continue;
+
+            Progress?.Invoke(this, $"{_count++} of {_totalCount} > Load '{tableType.Name}' definition...");
+
+            var script = await Task.Run(() => scripter.Script(new[] {tableType.Urn}), ct);
+            var content = new StringBuilder();
+
+            AddNote(content);
+
+            foreach (var contentLine in script)
+            {
+                content.AppendLine(contentLine);
+            }
+
+            result.Add(new TableDefinition(tableType.Name, content.ToString()));
+        }
     }
 
     /// <summary>
@@ -145,11 +220,10 @@ internal class DefinitionExportRepo : BaseRepo
     {
         builder
             .AppendLine("/*")
-            .AppendLine(" * NOTE / ATTENTION")
-            .AppendLine(" * ----------------")
-            .AppendLine(
-                " * The following script was generated automatically. Please check the content before you execute the script!")
-            .AppendLine(" */")
+            .AppendLine(" NOTE / ATTENTION")
+            .AppendLine(" ----------------")
+            .AppendLine(" The following script was generated automatically. Please check the content before you execute the script!")
+            .AppendLine("*/")
             .AppendLine();
     }
 }

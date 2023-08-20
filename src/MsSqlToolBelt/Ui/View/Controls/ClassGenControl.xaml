@@ -243,6 +243,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
@@ -265,7 +266,7 @@
                                 SelectedItem="{Binding SelectedModifier}" />
                             <Label Content="Class name:" />
                             <TextBox
-                                Width="200"
+                                Width="300"
                                 mah:TextBoxHelper.Watermark="Class name (only for the C# class)"
                                 Text="{Binding ClassName}" />
                         </StackPanel>
@@ -277,12 +278,12 @@
                         <TextBox
                             Grid.Row="1"
                             Grid.Column="1"
-                            Grid.ColumnSpan="2"
+                            Grid.ColumnSpan="3"
                             mah:TextBoxHelper.Watermark="Namespace (optional)"
                             Text="{Binding Namespace}" />
                         <Label
                             Grid.Row="1"
-                            Grid.Column="3"
+                            Grid.Column="4"
                             Grid.ColumnSpan="3"
                             Content="If a namespace is specified, a corresponding template is used"
                             Style="{StaticResource ItemHint}" />
@@ -307,6 +308,13 @@
                         <CheckBox
                             Grid.Row="2"
                             Grid.Column="3"
+                            Content="Column attribute (EF)"
+                            IsChecked="{Binding OptionColumnAttribute}"
+                            ToolTip="Works only in combination with the 'DB Model (EF)' option" />
+
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="4"
                             Content="Backing field"
                             IsChecked="{Binding OptionBackingField}" />
                         <CheckBox
@@ -337,13 +345,13 @@
 
                         <Button
                             Grid.Row="2"
-                            Grid.Column="4"
+                            Grid.Column="5"
                             Width="130"
                             Command="{Binding GenerateCodeFromQueryCommand}"
                             Content="Generate from Query" />
                         <Button
                             Grid.Row="2"
-                            Grid.Column="5"
+                            Grid.Column="6"
                             Width="130"
                             Command="{Binding GenerateClassCommand}"
                             Content="Generate" />

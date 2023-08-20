@@ -66,6 +66,14 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     private bool _optionDbModel;
 
     /// <summary>
+    /// Gets or sets the value which indicates if the column property should be added
+    /// <para />
+    /// Only for EF Core properties
+    /// </summary>
+    [ObservableProperty]
+    private bool _optionColumnAttribute;
+
+    /// <summary>
     /// The value which indicates if a backing field should be created
     /// </summary>
     private bool _optionBackingField;
@@ -158,6 +166,28 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Occurs when the user changes the db model option
+    /// </summary>
+    /// <param name="value">The new value</param>
+    partial void OnOptionDbModelChanged(bool value)
+    {
+        // If the user uncheck the option, remove the "column attribute" option
+        if (!value)
+            OptionColumnAttribute = false;
+    }
+
+    /// <summary>
+    /// Occurs when the user changes the column attribute option
+    /// </summary>
+    /// <param name="value">The new value</param>
+    partial void OnOptionColumnAttributeChanged(bool value)
+    {
+        // If the user checks the option, set the db model option
+        if (value)
+            OptionDbModel = true;
+    }
+
     #endregion
 
     /// <summary>
@@ -234,7 +264,11 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
         {
             var options = GetOptions();
 
-            _manager.Progress += (_, msg) => controller.SetMessage(msg);
+            _manager.Progress += (_, msg) =>
+            {
+                controller.SetMessage(msg);
+                InfoList += $"{Environment.NewLine}{msg}";
+            };
 
             await _manager.GenerateClassesAsync(options, Tables.ToList(), ctSource.Token);
         }
@@ -262,6 +296,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
             Modifier = SelectedModifier,
             SealedClass = OptionSealedClass,
             DbModel = OptionDbModel,
+            AddColumnAttribute = OptionColumnAttribute,
             WithBackingField = OptionBackingField,
             AddSummary = OptionSummary,
             Nullable = OptionNullable,

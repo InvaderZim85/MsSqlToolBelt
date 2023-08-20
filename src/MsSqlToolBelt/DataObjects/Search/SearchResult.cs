@@ -1,6 +1,8 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
 using Newtonsoft.Json;
 using System;
+using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.TableType;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;
@@ -24,6 +26,11 @@ internal class SearchResult
     /// Gets or sets the type of the entry
     /// </summary>
     public string Type { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the entry type
+    /// </summary>
+    public EntryType EntryType { get; init; }
 
     /// <summary>
     /// Gets or sets the creation date / time
@@ -53,9 +60,27 @@ internal class SearchResult
             Name = table.Name,
             Info = table.GetInfo(),
             Type = "Table",
+            EntryType = EntryType.Table,
             CreationDateTime = table.CreationDateTime,
             ModifiedDateTime = table.ModifiedDateTime,
             BoundItem = table
+        };
+    }
+
+    /// <summary>
+    /// Converts the <see cref="TableTypeEntry"/> into a <see cref="SearchResult"/>
+    /// </summary>
+    /// <param name="tableType">The table</param>
+    public static explicit operator SearchResult(TableTypeEntry tableType)
+    {
+        return new SearchResult
+        {
+            Name = tableType.Name,
+            Type = "TableType",
+            EntryType = EntryType.TableType,
+            CreationDateTime = tableType.CreationDateTime,
+            ModifiedDateTime = tableType.ModifiedDateTime,
+            BoundItem = tableType
         };
     }
 
@@ -69,6 +94,7 @@ internal class SearchResult
         {
             Name = entry.Name,
             Type = entry.TypeName,
+            EntryType = EntryType.Object,
             CreationDateTime = entry.CreationDateTime,
             ModifiedDateTime = entry.ModifiedDateTime,
             BoundItem = entry
@@ -89,6 +115,7 @@ internal class SearchResult
             Name = job.Name,
             Info = $"{enableInfo}, {jobVersion}",
             Type = "Job",
+            EntryType = EntryType.TableType,
             CreationDateTime = job.CreationDateTime,
             ModifiedDateTime = job.ModifiedDateTime,
             BoundItem = job
