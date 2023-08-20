@@ -26,6 +26,13 @@ public class ClassGenOptions
     public bool DbModel { get; set; }
 
     /// <summary>
+    /// Gets or sets the value which indicates if the column attribute should be added
+    /// <para />
+    /// Only for EF properties. This property will be ignores when <see cref="DbModel"/> is <see langword="false"/>
+    /// </summary>
+    public bool AddColumnAttribute { get; set; }
+
+    /// <summary>
     /// Gets or sets the value which indicates if a backing field should be created
     /// </summary>
     public bool WithBackingField { get; set; }

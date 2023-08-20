@@ -139,6 +139,12 @@
                 <CheckBox
                     Grid.Row="7"
                     Grid.Column="3"
+                    Content="Column attribute (EF)"
+                    IsChecked="{Binding OptionColumnAttribute}"
+                    ToolTip="Works only in combination with the 'DB Model (EF)' option" />
+                <CheckBox
+                    Grid.Row="7"
+                    Grid.Column="4"
                     Content="Backing field"
                     IsChecked="{Binding OptionBackingField}" />
                 <CheckBox
@@ -157,15 +163,13 @@
                     Margin="1,0,0,0"
                     Orientation="Horizontal">
                     <CheckBox Content="Use 'SetProperty' method" IsChecked="{Binding OptionSetField}" />
-
-                    <Button BorderThickness="0" Command="{Binding ShowSetFieldInfoCommand}">
+                    <Button
+                        BorderThickness="0"
+                        Command="{Binding ShowSetFieldInfoCommand}"
+                        ToolTip="Show information about the 'SetProperty' option">
                         <iconPacks:Material Kind="Information" />
-                        <Button.ToolTip>
-                            Show information about the "SetProperty" option
-                        </Button.ToolTip>
                     </Button>
                 </StackPanel>
-
             </Grid>
         </Border>
 

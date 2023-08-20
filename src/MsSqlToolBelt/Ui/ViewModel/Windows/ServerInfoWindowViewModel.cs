@@ -105,6 +105,20 @@ internal partial class ServerInfoWindowViewModel : ViewModelBase
                                              w.Value.ContainsIgnoreCase(Filter));
 
         ServerInfo = tmpList.OrderBy(o => o.Order).ThenBy(t => t.Key).ToObservableCollection();
+    }
 
+
+
+    /// <summary>
+    /// Copies / Exports the table information
+    /// </summary>
+    [RelayCommand]
+    private void CopyExportTable()
+    {
+        var tmpList = ServerInfo.Where(w => !w.ChildValues.Any()).ToList();
+        if (!tmpList.Any())
+            return;
+
+        ExportListData(tmpList, "ServerInfo");
     }
 }

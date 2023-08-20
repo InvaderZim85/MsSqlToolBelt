@@ -519,7 +519,7 @@ public sealed class ClassGenManager : IDisposable
         
         // Add the EF attribute for the column
         var columnAttributes = new List<string>();
-        if (!string.IsNullOrEmpty(column.Alias) && !column.Name.EqualsIgnoreCase(column.Alias))
+        if ((!string.IsNullOrEmpty(column.Alias) && !column.Name.EqualsIgnoreCase(column.Alias)) || options.AddColumnAttribute)
         {
             columnAttributes.Add($"[Column(\"{column.Name}\")]");
         }

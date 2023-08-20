@@ -190,7 +190,6 @@ internal class BaseRepo : IDisposable
     /// <param name="groupName">The group name</param>
     private void AddConfigPropertyValue(Configuration configuration, int order, string groupName)
     {
-
         void AddEntry(ServerInfoEntry rootEntry, ConfigProperty rootProperty, string rootGroupName)
         {
             var properties = rootProperty.GetType().GetProperties();
@@ -204,7 +203,7 @@ internal class BaseRepo : IDisposable
                 }
                 catch
                 {
-                    rootEntry.ChildValues.Add(new ServerInfoEntry(order, rootGroupName, property.Name, FailInfo));
+                    // ignored
                 }
             }
         }
@@ -279,7 +278,7 @@ internal class BaseRepo : IDisposable
             }
             catch
             {
-                ServerInfo.Add(new ServerInfoEntry(order, groupName, property.Name, FailInfo));
+                // ignored
             }
         }
     }

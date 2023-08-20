@@ -59,7 +59,7 @@ public sealed class BaseManager : IDisposable
     /// <returns>The awaitable task</returns>
     public async Task LoadServerInformationAsync()
     {
-        await Task.Run(() => _repo.LoadServerInfo());
+        await Task.Run(_repo.LoadServerInfo);
     }
 
     /// <inheritdoc />

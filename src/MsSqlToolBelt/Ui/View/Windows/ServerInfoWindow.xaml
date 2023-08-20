@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
     Title="Server / Database information"
-    Width="800"
-    Height="450"
+    Width="1024"
+    Height="768"
     mah:DialogParticipation.Register="{Binding}"
     BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
     BorderThickness="1"
@@ -48,6 +48,7 @@
 
                 <TextBox
                     Grid.Row="1"
+                    mah:TextBoxHelper.Watermark="Filter..."
                     Style="{StaticResource TextBoxFilter}"
                     Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
@@ -79,6 +80,13 @@
                 </DataGrid>
 
                 <Separator Grid.Row="4" />
+
+                <Button
+                    Grid.Row="5"
+                    Width="100"
+                    HorizontalAlignment="Right"
+                    Command="{Binding CopyExportTableCommand}"
+                    Content="Copy / Export" />
             </Grid>
         </Border>
 

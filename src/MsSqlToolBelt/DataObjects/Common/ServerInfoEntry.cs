@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 
@@ -30,6 +32,8 @@ public class ServerInfoEntry
     /// <summary>
     /// Gets or sets the list with the child values
     /// </summary>
+    [Appearance(Ignore = true)]
+    [JsonIgnore]
     public List<ServerInfoEntry> ChildValues { get; set; } = new();
 
     /// <summary>
