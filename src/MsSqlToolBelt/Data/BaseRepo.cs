@@ -183,6 +183,30 @@ internal class BaseRepo : IDisposable
     }
 
     /// <summary>
+    /// Adds the value of the desired property
+    /// </summary>
+    /// <param name="obj">The object</param>
+    /// <param name="properties">The list with the properties</param>
+    /// <param name="propertyName">The name of the property</param>
+    /// <param name="keyName">The name of the key (this is displayed to the user)</param>
+    /// <param name="order">The desired order</param>
+    /// <param name="groupName">The name of the group</param>
+    private void AddValue(object obj, IEnumerable<PropertyInfo> properties, string propertyName, string keyName, int order, string groupName)
+    {
+        try
+        {
+            var property = properties.FirstOrDefault(f => f.Name == propertyName);
+            ServerInfo.Add(property == null
+                ? new ServerInfoEntry(order, groupName, keyName, "/")
+                : new ServerInfoEntry(order, groupName, keyName, property.GetValue(obj)?.ToString() ?? FailInfo));
+        }
+        catch
+        {
+            ServerInfo.Add(new ServerInfoEntry(order, groupName, keyName, FailInfo));
+        }
+    }
+
+    /// <summary>
     /// Adds the config properties
     /// </summary>
     /// <param name="configuration">The configuration</param>
@@ -225,37 +249,15 @@ internal class BaseRepo : IDisposable
                     continue;
 
                 AddEntry(tmpProperty, configProperty, tmpGroupName);
-
-                ServerInfo.Add(tmpProperty);
+                
+                // Add the property only when there are child values
+                if (tmpProperty.ChildValues.Any())
+                    ServerInfo.Add(tmpProperty);
             }
             catch
             {
-                ServerInfo.Add(new ServerInfoEntry(order, groupName, property.Name, FailInfo));
+                // ignored
             }
-        }
-    }
-
-    /// <summary>
-    /// Adds the value of the desired property
-    /// </summary>
-    /// <param name="obj">The object</param>
-    /// <param name="properties">The list with the properties</param>
-    /// <param name="propertyName">The name of the property</param>
-    /// <param name="keyName">The name of the key (this is displayed to the user)</param>
-    /// <param name="order">The desired order</param>
-    /// <param name="groupName">The name of the group</param>
-    private void AddValue(object obj, IEnumerable<PropertyInfo> properties, string propertyName, string keyName, int order, string groupName)
-    {
-        try
-        {
-            var property = properties.FirstOrDefault(f => f.Name == propertyName);
-            ServerInfo.Add(property == null
-                ? new ServerInfoEntry(order, groupName, keyName, "/")
-                : new ServerInfoEntry(order, groupName, keyName, property.GetValue(obj)?.ToString() ?? FailInfo));
-        }
-        catch
-        {
-            ServerInfo.Add(new ServerInfoEntry(order, groupName, keyName, FailInfo));
         }
     }
 
