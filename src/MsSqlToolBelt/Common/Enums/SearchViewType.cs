@@ -6,6 +6,11 @@
 public enum SearchViewType
 {
     /// <summary>
+    /// Show an info
+    /// </summary>
+    None,
+
+    /// <summary>
     /// Shows the SQL preview
     /// </summary>
     Sql,

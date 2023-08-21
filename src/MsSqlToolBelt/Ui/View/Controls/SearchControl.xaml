@@ -5,6 +5,7 @@
     xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:controls="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -178,6 +179,31 @@
 
         <GridSplitter Grid.Row="1" Style="{StaticResource HorizontalSplitter}" />
 
+        <!--  Main  -->
+        <Border
+            Grid.Row="2"
+            Style="{StaticResource BorderStyle}"
+            Visibility="{Binding ShowMain}">
+            <Grid>
+
+                <iconPacks:PackIconPixelartIcons
+                    Width="100"
+                    Height="100"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="#2a2a2a"
+                    Kind="HumanRun" />
+
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="Select an entry to view the data here..." />
+
+            </Grid>
+
+
+        </Border>
+
         <!--  SQL Text  -->
         <Border
             Grid.Row="2"
@@ -226,7 +252,7 @@
             Grid.Row="2"
             Style="{StaticResource BorderStyle}"
             Visibility="{Binding ShowTableGrid, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <TabControl>
+            <TabControl SelectedIndex="{Binding TableTabIndex}">
                 <TabItem Header="Columns">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -322,6 +348,14 @@
 
                         <Button
                             Grid.Row="4"
+                            Grid.Column="0"
+                            Width="75"
+                            HorizontalAlignment="Left"
+                            Command="{Binding ReloadDataCommand}"
+                            Content="Reload" />
+
+                        <Button
+                            Grid.Row="4"
                             Width="100"
                             HorizontalAlignment="Right"
                             Command="{Binding CopyExportTableCommand}"
@@ -378,6 +412,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -406,9 +441,19 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="3" />
 
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    mah:TextBoxHelper.Watermark="Filter"
+                    Text="{Binding JobFilter, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FilterJobCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+
                 <DataGrid
                     Name="DataGridJob"
-                    Grid.Row="2"
+                    Grid.Row="3"
                     Grid.Column="0"
                     IsReadOnly="True"
                     ItemsSource="{Binding JobSteps}"
@@ -440,12 +485,23 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
+                <Button
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Width="75"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ReloadDataCommand}"
+                    Content="Reload" />
+
                 <GridSplitter
                     Grid.Row="2"
                     Grid.Column="1"
                     Style="{StaticResource VerticalSplitter}" />
 
-                <Grid Grid.Row="2" Grid.Column="2">
+                <Grid
+                    Grid.Row="2"
+                    Grid.RowSpan="2"
+                    Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

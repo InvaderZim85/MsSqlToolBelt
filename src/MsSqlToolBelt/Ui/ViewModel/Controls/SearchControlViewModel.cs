@@ -18,6 +18,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using MsSqlToolBelt.DataObjects.TableType;
+using Serilog.Core;
+using ZimLabs.CoreLib;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -97,47 +100,10 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private ObservableCollection<SearchResult> _searchResults = new();
 
     /// <summary>
-    /// Backing field for <see cref="SelectedResult"/>
-    /// </summary>
-    private SearchResult? _selectedResult;
-
-    /// <summary>
     /// Gets or sets the selected result
     /// </summary>
-    public SearchResult? SelectedResult
-    {
-        get => _selectedResult;
-        set
-        {
-            if (!SetProperty(ref _selectedResult, value) || _manager == null) 
-                return;
-
-            _manager.SelectedResult = value;
-
-            ButtonQueryWindowEnabled = false;
-
-            if (value == null)
-                return;
-
-            switch (value.EntryType)
-            {
-                case EntryType.Table:
-                case EntryType.TableType:
-                    SetVisibility(SearchViewType.Table);
-                    EnhanceData();
-                    break;
-                case EntryType.Job:
-                    SetVisibility(SearchViewType.Job);
-                    EnhanceData();
-                    break;
-                default:
-                    SetVisibility(SearchViewType.Sql);
-                    _sqlText = value.BoundItem is ObjectEntry entry ? entry.Definition : string.Empty;
-                    _setSqlText?.Invoke(_sqlText);
-                    break;
-            }
-        }
-    }
+    [ObservableProperty]
+    private SearchResult? _selectedResult;
 
     /// <summary>
     /// The list with the result types
@@ -208,6 +174,12 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<ColumnEntry> _columns = new();
+
+    /// <summary>
+    /// Gets or sets the tab index of the table tab control
+    /// </summary>
+    [ObservableProperty]
+    private int _tableTabIndex;
     #endregion
 
     #region Job grid
@@ -219,22 +191,16 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private ObservableCollection<JobStepEntry> _jobSteps = new();
 
     /// <summary>
-    /// Backing field for <see cref="SelectedJobStep"/>
+    /// Gets or sets the selected job step
     /// </summary>
+    [ObservableProperty]
     private JobStepEntry? _selectedJobStep = new();
 
     /// <summary>
-    /// Gets or sets the selected job step
+    /// Gets or sets the job filter
     /// </summary>
-    public JobStepEntry? SelectedJobStep
-    {
-        get => _selectedJobStep;
-        set
-        {
-            if (SetProperty(ref _selectedJobStep, value))
-                _setCmdText?.Invoke(value?.Command ?? "");
-        }
-    }
+    [ObservableProperty]
+    private string _jobFilter = string.Empty;
 
     #endregion
 
@@ -252,10 +218,16 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     #region View Properties - Bottom view
 
     /// <summary>
+    /// Gets or sets the value which indicates if the main "border" / panel should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _showMain = true;
+
+    /// <summary>
     /// The value which indicates if the sql editor should be shown
     /// </summary>
     [ObservableProperty]
-    private bool _showSql = true;
+    private bool _showSql;
 
     /// <summary>
     /// The value which indicates if the table grid should be shown
@@ -269,33 +241,82 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     [ObservableProperty]
     private bool _showJobGrid;
 
-    /// <summary>
-    /// Sets the visibility of the specified type
-    /// </summary>
-    /// <param name="type">The type</param>
-    private void SetVisibility(SearchViewType type)
-    {
-        // Grids
-        ShowJobGrid = false;
-        ShowSql = false;
-        ShowTableGrid = false;
-        
-        // Buttons
-        ButtonShowIndexEnabled = false;
+    #endregion
 
-        switch (type)
+    #region Change methods
+
+    /// <summary>
+    /// Occurs when the user selects another entry
+    /// </summary>
+    /// <param name="value">The selected value</param>
+    partial void OnSelectedResultChanged(SearchResult? value)
+    {
+        if (_manager == null)
+            return;
+
+        _manager.SelectedResult = value;
+
+        ButtonQueryWindowEnabled = false;
+
+        if (value == null)
+            return;
+
+        switch (value.EntryType)
         {
-            case SearchViewType.Job:
-                ShowJobGrid = true;
+            case EntryType.Table:
+            case EntryType.TableType:
+                SetVisibility(SearchViewType.Table);
+                EnhanceData(false);
                 break;
-            case SearchViewType.Sql:
-                ShowSql = true;
+            case EntryType.Job:
+                SetVisibility(SearchViewType.Job);
+                EnhanceData(false);
                 break;
-            case SearchViewType.Table:
-                ShowTableGrid = true;
+            case EntryType.Object:
+                SetVisibility(SearchViewType.Sql); // Default
+                _sqlText = value.BoundItem is ObjectEntry entry ? entry.Definition : string.Empty;
+                _setSqlText?.Invoke(_sqlText);
+                break;
+            default:
+                SetVisibility(SearchViewType.None);
                 break;
         }
     }
+
+    /// <summary>
+    /// Occurs when the user selects another tab (table tab control)
+    /// </summary>
+    /// <param name="value">The selected index</param>
+    partial void OnTableTabIndexChanged(int value)
+    {
+        // Index:
+        // - 0: Column preview
+        // - 1: Definition preview
+        if (value == 0)
+            return;
+
+        LoadTableDefinition();
+    }
+
+    /// <summary>
+    /// Occurs when the user selects another job step
+    /// </summary>
+    /// <param name="value">The job step</param>
+    partial void OnSelectedJobStepChanged(JobStepEntry? value)
+    {
+        _setCmdText?.Invoke(value?.Command ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Occurs when the user changes the job filter
+    /// </summary>
+    /// <param name="value">The new value</param>
+    partial void OnJobFilterChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            FilterJob();
+    }
+
     #endregion
 
     #region Commands
@@ -316,6 +337,159 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     {
         CopyToClipboard(_tableDefinitionText);
     }
+
+    /// <summary>
+    /// Opens the table query window
+    /// </summary>
+    [RelayCommand]
+    private void OpenQueryWindow()
+    {
+        if (SelectedResult?.BoundItem is not TableEntry table)
+            return;
+
+        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+    }
+
+    /// <summary>
+    /// Shows the search history
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ShowHistoryAsync()
+    {
+        _searchHistoryManager ??= new SearchHistoryManager();
+        var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
+
+        if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
+            return;
+
+        SearchString = window.SelectedEntry;
+
+        await ExecuteSearchAsync();
+    }
+
+    /// <summary>
+    /// Shows the window with the table indexes
+    /// </summary>
+    [RelayCommand]
+    private void ShowTableIndices()
+    {
+        if (SelectedResult is not {BoundItem: TableEntry table})
+            return;
+
+        var window = new TableIndexWindow(table)
+        {
+            Owner = Application.Current.MainWindow
+        };
+        window.ShowDialog();
+    }
+
+    /// <summary>
+    /// Copies / Exports the job information
+    /// </summary>
+    [RelayCommand]
+    private void CopyExportJob()
+    {
+        if (SelectedJobStep == null)
+            return;
+
+        ExportObjectData(SelectedJobStep, $"{SelectedJobStep.Name}");
+    }
+
+    /// <summary>
+    /// Copies / Exports the table information
+    /// </summary>
+    [RelayCommand]
+    private void CopyExportTable()
+    {
+        if (SelectedResult == null)
+            return;
+
+        ExportListData(Columns, $"{SelectedResult.Name}");
+    }
+
+    /// <summary>
+    /// Executes the search
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task ExecuteSearchAsync()
+    {
+        if (_manager == null)
+            return;
+
+        ResetSearch();
+
+        if (string.IsNullOrEmpty(SearchString))
+            return;
+
+        if (AddWildcardAutomatically && !SearchString.Contains('*') && !SearchString.Contains('%'))
+            SearchString = $"*{SearchString}*";
+
+        var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
+
+        void ProgressEvent(object? sender, string message)
+        {
+            controller.SetMessage(message);
+        }
+
+        try
+        {
+            // Add the search entry to the history
+            if (_searchHistoryManager != null)
+                await SearchHistoryManager.AddSearchEntryAsync(SearchString);
+
+            // Load the ignore list
+            if (_settingsManager != null)
+                await _settingsManager.LoadFilterAsync();
+
+            // Add the event
+            _manager.ProgressEvent += ProgressEvent;
+
+            // Execute the search
+            await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
+            ObjectTypes = _manager.ResultTypes.ToObservableCollection();
+            SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
+
+            FilterResult();
+
+            if (_manager.HasJobSearchError && !HideMsdbViolationMessage)
+            {
+                var result = await ShowMessageWithOptionAsync(MessageHelper.SearchMsdbAccessViolation);
+                HideMsdbViolationMessage = result == MessageDialogResult.Negative;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
+        }
+        finally
+        {
+            // Remove the event
+            _manager.ProgressEvent -= ProgressEvent;
+            await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
+    /// Reloads the data of the selected entry
+    /// </summary>
+    [RelayCommand]
+    private void ReloadData()
+    {
+        EnhanceData(true);
+    }
+
+    /// <summary>
+    /// Filters the job list
+    /// </summary>
+    [RelayCommand]
+    private void FilterJob()
+    {
+        FilterJobSteps();
+    }
+
     #endregion
 
     /// <summary>
@@ -389,6 +563,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (!completeReset)
             return;
 
+        SearchString = string.Empty;
+
         // Remove the columns
         Columns.Clear();
 
@@ -405,69 +581,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         // Reset the object types
         ObjectTypes.Clear();
         SelectedObjectType = string.Empty;
-    }
 
-    /// <summary>
-    /// Executes the search
-    /// </summary>
-    /// <returns>The awaitable task</returns>
-    [RelayCommand]
-    private async Task ExecuteSearchAsync()
-    {
-        if (_manager == null)
-            return;
-
-        ResetSearch();
-
-        if (string.IsNullOrEmpty(SearchString))
-            return;
-
-        if (AddWildcardAutomatically && !SearchString.Contains('*') && !SearchString.Contains('%'))
-            SearchString = $"*{SearchString}*";
-
-        var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
-
-        void ProgressEvent(object? sender, string message)
-        {
-            controller.SetMessage(message);
-        }
-
-        try
-        {
-            // Add the search entry to the history
-            if (_searchHistoryManager != null)
-                await SearchHistoryManager.AddSearchEntryAsync(SearchString);
-
-            // Load the ignore list
-            if (_settingsManager != null)
-                await _settingsManager.LoadFilterAsync();
-
-            // Add the event
-            _manager.ProgressEvent += ProgressEvent;
-
-            // Execute the search
-            await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
-            ObjectTypes = _manager.ResultTypes.ToObservableCollection();
-            SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
-
-            FilterResult();
-
-            if (_manager.HasJobSearchError && !HideMsdbViolationMessage)
-            {
-                var result = await ShowMessageWithOptionAsync(MessageHelper.SearchMsdbAccessViolation);
-                HideMsdbViolationMessage = result == MessageDialogResult.Negative;
-            }
-        }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex, ErrorMessageType.Load);
-        }
-        finally
-        {
-            // Remove the event
-            _manager.ProgressEvent -= ProgressEvent;
-            await controller.CloseAsync();
-        }
+        SetVisibility(SearchViewType.None);
     }
 
     /// <summary>
@@ -494,18 +609,67 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     }
 
     /// <summary>
+    /// Filters the job steps
+    /// </summary>
+    private void FilterJobSteps()
+    {
+        if (_manager?.SelectedResult?.BoundItem is not JobEntry job)
+        {
+            JobSteps = new ObservableCollection<JobStepEntry>();
+            return;
+        }
+
+        JobSteps = (string.IsNullOrWhiteSpace(JobFilter)
+            ? job.JobSteps
+            : job.JobSteps.Where(w => w.Name.ContainsIgnoreCase(JobFilter) ||
+                                      w.Command.ContainsIgnoreCase(JobFilter) ||
+                                      w.FailAction.ContainsIgnoreCase(JobFilter) ||
+                                      w.SuccessAction.ContainsIgnoreCase(JobFilter))).ToObservableCollection();
+    }
+
+    /// <summary>
+    /// Sets the visibility of the specified type
+    /// </summary>
+    /// <param name="type">The type</param>
+    private void SetVisibility(SearchViewType type)
+    {
+        // Grids
+        ShowMain = true;
+        ShowJobGrid = false;
+        ShowSql = false;
+        ShowTableGrid = false;
+
+        // Set the selected index
+        TableTabIndex = 0; // Back to the preview
+        
+        // Buttons
+        ButtonShowIndexEnabled = false;
+
+        switch (type)
+        {
+            case SearchViewType.Job:
+                ShowJobGrid = true;
+                break;
+            case SearchViewType.Sql:
+                ShowSql = true;
+                break;
+            case SearchViewType.Table:
+                ShowTableGrid = true;
+                break;
+            case SearchViewType.None:
+            default:
+                ShowMain = true;
+                break;
+        }
+    }
+
+    /// <summary>
     /// Enhances the selected search result
     /// </summary>
-    private async void EnhanceData()
+    private async void EnhanceData(bool forceReload)
     {
-        if (_manager?.SelectedResult == null)
-            return;
-
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
-
-        try
+        void ShowData()
         {
-            await _manager.EnrichDataAsync();
             ButtonShowIndexEnabled = false;
 
             // Reset the job / table list
@@ -528,10 +692,78 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
                     _tableDefinitionText = tableType.Definition;
                     _setTableDefinitionText?.Invoke(_tableDefinitionText);
                     break;
-                case JobEntry job:
-                    JobSteps = job.JobSteps.ToObservableCollection();
+                case JobEntry:
+                    FilterJobSteps();
                     break;
             }
+        }
+
+        if (_manager?.SelectedResult == null)
+            return;
+
+        if (_manager.EntryHasData() && !forceReload)
+        {
+            ShowData();
+            return;
+        }
+
+        var controller = await ShowProgressAsync("Loading", "Please wait while loading the entry data...");
+
+        try
+        {
+            await _manager.EnrichDataAsync();
+            
+            ShowData();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.Load);
+        }
+        finally
+        {
+            await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
+    /// Loads the definition of the table / table type
+    /// </summary>
+    private async void LoadTableDefinition()
+    {
+        void SetDefinitionText(string text)
+        {
+            _tableDefinitionText = text;
+            _setTableDefinitionText?.Invoke(_tableDefinitionText);
+        }
+
+        if (_manager == null)
+            return;
+
+        var definition = _manager.GetTableDefinition();
+
+        if (!string.IsNullOrWhiteSpace(definition))
+        {
+            SetDefinitionText(definition);
+            return;
+        }
+
+        var controller = await ShowProgressAsync("Please wait",
+            "Please wait while loading the definition. This may take a while...");
+
+        try
+        {
+            await _manager.LoadTableDefinitionAsync();
+
+            // Show the definition
+            definition = SelectedResult switch
+            {
+                { BoundItem: TableEntry table } => table.Definition,
+                { BoundItem: TableTypeEntry tableType } => tableType.Definition,
+                _ => string.Empty
+            };
+
+            SetDefinitionText(definition);
+
         }
         catch (Exception ex)
         {
@@ -556,76 +788,5 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         {
             Log.Warning(ex, "Can't save settings entry.");
         }
-    }
-
-    /// <summary>
-    /// Copies / Exports the table information
-    /// </summary>
-    [RelayCommand]
-    private void CopyExportTable()
-    {
-        if (SelectedResult == null)
-            return;
-
-        ExportListData(Columns, $"{SelectedResult.Name}");
-    }
-
-    /// <summary>
-    /// Copies / Exports the job information
-    /// </summary>
-    [RelayCommand]
-    private void CopyExportJob()
-    {
-        if (SelectedJobStep == null)
-            return;
-
-        ExportObjectData(SelectedJobStep, $"{SelectedJobStep.Name}");
-    }
-
-    /// <summary>
-    /// Shows the window with the table indexes
-    /// </summary>
-    [RelayCommand]
-    private void ShowTableIndices()
-    {
-        if (SelectedResult is not {BoundItem: TableEntry table})
-            return;
-
-        var window = new TableIndexWindow(table)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        window.ShowDialog();
-    }
-
-    /// <summary>
-    /// Shows the search history
-    /// </summary>
-    /// <returns>The awaitable task</returns>
-    [RelayCommand]
-    private async Task ShowHistoryAsync()
-    {
-        _searchHistoryManager ??= new SearchHistoryManager();
-        var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
-
-        if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
-            return;
-
-        SearchString = window.SelectedEntry;
-
-        await ExecuteSearchAsync();
-    }
-
-    /// <summary>
-    /// Opens the table query window
-    /// </summary>
-    [RelayCommand]
-    private void OpenQueryWindow()
-    {
-        if (SelectedResult?.BoundItem is not TableEntry table)
-            return;
-
-        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
-        window.ShowDialog();
     }
 }
