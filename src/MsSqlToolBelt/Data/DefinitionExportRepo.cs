@@ -223,6 +223,7 @@ internal class DefinitionExportRepo : BaseRepo
             .AppendLine(" NOTE / ATTENTION")
             .AppendLine(" ----------------")
             .AppendLine(" The following script was generated automatically. Please check the content before you execute the script!")
+            .AppendLine(" In addition to the actual create script, all dependencies are generated as well.")
             .AppendLine("*/")
             .AppendLine();
     }

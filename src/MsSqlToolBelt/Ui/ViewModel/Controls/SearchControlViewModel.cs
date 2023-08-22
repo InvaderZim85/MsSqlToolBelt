@@ -634,7 +634,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private void SetVisibility(SearchViewType type)
     {
         // Grids
-        ShowMain = true;
+        ShowMain = false;
         ShowJobGrid = false;
         ShowSql = false;
         ShowTableGrid = false;

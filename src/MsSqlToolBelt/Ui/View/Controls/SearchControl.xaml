@@ -183,7 +183,7 @@
         <Border
             Grid.Row="2"
             Style="{StaticResource BorderStyle}"
-            Visibility="{Binding ShowMain}">
+            Visibility="{Binding ShowMain, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
 
                 <iconPacks:PackIconPixelartIcons
@@ -445,6 +445,7 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     mah:TextBoxHelper.Watermark="Filter"
+                    Style="{StaticResource TextBoxFilter}"
                     Text="{Binding JobFilter, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding FilterJobCommand}" />
@@ -484,14 +485,6 @@
                             Header="Last duration" />
                     </DataGrid.Columns>
                 </DataGrid>
-
-                <Button
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    Width="75"
-                    HorizontalAlignment="Left"
-                    Command="{Binding ReloadDataCommand}"
-                    Content="Reload" />
 
                 <GridSplitter
                     Grid.Row="2"
@@ -599,12 +592,20 @@
                 </Grid>
 
                 <Separator
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Grid.Column="0"
                     Grid.ColumnSpan="3" />
 
                 <Button
-                    Grid.Row="4"
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Width="75"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ReloadDataCommand}"
+                    Content="Reload" />
+
+                <Button
+                    Grid.Row="5"
                     Grid.Column="2"
                     Width="100"
                     HorizontalAlignment="Right"
