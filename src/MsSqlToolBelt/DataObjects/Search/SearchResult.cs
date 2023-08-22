@@ -115,7 +115,7 @@ internal class SearchResult
             Name = job.Name,
             Info = $"{enableInfo}, {jobVersion}",
             Type = "Job",
-            EntryType = EntryType.TableType,
+            EntryType = EntryType.Job,
             CreationDateTime = job.CreationDateTime,
             ModifiedDateTime = job.ModifiedDateTime,
             BoundItem = job

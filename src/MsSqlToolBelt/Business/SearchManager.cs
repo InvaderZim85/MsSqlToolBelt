@@ -2,12 +2,11 @@
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.DataObjects.TableType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using MsSqlToolBelt.DataObjects.TableType;
 
 namespace MsSqlToolBelt.Business;
 
@@ -160,8 +159,6 @@ internal class SearchManager : IDisposable
         // Check if the columns are already loaded
         if (table.Columns.Count == 0)
             await _tableManager.EnrichTableAsync(table);
-
-        await _definitionManager.LoadTableDefinitionAsync(table);
     }
 
     /// <summary>
@@ -176,8 +173,23 @@ internal class SearchManager : IDisposable
         // Check if the columns are already loaded
         if (tableType.Columns.Count == 0)
             await _tableTypeManager.EnrichTableTypeAsync(tableType);
+    }
 
-        await _definitionManager.LoadTableTypeDefinitionAsync(tableType);
+    /// <summary>
+    /// Loads the table / table type definition
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    public async Task LoadTableDefinitionAsync()
+    {
+        switch (SelectedResult)
+        {
+            case { BoundItem: TableEntry table } when string.IsNullOrWhiteSpace(table.Definition):
+                await _definitionManager.LoadTableDefinitionAsync(table);
+                break;
+            case { BoundItem: TableTypeEntry tableType } when string.IsNullOrWhiteSpace(tableType.Definition):
+                await _definitionManager.LoadTableTypeDefinitionAsync(tableType);
+                break;
+        }
     }
 
     /// <summary>
@@ -194,6 +206,36 @@ internal class SearchManager : IDisposable
             return;
 
         await _repo.EnrichJobAsync(job);
+    }
+
+    /// <summary>
+    /// Gets the table definition
+    /// </summary>
+    /// <returns>The table definition</returns>
+    public string GetTableDefinition()
+    {
+        return SelectedResult switch
+        {
+            { BoundItem: TableEntry table } => table.Definition,
+            { BoundItem: TableTypeEntry tableType } => tableType.Definition,
+            _ => string.Empty
+        };
+    }
+
+    /// <summary>
+    /// Check if the selected entry contains "data"
+    /// </summary>
+    /// <returns><see langword="true"/> when the entry has data, otherwise <see langword="false"/></returns>
+    public bool EntryHasData()
+    {
+        return SelectedResult switch
+        {
+            { BoundItem: TableEntry table } when table.Columns.Any() => true,
+            { BoundItem: TableTypeEntry tableType } when tableType.Columns.Any() => true,
+            { BoundItem: ObjectEntry objectEntry } when !string.IsNullOrWhiteSpace(objectEntry.Definition) => true,
+            { BoundItem: JobEntry job } when job.JobSteps.Any() => true,
+            _ => false
+        };
     }
 
     /// <summary>
