@@ -1,8 +1,12 @@
-﻿using MsSqlToolBelt.Data;
+﻿using Microsoft.SqlServer.Management.Smo;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.DataObjects.Table;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,12 +15,22 @@ namespace MsSqlToolBelt.Business;
 /// <summary>
 /// Provides the functions for the interaction with the tables
 /// </summary>
-internal class TableManager : IDisposable
+public sealed class TableManager : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
     /// </summary>
     private bool _disposed;
+
+    /// <summary>
+    /// The name / path of the ms sql server
+    /// </summary>
+    private readonly string _dataSource;
+
+    /// <summary>
+    /// The name of the database
+    /// </summary>
+    private readonly string _database;
 
     /// <summary>
     /// The instance for the interaction with the database
@@ -31,6 +45,9 @@ internal class TableManager : IDisposable
     public TableManager(string dataSource, string database)
     {
         _repo = new TableRepo(dataSource, database);
+
+        _dataSource = dataSource;
+        _database = database;
     }
 
     /// <summary>
@@ -110,6 +127,61 @@ internal class TableManager : IDisposable
         {
             column.InIndex = foreignKeys.Any(a => a.ColumnName.Equals(column.Name));
         }
+    }
+
+    /// <summary>
+    /// Loads the table index fragmentation and stores the information at the respective index
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <returns>The awaitable task</returns>
+    public void LoadTableIndexFragmentation(TableEntry table)
+    {
+        var dbTable = LoadTable(table.Name);
+
+        var indexFragmentation = dbTable.EnumFragmentation(FragmentationOption.Fast);
+
+        var fragmentationData = (from DataRow row in indexFragmentation.Rows
+            select new TableIndexFragmentation
+            {
+                Index = row["Index_Name"].ToString() ?? string.Empty,
+                Fragmentation = row["AverageFragmentation"].ToDecimal()
+            }).ToList();
+
+        foreach (var entry in table.Indexes)
+        {
+            var fragmentation =
+                fragmentationData.FirstOrDefault(f => f.Index.Equals(entry.Name, StringComparison.OrdinalIgnoreCase));
+
+            entry.Fragmentation = fragmentation == null
+                ? "/"
+                : $"{fragmentation.Fragmentation:N2} %";
+        }
+    }
+
+    /// <summary>
+    /// Rebuild the indexes of the desired table
+    /// </summary>
+    /// <param name="table">The table</param>
+    /// <param name="fillFactor">The desired fill factor</param>
+    public void RebuildTableIndexes(TableEntry table, int fillFactor)
+    {
+        var dbTable = LoadTable(table.Name);
+
+        dbTable.RebuildIndexes(fillFactor);
+    }
+
+    /// <summary>
+    /// Loads the desired table
+    /// </summary>
+    /// <param name="tableName">The name of the table</param>
+    /// <returns>The table</returns>
+    private Table LoadTable(string tableName)
+    {
+        var server = new Server(_dataSource);
+
+        var database = server.Databases[_database];
+
+        return database.Tables[tableName];
     }
 
     /// <summary>

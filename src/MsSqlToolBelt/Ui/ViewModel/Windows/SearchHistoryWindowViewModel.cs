@@ -2,14 +2,14 @@
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Internal;
-using MsSqlToolBelt.Ui.Common;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using MsSqlToolBelt.Common.Enums;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
