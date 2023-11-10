@@ -21,6 +21,10 @@
         <windows:TableIndexWindowViewModel />
     </Window.DataContext>
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -54,13 +58,41 @@
                     Width="2*"
                     Binding="{Binding Columns}"
                     Header="Columns / Info" />
+                <DataGridTextColumn
+                    Width="120"
+                    Binding="{Binding Fragmentation}"
+                    Header="Fragmentation" />
             </DataGrid.Columns>
         </DataGrid>
 
         <Separator Grid.Row="3" />
 
         <Button
-            Name="ButtonClose"
+            Grid.Row="4"
+            Width="130"
+            HorizontalAlignment="Left"
+            Command="{Binding LoadTableFragmentationCommand}"
+            Content="Load fragmentation"
+            Visibility="{Binding ShowLoadFragmentationButton, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <StackPanel
+            Grid.Row="4"
+            Orientation="Horizontal"
+            Visibility="{Binding ShowRebuildOption, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Label Content="Fill factor:" />
+            <mah:NumericUpDown
+                Width="100"
+                Margin="3"
+                Maximum="100"
+                Minimum="0"
+                Value="{Binding FillFactor}" />
+            <Button Command="{Binding RebuildIndexesCommand}" Content="Rebuild indexes" />
+            <TextBlock Margin="10,3,3,3">
+                <Hyperlink NavigateUri="https://learn.microsoft.com/en-us/sql/relational-databases/indexes/reorganize-and-rebuild-indexes?view=sql-server-ver16" RequestNavigate="Hyperlink_OnRequestNavigate">For more information click here...</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+
+        <Button
             Grid.Row="4"
             Width="60"
             HorizontalAlignment="Right"

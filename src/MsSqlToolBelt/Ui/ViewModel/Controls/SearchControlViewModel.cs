@@ -7,7 +7,7 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
-using MsSqlToolBelt.Ui.Common;
+using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
@@ -17,10 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MsSqlToolBelt.DataObjects.TableType;
-using Serilog.Core;
 using ZimLabs.CoreLib;
-using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -33,6 +30,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The instance for the search
     /// </summary>
     private SearchManager? _manager;
+
+    /// <summary>
+    /// The instance for the interaction with the tables
+    /// </summary>
+    private TableManager? _tableManager;
 
     /// <summary>
     /// The instance for the interaction with the settings
@@ -375,10 +377,10 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     [RelayCommand]
     private void ShowTableIndices()
     {
-        if (SelectedResult is not {BoundItem: TableEntry table})
+        if (_tableManager == null || SelectedResult is not {BoundItem: TableEntry table})
             return;
 
-        var window = new TableIndexWindow(table)
+        var window = new TableIndexWindow(_tableManager, table)
         {
             Owner = Application.Current.MainWindow
         };
@@ -533,7 +535,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         _manager?.Dispose();
 
         // Create a new instance
-        _manager = new SearchManager(_settingsManager!, dataSource, database);
+        _tableManager = new TableManager(dataSource, database);
+        _manager = new SearchManager(_settingsManager!, _tableManager!, dataSource, database);
 
         _resettingConnection = false;
     }

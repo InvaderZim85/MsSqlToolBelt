@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.Ui.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

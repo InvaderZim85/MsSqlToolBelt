@@ -5,7 +5,6 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
@@ -52,17 +51,6 @@ internal static class UiHelper
         using var xmlReader = new XmlTextReader(reader);
 
         return HighlightingLoader.Load(xmlReader, HighlightingManager.Instance);
-    }
-
-    /// <summary>
-    /// Converts the list into a <see cref="ObservableCollection{T}"/>
-    /// </summary>
-    /// <typeparam name="T">The type of the data</typeparam>
-    /// <param name="list">The list</param>
-    /// <returns>The observable collection</returns>
-    public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> list)
-    {
-        return new ObservableCollection<T>(list);
     }
 
     /// <summary>

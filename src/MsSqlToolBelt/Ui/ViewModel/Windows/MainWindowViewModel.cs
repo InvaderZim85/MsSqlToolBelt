@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.Threading;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Updater;
 using MsSqlToolBelt.Ui.Common;
@@ -17,7 +16,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using MahApps.Metro.Controls;
 using ZimLabs.CoreLib;
 using Timer = System.Timers.Timer;
 
@@ -299,8 +297,8 @@ internal partial class MainWindowViewModel : ViewModelBase
         };
         _memoryTimer.Start();
 
-        var (_, buildInfo) = Helper.GetVersionInfo();
-        BuildInfo = $"Build date: {buildInfo}";
+        var (version, buildInfo) = Helper.GetVersionInfo();
+        BuildInfo = $"Version: {version} - Build date: {buildInfo}";
         SetHeaderInfo();
     }
 

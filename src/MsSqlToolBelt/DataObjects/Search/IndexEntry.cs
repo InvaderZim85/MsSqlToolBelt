@@ -14,4 +14,9 @@ public class IndexEntry
     /// Gets or sets the list of the columns
     /// </summary>
     public string Columns { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the table fragmentation
+    /// </summary>
+    public string Fragmentation { get; set; } = "No yet loaded.";
 }

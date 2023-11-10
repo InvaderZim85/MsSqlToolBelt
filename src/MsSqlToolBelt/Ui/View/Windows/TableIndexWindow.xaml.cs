@@ -1,10 +1,13 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
+using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace MsSqlToolBelt.Ui.View.Windows;
 
@@ -14,6 +17,11 @@ namespace MsSqlToolBelt.Ui.View.Windows;
 public partial class TableIndexWindow : MetroWindow
 {
     /// <summary>
+    /// The instance for the interaction with the tables
+    /// </summary>
+    private readonly TableManager _tableManager;
+
+    /// <summary>
     /// The table which should be shown
     /// </summary>
     private readonly TableEntry _table;
@@ -21,9 +29,12 @@ public partial class TableIndexWindow : MetroWindow
     /// <summary>
     /// Creates a new instance of the <see cref="TableIndexWindow"/>
     /// </summary>
-    public TableIndexWindow(TableEntry table)
+    /// <param name="tableManager">The instance for the interaction with the tables</param>
+    /// <param name="table">The selected table</param>
+    public TableIndexWindow(TableManager tableManager, TableEntry table)
     {
         InitializeComponent();
+        _tableManager = tableManager;
         _table = table;
     }
 
@@ -35,13 +46,13 @@ public partial class TableIndexWindow : MetroWindow
     private void TableIndexWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (DataContext is TableIndexWindowViewModel viewModel)
-            viewModel.InitViewModel(_table);
+            viewModel.InitViewModel(_tableManager, _table);
     }
 
     /// <summary>
     /// Occurs when the user hits the close button
     /// </summary>
-    /// <param name="sender">The <see cref="ButtonClose"/></param>
+    /// <param name="sender">The close button</param>
     /// <param name="e">The event arguments</param>
     private void ButtonClose_OnClick(object sender, RoutedEventArgs e)
     {
@@ -56,5 +67,15 @@ public partial class TableIndexWindow : MetroWindow
     private void DataGridIndexes_OnExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         DataGridIndexes.CopyToClipboard<IndexEntry>();
+    }
+
+    /// <summary>
+    /// Occurs when the user clicks the hyperlink of the project file
+    /// </summary>
+    /// <param name="sender">The project link"/></param>
+    /// <param name="e">The event arguments</param>
+    private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        Helper.OpenLink(e.Uri.ToString());
     }
 }

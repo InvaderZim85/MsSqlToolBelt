@@ -69,12 +69,13 @@ internal class SearchManager : IDisposable
     /// Creates a new instance of the <see cref="SearchManager"/>
     /// </summary>
     /// <param name="settingsManager">The instance of the settings manager</param>
+    /// <param name="tableManager">The instance for the interaction with the tables</param>
     /// <param name="dataSource">The name / path of the SQL server</param>
     /// <param name="database">The name of the database</param>
-    public SearchManager(SettingsManager settingsManager, string dataSource, string database)
+    public SearchManager(SettingsManager settingsManager, TableManager tableManager, string dataSource, string database)
     {
         _repo = new SearchRepo(dataSource, database);
-        _tableManager = new TableManager(dataSource, database);
+        _tableManager = tableManager;
         _tableTypeManager = new TableTypeManager(dataSource, database);
         _definitionManager = new DefinitionExportManager(settingsManager, dataSource, database);
     }
