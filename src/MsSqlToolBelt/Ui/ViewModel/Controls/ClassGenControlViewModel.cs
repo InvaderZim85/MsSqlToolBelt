@@ -382,12 +382,15 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Loads the data
     /// </summary>
-    public async void LoadData()
+    /// <param name="showProgress"><see langword="true"/> to show the progress, <see langword="false"/> to hide the progress information (optional)</param>
+    public async void LoadData(bool showProgress = true)
     {
         if (_dataLoaded || _manager == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the tables...");
+        ProgressDialogController? controller = null;
+        if (showProgress)
+            controller = await ShowProgressAsync("Loading", "Please wait while loading the tables...");
 
         try
         {
@@ -405,7 +408,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            if (controller != null)
+                await controller.CloseAsync();
         }
     }
 

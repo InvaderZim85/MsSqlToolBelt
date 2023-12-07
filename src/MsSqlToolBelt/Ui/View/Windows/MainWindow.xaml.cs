@@ -63,7 +63,8 @@ public partial class MainWindow : MetroWindow
     /// </summary>
     /// <param name="dataSource">The name / path of the server</param>
     /// <param name="database">The name of the database</param>
-    private void SetConnection(string dataSource, string database)
+    /// <param name="firstConnection"><see langword="true"/> when the first connection is being established, <see langword="false"/> if it's a reconnect</param>
+    private void SetConnection(string dataSource, string database, bool firstConnection)
     {
         SearchControl.SetConnection(dataSource, database);
         TableTypesControl.SetConnection(dataSource, database);
@@ -72,7 +73,7 @@ public partial class MainWindow : MetroWindow
         DefinitionExportControl.SetConnection(dataSource, database);
 
         // Reload the data
-        LoadData(TabControl.SelectedIndex);
+        LoadData(TabControl.SelectedIndex, firstConnection);
     }
 
     /// <summary>
@@ -91,21 +92,22 @@ public partial class MainWindow : MetroWindow
     /// Loads the data of the selected tab
     /// </summary>
     /// <param name="tabIndex">The tab index</param>
-    private void LoadData(int tabIndex)
+    /// <param name="showProgress"><see langword="true"/> to show the progress dialog of the control, otherwise <see langword="false"/></param>
+    private void LoadData(int tabIndex, bool showProgress)
     {
         switch (tabIndex)
         {
             case 1: // Table types
-                TableTypesControl.LoadData();
+                TableTypesControl.LoadData(showProgress);
                 break;
             case 2: // Class generator
-                ClassGenControl.LoadData();
+                ClassGenControl.LoadData(showProgress);
                 break;
             case 3: // Definition export
-                DefinitionExportControl.LoadData();
+                DefinitionExportControl.LoadData(showProgress);
                 break;
             case 4: // Replication control
-                ReplicationControl.LoadData();
+                ReplicationControl.LoadData(showProgress);
                 break;
         }
     }

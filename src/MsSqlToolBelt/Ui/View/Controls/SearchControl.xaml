@@ -192,7 +192,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Foreground="#2a2a2a"
-                    Kind="HumanRun" />
+                    Kind="InfoBox" />
 
                 <Label
                     HorizontalAlignment="Center"

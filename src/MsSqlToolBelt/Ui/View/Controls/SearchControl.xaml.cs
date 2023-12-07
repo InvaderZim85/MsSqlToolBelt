@@ -49,6 +49,12 @@ public partial class SearchControl : UserControl, IUserControl
             viewModel.CloseConnection();
     }
 
+    /// <inheritdoc />
+    public void LoadData(bool showProgress)
+    {
+        // Ignore
+    }
+
     /// <summary>
     /// Sets the text of the sql editor
     /// </summary>

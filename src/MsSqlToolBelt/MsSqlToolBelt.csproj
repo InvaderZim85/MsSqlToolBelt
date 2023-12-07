@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -6,9 +7,9 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>23.99.0.1040</AssemblyVersion>
-    <FileVersion>23.99.0.1040</FileVersion>
-    <Version>23.99.0.1040</Version>
+    <AssemblyVersion>23.340.0.588</AssemblyVersion>
+    <FileVersion>23.340.0.588</FileVersion>
+    <Version>23.340.0.588</Version>
     <Copyright>(c) 2023 by Andreas Pouwels</Copyright>
   </PropertyGroup>
   <ItemGroup>
@@ -17,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="Dapper" Version="2.1.24" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="4.11.0" />
@@ -30,7 +31,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="170.9.0" />
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.18.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.7.30" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.8.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
