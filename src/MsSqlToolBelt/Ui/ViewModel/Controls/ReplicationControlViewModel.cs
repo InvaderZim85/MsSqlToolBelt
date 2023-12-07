@@ -10,6 +10,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -163,12 +164,16 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Loads the data
     /// </summary>
-    public async void LoadData()
+    /// <param name="showProgress"><see langword="true"/> to show the progress, <see langword="false"/> to hide the progress information (optional)</param>
+    public async void LoadData(bool showProgress = true)
     {
         if (_dataLoaded || _manager == null)
             return;
 
-        var controller = await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
+        ProgressDialogController? controller = null;
+
+        if (showProgress)
+            controller = await ShowProgressAsync("Loading", "Please wait while loading the replication information...");
 
         try
         {
@@ -184,7 +189,8 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
         }
         finally
         {
-            await controller.CloseAsync();
+            if (controller != null)
+                await controller.CloseAsync();
         }
     }
 

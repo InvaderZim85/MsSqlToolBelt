@@ -6,7 +6,6 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Updater;
-using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using System;
@@ -15,7 +14,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using ZimLabs.CoreLib;
 using Timer = System.Timers.Timer;
 
@@ -34,13 +32,20 @@ internal partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>
     /// The action to set the repo
+    /// <para />
+    /// Parameters:
+    /// <list>
+    /// <item>1: Server</item>
+    /// <item>2: Database</item>
+    /// <item>3: Show progress dialog (only true for the first connection, than false)</item>
+    /// </list>
     /// </summary>
-    private Action<string, string>? _setConnection;
+    private Action<string, string, bool>? _setConnection;
 
     /// <summary>
     /// The action to load the data of the selected tab
     /// </summary>
-    private Action<int>? _loadData;
+    private Action<int, bool>? _loadData;
     #endregion
 
     #region Global variables
@@ -69,53 +74,53 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// Contains the release info
     /// </summary>
     private ReleaseInfo _releaseInfo = new();
+
+    /// <summary>
+    /// Contains the value which indicates if it's the first connection
+    /// <para />
+    /// This value is needed to hide the "progress dialog" during a "reconnect"
+    /// </summary>
+    private bool _firstConnection = true;
     #endregion
 
     #region View Properties
     /// <summary>
-    /// Backing field for <see cref="SettingsOpen"/>
+    /// Gets or sets the value which indicates if the settings control is open
     /// </summary>
+    [ObservableProperty]
     private bool _settingsOpen;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the settings fly out is open
+    /// Occurs when the value of <see cref="SettingsOpen"/> was changed
     /// </summary>
-    public bool SettingsOpen
+    /// <param name="value">The new value</param>
+    partial void OnSettingsOpenChanged(bool value)
     {
-        get => _settingsOpen;
-        set
+        switch (value)
         {
-            SetProperty(ref _settingsOpen, value);
-
-            switch (value)
-            {
-                case true:
-                    _initFlyOut?.Invoke(FlyOutType.Settings);
-                    break;
-                case false:
-                    LoadServerList();
-                    break;
-            }
+            case true:
+                _initFlyOut?.Invoke(FlyOutType.Settings);
+                break;
+            case false:
+                LoadServerList();
+                break;
         }
     }
 
     /// <summary>
-    /// Backing field for <see cref="InfoOpen"/>
+    /// Gets or sets the value which indicates if the info control is open
     /// </summary>
+    [ObservableProperty]
     private bool _infoOpen;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the info control is open
+    /// Occurs when the value of <see cref="InfoOpen"/> was changed
     /// </summary>
-    public bool InfoOpen
+    /// <param name="value">The new value</param>
+    partial void OnInfoOpenChanged(bool value)
     {
-        get => _infoOpen;
-        set
-        {
-            SetProperty(ref _infoOpen, value);
-            if (value)
-                _initFlyOut?.Invoke(FlyOutType.Info);
-        }
+        if (value)
+            _initFlyOut?.Invoke(FlyOutType.Info);
     }
 
     /// <summary>
@@ -131,21 +136,18 @@ internal partial class MainWindowViewModel : ViewModelBase
     private ServerEntry? _selectedServer;
 
     /// <summary>
-    /// Backing field for <see cref="DatabaseList"/>
+    /// Gets or sets the list with the databases
     /// </summary>
+    [ObservableProperty]
     private ObservableCollection<string> _databaseList = new();
 
     /// <summary>
-    /// Gets or sets the list with the databases
+    /// Occurs when the value of <see cref="DatabaseList"/> was changed
     /// </summary>
-    public ObservableCollection<string> DatabaseList
+    /// <param name="value">The new value</param>
+    partial void OnDatabaseListChanged(ObservableCollection<string> value)
     {
-        get => _databaseList;
-        private set
-        {
-            SetProperty(ref _databaseList, value);
-            ConnectedToServer = value.Any();
-        }
+        ConnectedToServer = value.Count != 0;
     }
 
     /// <summary>
@@ -167,21 +169,18 @@ internal partial class MainWindowViewModel : ViewModelBase
     private bool _connectionEstablished;
 
     /// <summary>
-    /// Backing field for <see cref="TabIndex"/>
+    /// Gets or sets the current tab index
     /// </summary>
+    [ObservableProperty] 
     private int _tabIndex;
 
     /// <summary>
-    /// Gets or sets the tab index
+    /// Occurs when the tab index was changed
     /// </summary>
-    public int TabIndex
+    /// <param name="value">The new tab index</param>
+    partial void OnTabIndexChanged(int value)
     {
-        get => _tabIndex;
-        set
-        {
-            if (SetProperty(ref _tabIndex, value))
-                _loadData?.Invoke(value);
-        }
+        _loadData?.Invoke(value, true);
     }
 
     /// <summary>
@@ -220,39 +219,50 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// The command to open the settings control
     /// </summary>
-    public ICommand OpenSettingsCommand => new RelayCommand(() => SettingsOpen = !SettingsOpen);
+    [RelayCommand]
+    private void OpenSettings()
+    {
+        SettingsOpen = !SettingsOpen;
+    }
 
     /// <summary>
     /// The command to show the info
     /// </summary>
-    public ICommand InfoCommand => new RelayCommand(() => InfoOpen = !InfoOpen);
+    [RelayCommand]
+    private void Info()
+    {
+        InfoOpen = !InfoOpen;
+    }
 
     /// <summary>
     /// The command to show the update window
     /// </summary>
-    public ICommand ShowUpdateInfoCommand => new RelayCommand(() =>
+    [RelayCommand]
+    private void ShowUpdateInfo()
     {
         var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
         dialog.ShowDialog();
-    });
+    }
 
     /// <summary>
     /// The command which occurs when the user hits the template manager menu item (main menu)
     /// </summary>
-    public ICommand ShowTemplateManagerCommand => new RelayCommand(() =>
+    [RelayCommand]
+    private static void ShowTemplateManager()
     {
-        var dialog = new TemplateWindow {Owner = Application.Current.MainWindow};
+        var dialog = new TemplateWindow { Owner = Application.Current.MainWindow };
         dialog.ShowDialog();
-    });
+    }
 
     /// <summary>
     /// The command which occurs when the user hits the show data type menu item
     /// </summary>
-    public ICommand ShowDataTypeCommand => new RelayCommand(() =>
+    [RelayCommand]
+    private static void ShowDataType()
     {
-        var dialog = new DataTypeWindow {Owner = Application.Current.MainWindow};
+        var dialog = new DataTypeWindow { Owner = Application.Current.MainWindow };
         dialog.ShowDialog();
-    });
+    }
 
     /// <summary>
     /// Opens the server info
@@ -279,7 +289,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// <param name="initFlyOut">The action to initialize the flyout</param>
     /// <param name="setConnection">The action to set the connection</param>
     /// <param name="loadData">The action to load the data of the selected tab</param>
-    public void InitViewModel(SettingsManager settingsManager, Action<FlyOutType> initFlyOut, Action<string, string> setConnection, Action<int> loadData)
+    public void InitViewModel(SettingsManager settingsManager, Action<FlyOutType> initFlyOut, Action<string, string, bool> setConnection, Action<int, bool> loadData)
     {
         _settingsManager = settingsManager;
         _initFlyOut = initFlyOut;
@@ -441,7 +451,10 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         _baseManager?.SwitchDatabase(SelectedDatabase);
 
-        _setConnection?.Invoke(SelectedServer!.Name, SelectedDatabase);
+        _setConnection?.Invoke(SelectedServer!.Name, SelectedDatabase, _firstConnection);
+
+        // Set the value to false, because the "first" connection was made
+        _firstConnection = false;
 
         ConnectionEstablished = true;
 

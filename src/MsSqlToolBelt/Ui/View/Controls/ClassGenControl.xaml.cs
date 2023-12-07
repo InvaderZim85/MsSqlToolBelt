@@ -56,13 +56,11 @@ public partial class ClassGenControl : UserControl, IUserControl
             viewModel.CloseConnection();
     }
 
-    /// <summary>
-    /// Loads the data
-    /// </summary>
-    public void LoadData()
+    /// <inheritdoc />
+    public void LoadData(bool showProgress)
     {
         if (DataContext is ClassGenControlViewModel viewModel)
-            viewModel.LoadData();
+            viewModel.LoadData(showProgress);
     }
 
     /// <summary>

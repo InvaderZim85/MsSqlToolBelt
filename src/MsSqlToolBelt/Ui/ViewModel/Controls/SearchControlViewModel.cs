@@ -547,6 +547,12 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         _manager?.Dispose();
     }
 
+    /// <inheritdoc />
+    public void LoadData(bool showProgress)
+    {
+        // Ignore
+    }
+
     /// <summary>
     /// Resets the last search result
     /// </summary>

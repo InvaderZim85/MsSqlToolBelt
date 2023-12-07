@@ -13,4 +13,10 @@ internal interface IConnection
     /// Closes the connection
     /// </summary>
     void CloseConnection();
+
+    /// <summary>
+    /// Loads the data of the control
+    /// </summary>
+    /// <param name="showProgress"><see langword="true"/> to show the progress dialog of the control, otherwise <see langword="false"/></param>
+    void LoadData(bool showProgress);
 }

@@ -35,13 +35,11 @@ public partial class TableTypesControl : UserControl, IConnection
             viewModel.CloseConnection();
     }
 
-    /// <summary>
-    /// Loads the data
-    /// </summary>
-    public void LoadData()
+    /// <inheritdoc />
+    public void LoadData(bool showProgress)
     {
         if (DataContext is TableTypesControlViewModel viewModel)
-            viewModel.LoadData();
+            viewModel.LoadData(showProgress);
     }
 
     /// <summary>

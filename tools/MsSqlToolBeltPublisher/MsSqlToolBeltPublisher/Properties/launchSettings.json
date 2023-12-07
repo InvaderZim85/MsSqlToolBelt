@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MsSqlToolBeltPublisher": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Repositories\\Appz\\MsSqlToolBelt\\src"
+    }
+  }
+}
