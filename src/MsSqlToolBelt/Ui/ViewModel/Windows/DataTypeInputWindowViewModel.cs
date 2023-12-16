@@ -1,10 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.DataObjects.ClassGen;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -27,7 +24,7 @@ internal partial class DataTypeInputWindowViewModel : ViewModelBase, IDataErrorI
     /// <summary>
     /// The list with all types (needed for the validation)
     /// </summary>
-    private List<ClassGenTypeEntry> _typeList = new();
+    private List<ClassGenTypeEntry> _typeList = [];
 
     /// <summary>
     /// The entry which should be changed

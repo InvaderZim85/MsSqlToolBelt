@@ -1,11 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
-using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Threading.Tasks;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -166,10 +165,11 @@ internal partial class TextDialogWindowViewModel : ViewModelBase
         if (CodeValid)
             _closeWindow?.Invoke();
 
-        var result = await ShowQuestionAsync("Validation",
-            "The code has been changed and needs to be validated again. If you close the window anyway, the generation of the class will be aborted." +
-            "\r\n\r\nClose the window anyway?",
-            "Yes", "No");
+        var message = new StringBuilder()
+            .AppendLine("The code has been changed and needs to be validated again. If you close the window anyway, the generation of the class will be aborted.")
+            .AppendLine()
+            .AppendLine("Close the window anyway?");
+        var result = await ShowQuestionAsync("Validation", message.ToString(), "Yes", "No");
 
         if (result == MessageDialogResult.Affirmative)
             _closeWindow?.Invoke();

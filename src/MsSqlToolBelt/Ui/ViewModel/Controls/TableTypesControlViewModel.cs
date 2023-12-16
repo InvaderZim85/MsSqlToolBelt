@@ -1,16 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.View.Common;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -36,7 +34,7 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
     /// The list with the table types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<TableTypeEntry> _tableTypes = new();
+    private ObservableCollection<TableTypeEntry> _tableTypes = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedTableType"/>
@@ -58,7 +56,7 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
             
             _manager.SelectedTableType = value;
 
-            if (value != null && value.Columns.Any())
+            if (value is { Columns.Count: > 0 })
                 SetColumns();
             else
                 EnrichData();
@@ -69,7 +67,7 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
     /// The list with the columns
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ColumnEntry> _columns = new();
+    private ObservableCollection<ColumnEntry> _columns = [];
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -117,8 +115,8 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
-        TableTypes = new ObservableCollection<TableTypeEntry>();
-        Columns = new ObservableCollection<ColumnEntry>();
+        TableTypes = [];
+        Columns = [];
 
         // Reset the manager
         _manager?.Dispose();

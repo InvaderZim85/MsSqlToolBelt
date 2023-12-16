@@ -2,7 +2,6 @@
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using Newtonsoft.Json;
-using System;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;
@@ -108,7 +107,7 @@ internal class JobStepEntry
     public int LastRunRetries { get; set; }
 
     /// <summary>
-    /// Gets or sets the last run date (format is yyyymmdd)
+    /// Gets or sets the last run date (format is yyyyMMdd)
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]

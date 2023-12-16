@@ -5,9 +5,7 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Templates;
-using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -38,7 +36,7 @@ internal partial class TemplateWindowViewModel : ViewModelBase
     /// The list with the templates
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<TemplateEntry> _templates = new();
+    private ObservableCollection<TemplateEntry> _templates = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedTemplate"/>

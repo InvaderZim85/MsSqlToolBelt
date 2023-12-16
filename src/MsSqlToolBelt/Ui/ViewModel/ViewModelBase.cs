@@ -2,16 +2,12 @@
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using MsSqlToolBelt.DataObjects.Common;
 using Timer = System.Timers.Timer;
 
 namespace MsSqlToolBelt.Ui.ViewModel;

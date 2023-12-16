@@ -8,11 +8,8 @@ using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Updater;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using ZimLabs.CoreLib;
 using Timer = System.Timers.Timer;
@@ -37,7 +34,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// <list>
     /// <item>1: Server</item>
     /// <item>2: Database</item>
-    /// <item>3: Show progress dialog (only true for the first connection, than false)</item>
+    /// <item>3: Show progress dialog (only true for the first connection, then false)</item>
     /// </list>
     /// </summary>
     private Action<string, string, bool>? _setConnection;
@@ -127,7 +124,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// The list with the available server
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ServerEntry> _serverList = new();
+    private ObservableCollection<ServerEntry> _serverList = [];
 
     /// <summary>
     /// The selected server
@@ -139,7 +136,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// Gets or sets the list with the databases
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _databaseList = new();
+    private ObservableCollection<string> _databaseList = [];
 
     /// <summary>
     /// Occurs when the value of <see cref="DatabaseList"/> was changed

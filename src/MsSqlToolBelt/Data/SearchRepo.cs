@@ -1,9 +1,5 @@
-﻿using System;
-using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Serilog;
 
 namespace MsSqlToolBelt.Data;
@@ -11,22 +7,17 @@ namespace MsSqlToolBelt.Data;
 /// <summary>
 /// Provides the functions for the search
 /// </summary>
-internal sealed class SearchRepo : BaseRepo
+/// <remarks>
+/// Creates a new instance of the <see cref="SearchRepo"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal sealed class SearchRepo(string dataSource, string database) : BaseRepo(dataSource, database)
 {
     /// <summary>
     /// Contains the name of the selected database
     /// </summary>
-    private readonly string _selectedDatabase;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="SearchRepo"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public SearchRepo(string dataSource, string database) : base(dataSource, database)
-    {
-        _selectedDatabase = database;
-    }
+    private readonly string _selectedDatabase = database;
 
     /// <summary>
     /// Switches the database 
@@ -47,7 +38,7 @@ internal sealed class SearchRepo : BaseRepo
     {
         // NOTE: The tables will be added in the manager...
         var objects = await LoadObjectsAsync(search);
-        return objects.Select(s => (SearchResult)s).ToList();
+        return [.. objects.Select(s => (SearchResult)s)];
     }
 
     /// <summary>
@@ -61,7 +52,7 @@ internal sealed class SearchRepo : BaseRepo
         {
             // NOTE: The tables will be added in the manager...
             var jobs = await LoadJobsAsync(search);
-            return (jobs.Select(s => (SearchResult)s).ToList(), false);
+            return ([.. jobs.Select(s => (SearchResult)s)], false);
         }
         catch (Exception ex)
         {
@@ -70,7 +61,7 @@ internal sealed class SearchRepo : BaseRepo
             // Note, we have to switch back to the "normal" database
             SwitchDatabase(false);
 
-            return (new List<SearchResult>(), true);
+            return ([], true);
         }
     }
 
@@ -79,30 +70,32 @@ internal sealed class SearchRepo : BaseRepo
     /// </summary>
     /// <param name="search">The search string</param>
     /// <returns>The list with the objects</returns>
-    private async Task<List<ObjectEntry>> LoadObjectsAsync(string search)
+    private Task<List<ObjectEntry>> LoadObjectsAsync(string search)
     {
         const string query =
-            @"SELECT DISTINCT
-                m.object_id AS Id,
-                OBJECT_NAME(m.object_id) AS [Name],
-                m.definition AS [Definition],
-                o.[type],
-                o.create_date AS CreationDateTime,
-                o.modify_date AS ModifiedDateTime
-            FROM
-                sys.sql_modules AS m
+            """
+            SELECT DISTINCT
+                            m.object_id AS Id,
+                            OBJECT_NAME(m.object_id) AS [Name],
+                            m.definition AS [Definition],
+                            o.[type],
+                            o.create_date AS CreationDateTime,
+                            o.modify_date AS ModifiedDateTime
+                        FROM
+                            sys.sql_modules AS m
+            
+                            INNER JOIN sys.objects AS o
+                            ON o.object_id = m.object_id
+                        WHERE
+                            (
+                                m.definition LIKE @search
+                                OR OBJECT_NAME(m.object_id) LIKE @search
+                            )
+                            AND o.[type] <> 'U' -- Ignore the tables
+                            AND o.is_ms_shipped = 0; -- Only user stuff
+            """;
 
-                INNER JOIN sys.objects AS o
-                ON o.object_id = m.object_id
-            WHERE
-                (
-                    m.definition LIKE @search
-                    OR OBJECT_NAME(m.object_id) LIKE @search
-                )
-                AND o.[type] <> 'U' -- Ignore the tables
-                AND o.is_ms_shipped = 0; -- Only user stuff";
-
-        return await QueryAsListAsync<ObjectEntry>(query, new
+        return QueryAsListAsync<ObjectEntry>(query, new
         {
             search
         });
@@ -119,7 +112,8 @@ internal sealed class SearchRepo : BaseRepo
         SwitchDatabase(true);
 
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 j.job_id AS Id,
                 j.[name],
                 j.[description] AS [Description],
@@ -138,7 +132,8 @@ internal sealed class SearchRepo : BaseRepo
                 j.name LIKE @search
                 OR j.[description] LIKE @search
                 OR js.step_name LIKE @search
-                OR js.command LIKE @search;";
+                OR js.command LIKE @search;
+            """;
 
         var result = await QueryAsListAsync<JobEntry>(query, new
         {
@@ -164,7 +159,8 @@ internal sealed class SearchRepo : BaseRepo
         SwitchDatabase(true);
 
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 js.step_id AS Id,
                 js.step_name AS [Name],
                 js.step_id AS Step,
@@ -186,7 +182,8 @@ internal sealed class SearchRepo : BaseRepo
                 INNER JOIN dbo.sysjobsteps AS js
                 ON js.job_id = j.job_id
             WHERE
-                j.job_id = @id;";
+                j.job_id = @id;
+            """;
 
         var result = await QueryAsListAsync<JobStepEntry>(query, job);
 

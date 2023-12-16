@@ -3,17 +3,20 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.TableType;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
 /// <summary>
 /// Provides the search logic
 /// </summary>
-internal class SearchManager : IDisposable
+/// <remarks>
+/// Creates a new instance of the <see cref="SearchManager"/>
+/// </remarks>
+/// <param name="settingsManager">The instance of the settings manager</param>
+/// <param name="tableManager">The instance for the interaction with the tables</param>
+/// <param name="dataSource">The name / path of the SQL server</param>
+/// <param name="database">The name of the database</param>
+internal class SearchManager(SettingsManager settingsManager, TableManager tableManager, string dataSource, string database) : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -28,32 +31,32 @@ internal class SearchManager : IDisposable
     /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
-    private readonly SearchRepo _repo;
+    private readonly SearchRepo _repo = new(dataSource, database);
 
     /// <summary>
     /// The instance for the interaction with the tables
     /// </summary>
-    private readonly TableManager _tableManager;
+    private readonly TableManager _tableManager = tableManager;
 
     /// <summary>
     /// The instance for the interaction with the table types
     /// </summary>
-    private readonly TableTypeManager _tableTypeManager;
+    private readonly TableTypeManager _tableTypeManager = new(dataSource, database);
 
     /// <summary>
     /// The instance for the interaction with the definition export
     /// </summary>
-    private readonly DefinitionExportManager _definitionManager;
+    private readonly DefinitionExportManager _definitionManager = new(settingsManager, dataSource, database);
 
     /// <summary>
     /// Gets the list with the result types
     /// </summary>
-    public List<string> ResultTypes { get; private set; } = new();
+    public List<string> ResultTypes { get; } = [];
 
     /// <summary>
     /// Gets the list with the found entries
     /// </summary>
-    public List<SearchResult> SearchResults { get; private set; } = new();
+    public List<SearchResult> SearchResults { get; private set; } = [];
 
     /// <summary>
     /// Gets or sets the selected result
@@ -66,21 +69,6 @@ internal class SearchManager : IDisposable
     public bool HasJobSearchError { get; private set; }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="SearchManager"/>
-    /// </summary>
-    /// <param name="settingsManager">The instance of the settings manager</param>
-    /// <param name="tableManager">The instance for the interaction with the tables</param>
-    /// <param name="dataSource">The name / path of the SQL server</param>
-    /// <param name="database">The name of the database</param>
-    public SearchManager(SettingsManager settingsManager, TableManager tableManager, string dataSource, string database)
-    {
-        _repo = new SearchRepo(dataSource, database);
-        _tableManager = tableManager;
-        _tableTypeManager = new TableTypeManager(dataSource, database);
-        _definitionManager = new DefinitionExportManager(settingsManager, dataSource, database);
-    }
-
-    /// <summary>
     /// Executes the search and stores the result into <see cref="SearchResults"/>
     /// </summary>
     /// <param name="search">The search term</param>
@@ -90,7 +78,7 @@ internal class SearchManager : IDisposable
     {
         void AddToResultList(List<SearchResult> resultList, List<SearchResult> searchResult)
         {
-            resultList.AddRange(ignoreList.Any() ? searchResult.Where(w => w.Name.IsValid(ignoreList)) : searchResult);
+            resultList.AddRange(ignoreList.Count > 0 ? searchResult.Where(w => w.Name.IsValid(ignoreList)) : searchResult);
         }
 
         if (search.Contains('*'))
@@ -105,7 +93,7 @@ internal class SearchManager : IDisposable
         var tables = await _tableManager.LoadTablesAsync(search);
 
         // Add the tables
-        result.AddRange(ignoreList.Any()
+        result.AddRange(ignoreList.Count > 0
             ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
             : tables.Select(s => (SearchResult) s));
 
@@ -114,7 +102,7 @@ internal class SearchManager : IDisposable
         var tableTypes = await _tableTypeManager.LoadTableTypesAsync(search);
 
         // Add the table types
-        result.AddRange(ignoreList.Any()
+        result.AddRange(ignoreList.Count > 0
             ? tableTypes.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
             : tableTypes.Select(s => (SearchResult) s));
 
@@ -152,61 +140,58 @@ internal class SearchManager : IDisposable
     /// Enriches the selected table with additional information
     /// </summary>
     /// <returns>The awaitable task</returns>
-    private async Task EnrichTableAsync()
+    private Task EnrichTableAsync()
     {
         if (SelectedResult is not {BoundItem: TableEntry table})
-            return;
+            return Task.CompletedTask;
 
         // Check if the columns are already loaded
-        if (table.Columns.Count == 0)
-            await _tableManager.EnrichTableAsync(table);
+        return table.Columns.Count == 0 ? _tableManager.EnrichTableAsync(table) : Task.CompletedTask;
     }
 
     /// <summary>
     /// Enriches the selected table type with additional information
     /// </summary>
     /// <returns>The awaitable task</returns>
-    private async Task EnrichTableTypeAsync()
+    private Task EnrichTableTypeAsync()
     {
         if (SelectedResult is not {BoundItem: TableTypeEntry tableType})
-            return;
+            return Task.CompletedTask;
 
         // Check if the columns are already loaded
-        if (tableType.Columns.Count == 0)
-            await _tableTypeManager.EnrichTableTypeAsync(tableType);
+        return tableType.Columns.Count == 0 ? _tableTypeManager.EnrichTableTypeAsync(tableType) : Task.CompletedTask;
     }
 
     /// <summary>
     /// Loads the table / table type definition
     /// </summary>
     /// <returns>The awaitable task</returns>
-    public async Task LoadTableDefinitionAsync()
+    public Task LoadTableDefinitionAsync()
     {
-        switch (SelectedResult)
+        return SelectedResult switch
         {
-            case { BoundItem: TableEntry table } when string.IsNullOrWhiteSpace(table.Definition):
-                await _definitionManager.LoadTableDefinitionAsync(table);
-                break;
-            case { BoundItem: TableTypeEntry tableType } when string.IsNullOrWhiteSpace(tableType.Definition):
-                await _definitionManager.LoadTableTypeDefinitionAsync(tableType);
-                break;
-        }
+            { BoundItem: TableEntry table } when string.IsNullOrWhiteSpace(table.Definition) => _definitionManager
+                .LoadTableDefinitionAsync(table),
+            { BoundItem: TableTypeEntry tableType } when string.IsNullOrWhiteSpace(tableType.Definition) =>
+                _definitionManager.LoadTableTypeDefinitionAsync(tableType),
+            _ => Task.CompletedTask
+        };
     }
 
     /// <summary>
     /// Enriches the selected job with additional information
     /// </summary>
     /// <returns>The awaitable task</returns>
-    private async Task EnrichJobAsync()
+    private Task EnrichJobAsync()
     {
         if (SelectedResult is not {BoundItem: JobEntry job})
-            return;
+            return Task.CompletedTask;
 
         // Check if the steps are already loaded
-        if (job.JobSteps.Any())
-            return;
+        if (job.JobSteps.Count > 0)
+            return Task.CompletedTask;
 
-        await _repo.EnrichJobAsync(job);
+        return _repo.EnrichJobAsync(job);
     }
 
     /// <summary>
@@ -231,10 +216,10 @@ internal class SearchManager : IDisposable
     {
         return SelectedResult switch
         {
-            { BoundItem: TableEntry table } when table.Columns.Any() => true,
-            { BoundItem: TableTypeEntry tableType } when tableType.Columns.Any() => true,
+            { BoundItem: TableEntry { Columns.Count: > 0 } } => true,
+            { BoundItem: TableTypeEntry { Columns.Count: > 0 } } => true,
             { BoundItem: ObjectEntry objectEntry } when !string.IsNullOrWhiteSpace(objectEntry.Definition) => true,
-            { BoundItem: JobEntry job } when job.JobSteps.Any() => true,
+            { BoundItem: JobEntry { JobSteps.Count: > 0 } } => true,
             _ => false
         };
     }

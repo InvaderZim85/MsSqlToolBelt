@@ -8,13 +8,8 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
-using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -36,7 +31,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the color themes
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _colorThemeList = new();
+    private ObservableCollection<string> _colorThemeList = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedColorTheme"/>
@@ -62,7 +57,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the server
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ServerEntry> _serverList = new();
+    private ObservableCollection<ServerEntry> _serverList = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedServer"/>
@@ -113,7 +108,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the filters
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<FilterEntry> _filterList = new();
+    private ObservableCollection<FilterEntry> _filterList = [];
 
     /// <summary>
     /// The selected filter
@@ -125,7 +120,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the filter types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IdTextEntry> _filterTypeList = new();
+    private ObservableCollection<IdTextEntry> _filterTypeList = [];
 
     /// <summary>
     /// The selected filter type
@@ -146,7 +141,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the export types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IdTextEntry> _exportTypes = new();
+    private ObservableCollection<IdTextEntry> _exportTypes = [];
 
     /// <summary>
     /// The selected export type

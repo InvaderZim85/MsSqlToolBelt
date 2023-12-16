@@ -325,7 +325,7 @@
                         <CheckBox
                             Grid.Row="3"
                             Grid.Column="2"
-                            Content="Nullable enabled (.NET 6)"
+                            Content="Nullable enabled"
                             IsChecked="{Binding OptionNullable}" />
                         <StackPanel
                             Grid.Row="3"

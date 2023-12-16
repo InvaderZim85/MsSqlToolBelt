@@ -4,10 +4,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -26,7 +23,7 @@ internal partial class ServerInfoWindowViewModel : ViewModelBase
     /// Gets or sets the list with the server info
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ServerInfoEntry> _serverInfo = new();
+    private ObservableCollection<ServerInfoEntry> _serverInfo = [];
 
     /// <summary>
     /// Gets or sets the selected server info
@@ -38,7 +35,7 @@ internal partial class ServerInfoWindowViewModel : ViewModelBase
     /// Gets or sets the sub list with the server info
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ServerInfoEntry> _subInfoList = new();
+    private ObservableCollection<ServerInfoEntry> _subInfoList = [];
 
     /// <summary>
     /// Gets or sets the filter
@@ -52,7 +49,7 @@ internal partial class ServerInfoWindowViewModel : ViewModelBase
     /// <param name="value">The selected value</param>
     partial void OnSelectedServerInfoChanged(ServerInfoEntry? value)
     {
-        SubInfoList = (value?.ChildValues ?? new List<ServerInfoEntry>()).ToObservableCollection();
+        SubInfoList = (value?.ChildValues ?? []).ToObservableCollection();
     }
 
     /// <summary>
@@ -115,8 +112,8 @@ internal partial class ServerInfoWindowViewModel : ViewModelBase
     [RelayCommand]
     private void CopyExportTable()
     {
-        var tmpList = ServerInfo.Where(w => !w.ChildValues.Any()).ToList();
-        if (!tmpList.Any())
+        var tmpList = ServerInfo.Where(w => w.ChildValues.Count == 0).ToList();
+        if (tmpList.Count == 0)
             return;
 
         ExportListData(tmpList, "ServerInfo");

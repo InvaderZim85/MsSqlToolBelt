@@ -1,15 +1,16 @@
 ﻿using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
 /// <summary>
 /// Provides several basic functions
 /// </summary>
-public sealed class BaseManager : IDisposable
+/// <remarks>
+/// Creates a new instance of the <see cref="BaseManager"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the ms sql server</param>
+public sealed class BaseManager(string dataSource) : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -19,7 +20,7 @@ public sealed class BaseManager : IDisposable
     /// <summary>
     /// The instance for the basic interaction with the server
     /// </summary>
-    private readonly BaseRepo _repo;
+    private readonly BaseRepo _repo = new(dataSource);
 
     /// <summary>
     /// Gets the list with the server information
@@ -27,21 +28,12 @@ public sealed class BaseManager : IDisposable
     public List<ServerInfoEntry> ServerInfo => _repo.ServerInfo;
 
     /// <summary>
-    /// Creates a new instance of the <see cref="BaseManager"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the ms sql server</param>
-    public BaseManager(string dataSource)
-    {
-        _repo = new BaseRepo(dataSource);
-    }
-
-    /// <summary>
     /// Loads all available databases of the selected server
     /// </summary>
     /// <returns>The list with the databases</returns>
-    public async Task<List<string>> LoadDatabasesAsync()
+    public Task<List<string>> LoadDatabasesAsync()
     {
-        return await _repo.LoadDatabasesAsync();
+        return _repo.LoadDatabasesAsync();
     }
 
     /// <summary>
@@ -57,9 +49,9 @@ public sealed class BaseManager : IDisposable
     /// Loads the server information
     /// </summary>
     /// <returns>The awaitable task</returns>
-    public async Task LoadServerInformationAsync()
+    public Task LoadServerInformationAsync()
     {
-        await Task.Run(_repo.LoadServerInfo);
+        return Task.Run(_repo.LoadServerInfo);
     }
 
     /// <inheritdoc />

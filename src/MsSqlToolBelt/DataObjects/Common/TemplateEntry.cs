@@ -6,41 +6,33 @@ namespace MsSqlToolBelt.DataObjects.Common;
 /// <summary>
 /// Represents a template file
 /// </summary>
-internal class TemplateEntry
+/// <remarks>
+/// Creates a new instance of the <see cref="TemplateEntry"/>
+/// </remarks>
+/// <param name="type">The type of the template</param>
+/// <param name="file">The template</param>
+/// <param name="content">The content of the template</param>
+internal class TemplateEntry(ClassGenTemplateType type, FileSystemInfo file, string content)
 {
     /// <summary>
     /// Gets the type of the template
     /// </summary>
-    public ClassGenTemplateType Type { get; }
+    public ClassGenTemplateType Type { get; } = type;
 
     /// <summary>
     /// Gets the name of the template file
     /// </summary>
-    public string FileName { get; }
+    public string FileName { get; } = file.Name;
 
     /// <summary>
     /// Gets the path of the template file
     /// </summary>
-    public string FilePath { get; }
+    public string FilePath { get; } = file.FullName;
 
     /// <summary>
     /// Gets or sets the content of the template file
     /// </summary>
-    public string Content { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="TemplateEntry"/>
-    /// </summary>
-    /// <param name="type">The type of the template</param>
-    /// <param name="file">The template</param>
-    /// <param name="content">The content of the template</param>
-    public TemplateEntry(ClassGenTemplateType type, FileSystemInfo file, string content)
-    {
-        Type = type;
-        FileName = file.Name;
-        FilePath = file.FullName;
-        Content = content;
-    }
+    public string Content { get; set; } = content;
 
     /// <summary>
     /// Returns the name of the file

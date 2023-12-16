@@ -2,15 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Updater;
-using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using MsSqlToolBelt.Common.Enums;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -47,7 +44,7 @@ internal partial class UpdateWindowViewModel : ViewModelBase
     private string _fileSize = string.Empty;
 
     /// <summary>
-    /// he value which indicates if the open file button is enabled
+    /// The value which indicates if the open file button is enabled
     /// </summary>
     [ObservableProperty]
     private bool _buttonOpenFileEnabled;
@@ -87,7 +84,7 @@ internal partial class UpdateWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Opens the page on github
+    /// Opens the page on GitHub
     /// </summary>
     [RelayCommand]
     private void OpenGithub()
@@ -142,5 +139,4 @@ internal partial class UpdateWindowViewModel : ViewModelBase
             BrowserVisibility = Visibility.Visible;
         }
     }
-
 }

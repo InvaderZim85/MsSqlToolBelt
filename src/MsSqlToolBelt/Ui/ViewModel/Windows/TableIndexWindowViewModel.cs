@@ -6,10 +6,7 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -38,7 +35,7 @@ internal partial class TableIndexWindowViewModel : ViewModelBase
     /// The list with the indexes
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IndexEntry> _indexes = new();
+    private ObservableCollection<IndexEntry> _indexes = [];
 
     /// <summary>
     /// Gets or sets the value which indicates if the rebuild option should be shown
@@ -85,7 +82,7 @@ internal partial class TableIndexWindowViewModel : ViewModelBase
     /// </summary>
     private void SetIndexes()
     {
-        Indexes = (_table?.Indexes ?? new List<IndexEntry>()).ToObservableCollection();
+        Indexes = (_table?.Indexes ?? []).ToObservableCollection();
     }
 
     /// <summary>

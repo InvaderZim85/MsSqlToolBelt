@@ -1,32 +1,28 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Data;
 
 /// <summary>
 /// Provides functions for the interaction with the tables
 /// </summary>
-internal class TableRepo : BaseRepo
+/// <remarks>
+/// Creates a new instance of the <see cref="TableRepo"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal class TableRepo(string dataSource, string database) : BaseRepo(dataSource, database)
 {
-    /// <summary>
-    /// Creates a new instance of the <see cref="TableRepo"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableRepo(string dataSource, string database) : base(dataSource, database) { }
-
     /// <summary>
     /// Loads all table which matches the search string
     /// </summary>
     /// <param name="search">The search string. If empty, all user defined tables will be loaded</param>
     /// <returns>The list with the tables</returns>
-    public async Task<List<TableEntry>> LoadTablesAsync(string search)
+    public Task<List<TableEntry>> LoadTablesAsync(string search)
     {
         var query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 t.object_id AS Id,
                 t.[name] AS [Name],
                 s.[name] AS [Schema],
@@ -37,25 +33,30 @@ internal class TableRepo : BaseRepo
                 t.modify_date AS ModifiedDateTime
             FROM
                 sys.tables AS t
-
+            
                 INNER JOIN sys.columns AS c
                 ON c.object_id = t.object_id
-
+            
                 INNER JOIN sys.schemas AS s
                 ON s.schema_id = t.schema_id
             WHERE
-                t.is_ms_shipped = 0 -- only user tables";
+                t.is_ms_shipped = 0 -- only user tables
+                
+            """;
 
         if (!string.IsNullOrEmpty(search))
+        {
             query +=
-                @"
-                AND 
-                (
-                    t.[name] LIKE @search
-                    OR c.[name] LIKE @search
-                );";
+                """
+                    AND
+                    (
+                        t.[name] LIKE @search
+                        OR c.[name] LIKE @search
+                    );
+                """;
+        }
 
-        return await QueryAsListAsync<TableEntry>(query, new
+        return QueryAsListAsync<TableEntry>(query, new
         {
             search
         });
@@ -69,7 +70,8 @@ internal class TableRepo : BaseRepo
     public async Task LoadColumnsAsync(TableEntry table)
     {
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 c.[name],
                 c.column_id AS [Order],
                 t.[name] AS DataType,
@@ -95,11 +97,12 @@ internal class TableRepo : BaseRepo
                 INNER JOIN sys.types AS t
                 ON t.user_type_id = c.user_type_id
             WHERE
-                ta.object_id = @id;";
+                ta.object_id = @id;
+            """;
 
         var result = await QueryAsListAsync<ColumnEntry>(query, table);
 
-        table.Columns = result.OrderBy(o => o.Order).ToList();
+        table.Columns = [.. result.OrderBy(o => o.Order)];
     }
 
     /// <summary>
@@ -110,7 +113,8 @@ internal class TableRepo : BaseRepo
     public async Task LoadPrimaryKeyInfoAsync(TableEntry table)
     {
         const string query =
-            @"DECLARE @pkValues TABLE
+            """
+            DECLARE @pkValues TABLE
             (
                 [Database] SYSNAME NOT NULL,
                 [Schema] SYSNAME NOT NULL,
@@ -126,7 +130,8 @@ internal class TableRepo : BaseRepo
             SELECT
                 [Column]
             FROM
-                @pkValues;";
+                @pkValues;
+            """;
 
         var columns = await QueryAsListAsync<string>(query, table);
 
@@ -144,7 +149,8 @@ internal class TableRepo : BaseRepo
     public async Task<List<IndexDto>> LoadTableIndexAsync(TableEntry table)
     {
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 i.[name] AS [Name],
                 COL_NAME(ic.object_id, ic.column_id) AS [Column]
             FROM
@@ -157,7 +163,8 @@ internal class TableRepo : BaseRepo
                 INNER JOIN sys.columns AS c
                 ON c.object_id = ic.object_id
             WHERE
-                c.object_id = @id";
+                c.object_id = @id
+            """;
 
         var result = await QueryAsListAsync<IndexDto>(query, table);
 
@@ -172,13 +179,14 @@ internal class TableRepo : BaseRepo
     public async Task<List<ForeignKeyDto>> LoadForeignKeyInfoAsync(TableEntry table)
     {
         const string query =
-            @"SELECT 
+            """
+            SELECT
                 fk.name AS [Name],
                 c_parent.name AS ColumnName,
                 t_child.name AS ReferencedTableName,
                 c_child.name AS ReferencedColumnName
-            FROM 
-                sys.foreign_keys AS fk 
+            FROM
+                sys.foreign_keys AS fk
 
                 INNER JOIN sys.foreign_key_columns AS fkc
                 ON fkc.constraint_object_id = fk.object_id
@@ -187,8 +195,8 @@ internal class TableRepo : BaseRepo
                 ON t_parent.object_id = fk.parent_object_id
 
                 INNER JOIN sys.columns AS c_parent
-                ON fkc.parent_column_id = c_parent.column_id  
-                AND c_parent.object_id = t_parent.object_id 
+                ON fkc.parent_column_id = c_parent.column_id
+                AND c_parent.object_id = t_parent.object_id
 
                 INNER JOIN sys.tables AS t_child
                 ON t_child.object_id = fk.referenced_object_id
@@ -198,9 +206,10 @@ internal class TableRepo : BaseRepo
                 AND fkc.referenced_column_id = c_child.column_id
             WHERE
                 t_parent.object_id = @id
-            ORDER BY 
+            ORDER BY
                 t_parent.name,
-                c_parent.name;";
+                c_parent.name;
+            """;
 
         var result = await QueryAsListAsync<ForeignKeyDto>(query, table);
 

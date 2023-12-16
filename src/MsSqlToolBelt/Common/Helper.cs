@@ -6,17 +6,13 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Common;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using ZimLabs.CoreLib;
-using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
 
@@ -38,9 +34,9 @@ internal static class Helper
         // Init the logger
         const string template = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
+        var logPath = Path.Combine(AppContext.BaseDirectory, "logs", "log_.log");
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.SQLite("logs/Log.db")
-            .WriteTo.File("logs/log_.log", rollingInterval: RollingInterval.Day, outputTemplate: template)
+            .WriteTo.File(logPath, rollingInterval: RollingInterval.Day, outputTemplate: template)
             .CreateLogger();
 
         // Init the taskbar
@@ -49,7 +45,6 @@ internal static class Helper
 
         // Init the settings database
         using var context = new AppDbContext();
-        var pendingMigrations = context.Database.GetPendingMigrations();
         context.Database.Migrate();
     }
 

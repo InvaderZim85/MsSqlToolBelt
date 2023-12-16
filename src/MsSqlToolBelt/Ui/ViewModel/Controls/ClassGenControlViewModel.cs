@@ -9,11 +9,7 @@ using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using ZimLabs.CoreLib;
@@ -61,7 +57,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The list with the tables
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<TableDto> _tables = new();
+    private ObservableCollection<TableDto> _tables = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedTable"/>
@@ -87,7 +83,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
             ButtonEfKeyCodeEnabled = false;
             ClassName = value?.Name ?? string.Empty;
 
-            if (value != null && value.Columns.Any())
+            if (value is { Columns.Count: > 0 })
                 SetColumns();
             else
                 EnrichData();
@@ -101,7 +97,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The list with the columns of the selected table
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ColumnDto> _columns = new();
+    private ObservableCollection<ColumnDto> _columns = [];
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -126,7 +122,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The list with the different types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IdTextEntry> _typeList = new();
+    private ObservableCollection<IdTextEntry> _typeList = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedType"/>
@@ -164,7 +160,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// The list with the different modifiers
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _modifierList = new();
+    private ObservableCollection<string> _modifierList = [];
 
     /// <summary>
     /// The selected modifier
@@ -283,7 +279,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     #endregion
 
     #region Commands
-    // Note: This are not all commands! The other commands are provided via the "RelayCommand" attribute!
+    // Note: These are not all commands! The other commands are provided via the "RelayCommand" attribute!
 
     /// <summary>
     /// The command to reload the table types
@@ -361,8 +357,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
-        Tables = new ObservableCollection<TableDto>();
-        Columns = new ObservableCollection<ColumnDto>();
+        Tables = [];
+        Columns = [];
         _setCode?.Invoke(new ClassGenResult());
 
         _manager?.Dispose();
@@ -672,8 +668,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// </summary>
     public void Clear()
     {
-        Tables = new ObservableCollection<TableDto>();
-        Columns = new ObservableCollection<ColumnDto>();
+        Tables = [];
+        Columns = [];
         HeaderColumns = "Columns";
         HeaderList = "Tables";
         _classGenResult = new ClassGenResult();

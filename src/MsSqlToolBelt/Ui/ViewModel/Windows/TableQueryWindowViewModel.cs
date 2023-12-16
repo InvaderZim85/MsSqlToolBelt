@@ -6,11 +6,8 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.View.Windows;
-using System;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -45,7 +42,7 @@ internal partial class TableQueryWindowViewModel : ViewModelBase
     /// Gets or sets the list with the limit values
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IdTextEntry> _limitValues = new();
+    private ObservableCollection<IdTextEntry> _limitValues = [];
 
     /// <summary>
     /// Gets or sets the selected limit value

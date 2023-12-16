@@ -3,15 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
-using MsSqlToolBelt.DataObjects.ClassGen;
-using MsSqlToolBelt.Ui.Common;
-using MsSqlToolBelt.Ui.View.Windows;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.ClassGen;
+using MsSqlToolBelt.Ui.View.Windows;
+using System.Collections.ObjectModel;
+using System.Windows;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -25,7 +21,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
     /// The list with the data types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ClassGenTypeEntry> _dataTypes = new();
+    private ObservableCollection<ClassGenTypeEntry> _dataTypes = [];
 
     /// <summary>
     /// The selected entry
@@ -55,7 +51,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddEntryAsync()
     {
-        var dialog = new DataTypeInputWindow(DataTypes.ToList())
+        var dialog = new DataTypeInputWindow([.. DataTypes])
             {Owner = Application.Current.MainWindow};
         if (dialog.ShowDialog() != true)
             return;
@@ -86,7 +82,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         // Create a "backup" to reset the value
         var original = SelectedEntry.Clone();
 
-        var dialog = new DataTypeInputWindow(DataTypes.ToList(), SelectedEntry)
+        var dialog = new DataTypeInputWindow([.. DataTypes], SelectedEntry)
             {Owner = Application.Current.MainWindow};
 
         if (dialog.ShowDialog() != true)

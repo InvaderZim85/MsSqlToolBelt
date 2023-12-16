@@ -3,10 +3,6 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
@@ -18,7 +14,7 @@ public class SearchHistoryManager
     /// <summary>
     /// Gets the list with the search history
     /// </summary>
-    public List<SearchHistoryEntry> SearchHistory { get; private set; } = new();
+    public List<SearchHistoryEntry> SearchHistory { get; private set; } = [];
 
     /// <summary>
     /// Gets or sets the selected entry

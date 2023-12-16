@@ -1,8 +1,7 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
-using Newtonsoft.Json;
-using System;
-using MsSqlToolBelt.Common.Enums;
+﻿using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
+using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Search;

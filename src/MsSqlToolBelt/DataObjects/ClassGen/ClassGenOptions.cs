@@ -28,7 +28,7 @@ public class ClassGenOptions
     /// <summary>
     /// Gets or sets the value which indicates if the column attribute should be added
     /// <para />
-    /// Only for EF properties. This property will be ignores when <see cref="DbModel"/> is <see langword="false"/>
+    /// Only for EF properties. This property will be ignored when <see cref="DbModel"/> is <see langword="false"/>
     /// </summary>
     public bool AddColumnAttribute { get; set; }
 

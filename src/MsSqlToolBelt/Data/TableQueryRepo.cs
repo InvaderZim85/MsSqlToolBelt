@@ -1,21 +1,18 @@
-﻿using System.Data;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
+﻿using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace MsSqlToolBelt.Data;
 
 /// <summary>
 /// Provides the functions for the interaction with the table data
 /// </summary>
-internal class TableQueryRepo : BaseRepo
+/// <remarks>
+/// Creates a new instance of the <see cref="TableQueryRepo"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal class TableQueryRepo(string dataSource, string database) : BaseRepo(dataSource, database)
 {
-    /// <summary>
-    /// Creates a new instance of the <see cref="TableQueryRepo"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableQueryRepo(string dataSource, string database) : base(dataSource, database) { }
-
     /// <summary>
     /// Executes a query to load the top X rows of the table
     /// </summary>

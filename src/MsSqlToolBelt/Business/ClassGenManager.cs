@@ -6,14 +6,9 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Templates;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Business;
@@ -71,12 +66,12 @@ public sealed class ClassGenManager : IDisposable
     /// <summary>
     /// The list with the conversion types
     /// </summary>
-    private List<ClassGenTypeEntry> _conversionTypes = new();
+    private List<ClassGenTypeEntry> _conversionTypes = [];
 
     /// <summary>
     /// Gets the list with the tables
     /// </summary>
-    public List<TableDto> Tables { get; private set; } = new();
+    public List<TableDto> Tables { get; private set; } = [];
 
     /// <summary>
     /// Gets or sets the selected table
@@ -117,7 +112,7 @@ public sealed class ClassGenManager : IDisposable
 
         // Load the filter and check the entry
         await _settingsManager.LoadFilterAsync();
-        Tables = _settingsManager.FilterList.Any()
+        Tables = _settingsManager.FilterList.Count > 0
             ? tmpTables.Where(w => w.Name.IsValid(_settingsManager.FilterList)).ToList()
             : tmpTables;
     }
@@ -191,17 +186,18 @@ public sealed class ClassGenManager : IDisposable
     }
 
     /// <summary>
-    /// Cleans the name of the namespace
+    /// Cleans the name of the namespace and removes spaces
     /// </summary>
     /// <param name="name">The name</param>
     /// <returns>The cleaned namespace name</returns>
     private static string CleanNamespace(string name)
     {
-        if (name.Contains('.'))
-        {
-            var content = name.Split(new[] {"."}, StringSplitOptions.RemoveEmptyEntries).ToList();
-            name = string.Join(".", content.Select(s => s.FirstChatToUpper()));
-        }
+        const char dot = '.';
+        if (!name.Contains(dot)) 
+            return name.FirstChatToUpper().Replace(" ", "");
+
+        var content = name.Split(dot, StringSplitOptions.RemoveEmptyEntries).ToList();
+        name = string.Join(dot, content.Select(s => s.FirstChatToUpper()));
 
         return name.FirstChatToUpper().Replace(" ", "");
     }
@@ -221,7 +217,7 @@ public sealed class ClassGenManager : IDisposable
             replaceList = GetReplaceList(false);
 
             // Split entry at underscore
-            var content = tableName.Split(new[] {"_"}, StringSplitOptions.RemoveEmptyEntries);
+            var content = tableName.Split('_', StringSplitOptions.RemoveEmptyEntries);
 
             // Create a new "class" name
             tableName = content.Aggregate(string.Empty, (current, entry) => current + entry.FirstChatToUpper());
@@ -380,7 +376,7 @@ public sealed class ClassGenManager : IDisposable
                 continue;
 
             // Step 1: Load the columns of the table (only if they are empty)
-            if (!tmpTable.Columns.Any())
+            if (tmpTable.Columns.Count == 0)
             {
                 await _tableManager.EnrichTableAsync(tmpTable);
                 table.SetColumns();
@@ -432,7 +428,7 @@ public sealed class ClassGenManager : IDisposable
         }
 
         // Remove the last empty line (not very nice, but hey, if it works, it works :D
-        if (properties.Any())
+        if (properties.Count > 0)
             properties.RemoveAt(properties.Count - 1);
 
         // Set the values
@@ -529,6 +525,11 @@ public sealed class ClassGenManager : IDisposable
             columnAttributes.Add("[DataType(DataType.Date)]");
         }
 
+        if ((column.DataType.EqualsIgnoreCase("varchar") || column.DataType.EqualsIgnoreCase("nvarchar")) && column.MaxLength != -1) // -1 indicates a NVARCHAR(MAX)
+        {
+            columnAttributes.Add($"[MaxLength({column.MaxLength})]");
+        }
+
         if (columnAttributes.Count == 0)
             return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
 
@@ -585,7 +586,7 @@ public sealed class ClassGenManager : IDisposable
         var template = _templateManager.GetTemplateContent(ClassGenTemplateType.EfCreatingBuilder);
 
         var keyColumns = table.Columns.Where(w => w.IsPrimaryKey).ToList();
-        if (!keyColumns.Any())
+        if (keyColumns.Count == 0)
             return (string.Empty, string.Empty);
 
         var shortCode = $"modelBuilder.Entity<{options.ClassName}>().HasKey(k => new {{ {string.Join(", ", keyColumns.Select(s => $"k.{s.PropertyName}"))} }});";
@@ -640,7 +641,7 @@ public sealed class ClassGenManager : IDisposable
         return new TableEntry
         {
             Name = options.ClassName,
-            Columns = columns.OrderBy(o => o.Order).ToList(),
+            Columns = [.. columns.OrderBy(o => o.Order)],
             ColumnUniqueError = uniqueError
         };
     }
@@ -681,13 +682,13 @@ public sealed class ClassGenManager : IDisposable
             return template;
 
         var lines = GetTemplateLines(template);
-        if (!lines.Any()) // If there is no line, something is wrong...
+        if (lines.Count == 0) // If there is no line, something is wrong...
             return template;
 
         if (template.Contains("$NAME2$"))
         {
             var index = GetLineIndex(lines, "$NAME2$");
-            if (index == -1) // If this happen, something is wrong...
+            if (index == -1) // If this happened, something is wrong...
                 return template;
 
             lines[index] = lines[index].Replace(";", " = string.Empty;");
@@ -695,7 +696,7 @@ public sealed class ClassGenManager : IDisposable
         else if (template.Contains("$NAME$"))
         {
             var index = GetLineIndex(lines, "$NAME$");
-            if (index == -1) // If this happen, something is wrong...
+            if (index == -1) // If this happened, something is wrong...
                 return template;
 
             lines[index] += " = string.Empty;";
@@ -713,7 +714,7 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The lines of the template</returns>
     private static List<string> GetTemplateLines(string template)
     {
-        return template.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
+        return [.. template.Split(new[] { Environment.NewLine }, StringSplitOptions.None)];
     }
 
     /// <summary>
@@ -721,7 +722,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="lines">The list with the lines</param>
     /// <param name="value">The value to search for</param>
-    /// <returns>The index of the line, if nothing was found, -1 will returned</returns>
+    /// <returns>The index of the line, if nothing was found, -1 will be returned</returns>
     private static int GetLineIndex(IReadOnlyList<string> lines, string value)
     {
         for (var i = 0; i < lines.Count; i++)
@@ -736,11 +737,11 @@ public sealed class ClassGenManager : IDisposable
 
     #region Various
     /// <summary>
-    /// Gets the list with the replace values
+    /// Gets the list with the "replace" values
     /// </summary>
     /// <param name="includeUnderscore"><see langword="true"/> to include the underscore in the list, otherwise <see langword="false"/> (optional)</param>
-    /// <returns>The list with the replace values</returns>
-    private static IEnumerable<ReplaceEntry> GetReplaceList(bool includeUnderscore = true)
+    /// <returns>The list with the "replace" values</returns>
+    private static List<ReplaceEntry> GetReplaceList(bool includeUnderscore = true)
     {
         var tmpList = new List<ReplaceEntry>
         {
@@ -767,13 +768,13 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The list with the modifier</returns>
     public static ObservableCollection<string> GetModifierList()
     {
-        return new ObservableCollection<string>
-        {
+        return
+        [
             "public",
             "internal",
             "protected",
             "protected internal"
-        };
+        ];
     }
 
     /// <summary>
@@ -781,7 +782,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     private void LoadTypeConversion()
     {
-        if (_conversionTypes.Any())
+        if (_conversionTypes.Count > 0)
             return;
 
         _conversionTypes = LoadDataTypes();
@@ -792,7 +793,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     private void ResetConversionTypes()
     {
-        // Clear the list so it has to be reloaded the next time
+        // Clear the list, so it has to be reloaded the next time
         _conversionTypes.Clear();
     }
 
@@ -805,11 +806,11 @@ public sealed class ClassGenManager : IDisposable
         var path = Path.Combine(Core.GetBaseDirPath(), ClassGenTypeConversionFileName);
 
         if (!File.Exists(path))
-            return new List<ClassGenTypeEntry>();
+            return [];
 
         var content = File.ReadAllText(path);
 
-        var data = JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? new List<ClassGenTypeEntry>();
+        var data = JsonConvert.DeserializeObject<List<ClassGenTypeEntry>>(content) ?? [];
 
         foreach (var entry in data)
         {
@@ -841,6 +842,8 @@ public sealed class ClassGenManager : IDisposable
     /// <returns><see langword="true"/> when the name is valid, otherwise <see langword="false"/></returns>
     public static bool ClassNameValid(string className)
     {
+        return !string.IsNullOrWhiteSpace(className) && !ClassNameStartsWithNumber();
+
         // Check if the class name starts with a number
         bool ClassNameStartsWithNumber()
         {
@@ -850,8 +853,6 @@ public sealed class ClassGenManager : IDisposable
             var firstChar = className[0].ToString();
             return int.TryParse(firstChar, out _);
         }
-
-        return !string.IsNullOrWhiteSpace(className) && !ClassNameStartsWithNumber();
     }
     #endregion
 

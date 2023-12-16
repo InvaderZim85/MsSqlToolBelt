@@ -4,18 +4,19 @@ using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.Table;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
 /// <summary>
 /// Provides the functions for the interaction with the tables
 /// </summary>
-public sealed class TableManager : IDisposable
+/// <remarks>
+/// Creates a new instance of the <see cref="TableManager"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+public sealed class TableManager(string dataSource, string database) : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -25,30 +26,17 @@ public sealed class TableManager : IDisposable
     /// <summary>
     /// The name / path of the ms sql server
     /// </summary>
-    private readonly string _dataSource;
+    private readonly string _dataSource = dataSource;
 
     /// <summary>
     /// The name of the database
     /// </summary>
-    private readonly string _database;
+    private readonly string _database = database;
 
     /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
-    private readonly TableRepo _repo;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="TableManager"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableManager(string dataSource, string database)
-    {
-        _repo = new TableRepo(dataSource, database);
-
-        _dataSource = dataSource;
-        _database = database;
-    }
+    private readonly TableRepo _repo = new(dataSource, database);
 
     /// <summary>
     /// Loads all tables
@@ -58,7 +46,7 @@ public sealed class TableManager : IDisposable
     public async Task<List<TableEntry>> LoadTablesAsync(string search = "")
     {
         var result = await _repo.LoadTablesAsync(search);
-        return result.OrderBy(o => o.Name).ToList();
+        return [.. result.OrderBy(o => o.Name)];
     }
 
     /// <summary>
@@ -92,11 +80,14 @@ public sealed class TableManager : IDisposable
 
         var names = indizes.Select(s => s.Name).Distinct();
 
-        table.Indexes = names.Select(s => new IndexEntry
-        {
-            Name = s,
-            Columns = string.Join(", ", indizes.Where(w => w.Name.Equals(s)).Select(ss => ss.Column).OrderBy(o => o))
-        }).ToList();
+        table.Indexes =
+        [
+            .. names.Select(s => new IndexEntry
+            {
+                Name = s,
+                Columns = string.Join(", ", indizes.Where(w => w.Name.Equals(s)).Select(ss => ss.Column).OrderBy(o => o))
+            })
+        ];
 
         // Update the columns
         foreach (var column in table.Columns.Where(w => !w.InIndex))
@@ -179,9 +170,9 @@ public sealed class TableManager : IDisposable
     {
         var server = new Server(_dataSource);
 
-        var database = server.Databases[_database];
+        var tmpDatabase = server.Databases[_database];
 
-        return database.Tables[tableName];
+        return tmpDatabase.Tables[tableName];
     }
 
     /// <summary>

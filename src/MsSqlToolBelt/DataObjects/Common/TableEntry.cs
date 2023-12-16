@@ -1,7 +1,5 @@
 ﻿using MsSqlToolBelt.DataObjects.Search;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using ZimLabs.TableCreator;
 
@@ -48,14 +46,14 @@ public class TableEntry : IdNameBase
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]
-    public List<ColumnEntry> Columns { get; set; } = new();
+    public List<ColumnEntry> Columns { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the list with the indizes
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]
-    public List<IndexEntry> Indexes { get; set; } = new();
+    public List<IndexEntry> Indexes { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the value which indicates if there are columns with the same name.
@@ -79,15 +77,15 @@ public class TableEntry : IdNameBase
     /// <returns>The information of the table</returns>
     public string GetInfo()
     {
-        static string GetYesNo(bool value)
-        {
-            return value ? "Yes" : "No";
-        }
-
         var replicated = $"Replicated: {GetYesNo(IsReplicated)}";
         var replicationFilter = $"Replication filter: {GetYesNo(HasReplicationFilter)}";
         var cdc = $"CDC: {GetYesNo(Cdc)}";
 
         return $"{replicated}, {replicationFilter}, {cdc}";
+
+        static string GetYesNo(bool value)
+        {
+            return value ? "Yes" : "No";
+        }
     }
 }

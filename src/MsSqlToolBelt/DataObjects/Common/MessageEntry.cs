@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MsSqlToolBelt.DataObjects.Common;
+﻿namespace MsSqlToolBelt.DataObjects.Common;
 
 /// <summary>
 /// Represents a single message entry

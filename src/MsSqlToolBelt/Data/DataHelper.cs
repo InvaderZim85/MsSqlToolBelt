@@ -1,9 +1,6 @@
 ﻿using Microsoft.SqlServer.Management.SqlParser.Parser;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Search;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Data;
@@ -60,7 +57,7 @@ internal static class DataHelper
     /// <summary>
     /// Converts the last run date and last run time into a normal date time. Fallback is <see cref="DateTime.MinValue"/>
     /// </summary>
-    /// <param name="lastRunDate">The last run date (format = yyyymmdd)</param>
+    /// <param name="lastRunDate">The last run date (format = yyyyMMdd)</param>
     /// <param name="lastRunTime">The last run time (format = hhmmss)</param>
     /// <returns>The converted date / time. If one of the values is "wrong", <see cref="DateTime.MinValue"/> will be returned</returns>
     public static DateTime ConvertToDateTime(int lastRunDate, int lastRunTime)

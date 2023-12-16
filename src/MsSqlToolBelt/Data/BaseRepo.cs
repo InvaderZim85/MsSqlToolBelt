@@ -1,13 +1,8 @@
 ﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Management.Smo;
 using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using ZimLabs.Database.MsSql;
 
 namespace MsSqlToolBelt.Data;
 
@@ -39,28 +34,18 @@ internal class BaseRepo : IDisposable
     /// <summary>
     /// Gets the list with the server information
     /// </summary>
-    public List<ServerInfoEntry> ServerInfo { get; private set; } = new();
-
-    /// <summary>
-    /// The instance for the interaction with the database
-    /// </summary>
-    protected readonly Connector Connector;
+    public List<ServerInfoEntry> ServerInfo { get; } = [];
 
     /// <summary>
     /// Gets the sql connection
     /// </summary>
-    protected SqlConnection Connection => Connector.Connection;
+    protected SqlConnection Connection { get; private set; } = new();
 
     /// <summary>
     /// Creates a new instance of the <see cref="BaseRepo"/>
     /// </summary>
     /// <param name="dataSource">The name / path of the MSSQL server</param>
-    public BaseRepo(string dataSource)
-    {
-        _dataSource = dataSource;
-        _database = string.Empty;
-        Connector = new Connector(dataSource);
-    }
+    public BaseRepo(string dataSource) : this(dataSource, "") { }
 
     /// <summary>
     /// Creates a new instance of the <see cref="BaseRepo"/>
@@ -71,7 +56,30 @@ internal class BaseRepo : IDisposable
     {
         _dataSource = dataSource;
         _database = database;
-        Connector = new Connector(dataSource, database);
+
+        SetConnection();
+    }
+
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    private void SetConnection()
+    {
+        // Create the connection string / connection
+        var conStringBuilder = new SqlConnectionStringBuilder
+        {
+            DataSource = _dataSource,
+            IntegratedSecurity = true,
+            TrustServerCertificate = true,
+            ApplicationName = "MsSqlToolBelt"
+        };
+
+        if (!string.IsNullOrEmpty(_database))
+        {
+            conStringBuilder.InitialCatalog = _database;
+        }
+
+        Connection = new SqlConnection(conStringBuilder.ConnectionString);
     }
 
     /// <summary>
@@ -84,9 +92,9 @@ internal class BaseRepo : IDisposable
     protected async Task<List<T>> QueryAsListAsync<T>(string query, object? parameters = null)
     {
         if (string.IsNullOrWhiteSpace(query))
-            return new List<T>();
+            return [];
 
-        var result = await Connector.Connection.QueryAsync<T>(query, parameters);
+        var result = await Connection.QueryAsync<T>(query, parameters);
 
         return result.ToList();
     }
@@ -111,7 +119,7 @@ internal class BaseRepo : IDisposable
 
         _database = database;
 
-        Connector.SwitchDatabase(database);
+        SetConnection();
     }
 
     /// <summary>
@@ -251,7 +259,7 @@ internal class BaseRepo : IDisposable
                 AddEntry(tmpProperty, configProperty, tmpGroupName);
                 
                 // Add the property only when there are child values
-                if (tmpProperty.ChildValues.Any())
+                if (tmpProperty.ChildValues.Count > 0)
                     ServerInfo.Add(tmpProperty);
             }
             catch
@@ -293,7 +301,7 @@ internal class BaseRepo : IDisposable
         if (_disposed)
             return;
 
-        Connector.Dispose();
+        Connection.Dispose();
 
         _disposed = true;
     }
