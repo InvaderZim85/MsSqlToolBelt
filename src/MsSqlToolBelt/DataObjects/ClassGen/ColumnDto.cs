@@ -73,6 +73,11 @@ public class ColumnDto : ObservableObject
     public int Order { get; set; }
 
     /// <summary>
+    /// Gets or sets the max length
+    /// </summary>
+    public int MaxLength { get; set; }
+
+    /// <summary>
     /// Converts the <see cref="ColumnEntry"/> into a <see cref="ColumnDto"/>
     /// </summary>
     /// <param name="column">The column</param>
@@ -84,7 +89,8 @@ public class ColumnDto : ObservableObject
             DataType = column.DataType,
             IsPrimaryKey = column.IsPrimaryKey,
             IsNullable = column.IsNullable,
-            Order = column.Order
+            Order = column.Order,
+            MaxLength = column.MaxLength
         };
     }
 }

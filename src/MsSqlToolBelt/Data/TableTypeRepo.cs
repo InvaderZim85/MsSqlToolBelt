@@ -1,27 +1,28 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Data;
 
 /// <summary>
 /// Provides the functions for the interaction with the table types
 /// </summary>
-internal sealed class TableTypeRepo : BaseRepo
+/// <remarks>
+/// Creates a new instance of the <see cref="TableTypeRepo"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal sealed class TableTypeRepo(string dataSource, string database) : BaseRepo(dataSource, database)
 {
     /// <summary>
-    /// Creates a new instance of the <see cref="TableTypeRepo"/>
+    /// Loads all available table types with the specific name
     /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableTypeRepo(string dataSource, string database) : base(dataSource, database) { }
-
-    public async Task<List<TableTypeEntry>> LoadTableTypesAsync(string search)
+    /// <param name="search">The search string</param>
+    /// <returns>The list with the table types</returns>
+    public Task<List<TableTypeEntry>> LoadTableTypesAsync(string search)
     {
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 tt.type_table_object_id AS Id,
                 tt.[name]
             FROM
@@ -35,9 +36,10 @@ internal sealed class TableTypeRepo : BaseRepo
                 (
                     tt.[name] LIKE @search
                     OR c.[name] LIKE @search
-                );";
+                );
+            """;
 
-        return await QueryAsListAsync<TableTypeEntry>(query, new
+        return QueryAsListAsync<TableTypeEntry>(query, new
         {
             search
         });
@@ -47,18 +49,20 @@ internal sealed class TableTypeRepo : BaseRepo
     /// Loads all available user defined table types
     /// </summary>
     /// <returns>The list with the table types</returns>
-    public async Task<List<TableTypeEntry>> LoadTableTypesAsync()
+    public Task<List<TableTypeEntry>> LoadTableTypesAsync()
     {
         const string query =
-            @"SELECT 
+            """
+            SELECT
                 tt.type_table_object_id AS Id,
                 tt.[name]
             FROM
                 sys.table_types AS tt
             WHERE
-                tt.is_user_defined = 1;";
+                tt.is_user_defined = 1;
+            """;
 
-        return await QueryAsListAsync<TableTypeEntry>(query);
+        return QueryAsListAsync<TableTypeEntry>(query);
     }
 
     /// <summary>
@@ -83,7 +87,8 @@ internal sealed class TableTypeRepo : BaseRepo
     private async Task LoadColumnsAsync(TableTypeEntry tableType)
     {
         const string query =
-            @"SELECT
+            """
+            SELECT
                 c.[name] AS [Name],
                 c.column_id AS [Order],
                 st.[name] AS Datatype,
@@ -101,13 +106,14 @@ internal sealed class TableTypeRepo : BaseRepo
                 ON c.object_id = tt.type_table_object_id
 
                 INNER JOIN sys.systypes AS st
-                ON st.xusertype = c.system_type_id 
+                ON st.xusertype = c.system_type_id
                 AND st.uid = 4
             WHERE
                 tt.type_table_object_id = @id
             ORDER BY
                 tt.[name],
-                c.column_id;";
+                c.column_id;
+            """;
 
         var result = await QueryAsListAsync<ColumnEntry>(query, tableType);
 
@@ -122,9 +128,10 @@ internal sealed class TableTypeRepo : BaseRepo
     private async Task LoadPrimaryKeyInfoAsync(TableTypeEntry tableType)
     {
         const string query =
-            @"SELECT 
+            """
+            SELECT
                 ic.column_id AS ColumnId
-            FROM 
+            FROM
                 sys.table_types AS tt
                 
                 INNER JOIN sys.key_constraints AS kc
@@ -140,11 +147,12 @@ internal sealed class TableTypeRepo : BaseRepo
                 INNER JOIN sys.columns AS c
                 ON c.object_id = ic.object_id
                 AND c.column_id = ic.column_id
-            WHERE   
-                tt.type_table_object_id = @id";
+            WHERE
+                tt.type_table_object_id = @id
+            """;
 
         var keyColumns = await QueryAsListAsync<int>(query, tableType);
-        if (!keyColumns.Any())
+        if (keyColumns.Count == 0)
             return;
 
         foreach (var column in tableType.Columns)

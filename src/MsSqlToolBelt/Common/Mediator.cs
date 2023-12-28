@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MsSqlToolBelt.Common;
+﻿namespace MsSqlToolBelt.Common;
 
 /// <summary>
 /// Provides functions to perform actions
@@ -11,7 +8,7 @@ internal static class Mediator
     /// <summary>
     /// Contains the list with the actions which should be executed when the specified key is selected
     /// </summary>
-    private static readonly SortedList<string, Action> Actions = new();
+    private static readonly SortedList<string, Action> Actions = [];
 
     /// <summary>
     /// Adds a new action
@@ -20,10 +17,7 @@ internal static class Mediator
     /// <param name="action">The action</param>
     public static void AddAction(string key, Action action)
     {
-        if (Actions.ContainsKey(key))
-            Actions[key] = action;
-        else
-            Actions.Add(key, action);
+        Actions[key] = action;
     }
 
     /// <summary>
@@ -32,11 +26,10 @@ internal static class Mediator
     /// <param name="key">The key of the action</param>
     public static void ExecuteAction(string key)
     {
-        if (!Actions.ContainsKey(key))
+        if (!Actions.TryGetValue(key, out var value))
             return;
 
-        // Execute the action
-        Actions[key]();
+        value();
     }
 
     /// <summary>

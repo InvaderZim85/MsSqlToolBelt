@@ -2,12 +2,9 @@
 using MsSqlToolBelt.Common.Enums;
 using Newtonsoft.Json;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using ZimLabs.TableCreator;
 
@@ -58,17 +55,21 @@ internal static class ExportHelper
     /// <returns>The content</returns>
     public static string CreateObjectContent<T>(T obj, ExportType type) where T : class
     {
-        if (type == ExportType.Json)
-            return JsonConvert.SerializeObject(obj, Formatting.Indented);
-        
-        if (type is ExportType.Ascii or ExportType.Csv or ExportType.Markdown)
+        switch (type)
         {
-            var outputType = ConvertToOutputType(type);
-            return obj.CreateValueTable(outputType);
+            case ExportType.Json:
+                return JsonConvert.SerializeObject(obj, Formatting.Indented);
+            case ExportType.Ascii or ExportType.Csv or ExportType.Markdown:
+            {
+                var outputType = ConvertToOutputType(type);
+                return obj.CreateValueTable(outputType);
+            }
+            default:
+            {
+                var listType = ConvertToListType(type);
+                return obj.CreateValueList(listType);
+            }
         }
-
-        var listType = ConvertToListType(type);
-        return obj.CreateValueList(listType);
     }
 
     /// <summary>
@@ -165,11 +166,11 @@ internal static class ExportHelper
     /// <param name="value">The value which should be exported</param>
     /// <param name="filepath">The path of the file</param>
     /// <returns>The awaitable task</returns>
-    private static async Task ExportAsJsonAsync(object value, string filepath)
+    private static Task ExportAsJsonAsync(object value, string filepath)
     {
         var content = CreateJsonContent(value);
 
-        await File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
+        return File.WriteAllTextAsync(filepath, content, Encoding.UTF8);
     }
 
     /// <summary>

@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using ZimLabs.TableCreator;
 
@@ -57,5 +55,5 @@ internal class JobEntry
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]
-    public List<JobStepEntry> JobSteps { get; set; } = new();
+    public List<JobStepEntry> JobSteps { get; set; } = [];
 }

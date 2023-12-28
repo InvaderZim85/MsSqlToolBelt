@@ -18,7 +18,7 @@ internal sealed class TemplateManager
     /// <summary>
     /// Gets the list with the templates
     /// </summary>
-    public List<TemplateEntry> Templates { get; } = new();
+    public List<TemplateEntry> Templates { get; } = [];
 
     /// <summary>
     /// Loads the desired template

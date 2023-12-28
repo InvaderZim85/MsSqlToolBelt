@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
@@ -98,7 +96,7 @@ internal static class Extensions
     }
 
     /// <summary>
-    /// Converts the <see cref="IEnumerable{T}"/> into an <see cref="ObservableCollection{T}"/>
+    /// Converts the <see cref="IEnumerable{T}"/> into a <see cref="ObservableCollection{T}"/>
     /// </summary>
     /// <typeparam name="T">The type of the data</typeparam>
     /// <param name="source">The source list</param>

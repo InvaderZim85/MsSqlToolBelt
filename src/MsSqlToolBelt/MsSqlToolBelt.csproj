@@ -1,55 +1,42 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
-    <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>23.340.0.588</AssemblyVersion>
-    <FileVersion>23.340.0.588</FileVersion>
-    <Version>23.340.0.588</Version>
-    <Copyright>(c) 2023 by Andreas Pouwels</Copyright>
   </PropertyGroup>
-  <ItemGroup>
-    <Resource Include="MsSqlToolBelt.ico" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Dapper" Version="2.1.24" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="4.11.0" />
-    <PackageReference Include="Markdig" Version="0.33.0" />
+    <PackageReference Include="Markdig" Version="0.34.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.13" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.13">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="170.9.0" />
-    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.18.0" />
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.21.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.8.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Sinks.SQLite" Version="6.0.0" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
-    <PackageReference Include="ZimLabs.Database.MsSql" Version="1.2.4" />
     <PackageReference Include="ZimLabs.Mapper" Version="1.1.0" />
-    <PackageReference Include="ZimLabs.TableCreator" Version="2.0.2" />
+    <PackageReference Include="ZimLabs.TableCreator" Version="2.1.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Themes\" />
-  </ItemGroup>
+
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Packages.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\ClassDefault.cgt">
@@ -61,70 +48,22 @@
     <None Update="Templates\EfCreatingBuilder.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Templates\PropertyBackingFieldCommentSetField.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Templates\PropertyBackingFieldComment.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Templates\PropertyBackingFieldDefaultSetField.cgt">
+    <None Update="Templates\PropertyBackingFieldCommentSetField.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\PropertyBackingFieldDefault.cgt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\PropertyBackingFieldDefaultSetField.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\PropertyDefault.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\PropertyDefaultComment.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\ClassDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\EfCreatingBuilder.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyBackingFieldComment.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyBackingFieldCommentSetField.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyBackingFieldDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyBackingFieldDefaultSetField.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithNamespace\PropertyDefaultComment.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\ClassDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\EfCreatingBuilder.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyBackingFieldComment.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyBackingFieldCommentSetField.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyBackingFieldDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyBackingFieldDefaultSetField.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyDefault.cgt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\WithoutNamespace\PropertyDefaultComment.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Themes\AvalonCSharpSchema.xml">
@@ -140,4 +79,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 </Project>

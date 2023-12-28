@@ -1,21 +1,21 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.SqlServer.Management.Smo;
+﻿using Microsoft.SqlServer.Management.Smo;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.DataObjects.Table;
+using System.Text;
 
 namespace MsSqlToolBelt.Data;
 
 /// <summary>
 /// Provides the functions for the definition export
 /// </summary>
-internal class DefinitionExportRepo : BaseRepo
+/// <remarks>
+/// Creates a new instance of the <see cref="DefinitionExportRepo"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal class DefinitionExportRepo(string dataSource, string database) : BaseRepo(dataSource, database)
 {
     /// <summary>
     /// Occurs when the definition load makes progress
@@ -25,12 +25,12 @@ internal class DefinitionExportRepo : BaseRepo
     /// <summary>
     /// The name / path of the MSSQL server
     /// </summary>
-    private readonly string _dataSource;
+    private readonly string _dataSource = dataSource;
 
     /// <summary>
     /// The name of the database
     /// </summary>
-    private readonly string _database;
+    private readonly string _database = database;
 
     /// <summary>
     /// The current count (only needed for the progress)
@@ -43,24 +43,14 @@ internal class DefinitionExportRepo : BaseRepo
     private int _totalCount;
 
     /// <summary>
-    /// Creates a new instance of the <see cref="DefinitionExportRepo"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public DefinitionExportRepo(string dataSource, string database) : base(dataSource, database)
-    {
-        _dataSource = dataSource;
-        _database = database;
-    }
-
-    /// <summary>
     /// Loads all relevant objects (procedures, views, ...)
     /// </summary>
     /// <returns></returns>
-    public async Task<List<ObjectEntry>> LoadObjectsAsync()
+    public Task<List<ObjectEntry>> LoadObjectsAsync()
     {
         const string query =
-            @"SELECT DISTINCT
+            """
+            SELECT DISTINCT
                 OBJECT_NAME(m.object_id) AS [Name],
                 m.definition AS [Definition],
                 o.[type],
@@ -73,9 +63,10 @@ internal class DefinitionExportRepo : BaseRepo
                 ON o.object_id = m.object_id
             WHERE
                 o.[type] <> 'U' -- Ignore the tables
-                AND o.is_ms_shipped = 0; -- Only user stuff";
+                AND o.is_ms_shipped = 0; -- Only user stuff
+            """;
 
-        return await QueryAsListAsync<ObjectEntry>(query);
+        return QueryAsListAsync<ObjectEntry>(query);
     }
 
     /// <summary>
@@ -87,7 +78,7 @@ internal class DefinitionExportRepo : BaseRepo
     public async Task<List<TableDefinition>> LoadTableDefinitionAsync(List<DefinitionExportObject> entries, CancellationToken ct)
     {
         var server = new Server(_dataSource);
-        var database = server.Databases[_database];
+        var tmpDatabase = server.Databases[_database];
 
         // Define the scripter
         var scripter = new Scripter(server)
@@ -123,14 +114,14 @@ internal class DefinitionExportRepo : BaseRepo
         var tableEntries = entries.Where(w => w.EntryType == EntryType.Table).ToList();
         var tableTypeEntries = entries.Where(w => w.EntryType == EntryType.TableType).ToList();
 
-        if (tableEntries.Any())
+        if (tableEntries.Count > 0)
         {
-            await LoadTableDefinitionAsync(database.Tables, scripter, result, tableEntries, ct);
+            await LoadTableDefinitionAsync(tmpDatabase.Tables, scripter, result, tableEntries, ct);
         }
 
-        if (tableTypeEntries.Any())
+        if (tableTypeEntries.Count > 0)
         {
-            await LoadTableTypeDefinitionAsync(database.UserDefinedTableTypes, scripter, result, tableTypeEntries, ct);
+            await LoadTableTypeDefinitionAsync(tmpDatabase.UserDefinedTableTypes, scripter, result, tableTypeEntries, ct);
         }
 
         return result;
@@ -140,7 +131,7 @@ internal class DefinitionExportRepo : BaseRepo
     /// Loads the table definitions
     /// </summary>
     /// <param name="tables">The table collection</param>
-    /// <param name="scripter">The scripter</param>
+    /// <param name="scripter">The "scripter"</param>
     /// <param name="result">The result list</param>
     /// <param name="entries">The list with the entries which should be exported</param>
     /// <param name="ct">The cancellation token</param>
@@ -216,7 +207,7 @@ internal class DefinitionExportRepo : BaseRepo
     /// Adds a note to the builder
     /// </summary>
     /// <param name="builder">The string builder</param>
-    private void AddNote(StringBuilder builder)
+    private static void AddNote(StringBuilder builder)
     {
         builder
             .AppendLine("/*")

@@ -4,12 +4,8 @@ using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Internal;
 using Newtonsoft.Json;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
@@ -21,12 +17,12 @@ public class SettingsManager
     /// <summary>
     /// Gets the list with the servers
     /// </summary>
-    public List<ServerEntry> ServerList { get; private set; } = new();
+    public List<ServerEntry> ServerList { get; private set; } = [];
 
     /// <summary>
     /// Gets the list with the filter entries
     /// </summary>
-    public List<FilterEntry> FilterList { get; private set; } = new();
+    public List<FilterEntry> FilterList { get; private set; } = [];
 
     #region Settings
     /// <summary>
@@ -98,7 +94,7 @@ public class SettingsManager
     /// <summary>
     /// Loads the server list and stores them into <see cref="ServerList"/>
     /// </summary>
-    /// <param name="withTracking">true to active the tracking, otherwise false (optional)</param>
+    /// <param name="withTracking">true to activate the tracking, otherwise false (optional)</param>
     /// <returns>The list with the servers</returns>
     public async Task LoadServerAsync(bool withTracking = false)
     {
@@ -195,7 +191,7 @@ public class SettingsManager
     /// <summary>
     /// Loads the list with the filters and stores them into <see cref="FilterList"/>
     /// </summary>
-    /// <param name="withTracking">true to active the tracking, otherwise false (optional)</param>
+    /// <param name="withTracking">true to activate the tracking, otherwise false (optional)</param>
     /// <returns>The list with the filter</returns>
     public async Task LoadFilterAsync(bool withTracking = false)
     {
@@ -290,7 +286,7 @@ public class SettingsManager
         var data = JsonConvert.DeserializeObject<SettingsDto>(content) ?? new SettingsDto();
 
         // Check if the dto is default
-        if (!data.Servers.Any() && !data.Settings.Any() && !data.Filters.Any())
+        if (data.Servers.Count == 0 && data.Settings.Count == 0 && data.Filters.Count == 0)
             return;
 
         // Import settings
@@ -355,7 +351,7 @@ public class SettingsManager
     /// <param name="settings">The list with the settings</param>
     /// <param name="overrideSettings"><see langword="true"/> to override all existing settings with the new one, otherwise <see langword="false"/></param>
     /// <returns>The awaitable task</returns>
-    private static async Task ImportSettingsAsync(List<SettingsEntry> settings, bool overrideSettings)
+    private static async Task ImportSettingsAsync(IEnumerable<SettingsEntry> settings, bool overrideSettings)
     {
         await using var context = new AppDbContext();
 

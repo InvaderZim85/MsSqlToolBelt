@@ -5,13 +5,8 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.ClassGen;
-using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Windows;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ZimLabs.CoreLib;
 
@@ -33,7 +28,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     /// The list with the tables
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<TableDto> _tables = new();
+    private ObservableCollection<TableDto> _tables = [];
 
     /// <summary>
     /// The info
@@ -45,7 +40,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     /// The list with the modifier
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _modifierList = new();
+    private ObservableCollection<string> _modifierList = [];
 
     /// <summary>
     /// The selected modifier
@@ -270,7 +265,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
                 InfoList += $"{Environment.NewLine}{msg}";
             };
 
-            await _manager.GenerateClassesAsync(options, Tables.ToList(), ctSource.Token);
+            await _manager.GenerateClassesAsync(options, [.. Tables], ctSource.Token);
         }
         catch (Exception ex)
         {

@@ -1,13 +1,14 @@
 ﻿using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.TableType;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
-internal class TableTypeManager : IDisposable
+/// <summary>
+/// Creates a new instance of the <see cref="TableTypeManager"/>
+/// </summary>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal class TableTypeManager(string dataSource, string database) : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -17,27 +18,17 @@ internal class TableTypeManager : IDisposable
     /// <summary>
     /// The instance for the interaction with the database
     /// </summary>
-    private readonly TableTypeRepo _repo;
+    private readonly TableTypeRepo _repo = new(dataSource, database);
 
     /// <summary>
     /// Gets or sets the list with the table types
     /// </summary>
-    public List<TableTypeEntry> TableTypes { get; private set; } = new();
+    public List<TableTypeEntry> TableTypes { get; private set; } = [];
 
     /// <summary>
     /// Gets or sets the selected table type
     /// </summary>
     public TableTypeEntry? SelectedTableType { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="TableTypeManager"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableTypeManager(string dataSource, string database)
-    {
-        _repo = new TableTypeRepo(dataSource, database);
-    }
 
     /// <summary>
     /// Loads all 
@@ -47,7 +38,7 @@ internal class TableTypeManager : IDisposable
     public async Task<List<TableTypeEntry>> LoadTableTypesAsync(string search)
     {
         var result = await _repo.LoadTableTypesAsync(search);
-        return result.OrderBy(o => o.Name).ToList();
+        return [.. result.OrderBy(o => o.Name)];
     }
 
     /// <summary>
@@ -63,12 +54,12 @@ internal class TableTypeManager : IDisposable
     /// Enriches the selected table type
     /// </summary>
     /// <returns>The awaitable task</returns>
-    public async Task EnrichTableTypeAsync()
+    public Task EnrichTableTypeAsync()
     {
-        if (SelectedTableType == null || SelectedTableType.Columns.Any())
-            return;
+        if (SelectedTableType == null || SelectedTableType.Columns.Count > 0)
+            return Task.CompletedTask;
 
-        await _repo.EnrichTableTypeAsync(SelectedTableType);
+        return _repo.EnrichTableTypeAsync(SelectedTableType);
     }
 
     /// <summary>
@@ -76,9 +67,9 @@ internal class TableTypeManager : IDisposable
     /// </summary>
     /// <param name="tableType">The table which should be enriched</param>
     /// <returns>The awaitable task</returns>
-    public async Task EnrichTableTypeAsync(TableTypeEntry tableType)
+    public Task EnrichTableTypeAsync(TableTypeEntry tableType)
     {
-        await _repo.EnrichTableTypeAsync(tableType);
+        return _repo.EnrichTableTypeAsync(tableType);
     }
 
     /// <summary>

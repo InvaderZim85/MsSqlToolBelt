@@ -1,19 +1,20 @@
 ﻿using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Common;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 
 /// <summary>
 /// Provides the functions for the interaction with the tables
 /// </summary>
-internal class TableQueryManager : IDisposable
+/// <remarks>
+/// Creates a new instance of the <see cref="TableQueryManager"/>
+/// </remarks>
+/// <param name="dataSource">The name / path of the MSSQL server</param>
+/// <param name="database">The name of the database</param>
+internal class TableQueryManager(string dataSource, string database) : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -23,7 +24,7 @@ internal class TableQueryManager : IDisposable
     /// <summary>
     /// The instance for the interaction with the tables
     /// </summary>
-    private readonly TableQueryRepo _repo;
+    private readonly TableQueryRepo _repo = new(dataSource, database);
 
     /// <summary>
     /// Gets the result table
@@ -33,8 +34,8 @@ internal class TableQueryManager : IDisposable
     /// <summary>
     /// Gets the list with the limit values
     /// </summary>
-    public static List<IdTextEntry> LimitList => new()
-    {
+    public static List<IdTextEntry> LimitList =>
+    [
         new IdTextEntry(0, "Don't limit"),
         new IdTextEntry(10, "Limit to 10 rows"),
         new IdTextEntry(50, "Limit to 50 rows"),
@@ -48,17 +49,7 @@ internal class TableQueryManager : IDisposable
         new IdTextEntry(5000, "Limit to 5.000 rows"),
         new IdTextEntry(10000, "Limit to 10.000 rows"),
         new IdTextEntry(50000, "Limit to 50.000 rows")
-    };
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="TableQueryManager"/>
-    /// </summary>
-    /// <param name="dataSource">The name / path of the MSSQL server</param>
-    /// <param name="database">The name of the database</param>
-    public TableQueryManager(string dataSource, string database)
-    {
-        _repo = new TableQueryRepo(dataSource, database);
-    }
+    ];
 
     /// <summary>
     /// Creates the query for the table
@@ -91,7 +82,7 @@ internal class TableQueryManager : IDisposable
             count++;
         }
 
-        // Add the from statement
+        // Add the "from" statement
         query
             .AppendLine("FROM")
             .AppendLine($"{spacer}[{table.Schema}].[{table.Name}] AS t");

@@ -2,10 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.Internal;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -35,7 +32,7 @@ internal partial class EditServerWindowViewModel : ViewModelBase
     /// The list with the databases
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _databaseList = new();
+    private ObservableCollection<string> _databaseList = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedDatabase"/>
@@ -99,17 +96,14 @@ internal partial class EditServerWindowViewModel : ViewModelBase
             using var baseRepo = new BaseRepo(SelectedServer.Name);
             var databases = await baseRepo.LoadDatabasesAsync();
 
-            DatabaseList = new ObservableCollection<string>
-            {
-                DefaultEntry
-            };
+            DatabaseList = [DefaultEntry];
 
             foreach (var database in databases.OrderBy(o => o))
             {
                 DatabaseList.Add(database);
             }
 
-            ButtonSelectedEnabled = databases.Any();
+            ButtonSelectedEnabled = databases.Count > 0;
 
             if (!string.IsNullOrEmpty(SelectedServer.DefaultDatabase))
             {

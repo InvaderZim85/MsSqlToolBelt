@@ -1,16 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.View.Common;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -33,7 +31,7 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
     /// The list with the tables
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<TableEntry> _tables = new();
+    private ObservableCollection<TableEntry> _tables = [];
     
     /// <summary>
     /// Backing field for <see cref="SelectedTable"/>
@@ -55,7 +53,7 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
 
             _manager.SelectedTable = value;
 
-            if (value != null && value.Columns.Any())
+            if (value is { Columns.Count: > 0 })
             {
                 SetColumns();
                 SetIndexes();
@@ -69,13 +67,13 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
     /// The list with the table columns
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ColumnEntry> _columns = new();
+    private ObservableCollection<ColumnEntry> _columns = [];
 
     /// <summary>
     /// The list with the indices
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IndexEntry> _indexes = new();
+    private ObservableCollection<IndexEntry> _indexes = [];
 
     /// <summary>
     /// Backing field for <see cref="Filter"/>
@@ -140,8 +138,8 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
-        Tables = new ObservableCollection<TableEntry>();
-        Columns = new ObservableCollection<ColumnEntry>();
+        Tables = [];
+        Columns = [];
 
         // Reset the manager
         _manager?.Dispose();

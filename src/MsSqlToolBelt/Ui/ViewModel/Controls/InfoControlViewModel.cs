@@ -1,15 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.Ui.Common;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using MsSqlToolBelt.Common.Enums;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -46,7 +42,7 @@ internal partial class InfoControlViewModel : ViewModelBase
     /// The list with the used packages
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<PackageInfo> _packageList = new();
+    private ObservableCollection<PackageInfo> _packageList = [];
 
     /// <summary>
     /// The command to open the log dir
@@ -98,7 +94,7 @@ internal partial class InfoControlViewModel : ViewModelBase
     {
         var content = await File.ReadAllLinesAsync(filepath);
         var tmpList = (from line in content
-            select line.Split(new[] {";"}, StringSplitOptions.TrimEntries)
+            select line.Split(';', StringSplitOptions.TrimEntries)
             into lineContent
             where lineContent.Length == 2
             select new PackageInfo {Name = lineContent[0], Version = lineContent[1]}).ToList();

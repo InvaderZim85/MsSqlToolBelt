@@ -3,8 +3,6 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.ClassGen;
@@ -72,7 +70,7 @@ public class TableDto : ObservableObject
     /// </summary>
     [Appearance(Ignore = true)]
     [JsonIgnore]
-    public List<ColumnDto> Columns { get; set; } = new();
+    public List<ColumnDto> Columns { get; set; } = [];
 
     /// <summary>
     /// Gets the type of the table
@@ -86,10 +84,10 @@ public class TableDto : ObservableObject
     {
         Columns = Table switch
         {
-            TableEntry table when table.Columns.Any() => table.Columns.Select(s => (ColumnDto) s).ToList(),
-            TableTypeEntry tableType when tableType.Columns.Any() => tableType.Columns.Select(s => (ColumnDto) s)
+            TableEntry { Columns.Count: > 0 } table => table.Columns.Select(s => (ColumnDto) s).ToList(),
+            TableTypeEntry { Columns.Count: > 0 } tableType => tableType.Columns.Select(s => (ColumnDto) s)
                 .ToList(),
-            _ => new List<ColumnDto>()
+            _ => []
         };
     }
 
@@ -103,7 +101,7 @@ public class TableDto : ObservableObject
         {
             Name = table.Name,
             Table = table,
-            Columns = table.Columns.Any() ? table.Columns.Select(s => (ColumnDto) s).ToList() : new List<ColumnDto>(),
+            Columns = table.Columns.Count > 0 ? table.Columns.Select(s => (ColumnDto) s).ToList() : [],
             Type = TableDtoType.Table
         };
     }
@@ -118,7 +116,7 @@ public class TableDto : ObservableObject
         {
             Name = table.Name,
             Table = table,
-            Columns = table.Columns.Any() ? table.Columns.Select(s => (ColumnDto) s).ToList() : new List<ColumnDto>(),
+            Columns = table.Columns.Count > 0 ? table.Columns.Select(s => (ColumnDto) s).ToList() : [],
             Type = TableDtoType.TableType
         };
     }

@@ -4,10 +4,7 @@ using Microsoft.Win32;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
@@ -35,7 +32,7 @@ internal partial class ExportWindowViewModel : ViewModelBase
     /// The list with the export types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<IdTextEntry> _exportTypes = new();
+    private ObservableCollection<IdTextEntry> _exportTypes = [];
 
     /// <summary>
     /// The selected export type

@@ -3,10 +3,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
@@ -91,6 +88,7 @@ internal static class UiHelper
 
             items.Add(entry);
         }
+
         items.OrderBy(sortFunc).ToList().CopyGridToClipboard();
     }
 }

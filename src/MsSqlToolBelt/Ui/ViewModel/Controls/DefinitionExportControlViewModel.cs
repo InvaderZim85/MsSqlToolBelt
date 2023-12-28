@@ -1,19 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
 using MsSqlToolBelt.Ui.View.Common;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -88,13 +84,13 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
     /// The list with the objects
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<DefinitionExportObject> _objects = new();
+    private ObservableCollection<DefinitionExportObject> _objects = [];
 
     /// <summary>
     /// The list with the types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _objectTypes = new();
+    private ObservableCollection<string> _objectTypes = [];
 
     /// <summary>
     /// The selected type
@@ -118,7 +114,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
     /// The list with the tables
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<DefinitionExportObject> _tables = new();
+    private ObservableCollection<DefinitionExportObject> _tables = [];
 
     /// <summary>
     /// Backing field for <see cref="ExportDir"/>
@@ -294,7 +290,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
     public void SetConnection(string dataSource, string database)
     {
         // Reset the lists
-        Objects = new ObservableCollection<DefinitionExportObject>();
+        Objects = [];
         _setText?.Invoke(string.Empty);
         InfoList = string.Empty;
 
@@ -471,7 +467,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         {
             _setControllerMessage = controller.SetMessage;
 
-            await _manager.ExportObjectsAsync(Objects.ToList(), objectList, ExportDir, CreateTypeDir);
+            await _manager.ExportObjectsAsync([.. Objects], objectList, ExportDir, CreateTypeDir);
 
             _setControllerMessage = null;
         }
@@ -522,7 +518,7 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         {
             _setControllerMessage = controller.SetMessage;
 
-            await _manager.ExportTablesAsync(Tables.ToList(), ExportDir, cts.Token);
+            await _manager.ExportTablesAsync([.. Tables], ExportDir, cts.Token);
 
             _setControllerMessage = null;
         }

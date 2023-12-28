@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 
 namespace MsSqlToolBelt.DataObjects.Updater;
 
@@ -46,7 +44,7 @@ public class ReleaseInfo
     /// <summary>
     /// Gets or sets the with the assets
     /// </summary>
-    public List<Asset> Assets { get; set; } = new();
+    public List<Asset> Assets { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the number current version

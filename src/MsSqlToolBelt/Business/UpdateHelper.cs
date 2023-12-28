@@ -2,9 +2,7 @@
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using Serilog;
-using System;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.Business;
 

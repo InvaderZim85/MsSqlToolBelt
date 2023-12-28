@@ -3,6 +3,7 @@ using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 
+#pragma warning disable CA1507 // Use nameof to express symbol names
 /// <summary>
 /// Represents a column
 /// </summary>
@@ -95,3 +96,5 @@ public class ColumnEntry
     /// </summary>
     public string DefaultValue { get; set; } = string.Empty;
 }
+
+#pragma warning restore CA1507 // Use nameof to express symbol names

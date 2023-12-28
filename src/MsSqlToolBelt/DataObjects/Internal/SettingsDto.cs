@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MsSqlToolBelt.DataObjects.Internal;
+﻿namespace MsSqlToolBelt.DataObjects.Internal;
 
 /// <summary>
 /// Represents the settings
@@ -10,15 +8,15 @@ internal class SettingsDto
     /// <summary>
     /// Gets or sets the list with the settings
     /// </summary>
-    public List<SettingsEntry> Settings { get; set; } = new();
+    public List<SettingsEntry> Settings { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the list with the settings
     /// </summary>
-    public List<ServerEntry> Servers { get; set; } = new();
+    public List<ServerEntry> Servers { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the list with the settings
     /// </summary>
-    public List<FilterEntry> Filters { get; set; } = new();
+    public List<FilterEntry> Filters { get; set; } = [];
 }

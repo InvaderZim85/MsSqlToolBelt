@@ -1,5 +1,4 @@
 ﻿using MsSqlToolBelt.Data;
-using System;
 using System.Diagnostics;
 
 namespace MsSqlToolBelt.DataObjects.Common;

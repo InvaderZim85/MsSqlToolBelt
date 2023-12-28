@@ -5,10 +5,7 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Internal;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
@@ -32,7 +29,7 @@ internal partial class SearchHistoryWindowViewModel : ViewModelBase
     /// The list with the search history
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<SearchHistoryEntry> _searchHistory = new();
+    private ObservableCollection<SearchHistoryEntry> _searchHistory = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedEntry"/>

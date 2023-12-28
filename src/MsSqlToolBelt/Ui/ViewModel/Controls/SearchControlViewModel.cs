@@ -5,17 +5,12 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using ZimLabs.CoreLib;
 
@@ -99,7 +94,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The search result
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<SearchResult> _searchResults = new();
+    private ObservableCollection<SearchResult> _searchResults = [];
 
     /// <summary>
     /// Gets or sets the selected result
@@ -111,7 +106,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The list with the result types
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _objectTypes = new();
+    private ObservableCollection<string> _objectTypes = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedObjectType"/>
@@ -175,7 +170,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The list with the table columns
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<ColumnEntry> _columns = new();
+    private ObservableCollection<ColumnEntry> _columns = [];
 
     /// <summary>
     /// Gets or sets the tab index of the table tab control
@@ -190,7 +185,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The list with the job steps
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<JobStepEntry> _jobSteps = new();
+    private ObservableCollection<JobStepEntry> _jobSteps = [];
 
     /// <summary>
     /// Gets or sets the selected job step
@@ -358,17 +353,17 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     /// <returns>The awaitable task</returns>
     [RelayCommand]
-    private async Task ShowHistoryAsync()
+    private Task ShowHistoryAsync()
     {
         _searchHistoryManager ??= new SearchHistoryManager();
         var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
 
         if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
-            return;
+            return Task.CompletedTask;
 
         SearchString = window.SelectedEntry;
 
-        await ExecuteSearchAsync();
+        return ExecuteSearchAsync();
     }
 
     /// <summary>
@@ -431,11 +426,6 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         var controller = await ShowProgressAsync("Search", $"Please wait while searching for \"{SearchString}\"...");
 
-        void ProgressEvent(object? sender, string message)
-        {
-            controller.SetMessage(message);
-        }
-
         try
         {
             // Add the search entry to the history
@@ -450,7 +440,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             _manager.ProgressEvent += ProgressEvent;
 
             // Execute the search
-            await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? new List<FilterEntry>());
+            await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? []);
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
@@ -471,6 +461,13 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             // Remove the event
             _manager.ProgressEvent -= ProgressEvent;
             await controller.CloseAsync();
+        }
+
+        return;
+
+        void ProgressEvent(object? sender, string message)
+        {
+            controller.SetMessage(message);
         }
     }
 
@@ -624,7 +621,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     {
         if (_manager?.SelectedResult?.BoundItem is not JobEntry job)
         {
-            JobSteps = new ObservableCollection<JobStepEntry>();
+            JobSteps = [];
             return;
         }
 
@@ -677,36 +674,6 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private async void EnhanceData(bool forceReload)
     {
-        void ShowData()
-        {
-            ButtonShowIndexEnabled = false;
-
-            // Reset the job / table list
-            Columns = new ObservableCollection<ColumnEntry>();
-            JobSteps = new ObservableCollection<JobStepEntry>();
-
-            switch (_manager.SelectedResult.BoundItem)
-            {
-                case TableEntry table:
-                    Columns = table.Columns.ToObservableCollection();
-                    ButtonShowIndexEnabled = table.Indexes.Any();
-                    ButtonQueryWindowEnabled = true;
-                    _tableDefinitionText = table.Definition;
-                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
-                    break;
-                case TableTypeEntry tableType:
-                    Columns = tableType.Columns.ToObservableCollection();
-                    ButtonShowIndexEnabled = false;
-                    ButtonQueryWindowEnabled = false;
-                    _tableDefinitionText = tableType.Definition;
-                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
-                    break;
-                case JobEntry:
-                    FilterJobSteps();
-                    break;
-            }
-        }
-
         if (_manager?.SelectedResult == null)
             return;
 
@@ -732,6 +699,38 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         {
             await controller.CloseAsync();
         }
+
+        return;
+
+        void ShowData()
+        {
+            ButtonShowIndexEnabled = false;
+
+            // Reset the job / table list
+            Columns = [];
+            JobSteps = [];
+
+            switch (_manager.SelectedResult.BoundItem)
+            {
+                case TableEntry table:
+                    Columns = table.Columns.ToObservableCollection();
+                    ButtonShowIndexEnabled = table.Indexes.Count > 0;
+                    ButtonQueryWindowEnabled = true;
+                    _tableDefinitionText = table.Definition;
+                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
+                    break;
+                case TableTypeEntry tableType:
+                    Columns = tableType.Columns.ToObservableCollection();
+                    ButtonShowIndexEnabled = false;
+                    ButtonQueryWindowEnabled = false;
+                    _tableDefinitionText = tableType.Definition;
+                    _setTableDefinitionText?.Invoke(_tableDefinitionText);
+                    break;
+                case JobEntry:
+                    FilterJobSteps();
+                    break;
+            }
+        }
     }
 
     /// <summary>
@@ -739,12 +738,6 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     private async void LoadTableDefinition()
     {
-        void SetDefinitionText(string text)
-        {
-            _tableDefinitionText = text;
-            _setTableDefinitionText?.Invoke(_tableDefinitionText);
-        }
-
         if (_manager == null)
             return;
 
@@ -781,6 +774,14 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         finally
         {
             await controller.CloseAsync();
+        }
+
+        return;
+
+        void SetDefinitionText(string text)
+        {
+            _tableDefinitionText = text;
+            _setTableDefinitionText?.Invoke(_tableDefinitionText);
         }
     }
 

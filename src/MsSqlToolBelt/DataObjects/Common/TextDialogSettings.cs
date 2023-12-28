@@ -1,6 +1,4 @@
 ﻿using MsSqlToolBelt.Common.Enums;
-using System;
-using System.Threading.Tasks;
 
 namespace MsSqlToolBelt.DataObjects.Common;
 
@@ -35,7 +33,7 @@ public class TextDialogSettings
     public bool ShowOption { get; set; }
 
     /// <summary>
-    /// Gets or sets the text of the check box
+    /// Gets or sets the text of the CheckBox
     /// </summary>
     public string CheckboxText { get; set; } = string.Empty;
 
