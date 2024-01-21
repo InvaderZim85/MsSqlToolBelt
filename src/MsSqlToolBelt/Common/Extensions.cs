@@ -141,4 +141,38 @@ internal static class Extensions
     {
         return $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
     }
+
+    /// <summary>
+    /// Converts the bool into a string (<see langword="true"/> = <c>1</c>, <see langword="false"/> = <c>0</c>)
+    /// </summary>
+    /// <param name="value">The bool value</param>
+    /// <returns>The string value according to the given input value</returns>
+    public static string BoolToString(this bool value)
+    {
+        return value ? "1" : "0";
+    }
+
+    /// <summary>
+    /// Converts a string entry to a bool (<c>"1"</c> = <see langword="true"/>, <c>"0"</c> = <see langword="false"/>)
+    /// </summary>
+    /// <param name="value">The value</param>
+    /// <returns>The bool value according to the given input value</returns>
+    public static bool StringToBool(this string value)
+    {
+        return value.Contains(';')
+            ? value.StringListToBool()?.FirstOrDefault() ?? false
+            : value.Equals("1");
+    }
+
+    /// <summary>
+    /// Converts a comma separated string list into a bool list. For example: <c>"1;0;1"</c> = <see langword="true"/>, <see langword="false"/>, <see langword="true"/>
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The list with the values</returns>
+    public static List<bool> StringListToBool(this string value)
+    {
+        return value.Contains(';')
+            ? value.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.StringToBool()).ToList()
+            : [value.StringToBool()];
+    }
 }

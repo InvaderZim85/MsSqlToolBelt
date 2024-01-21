@@ -80,11 +80,24 @@
                     Command="{Binding ShowHistoryCommand}"
                     Content="History" />
 
-                <CheckBox
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Content="Options:" />
+
+                <StackPanel
                     Grid.Row="1"
                     Grid.Column="1"
-                    Content="Add wildcard automatically (wildcard = * or %)"
-                    IsChecked="{Binding AddWildcardAutomatically}" />
+                    Grid.ColumnSpan="3"
+                    Orientation="Horizontal">
+                    <CheckBox Content="Add wildcard automatically (wildcard = * or %)" IsChecked="{Binding AddWildcardAutomatically}" />
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    <Label Content="Include in search:" />
+                    <CheckBox Content="Tables" IsChecked="{Binding SearchTables}" />
+                    <CheckBox Content="Table types" IsChecked="{Binding SearchTableTypes}" />
+                    <CheckBox Content="Objects" IsChecked="{Binding SearchObjects}" />
+                    <CheckBox Content="Jobs" IsChecked="{Binding SearchJobs}" />
+                </StackPanel>
 
                 <Separator
                     Grid.Row="2"

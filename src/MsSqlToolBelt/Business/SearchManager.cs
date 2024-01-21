@@ -72,15 +72,11 @@ internal class SearchManager(SettingsManager settingsManager, TableManager table
     /// Executes the search and stores the result into <see cref="SearchResults"/>
     /// </summary>
     /// <param name="search">The search term</param>
+    /// <param name="options">The search options</param>
     /// <param name="ignoreList">The list with the ignore filters</param>
     /// <returns>The awaitable task</returns>
-    public async Task SearchAsync(string search, List<FilterEntry> ignoreList)
+    public async Task SearchAsync(string search, SearchOptions options, List<FilterEntry> ignoreList)
     {
-        void AddToResultList(List<SearchResult> resultList, List<SearchResult> searchResult)
-        {
-            resultList.AddRange(ignoreList.Count > 0 ? searchResult.Where(w => w.Name.IsValid(ignoreList)) : searchResult);
-        }
-
         if (search.Contains('*'))
             search = search.Replace("*", "%");
 
@@ -89,33 +85,45 @@ internal class SearchManager(SettingsManager settingsManager, TableManager table
         var result = new List<SearchResult>();
 
         // Load the tables
-        ProgressEvent?.Invoke(this, $"Scanning tables for '{cleanSearchValue}'...");
-        var tables = await _tableManager.LoadTablesAsync(search);
+        if (options.Tables)
+        {
+            ProgressEvent?.Invoke(this, $"Scanning tables for '{cleanSearchValue}'...");
+            var tables = await _tableManager.LoadTablesAsync(search);
 
-        // Add the tables
-        result.AddRange(ignoreList.Count > 0
-            ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
-            : tables.Select(s => (SearchResult) s));
+            // Add the tables
+            result.AddRange(ignoreList.Count > 0
+                ? tables.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult)s)
+                : tables.Select(s => (SearchResult)s));
+        }
 
         // Load the table types
-        ProgressEvent?.Invoke(this, $"Scanning table types for '{cleanSearchValue}'...");
-        var tableTypes = await _tableTypeManager.LoadTableTypesAsync(search);
+        if (options.TableTypes)
+        {
+            ProgressEvent?.Invoke(this, $"Scanning table types for '{cleanSearchValue}'...");
+            var tableTypes = await _tableTypeManager.LoadTableTypesAsync(search);
 
-        // Add the table types
-        result.AddRange(ignoreList.Count > 0
-            ? tableTypes.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult) s)
-            : tableTypes.Select(s => (SearchResult) s));
+            // Add the table types
+            result.AddRange(ignoreList.Count > 0
+                ? tableTypes.Where(w => w.Name.IsValid(ignoreList)).Select(s => (SearchResult)s)
+                : tableTypes.Select(s => (SearchResult)s));
+        }
 
         // Load the other objects (procedures, etc.)
-        ProgressEvent?.Invoke(this, $"Scanning objects (procedures, views, etc.) for '{cleanSearchValue}'...");
-        var objectResult = await _repo.SearchObjectsAsync(search);
-        AddToResultList(result, objectResult);
+        if (options.Objects)
+        {
+            ProgressEvent?.Invoke(this, $"Scanning objects (procedures, views, etc.) for '{cleanSearchValue}'...");
+            var objectResult = await _repo.SearchObjectsAsync(search);
+            AddToResultList(result, objectResult);
+        }
 
         // Load the jobs (this maybe will fail if you don't have access to the MSDB database)
-        ProgressEvent?.Invoke(this, $"Scanning jobs for '{cleanSearchValue}'...");
-        var (jobResult, hasError) = await _repo.SearchJobsAsync(search);
-        AddToResultList(result, jobResult);
-        HasJobSearchError = hasError;
+        if (options.Jobs)
+        {
+            ProgressEvent?.Invoke(this, $"Scanning jobs for '{cleanSearchValue}'...");
+            var (jobResult, hasError) = await _repo.SearchJobsAsync(search);
+            AddToResultList(result, jobResult);
+            HasJobSearchError = hasError;
+        }
 
         SearchResults = result;
 
@@ -123,6 +131,13 @@ internal class SearchManager(SettingsManager settingsManager, TableManager table
         ResultTypes.Clear();
         ResultTypes.Add("All");
         ResultTypes.AddRange(SearchResults.Select(s => s.Type).Distinct().ToList());
+
+        return;
+
+        void AddToResultList(List<SearchResult> resultList, List<SearchResult> searchResult)
+        {
+            resultList.AddRange(ignoreList.Count > 0 ? searchResult.Where(w => w.Name.IsValid(ignoreList)) : searchResult);
+        }
     }
 
     /// <summary>
