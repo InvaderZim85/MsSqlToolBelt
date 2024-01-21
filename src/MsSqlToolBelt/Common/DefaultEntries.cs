@@ -31,4 +31,9 @@ internal static class DefaultEntries
     /// Gets the filepath of the custom color file
     /// </summary>
     public static string CustomColorFile => Path.Combine(AppContext.BaseDirectory, "CustomColors.json");
+
+    /// <summary>
+    /// The link of the wiki page
+    /// </summary>
+    public const string WikiPage = "https://github.com/InvaderZim85/MsSqlToolBelt/wiki";
 }

@@ -245,7 +245,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// The command which occurs when the user hits the template manager menu item (main menu)
     /// </summary>
     [RelayCommand]
-    private void ShowTemplateManager()
+    private static void ShowTemplateManager()
     {
         var dialog = new TemplateWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
@@ -255,7 +255,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// The command which occurs when the user hits the show data type menu item
     /// </summary>
     [RelayCommand]
-    private void ShowDataType()
+    private static void ShowDataType()
     {
         var dialog = new DataTypeWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
@@ -276,6 +276,15 @@ internal partial class MainWindowViewModel : ViewModelBase
         };
 
         serverInfoWindow.ShowDialog();
+    }
+
+    /// <summary>
+    /// Opens the wiki page in the default browser
+    /// </summary>
+    [RelayCommand]
+    private static void OpenWiki()
+    {
+        Helper.OpenLink(DefaultEntries.WikiPage);
     }
     #endregion
 

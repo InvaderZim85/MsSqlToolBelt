@@ -76,7 +76,12 @@ internal static class Helper
             ThemeManager.Current.ChangeTheme(Application.Current, newTheme);
         }
         else
-            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, colorScheme);
+        {
+            var schemeName =
+                ThemeManager.Current.ColorSchemes.FirstOrDefault(f =>
+                    f.Equals(colorScheme, StringComparison.OrdinalIgnoreCase)) ?? DefaultEntries.ColorScheme;
+            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, schemeName);
+        }
     }
 
     /// <summary>

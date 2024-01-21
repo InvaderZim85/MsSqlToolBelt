@@ -9,7 +9,11 @@
     <Version>23.362.0.1222</Version>
     <FileVersion>23.362.0.1222</FileVersion>
     <AssemblyVersion>23.362.0.1222</AssemblyVersion>
+    <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="MsSqlToolBelt.ico" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
