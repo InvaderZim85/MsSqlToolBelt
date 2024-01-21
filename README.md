@@ -4,18 +4,6 @@
 
 [![Releases](https://img.shields.io/github/v/release/InvaderZim85/MsSqlToolBelt)](https://github.com/InvaderZim85/MsSqlToolBelt/releases)
 
-**Content**
-<!-- TOC -->
-
-- [General](#general)
-- [Usage](#usage)
-    - [Ui](#ui)
-    - [Settings](#settings)
-        - [New server](#new-server)
-    - [Search](#search)
-
-<!-- /TOC -->
-
 ## General
 
 The program *MsSqlToolBelt* is a little helper tool which provides a search, a list of all custom table types of a MSSQL database and a C# class generator
