@@ -108,6 +108,11 @@ function ChangeProjectFile($filePath, $newVersion) {
     ChangeXmlNode $filePath "//Version" $newVersion
 }
 
+# Creates a zip archive
+function CreateZipArchive($sourceDir, $targetPath) {
+    Compress-Archive -Path $sourceDir -DestinationPath $targetPath -CompressionLevel Optimal
+}
+
 # ===========================
 # Main entry point
 # ===========================
@@ -162,6 +167,19 @@ try {
 
     # Create the release
     & $dotnet publish "src/MsSqlToolBelt.sln" -p:PublishProfile=src/MsSqlToolBelt/Properties/PublishProfiles/FolderProfile
+
+    # Create the release archive
+    $sourceDir = Join-Path -Path $currentLocation -ChildPath "src\MsSqlToolBelt\bin\Release\net8.0-windows\publish\win-x64\*"
+    $releaseDir = Join-Path -Path $currentLocation -ChildPath "releases"
+    # Create the release dir
+    if(-not [System.IO.Directory]::Exists($releaseDir)) {
+        Write-Host "Create release dir"
+        New-Item -Path $releaseDir -ItemType "directory"
+    }
+    $targetPath = Join-Path -Path $releaseDir -ChildPath "MsSqlToolBelt_v$newVersion.zip"
+
+    Write-Host "Create ZIP archive. Source: $sourceDir; Destination: $targetPath"
+    CreateZipArchive $sourceDir $targetPath
 
     return 0
 }

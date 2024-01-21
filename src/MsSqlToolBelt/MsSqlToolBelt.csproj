@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>23.362.0.1222</Version>
-    <FileVersion>23.362.0.1222</FileVersion>
-    <AssemblyVersion>23.362.0.1222</AssemblyVersion>
+    <Version>24.20.3.796</Version>
+    <FileVersion>24.20.3.796</FileVersion>
+    <AssemblyVersion>24.20.3.796</AssemblyVersion>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
@@ -45,7 +45,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="CustomColors.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Packages.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\ClassDefault.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
