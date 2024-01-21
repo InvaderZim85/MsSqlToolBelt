@@ -5,7 +5,6 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Ui.View.Windows;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
-using System;
 using System.Text;
 using System.Windows;
 
@@ -27,7 +26,7 @@ public partial class App : Application
     private SettingsManager? _settingsManager;
 
     /// <summary>
-    /// The start up date
+    /// The startup date
     /// </summary>
     private DateTime _startUp = DateTime.Now;
 

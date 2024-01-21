@@ -16,6 +16,13 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/dark.yellow.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style TargetType="{x:Type mah:MetroHeader}">
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Margin" Value="3" />
+                <Setter Property="FontStyle" Value="Italic" />
+                <Setter Property="FontSize" Value="13" />
+            </Style>
+
             <Style TargetType="{x:Type Label}">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
@@ -78,7 +85,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontStyle" Value="Italic" />
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase2}" />
             </Style>
 
             <Style
@@ -90,7 +97,7 @@
                 <Setter Property="Margin" Value="3" />
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="FontStyle" Value="Italic" />
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.AccentBase2}" />
             </Style>
 
             <Style BasedOn="{StaticResource MahApps.Styles.Button}" TargetType="{x:Type Button}">

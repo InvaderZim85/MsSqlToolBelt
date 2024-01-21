@@ -52,7 +52,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
     private async Task AddEntryAsync()
     {
         var dialog = new DataTypeInputWindow([.. DataTypes])
-            {Owner = Application.Current.MainWindow};
+            { Owner = GetMainWindow() };
         if (dialog.ShowDialog() != true)
             return;
 
@@ -83,7 +83,7 @@ internal partial class DataTypeWindowViewModel : ViewModelBase
         var original = SelectedEntry.Clone();
 
         var dialog = new DataTypeInputWindow([.. DataTypes], SelectedEntry)
-            {Owner = Application.Current.MainWindow};
+            { Owner = GetMainWindow() };
 
         if (dialog.ShowDialog() != true)
         {

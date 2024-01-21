@@ -80,23 +80,35 @@
                     Command="{Binding ShowHistoryCommand}"
                     Content="History" />
 
-                <CheckBox
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Content="Options:" />
+
+                <StackPanel
                     Grid.Row="1"
                     Grid.Column="1"
-                    Content="Add wildcard automatically (wildcard = * or %)"
-                    IsChecked="{Binding AddWildcardAutomatically}" />
+                    Grid.ColumnSpan="3"
+                    Orientation="Horizontal">
+                    <CheckBox Content="Add wildcard automatically (wildcard = * or %)" IsChecked="{Binding AddWildcardAutomatically}" />
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    <Label Content="Include in search:" />
+                    <CheckBox Content="Tables" IsChecked="{Binding SearchTables}" />
+                    <CheckBox Content="Table types" IsChecked="{Binding SearchTableTypes}" />
+                    <CheckBox Content="Objects" IsChecked="{Binding SearchObjects}" />
+                    <CheckBox Content="Jobs" IsChecked="{Binding SearchJobs}" />
+                </StackPanel>
 
                 <Separator
                     Grid.Row="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="4" />
 
-                <Label
+                <mah:MetroHeader
                     Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Content="{Binding HeaderResult}"
-                    Style="{StaticResource Headline}" />
+                    Content="{Binding HeaderResult}" />
 
                 <StackPanel
                     Grid.Row="3"
@@ -185,7 +197,6 @@
             Style="{StaticResource BorderStyle}"
             Visibility="{Binding ShowMain, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid>
-
                 <iconPacks:PackIconPixelartIcons
                     Width="100"
                     Height="100"
@@ -200,8 +211,6 @@
                     Content="Select an entry to view the data here..." />
 
             </Grid>
-
-
         </Border>
 
         <!--  SQL Text  -->
@@ -218,10 +227,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Preview"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Preview" />
 
                 <Separator Grid.Row="1" />
 
@@ -263,10 +269,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Label
-                            Grid.Row="0"
-                            Content="Table columns"
-                            Style="{StaticResource Headline}" />
+                        <mah:MetroHeader Grid.Row="0" Content="Table columns" />
 
                         <Separator Grid.Row="1" />
 
@@ -372,10 +375,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Label
-                            Grid.Row="0"
-                            Content="Table definition"
-                            Style="{StaticResource Headline}" />
+                        <mah:MetroHeader Grid.Row="0" Content="Table definition" />
 
                         <Separator Grid.Row="1" />
 
@@ -424,17 +424,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label
+                <mah:MetroHeader
                     Grid.Row="0"
                     Grid.Column="0"
-                    Content="Job steps"
-                    Style="{StaticResource Headline}" />
+                    Content="Job steps" />
 
-                <Label
+                <mah:MetroHeader
                     Grid.Row="0"
                     Grid.Column="2"
-                    Content="Details"
-                    Style="{StaticResource Headline}" />
+                    Content="Details" />
 
                 <Separator
                     Grid.Row="1"

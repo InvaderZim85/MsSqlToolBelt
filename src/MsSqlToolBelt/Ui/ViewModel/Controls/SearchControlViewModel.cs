@@ -11,7 +11,9 @@ using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using System.Collections.ObjectModel;
-using System.Windows;
+using System.Runtime.CompilerServices;
+using System.Windows.Markup.Localizer;
+using Dapper;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -161,6 +163,30 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     [ObservableProperty]
     private bool _hideMsdbViolationMessage;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if tables should be searched
+    /// </summary>
+    [ObservableProperty]
+    private bool _searchTables = true;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if table types should be searched
+    /// </summary>
+    [ObservableProperty]
+    private bool _searchTableTypes = true;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if objects (procedures, etc.) should be searched
+    /// </summary>
+    [ObservableProperty]
+    private bool _searchObjects = true;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if jobs should be searched
+    /// </summary>
+    [ObservableProperty]
+    private bool _searchJobs = true;
 
     #endregion
 
@@ -344,7 +370,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (SelectedResult?.BoundItem is not TableEntry table)
             return;
 
-        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
+        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = GetMainWindow() };
         window.ShowDialog();
     }
 
@@ -356,7 +382,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private Task ShowHistoryAsync()
     {
         _searchHistoryManager ??= new SearchHistoryManager();
-        var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
+        var window = new SearchHistoryWindow(_searchHistoryManager) { Owner = GetMainWindow() };
 
         if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
             return Task.CompletedTask;
@@ -377,7 +403,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         var window = new TableIndexWindow(_tableManager, table)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
         window.ShowDialog();
     }
@@ -440,7 +466,24 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             _manager.ProgressEvent += ProgressEvent;
 
             // Execute the search
-            await _manager.SearchAsync(SearchString, _settingsManager?.FilterList ?? []);
+            var options = new SearchOptions
+            {
+                Tables = SearchTables,
+                TableTypes = SearchTableTypes,
+                Objects = SearchObjects,
+                Jobs = SearchJobs
+            };
+
+            if (!options.OptionsValid)
+            {
+                await ShowMessageAsync("Search", "You have to select at least one search option.");
+                return;
+            }
+
+            // Save the options
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.SearchOptions, options.ToString());
+
+            await _manager.SearchAsync(SearchString, options, _settingsManager?.FilterList ?? []);
             ObjectTypes = _manager.ResultTypes.ToObservableCollection();
             SelectedObjectType = ObjectTypes.FirstOrDefault() ?? "All";
 
@@ -510,6 +553,31 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         try
         {
             AddWildcardAutomatically = await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
+
+            var searchOptions = await SettingsManager.LoadSettingsValueAsync<string>(SettingsKey.SearchOptions);
+            if (string.IsNullOrWhiteSpace(searchOptions)) 
+                return;
+
+            // Set the options
+            var tmpOptions = searchOptions.StringListToBool();
+            for (var i = 0; i < tmpOptions.Count; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        SearchTables = tmpOptions[i];
+                        break;
+                    case 1:
+                        SearchTableTypes = tmpOptions[i];
+                        break;
+                    case 2:
+                        SearchObjects = tmpOptions[i];
+                        break;
+                    case 3:
+                        SearchJobs = tmpOptions[i];
+                        break;
+                }
+            }
         }
         catch (Exception ex)
         {

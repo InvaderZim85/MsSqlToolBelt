@@ -1,4 +1,6 @@
-﻿namespace MsSqlToolBelt.Common;
+﻿using System.IO;
+
+namespace MsSqlToolBelt.Common;
 
 /// <summary>
 /// Provides several default entries
@@ -24,4 +26,14 @@ internal static class DefaultEntries
     /// The default amount of search history entries
     /// </summary>
     public const int SearchHistoryCount = 50;
+
+    /// <summary>
+    /// Gets the filepath of the custom color file
+    /// </summary>
+    public static string CustomColorFile => Path.Combine(AppContext.BaseDirectory, "CustomColors.json");
+
+    /// <summary>
+    /// The link of the wiki page
+    /// </summary>
+    public const string WikiPage = "https://github.com/InvaderZim85/MsSqlToolBelt/wiki";
 }

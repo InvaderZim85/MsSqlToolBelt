@@ -41,10 +41,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="{Binding HeaderList}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderList}" />
 
                 <StackPanel
                     Grid.Row="0"
@@ -128,10 +125,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="{Binding HeaderColumns}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderColumns}" />
 
                 <Separator Grid.Row="1" />
 
@@ -224,10 +218,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label
-                        Grid.Row="0"
-                        Content="Generator"
-                        Style="{StaticResource Headline}" />
+                    <mah:MetroHeader Grid.Row="0" Content="Generator" />
 
                     <Separator Grid.Row="1" />
 
@@ -370,10 +361,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label
-                        Grid.Row="0"
-                        Content="C# class"
-                        Style="{StaticResource Headline}" />
+                    <mah:MetroHeader Grid.Row="0" Content="C# class" />
 
                     <Separator Grid.Row="1" />
 
@@ -427,10 +415,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label
-                        Grid.Row="0"
-                        Content="SQL query"
-                        Style="{StaticResource Headline}" />
+                    <mah:MetroHeader Grid.Row="0" Content="SQL query" />
 
                     <Separator Grid.Row="1" />
 

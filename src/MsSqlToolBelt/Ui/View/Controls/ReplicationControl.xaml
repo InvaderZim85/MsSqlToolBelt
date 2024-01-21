@@ -36,10 +36,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="{Binding HeaderList}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderList}" />
 
                 <Separator Grid.Row="1" />
 
@@ -97,10 +94,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="{Binding HeaderColumns}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderColumns}" />
 
                 <Separator Grid.Row="1" />
 
@@ -144,10 +138,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <Label
-                    Grid.Row="3"
-                    Content="{Binding HeaderIndex}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="3" Content="{Binding HeaderIndex}" />
 
                 <Separator Grid.Row="4" />
 

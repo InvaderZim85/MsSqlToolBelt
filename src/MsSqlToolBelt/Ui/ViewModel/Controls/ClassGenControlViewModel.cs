@@ -306,7 +306,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
             CodeType = CodeType.CSharp
         })
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
 
         dialog.ShowDialog();
@@ -320,7 +320,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         if (_manager == null)
             return;
 
-        var exportDialog = new ClassGenWindow(_manager) {Owner = Application.Current.MainWindow};
+        var exportDialog = new ClassGenWindow(_manager) {Owner = GetMainWindow()};
         exportDialog.ShowDialog();
     });
 
@@ -590,7 +590,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
             CodeType = CodeType.Sql
         })
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
 
         dialog.ShowDialog();

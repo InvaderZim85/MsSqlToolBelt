@@ -237,7 +237,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ShowUpdateInfo()
     {
-        var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
+        var dialog = new UpdateWindow(_releaseInfo) { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -247,7 +247,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private static void ShowTemplateManager()
     {
-        var dialog = new TemplateWindow { Owner = Application.Current.MainWindow };
+        var dialog = new TemplateWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -257,7 +257,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private static void ShowDataType()
     {
-        var dialog = new DataTypeWindow { Owner = Application.Current.MainWindow };
+        var dialog = new DataTypeWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -272,10 +272,19 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         var serverInfoWindow = new ServerInfoWindow(_baseManager)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
 
         serverInfoWindow.ShowDialog();
+    }
+
+    /// <summary>
+    /// Opens the wiki page in the default browser
+    /// </summary>
+    [RelayCommand]
+    private static void OpenWiki()
+    {
+        Helper.OpenLink(DefaultEntries.WikiPage);
     }
     #endregion
 

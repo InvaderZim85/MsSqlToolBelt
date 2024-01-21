@@ -55,12 +55,11 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Label
+                <mah:MetroHeader
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="7"
-                    Content="Options"
-                    Style="{StaticResource Headline}" />
+                    Content="Options" />
 
                 <Separator
                     Grid.Row="1"
@@ -188,10 +187,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="{Binding HeaderTables}"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderTables}" />
 
                 <Separator Grid.Row="1" />
 
@@ -279,10 +275,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Export info"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Export info" />
 
                 <Separator Grid.Row="1" />
 

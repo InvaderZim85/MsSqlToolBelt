@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Media;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
@@ -104,5 +105,74 @@ internal static class Extensions
     public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
     {
         return new ObservableCollection<T>(source);
+    }
+
+    /// <summary>
+    /// Formats the time span into a readable string
+    /// </summary>
+    /// <param name="value">The original value</param>
+    /// <param name="showDays"><see langword="true"/> to show the days, otherwise false</param>
+    /// <returns>The formatted time span</returns>
+    public static string ToFormattedString(this TimeSpan value, bool showDays = false)
+    {
+        return showDays
+            ? $"{value.TotalDays:N0}d {value.Hours:00}:{value.Minutes:00}:{value.Seconds:00}"
+            : $"{value.TotalHours:#00}:{value.Minutes:00}:{value.Seconds:00}";
+    }
+
+    /// <summary>
+    /// Converts the color to a HEX value (for example <i>Green</i> > <c>#FF00FF00</c>)
+    /// </summary>
+    /// <param name="color">The color</param>
+    /// <returns>The HEX value of the color</returns>
+    public static string ToHex(this Color? color)
+    {
+        return color == null
+            ? string.Empty
+            : color.Value.ToHex();
+    }
+
+    /// <summary>
+    /// Converts the color to a HEX value (for example <i>Green</i> > <c>#FF00FF00</c>)
+    /// </summary>
+    /// <param name="color">The color</param>
+    /// <returns>The HEX value of the color</returns>
+    public static string ToHex(this Color color)
+    {
+        return $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+
+    /// <summary>
+    /// Converts the bool into a string (<see langword="true"/> = <c>1</c>, <see langword="false"/> = <c>0</c>)
+    /// </summary>
+    /// <param name="value">The bool value</param>
+    /// <returns>The string value according to the given input value</returns>
+    public static string BoolToString(this bool value)
+    {
+        return value ? "1" : "0";
+    }
+
+    /// <summary>
+    /// Converts a string entry to a bool (<c>"1"</c> = <see langword="true"/>, <c>"0"</c> = <see langword="false"/>)
+    /// </summary>
+    /// <param name="value">The value</param>
+    /// <returns>The bool value according to the given input value</returns>
+    public static bool StringToBool(this string value)
+    {
+        return value.Contains(';')
+            ? value.StringListToBool()?.FirstOrDefault() ?? false
+            : value.Equals("1");
+    }
+
+    /// <summary>
+    /// Converts a comma separated string list into a bool list. For example: <c>"1;0;1"</c> = <see langword="true"/>, <see langword="false"/>, <see langword="true"/>
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The list with the values</returns>
+    public static List<bool> StringListToBool(this string value)
+    {
+        return value.Contains(';')
+            ? value.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.StringToBool()).ToList()
+            : [value.StringToBool()];
     }
 }

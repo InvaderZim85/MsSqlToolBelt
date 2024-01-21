@@ -61,6 +61,15 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
+    /// Gets the main window
+    /// </summary>
+    /// <returns>The main window</returns>
+    protected static Window GetMainWindow()
+    {
+        return Application.Current.MainWindow!;
+    }
+
+    /// <summary>
     /// Shows a message dialog
     /// </summary>
     /// <param name="title">The title of the dialog</param>
@@ -260,7 +269,7 @@ internal class ViewModelBase : ObservableObject
         ProgressDialogController? controller = null;
         try
         {
-            var dialog = new ExportWindow(defaultName, ExportDataType.List) {Owner = Application.Current.MainWindow};
+            var dialog = new ExportWindow(defaultName, ExportDataType.List) {Owner = GetMainWindow() };
             if (dialog.ShowDialog() != true)
                 return;
 
@@ -306,7 +315,7 @@ internal class ViewModelBase : ObservableObject
         ProgressDialogController? controller = null;
         try
         {
-            var dialog = new ExportWindow(defaultName, ExportDataType.List) { Owner = Application.Current.MainWindow };
+            var dialog = new ExportWindow(defaultName, ExportDataType.List) { Owner = GetMainWindow() };
             if (dialog.ShowDialog() != true)
                 return;
 

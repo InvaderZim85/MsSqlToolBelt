@@ -44,6 +44,9 @@
                 Command="{Binding ShowUpdateInfoCommand}"
                 Content="Update available!"
                 Visibility="{Binding ButtonUpdateVisible}" />
+            <Button Command="{Binding OpenWikiCommand}" ToolTip="Opens the manual (wiki)">
+                <iconPacks:PackIconPixelartIcons Kind="BookOpen" />
+            </Button>
             <Button Command="{Binding InfoCommand}" ToolTip="Shows information about the program">
                 <iconPacks:PackIconPixelartIcons Kind="InfoBox" />
             </Button>

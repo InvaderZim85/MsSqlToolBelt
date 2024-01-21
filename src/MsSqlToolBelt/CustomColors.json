@@ -1,0 +1,30 @@
+[
+    {
+        "Name": "Windows 11",
+        "Color": "#FF1F1F1F"
+    },
+    {
+        "Name": "GitHub",
+        "Color": "#FF1E2327"
+    },
+    {
+        "Name": "Gray",
+        "Color": "#FF656565"
+    },
+    {
+        "Name": "Orange 1",
+        "Color": "#FFFFA000"
+    },
+    {
+        "Name": "Orange 2",
+        "Color": "#FFFF8000"
+    },
+    {
+        "Name": "Orange 3",
+        "Color": "#FFE57917"
+    },
+    {
+        "Name": "Orange 4",
+        "Color": "#FFFF5300"
+    }
+]

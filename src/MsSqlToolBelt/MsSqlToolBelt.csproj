@@ -6,35 +6,31 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>24.3.0.545</Version>
-    <FileVersion>24.3.0.545</FileVersion>
-    <AssemblyVersion>24.3.0.545</AssemblyVersion>
+    <Version>24.20.3.796</Version>
+    <FileVersion>24.20.3.796</FileVersion>
+    <AssemblyVersion>24.20.3.796</AssemblyVersion>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Packages.csv" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MsSqlToolBelt.ico" />
-    <Resource Include="Packages.csv" />
+    <Content Include="MsSqlToolBelt.ico" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Dapper" Version="2.1.24" />
+    <PackageReference Include="Dapper" Version="2.1.28" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="4.11.0" />
     <PackageReference Include="Markdig" Version="0.34.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="170.9.0" />
-    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.21.0" />
+    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="171.24.0" />
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.23.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.8.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
@@ -46,6 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CustomColors.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Packages.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\ClassDefault.cgt">
