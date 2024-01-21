@@ -41,10 +41,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Information"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Information" />
 
                 <TextBox
                     Grid.Row="1"
@@ -100,10 +97,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Details"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Details" />
 
                 <Separator Grid.Row="1" />
 

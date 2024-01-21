@@ -6,18 +6,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>24.3.0.545</Version>
-    <FileVersion>24.3.0.545</FileVersion>
-    <AssemblyVersion>24.3.0.545</AssemblyVersion>
-    <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
+    <Version>23.362.0.1222</Version>
+    <FileVersion>23.362.0.1222</FileVersion>
+    <AssemblyVersion>23.362.0.1222</AssemblyVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Packages.csv" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MsSqlToolBelt.ico" />
-    <Resource Include="Packages.csv" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
@@ -47,6 +39,9 @@
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CustomColors.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Templates\ClassDefault.cgt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

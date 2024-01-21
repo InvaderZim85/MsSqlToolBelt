@@ -344,7 +344,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (SelectedResult?.BoundItem is not TableEntry table)
             return;
 
-        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = Application.Current.MainWindow };
+        var window = new TableQueryWindow(_dataSource, _database, table) { Owner = GetMainWindow() };
         window.ShowDialog();
     }
 
@@ -356,7 +356,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private Task ShowHistoryAsync()
     {
         _searchHistoryManager ??= new SearchHistoryManager();
-        var window = new SearchHistoryWindow(_searchHistoryManager) {Owner = Application.Current.MainWindow};
+        var window = new SearchHistoryWindow(_searchHistoryManager) { Owner = GetMainWindow() };
 
         if (window.ShowDialog() == false || string.IsNullOrEmpty(window.SelectedEntry))
             return Task.CompletedTask;
@@ -377,7 +377,7 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
 
         var window = new TableIndexWindow(_tableManager, table)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
         window.ShowDialog();
     }

@@ -94,10 +94,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <Label
-                                Grid.Row="0"
-                                Content="Objects (procedures, views, etc.)"
-                                Style="{StaticResource Headline}" />
+                            <mah:MetroHeader Grid.Row="0" Content="Objects (procedures, views, etc.)" />
 
                             <StackPanel
                                 Grid.Row="0"
@@ -183,10 +180,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <Label
-                                Grid.Row="0"
-                                Content="Custom list"
-                                Style="{StaticResource Headline}" />
+                            <mah:MetroHeader Grid.Row="0" Content="Custom list" />
 
                             <Separator Grid.Row="1" />
 
@@ -244,10 +238,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Label
-                            Grid.Row="0"
-                            Content="Tables"
-                            Style="{StaticResource Headline}" />
+                        <mah:MetroHeader Grid.Row="0" Content="Tables" />
 
                         <Separator Grid.Row="1" />
 
@@ -316,10 +307,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Export info"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Export info" />
 
                 <Separator Grid.Row="1" />
 

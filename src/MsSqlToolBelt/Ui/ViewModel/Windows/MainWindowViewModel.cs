@@ -237,7 +237,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ShowUpdateInfo()
     {
-        var dialog = new UpdateWindow(_releaseInfo) { Owner = Application.Current.MainWindow };
+        var dialog = new UpdateWindow(_releaseInfo) { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -245,9 +245,9 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// The command which occurs when the user hits the template manager menu item (main menu)
     /// </summary>
     [RelayCommand]
-    private static void ShowTemplateManager()
+    private void ShowTemplateManager()
     {
-        var dialog = new TemplateWindow { Owner = Application.Current.MainWindow };
+        var dialog = new TemplateWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -255,9 +255,9 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// The command which occurs when the user hits the show data type menu item
     /// </summary>
     [RelayCommand]
-    private static void ShowDataType()
+    private void ShowDataType()
     {
-        var dialog = new DataTypeWindow { Owner = Application.Current.MainWindow };
+        var dialog = new DataTypeWindow { Owner = GetMainWindow() };
         dialog.ShowDialog();
     }
 
@@ -272,7 +272,7 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         var serverInfoWindow = new ServerInfoWindow(_baseManager)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
 
         serverInfoWindow.ShowDialog();

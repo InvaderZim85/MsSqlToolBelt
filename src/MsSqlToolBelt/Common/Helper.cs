@@ -12,6 +12,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Windows.Media;
+using MsSqlToolBelt.DataObjects.Internal;
+using Newtonsoft.Json;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Common;
@@ -25,6 +28,11 @@ internal static class Helper
     /// Contains the instance of the taskbar manager
     /// </summary>
     private static TaskbarManager? _taskbarInstance;
+
+    /// <summary>
+    /// Contains the list with the custom color schemes
+    /// </summary>
+    private static List<CustomColorScheme> _customColorSchemes = [];
 
     /// <summary>
     /// Init the logger
@@ -48,18 +56,7 @@ internal static class Helper
         context.Database.Migrate();
     }
 
-    /// <summary>
-    /// Formats the time span into a readable string
-    /// </summary>
-    /// <param name="value">The original value</param>
-    /// <param name="showDays"><see langword="true"/> to show the days, otherwise false</param>
-    /// <returns>The formatted time span</returns>
-    public static string ToFormattedString(this TimeSpan value, bool showDays = false)
-    {
-        return showDays
-            ? $"{value.TotalDays:N0}d {value.Hours:00}:{value.Minutes:00}:{value.Seconds:00}"
-            : $"{value.TotalHours:#00}:{value.Minutes:00}:{value.Seconds:00}";
-    }
+    #region Color theme
 
     /// <summary>
     /// Sets the color scheme
@@ -67,8 +64,91 @@ internal static class Helper
     /// <param name="colorScheme">The scheme which should be set</param>
     public static void SetColorTheme(string colorScheme)
     {
-        ThemeManager.Current.ChangeThemeColorScheme(Application.Current, colorScheme);
+        var customColors = LoadCustomColors();
+        if (customColors.Select(s => s.Name).Contains(colorScheme, StringComparer.OrdinalIgnoreCase))
+        {
+            var customColor = customColors.FirstOrDefault(f => f.Name.Equals(colorScheme, StringComparison.OrdinalIgnoreCase));
+            if (customColor == null)
+                return;
+            
+            var newTheme = new Theme("AppTheme", "AppTheme", "Dark", customColor.ColorValue.ToHex(), customColor.ColorValue,
+                new SolidColorBrush(customColor.ColorValue), true, false);
+            ThemeManager.Current.ChangeTheme(Application.Current, newTheme);
+        }
+        else
+            ThemeManager.Current.ChangeThemeColorScheme(Application.Current, colorScheme);
     }
+
+    /// <summary>
+    /// Loads the custom colors
+    /// </summary>
+    /// <returns>The list with the custom color</returns>
+    public static List<CustomColorScheme> LoadCustomColors()
+    {
+        if (_customColorSchemes.Count > 0)
+            return _customColorSchemes;
+
+        if (!File.Exists(DefaultEntries.CustomColorFile))
+            return []; // Return an empty list
+
+        try
+        {
+            var content = File.ReadAllText(DefaultEntries.CustomColorFile);
+
+            _customColorSchemes = JsonConvert.DeserializeObject<List<CustomColorScheme>>(content) ?? [];
+
+            return _customColorSchemes;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Can't load custom colors. File: '{path}'", DefaultEntries.CustomColorFile);
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Saves the list with the custom colors
+    /// </summary>
+    /// <param name="customColors">The list with the custom colors</param>
+    /// <returns><see langword="true"/> when the colors were saves successfully, otherwise <see langword="false"/></returns>
+    public static bool SaveCustomColors(List<CustomColorScheme> customColors)
+    {
+        if (customColors.Count == 0)
+            return true;
+
+        try
+        {
+            var content = JsonConvert.SerializeObject(customColors, Formatting.Indented);
+
+            File.WriteAllText(DefaultEntries.CustomColorFile, content);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Can't save custom colors. File: '{path}'", DefaultEntries.CustomColorFile);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Removes a custom color from the list
+    /// </summary>
+    /// <param name="name">The name of the color</param>
+    /// <returns><see langword="true"/> when the color was deleted successfully, otherwise <see langword="false"/></returns>
+    public static bool RemoveCustomColor(string name)
+    {
+        var customColors = LoadCustomColors();
+
+        var customColor = customColors.FirstOrDefault(f => f.Name.Equals(name));
+        if (customColor == null)
+            return true;
+
+        customColors.Remove(customColor);
+
+        return SaveCustomColors(customColors);
+    }
+    #endregion
 
     /// <summary>
     /// Creates a list of the <see cref="FilterType"/> enum

@@ -1,0 +1,99 @@
+﻿<mah:MetroWindow
+    x:Class="MsSqlToolBelt.Ui.View.Windows.CustomColorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Windows"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:windows="clr-namespace:MsSqlToolBelt.Ui.ViewModel.Windows"
+    Title="Custom theme color"
+    Width="400"
+    Height="170"
+    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+    BorderThickness="1"
+    IsMaxRestoreButtonEnabled="False"
+    IsMinButtonEnabled="False"
+    Loaded="CustomColorWindow_OnLoaded"
+    ResizeMode="NoResize"
+    TitleCharacterCasing="Normal"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Window.DataContext>
+        <windows:CustomColorWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            Content="Name:" />
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="1"
+            Text="{Binding Name}" />
+
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            Content="Color:" />
+        <mah:ColorPicker
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="3"
+            SelectedColor="{Binding SelectedColor}" />
+
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            Content="Note:"
+            Style="{StaticResource ItemKey}" />
+
+        <TextBlock Grid.Row="2" Grid.Column="1">
+            Depending on the color selected, some texts / headings may no<LineBreak />
+            longer be clearly legible.</TextBlock>
+
+        <Separator
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2" />
+
+        <Label
+            Grid.Row="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Left"
+            Content="{Binding InfoMessage}"
+            Foreground="Red" />
+
+        <StackPanel
+            Grid.Row="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            FlowDirection="RightToLeft"
+            Orientation="Horizontal">
+            <Button
+                Width="60"
+                Command="{Binding CloseWindowCommand}"
+                Content="Close" />
+            <Button
+                Width="60"
+                Command="{Binding SaveColorCommand}"
+                Content="Ok" />
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

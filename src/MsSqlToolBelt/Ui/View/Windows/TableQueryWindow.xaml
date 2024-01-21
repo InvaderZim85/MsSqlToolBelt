@@ -41,10 +41,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock
-                    Grid.Row="0"
-                    Style="{StaticResource HeadlineBlock}"
-                    Text="{Binding TableName}" />
+                <mah:MetroHeader Grid.Row="0" Content="{Binding TableName}" />
 
                 <Separator Grid.Row="1" />
 
@@ -90,10 +87,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Content="Content"
-                    Style="{StaticResource Headline}" />
+                <mah:MetroHeader Grid.Row="0" Content="Content" />
 
                 <Separator Grid.Row="1" />
 

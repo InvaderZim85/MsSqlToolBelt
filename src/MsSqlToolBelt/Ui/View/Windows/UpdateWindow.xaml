@@ -42,12 +42,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label
+        <mah:MetroHeader
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Content="A new version of the MsSqlToolBelt is available!"
-            Style="{StaticResource Headline}" />
+            Content="A new version of the MsSqlToolBelt is available!" />
         <Separator
             Grid.Row="1"
             Grid.Column="0"

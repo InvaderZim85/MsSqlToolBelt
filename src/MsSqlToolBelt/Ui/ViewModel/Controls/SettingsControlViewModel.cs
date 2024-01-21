@@ -10,7 +10,7 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
-using System.Windows;
+using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -31,23 +31,23 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// The list with the color themes
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<string> _colorThemeList = [];
+    private ObservableCollection<ColorEntry> _colorThemeList = [];
 
     /// <summary>
     /// Backing field for <see cref="SelectedColorTheme"/>
     /// </summary>
-    private string? _selectedColorTheme = string.Empty;
+    private ColorEntry? _selectedColorTheme;
 
     /// <summary>
     /// Gets or sets the selected color theme
     /// </summary>
-    public string? SelectedColorTheme
+    public ColorEntry? SelectedColorTheme
     {
         get => _selectedColorTheme;
         set
         {
-            if (SetProperty(ref _selectedColorTheme, value) && !string.IsNullOrEmpty(value))
-                Helper.SetColorTheme(value);
+            if (SetProperty(ref _selectedColorTheme, value) && value != null)
+                Helper.SetColorTheme(value.Name);
         }
     }
     #endregion
@@ -179,10 +179,12 @@ internal partial class SettingsControlViewModel : ViewModelBase
             // Init the filter types
             FilterTypeList = Helper.CreateFilterTypeList().ToObservableCollection();
 
+            // Preselect a theme
+            var themeName =
+                await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
+
             // Load the colors
-            ColorThemeList = ThemeManager.Current.ColorSchemes.ToObservableCollection();
-            var themeName = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
-            SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Equals(themeName, StringComparison.OrdinalIgnoreCase));
+            AddColors(themeName);
 
             // Load the server
             await LoadServerAsync();
@@ -205,20 +207,83 @@ internal partial class SettingsControlViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Adds the colors
+    /// </summary>
+    /// <param name="preSelection">The name of the color which should be selected</param>
+    private void AddColors(string preSelection)
+    {
+        var tmpList = new List<ColorEntry>();
+        tmpList.AddRange(ThemeManager.Current.ColorSchemes.Select(s => new ColorEntry(s, false)));
+
+        // Add the custom colors
+        tmpList.AddRange(Helper.LoadCustomColors().Select(s => s.Name).Select(s => new ColorEntry(s, true)));
+
+        ColorThemeList = tmpList.ToObservableCollection();
+
+        SelectedColorTheme = ColorThemeList.FirstOrDefault(f => f.Name.EqualsIgnoreCase(preSelection));
+    }
+
+    /// <summary>
+    /// Adds the window to add a new color
+    /// </summary>
+    [RelayCommand]
+    private void AddCustomColor()
+    {
+        var dialog = new CustomColorWindow
+        {
+            Owner = GetMainWindow()
+        };
+
+        if (dialog.ShowDialog() != true)
+            return;
+            
+        AddColors(dialog.ColorName);
+    }
+
+    /// <summary>
+    /// Deletes the selected custom color
+    /// </summary>
+    [RelayCommand]
+    private async Task DeleteCustomColorAsync()
+    {
+        if (SelectedColorTheme == null)
+            return;
+
+        if (!SelectedColorTheme.CustomColor)
+        {
+            await ShowMessageAsync("Color", "You can't delete a default color. Please select a custom color.");
+            return;
+        }
+
+        // Save the custom colors
+        var result = Helper.RemoveCustomColor(SelectedColorTheme.Name);
+
+        if (result)
+        {
+            AddColors(ColorThemeList.FirstOrDefault()?.Name ?? string.Empty);
+        }
+        else
+        {
+            await ShowMessageAsync("Color",
+                $"An error has occurred while deleting the color '{SelectedColorTheme.Name}'");
+        }
+    }
+
+    /// <summary>
     /// Saves the current theme
     /// </summary>
     /// <returns>The awaitable task</returns>
     [RelayCommand]
     private async Task SaveThemeAsync()
     {
-        if (string.IsNullOrEmpty(SelectedColorTheme))
+        if (SelectedColorTheme == null)
             return;
 
         var controller = await ShowProgressAsync("Save", "Please wait while saving the theme...");
 
         try
         {
-            await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme);
+            await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme.Name);
         }
         catch (Exception ex)
         {
@@ -260,7 +325,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddServerAsync()
     {
-        var dialog = new EditServerWindow { Owner = Application.Current.MainWindow };
+        var dialog = new EditServerWindow { Owner = GetMainWindow() };
         if (dialog.ShowDialog() == false)
             return;
 
@@ -298,7 +363,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
         var dialog = new EditServerWindow
         {
             SelectedServer = SelectedServer,
-            Owner = Application.Current.MainWindow
+            Owner = GetMainWindow()
         };
         if (dialog.ShowDialog() == false)
             return;
