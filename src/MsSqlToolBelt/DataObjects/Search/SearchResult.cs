@@ -1,4 +1,5 @@
-﻿using MsSqlToolBelt.Common.Enums;
+﻿using MsSqlToolBelt.Common;
+using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using Newtonsoft.Json;
@@ -14,6 +15,7 @@ internal class SearchResult
     /// <summary>
     /// Gets or sets the name
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; init; } = string.Empty;
 
     /// <summary>

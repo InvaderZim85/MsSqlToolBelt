@@ -1,9 +1,11 @@
 ﻿using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
@@ -57,17 +59,51 @@ internal static class UiHelper
     /// <param name="dataGrid">The desired data grid</param>
     public static void CopyToClipboard<T>(this DataGrid dataGrid) where T : class
     {
-        var items = new List<T>();
-
-        foreach (var item in dataGrid.SelectedItems)
+        switch (dataGrid.SelectedItems.Count)
         {
-            if (item is not T entry)
-                continue;
-            
-            items.Add(entry);
+            case 0:
+                return;
+            case 1:
+                if (dataGrid.SelectedItem is not T line)
+                    return;
+
+                var copyOnlyName = SettingsManager.LoadSettingsValue(SettingsKey.CopyGridSingleLineOnlyValue, false);
+                if (copyOnlyName)
+                {
+                    var tmpValue = line.GetCopyValue();
+                    if (string.IsNullOrEmpty(tmpValue))
+                        CopyAsList();
+                    else
+                        Clipboard.SetText(tmpValue);
+                }
+                else
+                {
+                    CopyAsList();
+                }
+                break;
+            default:
+            {
+                CopyAsList();
+                break;
+            }
         }
 
-        items.CopyGridToClipboard();
+        return;
+
+        void CopyAsList()
+        {
+            var items = new List<T>();
+
+            foreach (var item in dataGrid.SelectedItems)
+            {
+                if (item is not T entry)
+                    continue;
+
+                items.Add(entry);
+            }
+
+            items.CopyGridToClipboard();
+        }
     }
 
     /// <summary>

@@ -1,4 +1,6 @@
-﻿namespace MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.Common;
+
+namespace MsSqlToolBelt.DataObjects.Common;
 
 /// <summary>
 /// Represents a package entry
@@ -8,6 +10,7 @@ internal class PackageInfo
     /// <summary>
     /// Gets or sets the name of the package
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

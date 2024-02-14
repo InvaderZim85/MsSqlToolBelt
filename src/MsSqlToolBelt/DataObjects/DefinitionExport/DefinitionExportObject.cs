@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
@@ -31,6 +32,7 @@ internal class DefinitionExportObject : ObservableObject
     /// <summary>
     /// Gets the name of the object
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; init; } = string.Empty;
 
     /// <summary>

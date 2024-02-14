@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MsSqlToolBelt.Common;
+using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
@@ -12,6 +13,7 @@ public class ColumnEntry
     /// <summary>
     /// Gets or sets the name of the column
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

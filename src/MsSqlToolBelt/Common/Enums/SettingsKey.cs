@@ -33,5 +33,10 @@ public enum SettingsKey
     /// <summary>
     /// The search options
     /// </summary>
-    SearchOptions = 5
+    SearchOptions = 5,
+
+    /// <summary>
+    /// Specifies whether only the name should be copied if only one row is selected in the grid.
+    /// </summary>
+    CopyGridSingleLineOnlyValue = 6
 }

@@ -1,10 +1,10 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
-using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
