@@ -264,6 +264,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="32" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -304,22 +305,48 @@
                 <Label
                     Grid.Row="3"
                     Grid.Column="0"
+                    Content="Copy only 'name':">
+                    <Label.ToolTip>
+                        Note: If the grid does not have a 'Name' column, the entire content of the column is copied in the specified format (see Copy format)
+                    </Label.ToolTip>
+                </Label>
+                <CheckBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    IsChecked="{Binding CopyGridSingleLineOnlyValue}">
+                    <CheckBox.ToolTip>
+                        Note: If the grid does not have a 'Name' column, the entire content of the column is copied in the specified format (see Copy format)
+                    </CheckBox.ToolTip>
+                </CheckBox>
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    Content="If selected, only the 'name' of a column is copied if only one row is selected."
+                    Style="{StaticResource ItemHint}">
+                    <Label.ToolTip>
+                        Note: If the grid does not have a 'Name' column, the entire content of the column is copied in the specified format (see Copy format)
+                    </Label.ToolTip>
+                </Label>
+
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="0"
                     Content="Search history count:" />
                 <mah:NumericUpDown
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Grid.Column="1"
                     Margin="3"
                     Minimum="0"
                     NumericInputMode="Numbers"
                     Value="{Binding SearchHistoryCount}" />
                 <Label
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Grid.Column="2"
-                    Content="The number of search history entries (0 = infitiniy)"
+                    Content="The number of search history entries (0 = infinity)"
                     Style="{StaticResource ItemHint}" />
 
                 <Button
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     Width="60"

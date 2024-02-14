@@ -1,14 +1,14 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Navigation;
-using ICSharpCode.AvalonEdit.Search;
+﻿using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
@@ -88,7 +88,7 @@ public partial class ClassGenControl : UserControl, IUserControl
     /// <summary>
     /// Occurs when the user hits the link
     /// </summary>
-    /// <param name="sender">The hyper link</param>
+    /// <param name="sender">The hyperlink</param>
     /// <param name="e">The event arguments</param>
     private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
     {

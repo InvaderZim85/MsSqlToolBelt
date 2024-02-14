@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MsSqlToolBelt.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MsSqlToolBelt.DataObjects.Internal;
@@ -20,6 +21,7 @@ public class ServerEntry
     /// Gets or sets the name / path of the sever
     /// </summary>
     [Required]
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

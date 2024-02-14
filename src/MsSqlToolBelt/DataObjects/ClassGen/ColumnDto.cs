@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.DataObjects.Common;
 
 namespace MsSqlToolBelt.DataObjects.ClassGen;
@@ -25,6 +26,7 @@ public class ColumnDto : ObservableObject
     /// <summary>
     /// Gets or sets the name of the column
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

@@ -60,7 +60,7 @@
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
             <mah:Flyout
-                Width="600"
+                Width="725"
                 ClosingFinished="Flyout_OnClosingFinished"
                 Header="Settings"
                 IsOpen="{Binding SettingsOpen}"

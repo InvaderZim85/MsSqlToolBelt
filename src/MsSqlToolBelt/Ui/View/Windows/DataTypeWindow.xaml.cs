@@ -1,9 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
+using System.Windows;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.View.Windows;
 

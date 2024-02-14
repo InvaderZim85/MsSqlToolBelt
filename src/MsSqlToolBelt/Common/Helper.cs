@@ -5,6 +5,8 @@ using Microsoft.WindowsAPICodePack.Taskbar;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data.Internal;
 using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.Internal;
+using Newtonsoft.Json;
 using Serilog;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,8 +15,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
-using MsSqlToolBelt.DataObjects.Internal;
-using Newtonsoft.Json;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Common;
@@ -308,6 +308,30 @@ internal static class Helper
         var tmpValue = string.Join("", values);
 
         return tmpValue.GetHashCode();
+    }
+
+    /// <summary>
+    /// Gets the copy value of the item.
+    /// <para />
+    /// The value is determined by the <see cref="ClipboardPropertyAttribute"/>
+    /// <para />
+    /// <b>NOTE</b>: If the property is linked to more than one property, the first occurrence is used!
+    /// </summary>
+    /// <param name="item">The item</param>
+    /// <returns>The value of the specified property</returns>
+    public static string GetCopyValue(this object item)
+    {
+        var properties = item.GetType().GetProperties();
+        foreach (var property in properties)
+        {
+            var attribute = property.GetCustomAttribute<ClipboardPropertyAttribute>();
+            if (attribute == null)
+                continue;
+
+            return property.GetValue(item)?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
     }
 
     #region Taskbar

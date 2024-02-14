@@ -154,10 +154,16 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private int _searchHistoryCount = 50;
+
+    /// <summary>
+    /// Gets or sets the value which specifies whether only the name should be copied if only one row is selected in the grid.
+    /// </summary>
+    [ObservableProperty]
+    private bool _copyGridSingleLineOnlyValue;
     #endregion
 
     #endregion
-    
+
     /// <summary>
     /// Init the view model
     /// </summary>
@@ -195,10 +201,15 @@ internal partial class SettingsControlViewModel : ViewModelBase
             // Set the various data
             var exportList = Helper.CreateExportTypeList(ExportDataType.List);
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
-            var exportType = await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat); // 1 = CSV
+            var exportType = await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat,
+                DefaultEntries.CopyToClipboardFormat); // 1 = CSV
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
 
-            SearchHistoryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
+            SearchHistoryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount,
+                DefaultEntries.SearchHistoryCount);
+
+            CopyGridSingleLineOnlyValue =
+                await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyGridSingleLineOnlyValue, false);
         }
         catch (Exception ex)
         {
@@ -555,8 +566,9 @@ internal partial class SettingsControlViewModel : ViewModelBase
         {
             var saveList = new SortedList<SettingsKey, object>
             {
-                {SettingsKey.CopyToClipboardFormat, SelectedExportType.Id},
-                {SettingsKey.SearchHistoryEntryCount, SearchHistoryCount}
+                { SettingsKey.CopyToClipboardFormat, SelectedExportType.Id },
+                { SettingsKey.SearchHistoryEntryCount, SearchHistoryCount },
+                { SettingsKey.CopyGridSingleLineOnlyValue, CopyGridSingleLineOnlyValue }
             };
 
             await SettingsManager.SaveSettingsValuesAsync(saveList);

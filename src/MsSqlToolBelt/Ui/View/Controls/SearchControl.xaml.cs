@@ -1,12 +1,12 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
-using ICSharpCode.AvalonEdit.Search;
+﻿using ICSharpCode.AvalonEdit.Search;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 

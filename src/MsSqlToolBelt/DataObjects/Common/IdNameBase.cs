@@ -1,4 +1,6 @@
-﻿namespace MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.Common;
+
+namespace MsSqlToolBelt.DataObjects.Common;
 
 /// <summary>
 /// Represents a simple id / name entry
@@ -13,5 +15,6 @@ public class IdNameBase
     /// <summary>
     /// Gets or sets the name of the table
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 }

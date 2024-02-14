@@ -51,6 +51,31 @@ public class SettingsManager
     }
 
     /// <summary>
+    /// Loads the specified settings value
+    /// </summary>
+    /// <typeparam name="T">The type of the value</typeparam>
+    /// <param name="key">The desired key</param>
+    /// <param name="fallback">The desired fallback</param>
+    /// <returns>The value</returns>
+    public static T LoadSettingsValue<T>(SettingsKey key, T? fallback = default)
+    {
+        using var context = new AppDbContext();
+        var value = context.Settings.FirstOrDefault(f => f.KeyId == (int)key);
+        if (value == null)
+            return fallback == null ? Activator.CreateInstance<T>() : fallback;
+
+        try
+        {
+            return (T)Convert.ChangeType(value.Value, typeof(T));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error while loading settings value. Key {key}", key);
+            return fallback == null ? Activator.CreateInstance<T>() : fallback;
+        }
+    }
+
+    /// <summary>
     /// Saves a settings value
     /// </summary>
     /// <param name="key">The desired key</param>

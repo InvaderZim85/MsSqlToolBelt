@@ -1,4 +1,5 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.Common;
+using MsSqlToolBelt.DataObjects.Common;
 using Newtonsoft.Json;
 using ZimLabs.TableCreator;
 
@@ -17,6 +18,7 @@ public class TableTypeEntry
     /// <summary>
     /// Gets or sets the name of the table type
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

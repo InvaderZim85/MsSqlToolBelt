@@ -178,7 +178,12 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
             : _manager.TableTypes.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
 
         TableTypes = result.ToObservableCollection();
-        HeaderList = TableTypes.Count > 1 ? $"{TableTypes.Count} table types" : "1 table type";
+        HeaderList = TableTypes.Count switch
+        {
+            0 => "No table types available",
+            1 => "1 table type",
+            _ => $"{TableTypes.Count} table types"
+        };
     }
 
     /// <summary>

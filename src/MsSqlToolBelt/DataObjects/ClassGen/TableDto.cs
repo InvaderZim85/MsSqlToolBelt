@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
@@ -15,6 +16,7 @@ public class TableDto : ObservableObject
     /// <summary>
     /// Gets or sets the name of the table
     /// </summary>
+    [ClipboardProperty]
     public string Name { get; init; } = string.Empty;
 
     /// <summary>
