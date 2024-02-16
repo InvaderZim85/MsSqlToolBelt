@@ -6,7 +6,6 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
-using MsSqlToolBelt.Ui.View.Common;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ZimLabs.CoreLib;
@@ -16,7 +15,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.TableTypesControl"/>
 /// </summary>
-internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
+internal partial class TableTypesControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance of the table type manager
@@ -111,7 +110,11 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
         LoadData();
     });
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
@@ -126,7 +129,9 @@ internal partial class TableTypesControlViewModel : ViewModelBase, IConnection
         _dataLoaded = false;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the current connection
+    /// </summary>
     public void CloseConnection()
     {
         _manager?.Dispose();

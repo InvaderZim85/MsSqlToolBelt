@@ -7,10 +7,9 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.Ui.View.Common;
+using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
 using ZimLabs.CoreLib;
 
@@ -19,7 +18,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.ClassGenControl"/>
 /// </summary>
-internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
+internal partial class ClassGenControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the class generator
@@ -50,6 +49,11 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Contains the result of the class generator
     /// </summary>
     private ClassGenResult _classGenResult = new();
+
+    /// <summary>
+    /// Gets or sets the preselection
+    /// </summary>
+    public string Preselection { get; set; } = string.Empty;
 
     #region View properties
 
@@ -250,8 +254,6 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     [ObservableProperty]
     private string _namespace = string.Empty;
 
-
-
     /// <summary>
     /// Occurs when the user changes the db model option
     /// </summary>
@@ -280,15 +282,6 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
 
     #region Commands
     // Note: These are not all commands! The other commands are provided via the "RelayCommand" attribute!
-
-    /// <summary>
-    /// The command to reload the table types
-    /// </summary>
-    public ICommand ReloadCommand => new RelayCommand(() =>
-    {
-        _dataLoaded = false;
-        LoadData();
-    });
 
     /// <summary>
     /// The command to show the ef key code
@@ -353,7 +346,11 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         SelectedType = TypeList.FirstOrDefault(f => f.Id == 0);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
@@ -367,7 +364,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         _manager = new ClassGenManager(_settingsManager!, dataSource, database);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the connection
+    /// </summary>
     public void CloseConnection()
     {
         _manager?.Dispose();
@@ -379,13 +378,18 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
     /// Loads the data
     /// </summary>
     /// <param name="showProgress"><see langword="true"/> to show the progress, <see langword="false"/> to hide the progress information (optional)</param>
-    public async void LoadData(bool showProgress = true)
+    public async Task LoadDataAsync(bool showProgress = true)
     {
         if (_dataLoaded || _manager == null)
+        {
+            if (!string.IsNullOrEmpty(Preselection))
+                FilterList();
+
             return;
+        }
 
         ProgressDialogController? controller = null;
-        if (showProgress)
+        if (showProgress && string.IsNullOrEmpty(Preselection))
             controller = await ShowProgressAsync("Loading", "Please wait while loading the tables...");
 
         try
@@ -457,6 +461,11 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         Tables = result.ToObservableCollection();
 
         HeaderList = Tables.Count > 1 ? $"{Tables.Count} entries" : "1 entry";
+
+        if (string.IsNullOrEmpty(Preselection))
+            return;
+
+        SelectedTable = Tables.FirstOrDefault(f => f.Name.Equals(Preselection));
     }
 
     /// <summary>
@@ -621,6 +630,16 @@ internal partial class ClassGenControlViewModel : ViewModelBase, IConnection
         {
             await controller.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// The command to reload the content
+    /// </summary>
+    [RelayCommand]
+    private async Task ReloadAsync()
+    {
+        _dataLoaded = false;
+        await LoadDataAsync();
     }
     #endregion
 

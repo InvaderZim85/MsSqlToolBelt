@@ -6,7 +6,6 @@ using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.DefinitionExport;
-using MsSqlToolBelt.Ui.View.Common;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Input;
@@ -17,7 +16,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="Controls.DefinitionExportControlViewModel"/>
 /// </summary>
-internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnection
+internal partial class DefinitionExportControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the objects
@@ -286,7 +285,11 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         _setText = setText;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         // Reset the lists
@@ -309,7 +312,9 @@ internal partial class DefinitionExportControlViewModel : ViewModelBase, IConnec
         _objectDataLoaded = false;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the current connection
+    /// </summary>
     public void CloseConnection()
     {
         _manager?.Dispose();

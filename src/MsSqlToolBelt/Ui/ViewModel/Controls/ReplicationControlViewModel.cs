@@ -6,14 +6,13 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
-using MsSqlToolBelt.Ui.View.Common;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
-internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
+internal partial class ReplicationControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the interaction with the replication data
@@ -134,7 +133,11 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
         LoadData();
     });
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         // Clear the current result
@@ -153,7 +156,9 @@ internal partial class ReplicationControlViewModel : ViewModelBase, IConnection
         _dataLoaded = false;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the current connection
+    /// </summary>
     public void CloseConnection()
     {
         _manager?.Dispose();

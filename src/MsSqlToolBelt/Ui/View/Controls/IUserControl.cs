@@ -1,9 +1,8 @@
 ﻿using MsSqlToolBelt.Business;
-using MsSqlToolBelt.Ui.View.Common;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
-internal interface IUserControl : IConnection
+internal interface IUserControl
 {
     /// <summary>
     /// Init the control

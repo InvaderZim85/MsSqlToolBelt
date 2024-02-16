@@ -7,13 +7,9 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.TableType;
-using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using Serilog;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Markup.Localizer;
-using Dapper;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -21,7 +17,7 @@ namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 /// <summary>
 /// Provides the logic for the <see cref="View.Controls.SettingsControl"/>
 /// </summary>
-internal partial class SearchControlViewModel : ViewModelBase, IConnection
+internal partial class SearchControlViewModel : ViewModelBase
 {
     /// <summary>
     /// The instance for the search
@@ -59,6 +55,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     private Action<string>? _setCmdText;
 
     /// <summary>
+    /// The action to open the selected entry in the class generator
+    /// </summary>
+    private Action<SearchResult>? _openInClassGenerator;
+
+    /// <summary>
     /// Contains the sql text
     /// </summary>
     private string _sqlText = string.Empty;
@@ -82,6 +83,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// The value which indicates if the connection is setting / resetting
     /// </summary>
     private bool _resettingConnection;
+
+    /// <summary>
+    /// Contains the value which indicates if the "search" is still executed
+    /// </summary>
+    private bool _searchExecuted;
 
     #region View properties
 
@@ -123,8 +129,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         get => _selectedObjectType;
         set
         {
-            if (SetProperty(ref _selectedObjectType, value) && !_resettingConnection)
-                FilterResult();
+            if (SetProperty(ref _selectedObjectType, value) && !_resettingConnection && !_searchExecuted)
+                FilterResult(true);
         }
     }
 
@@ -187,6 +193,12 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// </summary>
     [ObservableProperty]
     private bool _searchJobs = true;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the context menu item "Open in class generator..." is enabled
+    /// </summary>
+    [ObservableProperty]
+    private bool _openInClassGenMenuItemEnabled;
 
     #endregion
 
@@ -304,6 +316,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
                 SetVisibility(SearchViewType.None);
                 break;
         }
+
+        OpenInClassGenMenuItemEnabled = value.EntryType is EntryType.Table or EntryType.TableType;
     }
 
     /// <summary>
@@ -442,7 +456,9 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         if (_manager == null)
             return;
 
-        ResetSearch();
+        _searchExecuted = true;
+
+        ResetSearch(string.IsNullOrEmpty(SearchString));
 
         if (string.IsNullOrEmpty(SearchString))
             return;
@@ -504,6 +520,8 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
             // Remove the event
             _manager.ProgressEvent -= ProgressEvent;
             await controller.CloseAsync();
+
+            _searchExecuted = false;
         }
 
         return;
@@ -532,6 +550,19 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         FilterJobSteps();
     }
 
+    /// <summary>
+    /// Opens the selected table / table type in the class generator
+    /// </summary>
+    [RelayCommand]
+    private void OpenInClassGenerator()
+    {
+        if (SelectedResult == null || (SelectedResult.EntryType != EntryType.Table &&
+                                       SelectedResult.EntryType != EntryType.TableType))
+            return;
+
+        _openInClassGenerator?.Invoke(SelectedResult);
+    }
+
     #endregion
 
     /// <summary>
@@ -541,21 +572,25 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// <param name="setSqlText">The action to set the text of the sql control</param>
     /// <param name="setCmdText">The action to set the text of the cmd control</param>
     /// <param name="setTableDefinition">The action to set the text of the table definition control</param>
-    public async void InitViewModel(SettingsManager settingsManager, Action<string> setSqlText, Action<string> setCmdText, Action<string> setTableDefinition)
+    /// <param name="openInClassGenerator">The action to open the selected entry in the class generator</param>
+    public async void InitViewModel(SettingsManager settingsManager, Action<string> setSqlText,
+        Action<string> setCmdText, Action<string> setTableDefinition, Action<SearchResult> openInClassGenerator)
     {
         _settingsManager = settingsManager;
         _setSqlText = setSqlText;
         _setCmdText = setCmdText;
         _setTableDefinitionText = setTableDefinition;
+        _openInClassGenerator = openInClassGenerator;
 
         _searchHistoryManager = new SearchHistoryManager();
 
         try
         {
-            AddWildcardAutomatically = await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
+            AddWildcardAutomatically =
+                await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
 
             var searchOptions = await SettingsManager.LoadSettingsValueAsync<string>(SettingsKey.SearchOptions);
-            if (string.IsNullOrWhiteSpace(searchOptions)) 
+            if (string.IsNullOrWhiteSpace(searchOptions))
                 return;
 
             // Set the options
@@ -585,7 +620,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         _dataSource = dataSource;
@@ -606,16 +645,12 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
         _resettingConnection = false;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the current connection
+    /// </summary>
     public void CloseConnection()
     {
         _manager?.Dispose();
-    }
-
-    /// <inheritdoc />
-    public void LoadData(bool showProgress)
-    {
-        // Ignore
     }
 
     /// <summary>
@@ -662,9 +697,11 @@ internal partial class SearchControlViewModel : ViewModelBase, IConnection
     /// <summary>
     /// Filters and shows the result
     /// </summary>
-    private void FilterResult()
+    /// <param name="resetSearch"><see langword="true"/> to perform a reset of the search, otherwise <see langword="false"/></param>
+    private void FilterResult(bool resetSearch = false)
     {
-        ResetSearch();
+        if (resetSearch)
+            ResetSearch();
 
         var result = SelectedObjectType.Equals("All")
             ? _manager!.SearchResults

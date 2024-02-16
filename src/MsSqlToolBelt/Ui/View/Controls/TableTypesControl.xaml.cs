@@ -1,7 +1,6 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.Common;
-using MsSqlToolBelt.Ui.View.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,7 +10,7 @@ namespace MsSqlToolBelt.Ui.View.Controls;
 /// <summary>
 /// Interaction logic for TableTypesControl.xaml
 /// </summary>
-public partial class TableTypesControl : UserControl, IConnection
+public partial class TableTypesControl : UserControl
 {
     /// <summary>
     /// Creates a new instance of the <see cref="TableTypesControl"/>
@@ -21,21 +20,30 @@ public partial class TableTypesControl : UserControl, IConnection
         InitializeComponent();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         if (DataContext is TableTypesControlViewModel viewModel)
             viewModel.SetConnection(dataSource, database);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the current connection
+    /// </summary>
     public void CloseConnection()
     {
         if (DataContext is TableTypesControlViewModel viewModel)
             viewModel.CloseConnection();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Loads the data
+    /// </summary>
+    /// <param name="showProgress"><see langword="true"/> to show the progress bar, otherwise <see langword="false"/></param>
     public void LoadData(bool showProgress)
     {
         if (DataContext is TableTypesControlViewModel viewModel)

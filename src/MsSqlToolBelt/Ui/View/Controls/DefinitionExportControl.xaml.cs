@@ -30,21 +30,30 @@ public partial class DefinitionExportControl : UserControl, IUserControl
         CodeEditor.InitAvalonEditor(CodeType.None);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         if (DataContext is DefinitionExportControlViewModel viewModel)
             viewModel.SetConnection(dataSource, database);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the connection
+    /// </summary>
     public void CloseConnection()
     {
         if (DataContext is DefinitionExportControlViewModel viewModel)
             viewModel.CloseConnection();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Loads the data
+    /// </summary>
+    /// <param name="showProgress"><see langword="true"/> to show the progress bar, otherwise <see langword="false"/></param>
     public void LoadData(bool showProgress)
     {
         if (DataContext is DefinitionExportControlViewModel viewModel)

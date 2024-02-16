@@ -8,7 +8,7 @@ namespace MsSqlToolBelt.DataObjects.Search;
 /// Represents an T-SQL job
 /// </summary>
 [DebuggerDisplay("{Name}")]
-internal class JobEntry
+public sealed class JobEntry
 {
     /// <summary>
     /// Gets or sets the id of the job
