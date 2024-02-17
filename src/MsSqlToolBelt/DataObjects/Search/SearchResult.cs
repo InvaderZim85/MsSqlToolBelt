@@ -10,7 +10,7 @@ namespace MsSqlToolBelt.DataObjects.Search;
 /// <summary>
 /// Represents the search result
 /// </summary>
-internal class SearchResult
+public sealed class SearchResult
 {
     /// <summary>
     /// Gets or sets the name

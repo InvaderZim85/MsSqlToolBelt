@@ -7,7 +7,7 @@ namespace MsSqlToolBelt.DataObjects.Common;
 /// Represents a database object like a procedure, view
 /// </summary>
 [DebuggerDisplay("{Name}")]
-internal class ObjectEntry : IdNameBase
+public sealed class ObjectEntry : IdNameBase
 {
     /// <summary>
     /// Gets or sets the definition of the object (aka Create-Statement)

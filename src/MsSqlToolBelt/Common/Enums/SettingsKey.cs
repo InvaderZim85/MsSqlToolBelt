@@ -38,5 +38,12 @@ public enum SettingsKey
     /// <summary>
     /// Specifies whether only the name should be copied if only one row is selected in the grid.
     /// </summary>
-    CopyGridSingleLineOnlyValue = 6
+    CopyGridSingleLineOnlyValue = 6,
+
+    /// <summary>
+    /// The tab settings
+    /// <para />
+    /// <b>Note</b>: The values are stored as comma separated string!
+    /// </summary>
+    TabSettings = 7
 }

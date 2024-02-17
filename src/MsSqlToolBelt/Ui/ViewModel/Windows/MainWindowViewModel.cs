@@ -210,6 +210,39 @@ internal partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private Visibility _buttonUpdateVisible = Visibility.Hidden;
 
+    #region Tab
+
+    /// <summary>
+    /// Gets or sets the visibility of the search tab
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _tabSearch = Visibility.Visible;
+
+    /// <summary>
+    /// Gets or sets the visibility of the table type tab
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _tabTableTypes = Visibility.Visible;
+
+    /// <summary>
+    /// Gets or sets the visibility of the class generator tab
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _tabClassGen = Visibility.Visible;
+
+    /// <summary>
+    /// Gets or sets the visibility of the definition export tab
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _tabDefinitionExport = Visibility.Visible;
+
+    /// <summary>
+    /// Gets or sets the visibility of the replication info tab
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _tabReplicationInfo = Visibility.Visible;
+    #endregion
+
     #endregion
 
     #region Commands
@@ -316,6 +349,40 @@ internal partial class MainWindowViewModel : ViewModelBase
         var (version, buildInfo) = Helper.GetVersionInfo();
         BuildInfo = $"Version: {version} - Build date: {buildInfo}";
         SetHeaderInfo();
+
+        // Set the tab visibility
+        SetTabVisibility();
+        Mediator.AddAction(nameof(SetTabVisibility), SetTabVisibility);
+    }
+
+    /// <summary>
+    /// Sets the tab visibility
+    /// </summary>
+    public void SetTabVisibility()
+    {
+        var values = SettingsManager.LoadTabSettings();
+
+        foreach (var entry in values)
+        {
+            switch (entry.Key)
+            {
+                case TabControlEntry.Search:
+                    TabSearch = entry.Value.ToVisibility();
+                    break;
+                case TabControlEntry.TableTypes:
+                    TabTableTypes = entry.Value.ToVisibility();
+                    break;
+                case TabControlEntry.ClassGenerator:
+                    TabClassGen = entry.Value.ToVisibility();
+                    break;
+                case TabControlEntry.DefinitionExport:
+                    TabDefinitionExport = entry.Value.ToVisibility();
+                    break;
+                case TabControlEntry.ReplicationInfo:
+                    TabReplicationInfo = entry.Value.ToVisibility();
+                    break;
+            }
+        }
     }
 
     /// <summary>

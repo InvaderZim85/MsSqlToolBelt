@@ -8,6 +8,7 @@ using MahApps.Metro.IconPacks;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
 
@@ -150,10 +151,20 @@ public partial class MainWindow : MetroWindow
         SearchControl.InitControl(_settingsManager);
         ClassGenControl.InitControl(_settingsManager);
         DefinitionExportControl.InitControl(_settingsManager);
+
+        // Set the event
+        SearchControl.OpenInClassGenerator += (_, searchResult) =>
+        {
+            // Set the preselection
+            ClassGenControl.Preselection = searchResult.Name;
+
+            // Switch to the class generator
+            TabControl.SelectedIndex = 2;
+        };
     }
 
     /// <summary>
-    /// Occurs when the user double clicks the build info
+    /// Occurs when the user double-clicks the build info
     /// </summary>
     /// <param name="sender">The build info (on the bottom right)</param>
     /// <param name="e">The event arguments</param>

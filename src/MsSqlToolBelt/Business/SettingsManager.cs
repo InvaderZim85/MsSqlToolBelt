@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System.IO;
 using System.Text;
+using MsSqlToolBelt.Common;
 
 namespace MsSqlToolBelt.Business;
 
@@ -423,6 +424,55 @@ public class SettingsManager
         }
 
         await context.SaveChangesAsync();
+    }
+    #endregion
+
+    #region Various
+    /// <summary>
+    /// Loads the tab settings
+    /// </summary>
+    /// <returns>The list with the tab settings</returns>
+    public static SortedList<TabControlEntry, bool> LoadTabSettings()
+    {
+        var result = new SortedList<TabControlEntry, bool>();
+        // Init the list with the default values
+        foreach (var entry in Enum.GetValues<TabControlEntry>())
+        {
+            result.Add(entry, true);
+        }
+
+        var values = LoadSettingsValue(SettingsKey.TabSettings, string.Empty);
+        if (string.IsNullOrEmpty(values))
+            return result;
+
+        var content = values.Split(';');
+        if (content.Length != result.Count)
+            return result; // Mismatch
+
+        foreach (var entry in Enum.GetValues<TabControlEntry>())
+        {
+            var index = (int)entry;
+            var value = index > content.Length - 1 || content[index].StringToBool();
+            result[entry] = value;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Saves the tab settings
+    /// </summary>
+    /// <param name="values">The list with the settings</param>
+    /// <returns>The awaitable task</returns>
+    public static async Task SaveTabSettingsAsync(SortedList<TabControlEntry, bool> values)
+    {
+        var tmpValues = values.OrderBy(o => (int)o.Key).Select(s => s.Value.BoolToString()).ToList();
+        var tmpContent = string.Join(';', tmpValues);
+
+        await SaveSettingsValueAsync(SettingsKey.TabSettings, tmpContent);
+
+        // Execute the mediator function
+        Mediator.ExecuteAction("SetTabVisibility");
     }
     #endregion
 }

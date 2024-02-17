@@ -160,6 +160,11 @@
                             Header="Type"
                             IsReadOnly="True" />
                     </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding OpenInClassGeneratorCommand}" Header="Open in class generator..." />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                 </DataGrid>
 
                 <Separator
@@ -349,13 +354,23 @@
 
                         <Separator Grid.Row="3" />
 
-                        <Button
+                        <StackPanel
                             Grid.Row="4"
                             Grid.Column="0"
-                            Width="75"
-                            HorizontalAlignment="Left"
-                            Command="{Binding ReloadDataCommand}"
-                            Content="Reload" />
+                            Orientation="Horizontal">
+                            <Button
+                                Width="75"
+                                Command="{Binding ReloadDataCommand}"
+                                Content="Reload" />
+
+                            <Button
+                                Width="175"
+                                Command="{Binding OpenInClassGeneratorCommand}"
+                                Content="Open in class generator..."
+                                IsEnabled="{Binding OpenInClassGenMenuItemEnabled}" />
+                        </StackPanel>
+
+
 
                         <Button
                             Grid.Row="4"

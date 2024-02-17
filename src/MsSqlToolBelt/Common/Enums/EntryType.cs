@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides the different types
 /// </summary>
-internal enum EntryType
+public enum EntryType
 {
     /// <summary>
     /// Object like a stored procedure

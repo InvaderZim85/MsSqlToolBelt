@@ -9,7 +9,7 @@ namespace MsSqlToolBelt.DataObjects.Search;
 /// <summary>
 /// Represents a job step
 /// </summary>
-internal class JobStepEntry
+public sealed class JobStepEntry
 {
     /// <summary>
     /// Gets or sets the id of the step

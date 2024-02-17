@@ -16,6 +16,11 @@ namespace MsSqlToolBelt.Ui.View.Controls;
 public partial class SearchControl : UserControl, IUserControl
 {
     /// <summary>
+    /// Occurs when the user wants to open the current search result in the class generator
+    /// </summary>
+    public event EventHandler<SearchResult>? OpenInClassGenerator;
+
+    /// <summary>
     /// Creates a new instance of the <see cref="SearchControl"/>
     /// </summary>
     public SearchControl()
@@ -28,31 +33,31 @@ public partial class SearchControl : UserControl, IUserControl
     public void InitControl(SettingsManager manager)
     {
         if (DataContext is SearchControlViewModel viewModel)
-            viewModel.InitViewModel(manager, SetSqlText, SetCmdText, SetTableDefinitionText);
+            viewModel.InitViewModel(manager, SetSqlText, SetCmdText, SetTableDefinitionText, RaiseOpenInClassGenerator);
 
         SqlEditor.InitAvalonEditor(CodeType.Sql);
         CmdEditor.InitAvalonEditor(CodeType.Sql);
         TableDefinitionEditor.InitAvalonEditor(CodeType.Sql);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Sets the connection
+    /// </summary>
+    /// <param name="dataSource">The data source</param>
+    /// <param name="database">The database</param>
     public void SetConnection(string dataSource, string database)
     {
         if (DataContext is SearchControlViewModel viewModel)
             viewModel.SetConnection(dataSource, database);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Closes the connection
+    /// </summary>
     public void CloseConnection()
     {
         if (DataContext is SearchControlViewModel viewModel)
             viewModel.CloseConnection();
-    }
-
-    /// <inheritdoc />
-    public void LoadData(bool showProgress)
-    {
-        // Ignore
     }
 
     /// <summary>
@@ -83,6 +88,15 @@ public partial class SearchControl : UserControl, IUserControl
     {
         TableDefinitionEditor.Text = text;
         TableDefinitionEditor.ScrollToHome();
+    }
+
+    /// <summary>
+    /// Raises the <see cref="OpenInClassGenerator"/> event
+    /// </summary>
+    /// <param name="result">The search result</param>
+    private void RaiseOpenInClassGenerator(SearchResult result)
+    {
+        OpenInClassGenerator?.Invoke(this, result);
     }
 
     /// <summary>
