@@ -90,7 +90,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ui\View\Common\" />
-  </ItemGroup>
 </Project>

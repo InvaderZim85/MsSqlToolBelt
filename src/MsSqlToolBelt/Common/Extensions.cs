@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Media;
 using ZimLabs.Mapper;
 
@@ -174,5 +175,15 @@ internal static class Extensions
         return value.Contains(';')
             ? value.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(s => s.StringToBool()).ToList()
             : [value.StringToBool()];
+    }
+
+    /// <summary>
+    /// Converts the <see langword="bool"/> value into a <see cref="Visibility"/> value
+    /// </summary>
+    /// <param name="value">The original value</param>
+    /// <returns>The visibility value</returns>
+    public static Visibility ToVisibility(this bool value)
+    {
+        return value ? Visibility.Visible : Visibility.Collapsed;
     }
 }

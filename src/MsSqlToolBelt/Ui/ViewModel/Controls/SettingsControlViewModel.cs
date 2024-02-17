@@ -50,6 +50,36 @@ internal partial class SettingsControlViewModel : ViewModelBase
                 Helper.SetColorTheme(value.Name);
         }
     }
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the search tab should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _tabSearch;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the table type tab should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _tabTableTypes;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the class generator tab should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _tabClassGen;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the definition export tab should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _tabDefinitionExport;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the replication info tab should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _tabReplicationInfo;
     #endregion
 
     #region Server
@@ -210,10 +240,42 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
             CopyGridSingleLineOnlyValue =
                 await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyGridSingleLineOnlyValue, false);
+
+            var tabSettings = SettingsManager.LoadTabSettings();
+            SetTabSettings(tabSettings);
         }
         catch (Exception ex)
         {
             await ShowErrorAsync(ex, ErrorMessageType.Load);
+        }
+    }
+
+    /// <summary>
+    /// Sets the tab settings
+    /// </summary>
+    /// <param name="settings">The list with the settings</param>
+    private void SetTabSettings(SortedList<TabControlEntry, bool> settings)
+    {
+        foreach (var entry in settings)
+        {
+            switch (entry.Key)
+            {
+                case TabControlEntry.Search:
+                    TabSearch = entry.Value;
+                    break;
+                case TabControlEntry.TableTypes:
+                    TabTableTypes = entry.Value;
+                    break;
+                case TabControlEntry.ClassGenerator:
+                    TabClassGen = entry.Value;
+                    break;
+                case TabControlEntry.DefinitionExport:
+                    TabDefinitionExport = entry.Value;
+                    break;
+                case TabControlEntry.ReplicationInfo:
+                    TabReplicationInfo = entry.Value;
+                    break;
+            }
         }
     }
 
@@ -295,6 +357,8 @@ internal partial class SettingsControlViewModel : ViewModelBase
         try
         {
             await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme.Name);
+
+            await SaveTabSettingsAsync();
         }
         catch (Exception ex)
         {
@@ -304,6 +368,24 @@ internal partial class SettingsControlViewModel : ViewModelBase
         {
             await controller.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Saves the tab settings
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    private Task SaveTabSettingsAsync()
+    {
+        var settings = new SortedList<TabControlEntry, bool>
+        {
+            { TabControlEntry.Search, TabSearch },
+            { TabControlEntry.TableTypes, TabTableTypes },
+            { TabControlEntry.ClassGenerator, TabClassGen },
+            { TabControlEntry.DefinitionExport, TabDefinitionExport },
+            { TabControlEntry.ReplicationInfo, TabReplicationInfo }
+        };
+
+        return SettingsManager.SaveTabSettingsAsync(settings);
     }
 
     #region Server

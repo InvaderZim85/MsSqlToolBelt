@@ -26,10 +26,11 @@ internal static class Mediator
     /// <param name="key">The key of the action</param>
     public static void ExecuteAction(string key)
     {
-        if (!Actions.TryGetValue(key, out var value))
+        if (!Actions.TryGetValue(key, out var action))
             return;
 
-        value();
+        // Execute the action
+        action();
     }
 
     /// <summary>

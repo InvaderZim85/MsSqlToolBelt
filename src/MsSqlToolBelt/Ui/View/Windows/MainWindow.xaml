@@ -188,19 +188,19 @@
                 IsEnabled="{Binding ConnectionEstablished}"
                 SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
                 Style="{DynamicResource MahApps.Styles.TabControl.Animated}">
-                <TabItem Header="Search">
+                <TabItem Header="Search" Visibility="{Binding TabSearch}">
                     <controls:SearchControl x:Name="SearchControl" />
                 </TabItem>
-                <TabItem Header="Table types">
+                <TabItem Header="Table types" Visibility="{Binding TabTableTypes}">
                     <controls:TableTypesControl x:Name="TableTypesControl" />
                 </TabItem>
-                <TabItem Header="Class generator">
+                <TabItem Header="Class generator" Visibility="{Binding TabClassGen}">
                     <controls:ClassGenControl x:Name="ClassGenControl" />
                 </TabItem>
-                <TabItem Header="Definition export">
+                <TabItem Header="Definition export" Visibility="{Binding TabDefinitionExport}">
                     <controls:DefinitionExportControl x:Name="DefinitionExportControl" />
                 </TabItem>
-                <TabItem Header="Replication info">
+                <TabItem Header="Replication info" Visibility="{Binding TabReplicationInfo}">
                     <controls:ReplicationControl x:Name="ReplicationControl" />
                 </TabItem>
             </TabControl>
