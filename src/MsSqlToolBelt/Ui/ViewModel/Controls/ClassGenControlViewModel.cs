@@ -7,10 +7,8 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.Data;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
-using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -44,6 +42,11 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     /// The action to set the visibility of a column (true = visible, false = hidden)
     /// </summary>
     private Action<bool>? _setColumnVisibility;
+
+    /// <summary>
+    /// The action to open the selected entry in the search
+    /// </summary>
+    private Action<string>? _openInSearch;
 
     /// <summary>
     /// Contains the result of the class generator
@@ -276,46 +279,17 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             OptionDbModel = true;
     }
 
-    #endregion
-
-    #endregion
-
-    #region Commands
-    // Note: These are not all commands! The other commands are provided via the "RelayCommand" attribute!
-
     /// <summary>
-    /// The command to show the ef key code
+    /// Occurs when the user changes the backing field option
     /// </summary>
-    public ICommand ShowEfKeyCodeCommand => new RelayCommand(() =>
+    /// <param name="value">The new value</param>
+    partial void OnOptionBackingFieldChanged(bool value)
     {
-        var dialog = new TextDialogWindow(new TextDialogSettings
-        {
-            Title = "Class generator - EF key code",
-            Caption = "Code to configure multiple columns as key",
-            CheckboxText = "Without method body",
-            ShowOption = true,
-            Text = _classGenResult.EfCoreKeyCode,
-            TextOption = _classGenResult.EfCoreKeyCodeShort,
-            CodeType = CodeType.CSharp
-        })
-        {
-            Owner = GetMainWindow()
-        };
+        if (!value)
+            OptionSetField = false;
+    }
 
-        dialog.ShowDialog();
-    });
-
-    /// <summary>
-    /// The command which occurs when the user hits the "multiple export" button
-    /// </summary>
-    public ICommand MultipleExportCommand => new RelayCommand(() =>
-    {
-        if (_manager == null)
-            return;
-
-        var exportDialog = new ClassGenWindow(_manager) {Owner = GetMainWindow()};
-        exportDialog.ShowDialog();
-    });
+    #endregion
 
     #endregion
 
@@ -326,11 +300,13 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     /// <param name="settingsManager">The instance for the interaction with the settings</param>
     /// <param name="setCode">The action to set the sql text</param>
     /// <param name="setColumnVisibility">The action to set the visibility of a column</param>
-    public void InitViewModel(SettingsManager settingsManager, Action<ClassGenResult> setCode, Action<bool> setColumnVisibility)
+    /// <param name="openInSearch">The action to open the selected entry in the search</param>
+    public void InitViewModel(SettingsManager settingsManager, Action<ClassGenResult> setCode, Action<bool> setColumnVisibility, Action<string> openInSearch)
     {
         _settingsManager = settingsManager;
         _setCode = setCode;
         _setColumnVisibility = setColumnVisibility;
+        _openInSearch = openInSearch;
 
         var tmpList = new List<IdTextEntry>
         {
@@ -641,6 +617,43 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         _dataLoaded = false;
         await LoadDataAsync();
     }
+
+    /// <summary>
+    /// Opens the multi export window
+    /// </summary>
+    [RelayCommand]
+    public void MultiExport()
+    {
+        if (_manager == null)
+            return;
+
+        var exportDialog = new ClassGenWindow(_manager) { Owner = GetMainWindow() };
+        exportDialog.ShowDialog();
+    }
+
+    /// <summary>
+    /// Opens the dialog window with the ef code for the primary key
+    /// </summary>
+    [RelayCommand]
+    private void ShowEfKeyCode()
+    {
+        var dialog = new TextDialogWindow(new TextDialogSettings
+        {
+            Title = "Class generator - EF key code",
+            Caption = "Code to configure multiple columns as key",
+            CheckboxText = "Without method body",
+            ShowOption = true,
+            Text = _classGenResult.EfCoreKeyCode,
+            TextOption = _classGenResult.EfCoreKeyCodeShort,
+            CodeType = CodeType.CSharp
+        })
+        {
+            Owner = GetMainWindow()
+        };
+
+        dialog.ShowDialog();
+    }
+
     #endregion
 
     #region Various
@@ -730,6 +743,18 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         const string gitHubLink = "https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/";
 
         Helper.OpenLink(gitHubLink);
+    }
+
+    /// <summary>
+    /// Opens the selected table in the search
+    /// </summary>
+    [RelayCommand]
+    private void OpenInSearch()
+    {
+        if (SelectedTable == null)
+            return;
+
+        _openInSearch?.Invoke(SelectedTable.Name);
     }
     #endregion
 }

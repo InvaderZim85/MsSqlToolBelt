@@ -172,20 +172,15 @@
             Background="{DynamicResource MahApps.Brushes.Control.Background}"
             BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
             BorderThickness="2"
+            CornerRadius="5"
             Opacity="1"
             Visibility="{Binding ShowInfo, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border.Effect>
-                <DropShadowEffect
-                    BlurRadius="10"
-                    Opacity="0.8"
-                    ShadowDepth="10" />
-            </Border.Effect>
 
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="40" />
-                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
@@ -204,8 +199,15 @@
                     Margin="3"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                    Foreground="Orange"
                     Kind="InformationOutline" />
+
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    FontWeight="Bold"
+                    Text="- No data available -" />
 
                 <TextBlock
                     Grid.Row="3"

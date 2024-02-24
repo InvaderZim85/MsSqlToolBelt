@@ -53,6 +53,11 @@
                             Binding="{Binding Name}"
                             Header="Name" />
                     </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding OpenInSearchCommand}" Header="Open in search..." />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                 </DataGrid>
 
                 <Separator Grid.Row="3" />
@@ -70,12 +75,17 @@
 
                 <Separator Grid.Row="5" />
 
-                <Button
+                <StackPanel
                     Grid.Row="6"
-                    Width="60"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ReloadCommand}"
-                    Content="Reload" />
+                    FlowDirection="RightToLeft"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        Command="{Binding ReloadCommand}"
+                        Content="Reload" />
+                    <Button Command="{Binding OpenInSearchCommand}" Content="Open in search" />
+                </StackPanel>
+
             </Grid>
         </Border>
 

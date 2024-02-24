@@ -161,7 +161,7 @@ internal static class Extensions
     public static bool StringToBool(this string value)
     {
         return value.Contains(';')
-            ? value.StringListToBool()?.FirstOrDefault() ?? false
+            ? value.StringListToBool().FirstOrDefault()
             : value.Equals("1");
     }
 

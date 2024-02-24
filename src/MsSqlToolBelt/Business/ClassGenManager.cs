@@ -336,21 +336,6 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The awaitable task</returns>
     public async Task GenerateClassesAsync(ClassGenOptions options, List<TableDto> tables, CancellationToken ct)
     {
-        // Generates the file name for the class
-        string GenerateFilePath(string tableName, int index)
-        {
-            while (true)
-            {
-                var path = Path.Combine(options.OutputDirectory, index == 0 ? $"{tableName}.cs" : $"{tableName}_{index}.cs");
-
-                // Check if the file already exists
-                if (!File.Exists(path)) 
-                    return path;
-
-                index += 1;
-            }
-        }
-
         // Check if the directory should be cleared
         if (options.EmptyDirectoryBeforeExport)
         {
@@ -390,6 +375,22 @@ public sealed class ClassGenManager : IDisposable
         }
 
         Progress?.Invoke(this, "Done.");
+        return;
+
+        // Generates the file name for the class
+        string GenerateFilePath(string tableName, int index)
+        {
+            while (true)
+            {
+                var path = Path.Combine(options.OutputDirectory, index == 0 ? $"{tableName}.cs" : $"{tableName}_{index}.cs");
+
+                // Check if the file already exists
+                if (!File.Exists(path)) 
+                    return path;
+
+                index += 1;
+            }
+        }
     }
 
     #region CSharp class
@@ -419,17 +420,7 @@ public sealed class ClassGenManager : IDisposable
             : ClassGenTemplateType.ClassDefault);
 
         // Generate the properties
-        var properties = new List<string>();
-
-        foreach (var column in table.Columns.Where(w => w.Use).OrderBy(o => o.Order))
-        {
-            properties.Add(GenerateColumn(options, column));
-            properties.Add(""); // Add an empty line for the break
-        }
-
-        // Remove the last empty line (not very nice, but hey, if it works, it works :D
-        if (properties.Count > 0)
-            properties.RemoveAt(properties.Count - 1);
+        var properties = table.Columns.Where(w => w.Use).OrderBy(o => o.Order).Select(column => GenerateColumn(options, column)).ToList();
 
         // Set the values
         classTemplate = classTemplate.Replace("$NAMESPACE$", CleanNamespace(options.Namespace));
@@ -455,7 +446,7 @@ public sealed class ClassGenManager : IDisposable
             : $"{spacer}[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]";
 
         // Split the template into it's lines to add the class header
-        var content = classTemplate.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
+        var content = classTemplate.Split([Environment.NewLine], StringSplitOptions.None).ToList();
 
         // Get the index of the class name
         var classIndex = content.FindIndex(f => f.ContainsIgnoreCase("class"));
@@ -485,7 +476,7 @@ public sealed class ClassGenManager : IDisposable
         var dataType = GetCSharpType(column.DataType);
 
         // Template
-        var template = GetClassTemplate(options, dataType);
+        var template = LoadTemplate(options, dataType);
         template = template.Replace("$TYPE$",
             string.IsNullOrEmpty(dataType.CSharpType) ? column.DataType : dataType.CSharpType);
         if (column.IsNullable && (!dataType.IsNullable || options.Nullable))
@@ -499,22 +490,15 @@ public sealed class ClassGenManager : IDisposable
         // Backing field name
         template = template.Replace("$NAME2$", CreateBackingFieldName(column.PropertyName));
 
-        var content = template.Split(new[] {Environment.NewLine}, StringSplitOptions.None).ToList();
+        var content = template.Split([Environment.NewLine], StringSplitOptions.None).ToList();
 
-        int index;
-        if (options.DbModel && column.IsPrimaryKey)
-        {
-            // Add the key attribute for the column
-            index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
-            if (index != -1)
-                content.Insert(index, "[Key]");
-        }
-
-        if (!options.DbModel)
-            return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
-        
-        // Add the EF attribute for the column
+        // The list with the column attributes
         var columnAttributes = new List<string>();
+
+        if (options.DbModel && column.IsPrimaryKey)
+            columnAttributes.Add("[Key]");
+
+        // Add the EF attribute for the column
         if ((!string.IsNullOrEmpty(column.Alias) && !column.Name.EqualsIgnoreCase(column.Alias)) || options.AddColumnAttribute)
         {
             columnAttributes.Add($"[Column(\"{column.Name}\")]");
@@ -530,16 +514,26 @@ public sealed class ClassGenManager : IDisposable
             columnAttributes.Add($"[MaxLength({column.MaxLength})]");
         }
 
-        if (columnAttributes.Count == 0)
-            return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
+        var sb = new StringBuilder();
+        foreach (var line in content)
+        {
+            if (line.Equals("$ATTRIBUTES$"))
+            {
+                if (columnAttributes.Count == 0)
+                    continue;
+                
+                foreach (var attribute in columnAttributes)
+                {
+                    sb.AppendLine($"{spacer}{attribute}");
+                }
 
-        var columnAttribute = string.Join(Environment.NewLine, columnAttributes);
+                continue;
+            }
 
-        index = content.IndexOf(content.FirstOrDefault(f => f.ContainsIgnoreCase("public")) ?? "");
-        if (index != -1)
-            content.Insert(index, columnAttribute);
+            sb.AppendLine($"{spacer}{line}");
+        }
 
-        return string.Join(Environment.NewLine, content.Select(s => $"{spacer}{s}"));
+        return sb.ToString();
     }
 
     /// <summary>
@@ -656,7 +650,7 @@ public sealed class ClassGenManager : IDisposable
     /// <param name="options">The options</param>
     /// <param name="dataType">Gets the data type</param>
     /// <returns>The template</returns>
-    private string GetClassTemplate(ClassGenOptions options, ClassGenTypeEntry dataType)
+    private string LoadTemplate(ClassGenOptions options, ClassGenTypeEntry dataType)
     {
         var template = options.AddSummary switch
         {

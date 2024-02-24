@@ -6,6 +6,7 @@ private $TYPE$$NULLABLE$ $NAME2$;
 /// <summary>
 /// Gets or sets the TODO
 /// </summary>
+$ATTRIBUTES$
 public $TYPE$$NULLABLE$ $NAME$
 {
     get => $NAME2$;

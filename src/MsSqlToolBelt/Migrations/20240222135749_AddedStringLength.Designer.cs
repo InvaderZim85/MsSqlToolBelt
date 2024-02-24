@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MsSqlToolBelt.Data.Internal;
 
@@ -10,9 +11,11 @@ using MsSqlToolBelt.Data.Internal;
 namespace MsSqlToolBelt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240222135749_AddedStringLength")]
+    partial class AddedStringLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -89,7 +92,7 @@ namespace MsSqlToolBelt.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name", "DefaultDatabase")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Server");

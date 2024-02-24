@@ -23,6 +23,11 @@ internal partial class EditServerWindowViewModel : ViewModelBase
     private Action<bool>? _closeWindow;
 
     /// <summary>
+    /// Function to check if the name / default database is unique
+    /// </summary>
+    private Func<string, string, Task<bool>>? _checkFunc;
+
+    /// <summary>
     /// The selected server
     /// </summary>
     [ObservableProperty]
@@ -73,9 +78,11 @@ internal partial class EditServerWindowViewModel : ViewModelBase
     /// Init the view model
     /// </summary>
     /// <param name="closeWindow">The action to close the window with the desired dialog result</param>
-    public async void InitViewModel(Action<bool> closeWindow)
+    /// <param name="checkEntry">The function to check if the entry is unique or not</param>
+    public async void InitViewModel(Action<bool> closeWindow, Func<string, string, Task<bool>> checkEntry)
     {
         _closeWindow = closeWindow;
+        _checkFunc = checkEntry;
 
         await ConnectAsync();
     }
@@ -126,7 +133,7 @@ internal partial class EditServerWindowViewModel : ViewModelBase
     /// Selects the database 
     /// </summary>
     [RelayCommand]
-    private void SetData()
+    private async Task SetDataAsync()
     {
         if (string.IsNullOrEmpty(SelectedServer.Name))
         {
@@ -134,7 +141,15 @@ internal partial class EditServerWindowViewModel : ViewModelBase
             return;
         }
 
+        // Check name / database
+        if (_checkFunc != null && !await _checkFunc(SelectedServer.Name, SelectedDatabase))
+        {
+            ShowInfoMessage("Server / Database already exists...");
+            return;
+        }
+
         SelectedServer.DefaultDatabase = SelectedDatabase;
+
 
         _closeWindow?.Invoke(true);
     }

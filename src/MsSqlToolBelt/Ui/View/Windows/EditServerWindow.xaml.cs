@@ -11,6 +11,11 @@ namespace MsSqlToolBelt.Ui.View.Windows;
 public partial class EditServerWindow : MetroWindow
 {
     /// <summary>
+    /// The function to check if the name / database is unique
+    /// </summary>
+    private readonly Func<string, string, Task<bool>> _checkFunc;
+
+    /// <summary>
     /// Gets or sets the selected server
     /// </summary>
     public ServerEntry SelectedServer
@@ -26,9 +31,12 @@ public partial class EditServerWindow : MetroWindow
     /// <summary>
     /// Creates a new instance of the <see cref="EditServerWindow"/>
     /// </summary>
-    public EditServerWindow()
+    /// <param name="checkFunc">The function to check if the name / database is unique</param>
+    public EditServerWindow(Func<string, string, Task<bool>> checkFunc)
     {
         InitializeComponent();
+
+        _checkFunc = checkFunc;
     }
 
     /// <summary>
@@ -48,6 +56,6 @@ public partial class EditServerWindow : MetroWindow
     private void EditServerWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (DataContext is EditServerWindowViewModel viewModel)
-            viewModel.InitViewModel(CloseWindow);
+            viewModel.InitViewModel(CloseWindow, _checkFunc);
     }
 }

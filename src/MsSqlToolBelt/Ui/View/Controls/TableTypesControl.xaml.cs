@@ -1,4 +1,6 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.Business;
+using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -13,11 +15,25 @@ namespace MsSqlToolBelt.Ui.View.Controls;
 public partial class TableTypesControl : UserControl
 {
     /// <summary>
+    /// Occurs when the user wants to open the selected class in the search
+    /// </summary>
+    public event EventHandler<string>? OpenInSearch;
+
+    /// <summary>
     /// Creates a new instance of the <see cref="TableTypesControl"/>
     /// </summary>
     public TableTypesControl()
     {
         InitializeComponent();
+    }
+
+    /// <summary>
+    /// Init the control
+    /// </summary>
+    public void InitControl()
+    {
+        if (DataContext is TableTypesControlViewModel viewModel)
+            viewModel.InitViewModel(RaiseOpenInSearch);
     }
 
     /// <summary>
@@ -38,6 +54,15 @@ public partial class TableTypesControl : UserControl
     {
         if (DataContext is TableTypesControlViewModel viewModel)
             viewModel.CloseConnection();
+    }
+
+    /// <summary>
+    /// Raises the <see cref="OpenInSearch"/> event
+    /// </summary>
+    /// <param name="value">The value which should be searched for</param>
+    private void RaiseOpenInSearch(string value)
+    {
+        OpenInSearch?.Invoke(this, value);
     }
 
     /// <summary>

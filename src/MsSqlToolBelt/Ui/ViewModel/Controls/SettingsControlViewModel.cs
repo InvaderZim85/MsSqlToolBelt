@@ -418,12 +418,14 @@ internal partial class SettingsControlViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddServerAsync()
     {
-        var dialog = new EditServerWindow { Owner = GetMainWindow() };
+        var dialog = new EditServerWindow(SettingsManager.ServerDatabaseUniqueAsync) { Owner = GetMainWindow() };
         if (dialog.ShowDialog() == false)
             return;
 
 
-        var existingServer = ServerList.FirstOrDefault(f => f.Name.Equals(dialog.SelectedServer.Name, StringComparison.OrdinalIgnoreCase));
+        var existingServer = ServerList.FirstOrDefault(f =>
+            f.Name.Equals(dialog.SelectedServer.Name, StringComparison.OrdinalIgnoreCase) &&
+            f.DefaultDatabase.Equals(dialog.SelectedServer.DefaultDatabase, StringComparison.OrdinalIgnoreCase));
         if (existingServer != null)
         {
             SelectedServer = existingServer;
@@ -453,7 +455,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
         if (SelectedServer == null)
             return;
 
-        var dialog = new EditServerWindow
+        var dialog = new EditServerWindow(SettingsManager.ServerDatabaseUniqueAsync)
         {
             SelectedServer = SelectedServer,
             Owner = GetMainWindow()

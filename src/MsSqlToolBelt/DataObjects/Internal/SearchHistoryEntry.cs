@@ -18,6 +18,7 @@ public class SearchHistoryEntry
     /// <summary>
     /// Gets or sets the search entry
     /// </summary>
+    [MaxLength(500)]
     public string SearchEntry { get; set; } = string.Empty;
 
     /// <summary>

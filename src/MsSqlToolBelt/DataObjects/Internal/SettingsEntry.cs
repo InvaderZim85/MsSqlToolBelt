@@ -25,6 +25,7 @@ internal class SettingsEntry
     /// Gets or sets the value of the key
     /// </summary>
     [Required]
+    [MaxLength(200)]
     public string Value { get; set; } = string.Empty;
 
     /// <summary>

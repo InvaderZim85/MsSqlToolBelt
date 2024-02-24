@@ -22,11 +22,13 @@ public class ServerEntry
     /// </summary>
     [Required]
     [ClipboardProperty]
+    [MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the name of the default database
     /// </summary>
+    [MaxLength(200)]
     public string DefaultDatabase { get; set; } = string.Empty;
 
     /// <summary>
@@ -42,6 +44,7 @@ public class ServerEntry
     /// <summary>
     /// Gets or sets the description of the server (optional)
     /// </summary>
+    [MaxLength(2000)]
     public string Description { get; set; } = string.Empty;
 
     /// <summary>

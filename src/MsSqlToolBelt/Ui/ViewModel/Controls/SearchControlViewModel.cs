@@ -654,6 +654,17 @@ internal partial class SearchControlViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Executes the search with the given value
+    /// </summary>
+    /// <param name="value">The value to search for</param>
+    /// <returns>The awaitable task</returns>
+    public Task ExecuteSearchAsync(string value)
+    {
+        SearchString = value;
+        return ExecuteSearchAsync();
+    }
+
+    /// <summary>
     /// Resets the last search result
     /// </summary>
     /// <param name="completeReset"><see langword="true"/> to perform a complete reset, otherwise <see langword="false"/></param>
