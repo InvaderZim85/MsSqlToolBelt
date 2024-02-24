@@ -1,4 +1,5 @@
-﻿using MsSqlToolBelt.Business;
+﻿using ICSharpCode.AvalonEdit.Search;
+using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.ClassGen;
@@ -8,8 +9,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using ICSharpCode.AvalonEdit.Search;
-using MsSqlToolBelt.DataObjects.Search;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
@@ -18,6 +17,11 @@ namespace MsSqlToolBelt.Ui.View.Controls;
 /// </summary>
 public partial class ClassGenControl : UserControl, IUserControl
 {
+    /// <summary>
+    /// Occurs when the user wants to open the selected class in the search
+    /// </summary>
+    public event EventHandler<string>? OpenInSearch; 
+
     /// <summary>
     /// Gets or sets the preselection
     /// </summary>
@@ -36,6 +40,7 @@ public partial class ClassGenControl : UserControl, IUserControl
     public ClassGenControl()
     {
         InitializeComponent();
+
         SearchPanel.Install(ClassCodeEditor);
         SearchPanel.Install(SqlCodeEditor);
     }
@@ -43,10 +48,11 @@ public partial class ClassGenControl : UserControl, IUserControl
     /// <summary>
     /// Init the control
     /// </summary>
+    /// <param name="manager">The instance of the settings manager</param>
     public void InitControl(SettingsManager manager)
     {
         if (DataContext is ClassGenControlViewModel viewModel)
-            viewModel.InitViewModel(manager, SetCode, SetColumnVisibility);
+            viewModel.InitViewModel(manager, SetCode, SetColumnVisibility, RaiseOpenInSearch);
 
         ClassCodeEditor.InitAvalonEditor(CodeType.CSharp);
         SqlCodeEditor.InitAvalonEditor(CodeType.Sql);
@@ -111,6 +117,15 @@ public partial class ClassGenControl : UserControl, IUserControl
     private void SetColumnVisibility(bool visible)
     {
         ColumnAlias.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
+    }
+
+    /// <summary>
+    /// Raises the <see cref="OpenInSearch"/> event
+    /// </summary>
+    /// <param name="value">The value which should be searched for</param>
+    private void RaiseOpenInSearch(string value)
+    {
+        OpenInSearch?.Invoke(this, value);
     }
 
     /// <summary>

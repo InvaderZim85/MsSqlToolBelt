@@ -140,10 +140,11 @@ public class SettingsManager
         await using var context = new AppDbContext();
 
         // Check if the entry already exists
-        if (context.ServerEntries.Any(a => a.Name.Equals(server.Name)))
+        if (await context.ServerEntries.AnyAsync(a =>
+                a.Name.Equals(server.Name) && a.DefaultDatabase.Equals(server.DefaultDatabase)))
             return;
 
-        var newOrder = (context.ServerEntries.Any() ? await context.ServerEntries.MaxAsync(m => m.Order) : 0) + 1;
+        var newOrder = (await context.ServerEntries.AnyAsync() ? await context.ServerEntries.MaxAsync(m => m.Order) : 0) + 1;
         server.Order = newOrder;
 
         await context.ServerEntries.AddAsync(server);
@@ -210,6 +211,20 @@ public class SettingsManager
 
         context.ServerEntries.UpdateRange(server, otherServer);
         await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Checks if the server entry is unique (name and database will be checked)
+    /// </summary>
+    /// <param name="server">The name / path of the server</param>
+    /// <param name="database">The name of the database</param>
+    /// <returns><see langword="true"/> when the entry is unique, otherwise <see langword="false"/></returns>
+    public static async Task<bool> ServerDatabaseUniqueAsync(string server, string database)
+    {
+        await using var context = new AppDbContext();
+
+        return !await context.ServerEntries.AsNoTracking().AnyAsync(a => a.Name.Equals(server) &&
+                                                                        a.DefaultDatabase.Equals(database));
     }
     #endregion
 

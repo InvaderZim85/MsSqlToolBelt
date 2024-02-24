@@ -41,6 +41,7 @@ public class FilterEntry
     /// Gets or sets the search value
     /// </summary>
     [Required]
+    [MaxLength(500)]
     public string Value { get; set; } = string.Empty;
 
     /// <summary>

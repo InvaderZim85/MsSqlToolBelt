@@ -92,7 +92,8 @@
 
         <Label
             Grid.Row="5"
-            Grid.Column="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
             HorizontalAlignment="Left"
             Content="{Binding InfoMessage}"
             Foreground="Red" />

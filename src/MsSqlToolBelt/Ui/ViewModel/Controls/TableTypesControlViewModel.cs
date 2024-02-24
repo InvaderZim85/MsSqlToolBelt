@@ -27,6 +27,11 @@ internal partial class TableTypesControlViewModel : ViewModelBase
     /// </summary>
     private bool _dataLoaded;
 
+    /// <summary>
+    /// The action to open the selected entry in the search
+    /// </summary>
+    private Action<string>? _openInSearch;
+
     #region View Properties
 
     /// <summary>
@@ -138,6 +143,15 @@ internal partial class TableTypesControlViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Init the view model
+    /// </summary>
+    /// <param name="openInSearch">The action to open the selected entry in the search</param>
+    public void InitViewModel(Action<string> openInSearch)
+    {
+        _openInSearch = openInSearch;
+    }
+
+    /// <summary>
     /// Loads the data
     /// </summary>
     /// <param name="showProgress"><see langword="true"/> to show the progress, <see langword="false"/> to hide the progress information (optional)</param>
@@ -229,5 +243,17 @@ internal partial class TableTypesControlViewModel : ViewModelBase
         Columns = _manager.SelectedTableType.Columns.ToObservableCollection();
 
         HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
+    }
+
+    /// <summary>
+    /// Opens the selected table in the search
+    /// </summary>
+    [RelayCommand]
+    private void OpenInSearch()
+    {
+        if (SelectedTableType == null)
+            return;
+
+        _openInSearch?.Invoke(SelectedTableType.Name);
     }
 }

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Navigation;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
 using MsSqlToolBelt.Business;
 using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
-using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.Ui.View.Controls;
 using MsSqlToolBelt.Ui.ViewModel.Windows;
 using Serilog;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Navigation;
 
 namespace MsSqlToolBelt.Ui.View.Windows;
 
@@ -51,10 +50,10 @@ public partial class MainWindow : MetroWindow
         switch (type)
         {
             case FlyOutType.Settings:
-                SettingsControl.InitControl(_settingsManager);
+                ControlSettings.InitControl(_settingsManager);
                 break;
             case FlyOutType.Info:
-                InfoControl.InitControl(_startTime, _settingsManager);
+                ControlInfo.InitControl(_startTime, _settingsManager);
                 break;
         }
     }
@@ -67,14 +66,14 @@ public partial class MainWindow : MetroWindow
     /// <param name="firstConnection"><see langword="true"/> when the first connection is being established, <see langword="false"/> if it's a reconnect</param>
     private void SetConnection(string dataSource, string database, bool firstConnection)
     {
-        SearchControl.SetConnection(dataSource, database);
-        TableTypesControl.SetConnection(dataSource, database);
-        ReplicationControl.SetConnection(dataSource, database);
-        ClassGenControl.SetConnection(dataSource, database);
-        DefinitionExportControl.SetConnection(dataSource, database);
+        ControlSearch.SetConnection(dataSource, database);
+        ControlTableTypes.SetConnection(dataSource, database);
+        ControlReplication.SetConnection(dataSource, database);
+        ControlClassGen.SetConnection(dataSource, database);
+        ControlDefinitionExport.SetConnection(dataSource, database);
 
         // Reload the data
-        LoadData(TabControl.SelectedIndex, firstConnection);
+        LoadData(ControlTabs.SelectedIndex, firstConnection);
     }
 
     /// <summary>
@@ -82,11 +81,11 @@ public partial class MainWindow : MetroWindow
     /// </summary>
     public void CloseConnection()
     {
-        SearchControl.CloseConnection();
-        TableTypesControl.CloseConnection();
-        ReplicationControl.CloseConnection();
-        ClassGenControl.CloseConnection();
-        DefinitionExportControl.CloseConnection();
+        ControlSearch.CloseConnection();
+        ControlTableTypes.CloseConnection();
+        ControlReplication.CloseConnection();
+        ControlClassGen.CloseConnection();
+        ControlDefinitionExport.CloseConnection();
     }
 
     /// <summary>
@@ -99,16 +98,16 @@ public partial class MainWindow : MetroWindow
         switch (tabIndex)
         {
             case 1: // Table types
-                TableTypesControl.LoadData(showProgress);
+                ControlTableTypes.LoadData(showProgress);
                 break;
             case 2: // Class generator
-                ClassGenControl.LoadData(showProgress);
+                ControlClassGen.LoadData(showProgress);
                 break;
             case 3: // Definition export
-                DefinitionExportControl.LoadData(showProgress);
+                ControlDefinitionExport.LoadData(showProgress);
                 break;
             case 4: // Replication control
-                ReplicationControl.LoadData(showProgress);
+                ControlReplication.LoadData(showProgress);
                 break;
         }
     }
@@ -126,7 +125,7 @@ public partial class MainWindow : MetroWindow
             Helper.SetColorTheme(scheme);
 
             // Stops the info timer (only if needed)
-            InfoControl.StopUpTimeTimer();
+            ControlInfo.StopUpTimeTimer();
         }
         catch (Exception ex)
         {
@@ -148,19 +147,37 @@ public partial class MainWindow : MetroWindow
         }
 
         // Init the other controls
-        SearchControl.InitControl(_settingsManager);
-        ClassGenControl.InitControl(_settingsManager);
-        DefinitionExportControl.InitControl(_settingsManager);
+        ControlSearch.InitControl(_settingsManager);
+        ControlClassGen.InitControl(_settingsManager);
+        ControlDefinitionExport.InitControl(_settingsManager);
+        ControlTableTypes.InitControl();
 
         // Set the event
-        SearchControl.OpenInClassGenerator += (_, searchResult) =>
+        ControlSearch.OpenInClassGenerator += (_, searchResult) =>
         {
             // Set the preselection
-            ClassGenControl.Preselection = searchResult.Name;
+            ControlClassGen.Preselection = searchResult.Name;
 
             // Switch to the class generator
-            TabControl.SelectedIndex = 2;
+            ControlTabs.SelectedIndex = 2;
         };
+
+        ControlTableTypes.OpenInSearch += OnOpenInSearch;
+        ControlTableTypes.OpenInSearch += OnOpenInSearch;
+    }
+
+    /// <summary>
+    /// Opens the desired value in the search
+    /// </summary>
+    /// <param name="sender">The <see cref="ClassGenControl"/> or <see cref="TableTypesControl"/></param>
+    /// <param name="e">The string to search for</param>
+    private async void OnOpenInSearch(object? sender, string e)
+    {
+        // Switch to the search
+        ControlTabs.SelectedIndex = 0;
+
+        // Execute the search
+        await ControlSearch.ExecuteSearchAsync(e);
     }
 
     /// <summary>

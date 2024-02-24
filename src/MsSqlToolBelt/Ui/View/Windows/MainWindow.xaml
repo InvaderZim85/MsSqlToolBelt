@@ -65,7 +65,7 @@
                 Header="Settings"
                 IsOpen="{Binding SettingsOpen}"
                 Position="Right">
-                <controls:SettingsControl x:Name="SettingsControl" />
+                <controls:SettingsControl x:Name="ControlSettings" />
             </mah:Flyout>
 
             <mah:Flyout
@@ -73,7 +73,7 @@
                 Header="Info"
                 IsOpen="{Binding InfoOpen}"
                 Position="Right">
-                <controls:InfoControl x:Name="InfoControl" />
+                <controls:InfoControl x:Name="ControlInfo" />
             </mah:Flyout>
         </mah:FlyoutsControl>
     </mah:MetroWindow.Flyouts>
@@ -181,7 +181,7 @@
             </Border>
 
             <TabControl
-                Name="TabControl"
+                Name="ControlTabs"
                 Grid.Row="1"
                 mah:TabControlHelper.Transition="Left"
                 mah:TabControlHelper.Underlined="SelectedTabItem"
@@ -189,19 +189,19 @@
                 SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}"
                 Style="{DynamicResource MahApps.Styles.TabControl.Animated}">
                 <TabItem Header="Search" Visibility="{Binding TabSearch}">
-                    <controls:SearchControl x:Name="SearchControl" />
+                    <controls:SearchControl x:Name="ControlSearch" />
                 </TabItem>
                 <TabItem Header="Table types" Visibility="{Binding TabTableTypes}">
-                    <controls:TableTypesControl x:Name="TableTypesControl" />
+                    <controls:TableTypesControl x:Name="ControlTableTypes" />
                 </TabItem>
                 <TabItem Header="Class generator" Visibility="{Binding TabClassGen}">
-                    <controls:ClassGenControl x:Name="ClassGenControl" />
+                    <controls:ClassGenControl x:Name="ControlClassGen" />
                 </TabItem>
                 <TabItem Header="Definition export" Visibility="{Binding TabDefinitionExport}">
-                    <controls:DefinitionExportControl x:Name="DefinitionExportControl" />
+                    <controls:DefinitionExportControl x:Name="ControlDefinitionExport" />
                 </TabItem>
                 <TabItem Header="Replication info" Visibility="{Binding TabReplicationInfo}">
-                    <controls:ReplicationControl x:Name="ReplicationControl" />
+                    <controls:ReplicationControl x:Name="ControlReplication" />
                 </TabItem>
             </TabControl>
 

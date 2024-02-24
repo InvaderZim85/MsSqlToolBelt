@@ -61,6 +61,19 @@ public partial class SearchControl : UserControl, IUserControl
     }
 
     /// <summary>
+    /// Executes the search with the given value
+    /// </summary>
+    /// <param name="value">The value to search for</param>
+    /// <returns>The awaitable task</returns>
+    public Task ExecuteSearchAsync(string value)
+    {
+        if (DataContext is SearchControlViewModel viewModel)
+            return viewModel.ExecuteSearchAsync(value);
+        
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
     /// Sets the text of the sql editor
     /// </summary>
     /// <param name="text">The text which should be set</param>

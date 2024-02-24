@@ -59,7 +59,11 @@ internal class AppDbContext : DbContext
     /// <param name="modelBuilder">The model builder</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ServerEntry>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<ServerEntry>().HasIndex(x => new
+        {
+            x.Name,
+            x.DefaultDatabase
+        }).IsUnique();
         modelBuilder.Entity<SettingsEntry>().HasIndex(x => x.KeyId).IsUnique();
         modelBuilder.Entity<SearchHistoryEntry>().HasIndex(x => x.SearchEntry);
     }
