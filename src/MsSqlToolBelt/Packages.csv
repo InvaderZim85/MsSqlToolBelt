@@ -5,13 +5,13 @@ Dapper;2.1.28
 MahApps.Metro;2.4.10
 MahApps.Metro.IconPacks.Material;4.11.0
 MahApps.Metro.IconPacks.PixelartIcons;4.11.0
-Markdig;0.34.0
+Markdig;0.35.0
 Microsoft-WindowsAPICodePack-Shell;1.1.5
-Microsoft.EntityFrameworkCore.Sqlite;8.0.1
-Microsoft.EntityFrameworkCore.Tools;8.0.1
+Microsoft.EntityFrameworkCore.Sqlite;8.0.2
+Microsoft.EntityFrameworkCore.Tools;8.0.2
 Microsoft.SqlServer.Management.SqlParser;171.24.0
 Microsoft.SqlServer.SqlManagementObjects;170.23.0
-Microsoft.VisualStudio.Threading;17.8.14
+Microsoft.VisualStudio.Threading;17.9.28
 Newtonsoft.Json;13.0.3
 RestSharp;110.2.0
 RestSharp.Serializers.NewtonsoftJson;110.2.0

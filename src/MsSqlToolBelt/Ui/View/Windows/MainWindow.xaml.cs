@@ -162,7 +162,7 @@ public partial class MainWindow : MetroWindow
             ControlTabs.SelectedIndex = 2;
         };
 
-        ControlTableTypes.OpenInSearch += OnOpenInSearch;
+        ControlClassGen.OpenInSearch += OnOpenInSearch;
         ControlTableTypes.OpenInSearch += OnOpenInSearch;
     }
 
