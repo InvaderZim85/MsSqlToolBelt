@@ -22,7 +22,7 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="4.11.0" />
-    <PackageReference Include="Markdig" Version="0.35.0" />
+    <PackageReference Include="Markdig" Version="0.36.2" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
