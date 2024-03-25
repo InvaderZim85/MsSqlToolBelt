@@ -29,7 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="171.24.0" />
+    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="172.0.1" />
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="170.23.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.9.28" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
