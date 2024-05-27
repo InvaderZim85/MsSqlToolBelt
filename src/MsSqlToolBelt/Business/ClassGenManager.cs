@@ -405,6 +405,9 @@ public sealed class ClassGenManager : IDisposable
     /// <summary>
     /// Generates the class code
     /// </summary>
+    /// <remarks>
+    ///
+    /// </remarks>
     /// <param name="options">The desired options</param>
     /// <param name="table">The desired table</param>
     /// <param name="infoText">An info which will be added before the class</param>
@@ -414,10 +417,21 @@ public sealed class ClassGenManager : IDisposable
         // Load the templates
         _templateManager.LoadTemplates(false);
 
-        // Get the class template
-        var classTemplate = _templateManager.GetTemplateContent(options.WithNamespace
-            ? ClassGenTemplateType.ClassDefaultWithNs
-            : ClassGenTemplateType.ClassDefault);
+        ClassGenTemplateType classType;
+        if (options.WithNamespace)
+        {
+            classType = options.AddSummary
+                ? ClassGenTemplateType.ClassDefaultWithNsComment
+                : ClassGenTemplateType.ClassDefaultWithNs;
+        }
+        else
+        {
+            classType = options.AddSummary
+                ? ClassGenTemplateType.ClassDefaultComment
+                : ClassGenTemplateType.ClassDefault;
+        }
+
+        var classTemplate = _templateManager.GetTemplateContent(classType);
 
         // Generate the properties
         var properties = table.Columns.Where(w => w.Use).OrderBy(o => o.Order).Select(column => GenerateColumn(options, column)).ToList();
@@ -444,6 +458,19 @@ public sealed class ClassGenManager : IDisposable
         var classHeader = string.IsNullOrEmpty(table.Schema)
             ? $"{spacer}[Table(\"{table.Name}\")]"
             : $"{spacer}[Table(\"{table.Name}\", Schema = \"{table.Schema}\")]";
+
+        // Check if we should add a "remark"
+        if (options is { AddSummary: true, AddTableNameInSummary: true })
+        {
+            var remarks =
+                $"""
+                {spacer}/// <remarks>
+                {spacer}/// Table <c>{table.Name}</c>
+                {spacer}/// </remarks>
+                """;
+
+            classHeader = $"{remarks}{Environment.NewLine}{classHeader}";
+        }
 
         // Split the template into it's lines to add the class header
         var content = classTemplate.Split([Environment.NewLine], StringSplitOptions.None).ToList();
@@ -509,9 +536,11 @@ public sealed class ClassGenManager : IDisposable
             columnAttributes.Add("[DataType(DataType.Date)]");
         }
 
-        if ((column.DataType.EqualsIgnoreCase("varchar") || column.DataType.EqualsIgnoreCase("nvarchar")) && column.MaxLength != -1) // -1 indicates a NVARCHAR(MAX)
+        if (column.DataType.EqualsIgnoreCase("varchar") || column.DataType.EqualsIgnoreCase("nvarchar"))
         {
-            columnAttributes.Add($"[MaxLength({column.MaxLength})]");
+            columnAttributes.Add(column.MaxLength == -1 // -1 indicates a NVARCHAR(MAX)
+                ? "[MaxLength(int.MaxValue)]"
+                : $"[MaxLength({column.MaxLength})]");
         }
 
         var sb = new StringBuilder();
@@ -654,15 +683,15 @@ public sealed class ClassGenManager : IDisposable
     {
         var template = options.AddSummary switch
         {
-            true when options is {WithBackingField: true, AddSetField: false} =>
+            true when options is { WithBackingField: true, AddSetField: false } =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
-            true when options is {WithBackingField: true, AddSetField: true} =>
+            true when options is { WithBackingField: true, AddSetField: true } =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
             true when !options.WithBackingField =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
-            false when options is {WithBackingField: true, AddSetField: false} =>
+            false when options is { WithBackingField: true, AddSetField: false } =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
-            false when options is {WithBackingField: true, AddSetField: true} =>
+            false when options is { WithBackingField: true, AddSetField: true } =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
             false when !options.WithBackingField =>
                 _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
@@ -708,7 +737,7 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The lines of the template</returns>
     private static List<string> GetTemplateLines(string template)
     {
-        return [.. template.Split(new[] { Environment.NewLine }, StringSplitOptions.None)];
+        return [.. template.Split([Environment.NewLine], StringSplitOptions.None)];
     }
 
     /// <summary>

@@ -1,0 +1,7 @@
+/// <summary>
+/// TODO
+/// </summary>
+$MODIFIER$$SEALED$ class $NAME$ $INHERITS$
+{
+$PROPERTIES$
+}

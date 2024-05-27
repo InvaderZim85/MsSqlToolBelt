@@ -232,24 +232,16 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     private bool _tableOptionEnabled;
 
     /// <summary>
-    /// Backing field for <see cref="OptionSetField"/>
+    /// The value which indicates if the table name should be added in the summary
     /// </summary>
-    private bool _optionSetField;
+    [ObservableProperty]
+    private bool _optionAddTableNameInSummary;
 
     /// <summary>
-    /// Gets or sets the value which indicates if the set field method should be used.
-    /// <para />
-    /// If this option is enabled, the option <see cref="OptionBackingField"/> will be enabled)
+    /// Backing field for <see cref="OptionSetField"/>
     /// </summary>
-    public bool OptionSetField
-    {
-        get => _optionSetField;
-        set
-        {
-            if (SetProperty(ref _optionSetField, value) && value)
-                OptionBackingField = true;
-        }
-    }
+    [ObservableProperty]
+    private bool _optionSetField;
 
     /// <summary>
     /// The desired namespace of the class
@@ -287,6 +279,16 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     {
         if (!value)
             OptionSetField = false;
+    }
+
+    /// <summary>
+    /// Occurs when the user changes the option "set field"
+    /// </summary>
+    /// <param name="value">The new value</param>
+    partial void OnOptionSetFieldChanged(bool value)
+    {
+        if (value)
+            OptionBackingField = true;
     }
 
     #endregion
@@ -545,7 +547,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             AddSummary = OptionSummary,
             Nullable = OptionNullable,
             AddSetField = OptionSetField,
-            Namespace = Namespace
+            Namespace = Namespace,
+            AddTableNameInSummary = OptionAddTableNameInSummary
         };
     }
 
