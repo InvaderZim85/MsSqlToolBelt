@@ -78,4 +78,9 @@ public class ClassGenOptions
     /// Gets the value which indicates if the template with namespace should be used
     /// </summary>
     public bool WithNamespace => !string.IsNullOrWhiteSpace(Namespace);
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the table name should be added in the class summary
+    /// </summary>
+    public bool AddTableNameInSummary { get; set; }
 }

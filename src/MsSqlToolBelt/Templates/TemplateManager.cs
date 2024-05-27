@@ -24,7 +24,7 @@ internal sealed class TemplateManager
     /// <returns>The content of the template</returns>
     public string GetTemplateContent(ClassGenTemplateType type)
     {
-        if (!Templates.Any())
+        if (Templates.Count == 0)
             LoadTemplates();
 
         return Templates.FirstOrDefault(f => f.Type == type)?.Content ??
@@ -37,7 +37,7 @@ internal sealed class TemplateManager
     /// <param name="reload">true to reload all templates, otherwise false</param>
     public void LoadTemplates(bool reload = true)
     {
-        if (Templates.Any() && !reload)
+        if (Templates.Count > 0 && !reload)
             return;
 
         // Remove all loaded templates
