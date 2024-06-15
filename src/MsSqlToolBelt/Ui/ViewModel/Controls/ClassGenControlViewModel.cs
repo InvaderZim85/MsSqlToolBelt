@@ -54,6 +54,11 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     private ClassGenResult _classGenResult = new();
 
     /// <summary>
+    /// Contains the value which indicates if the filter change should be ignored
+    /// </summary>
+    private bool _ignoreFilterChange;
+
+    /// <summary>
     /// Gets or sets the preselection
     /// </summary>
     public string Preselection { get; set; } = string.Empty;
@@ -120,6 +125,10 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         set
         {
             SetProperty(ref _filter, value);
+
+            if (_ignoreFilterChange)
+                return;
+
             if (string.IsNullOrEmpty(value))
                 FilterList();
         }
@@ -427,6 +436,16 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         if (_manager == null)
             return;
 
+        // Check if there is a filter, when there is a filter and the filter doesn't contain the preselection
+        // remove the filter, otherwise we can't show the desired table
+        if (!string.IsNullOrEmpty(Preselection) && !string.IsNullOrEmpty(Filter) &&
+            !Filter.Contains(Preselection, StringComparison.OrdinalIgnoreCase))
+        {
+            // Ignore the filter change, otherwise the filter change (= string.empty) will execute this method
+            _ignoreFilterChange = true;
+            Filter = string.Empty; // Remove the filter
+        }
+
         var result = string.IsNullOrEmpty(Filter)
             ? _manager.Tables
             : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
@@ -444,6 +463,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             return;
 
         SelectedTable = Tables.FirstOrDefault(f => f.Name.Equals(Preselection));
+
+        _ignoreFilterChange = false;
     }
 
     /// <summary>
