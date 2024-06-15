@@ -94,7 +94,8 @@ public partial class ClassGenControl : UserControl, IUserControl
         if (string.IsNullOrEmpty(Preselection))
             return;
 
-        DataGridTables.ScrollIntoView(DataGridTables.SelectedItem);
+        if (DataGridTables.SelectedItem != null)
+            DataGridTables.ScrollIntoView(DataGridTables.SelectedItem);
     }
 
     /// <summary>
