@@ -13,164 +13,227 @@
     d:DesignWidth="800"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
+
     <UserControl.DataContext>
         <controls:ReplicationControlViewModel />
     </UserControl.DataContext>
 
     <Grid IsEnabled="{Binding ControlEnabled}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="2*" />
-        </Grid.ColumnDefinitions>
+        <TabControl>
+            <TabItem Header="Table information">
+                <Grid IsEnabled="{Binding ControlEnabled}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Style="{StaticResource BorderStyle}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource BorderStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderList}" />
+                            <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderList}" />
 
-                <Separator Grid.Row="1" />
+                            <Separator Grid.Row="1" />
 
-                <DataGrid
-                    Name="DataGridTables"
-                    Grid.Row="2"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Tables}"
-                    SelectedItem="{Binding SelectedTable}">
-                    <DataGrid.CommandBindings>
-                        <CommandBinding Command="Copy" Executed="DataGridTables_OnExecuted" />
-                    </DataGrid.CommandBindings>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Name}"
-                            Header="Name" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <DataGrid
+                                Name="DataGridTables"
+                                Grid.Row="2"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding Tables}"
+                                SelectedItem="{Binding SelectedTable}">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="Copy" Executed="DataGridTables_OnExecuted" />
+                                </DataGrid.CommandBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Name}"
+                                        Header="Name" />
+                                </DataGrid.Columns>
+                            </DataGrid>
 
-                <Separator Grid.Row="3" />
+                            <Separator Grid.Row="3" />
 
-                <TextBox
-                    Grid.Row="4"
-                    mah:TextBoxHelper.SelectAllOnFocus="True"
-                    mah:TextBoxHelper.Watermark="Filter..."
-                    Style="{StaticResource TextBoxFilter}"
-                    Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
-                    <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
-                    </TextBox.InputBindings>
-                </TextBox>
+                            <TextBox
+                                Grid.Row="4"
+                                mah:TextBoxHelper.SelectAllOnFocus="True"
+                                mah:TextBoxHelper.Watermark="Filter..."
+                                Style="{StaticResource TextBoxFilter}"
+                                Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter" Command="{Binding FilterListCommand}" />
+                                </TextBox.InputBindings>
+                            </TextBox>
 
-                <Separator Grid.Row="5" />
+                            <Separator Grid.Row="5" />
 
-                <Button
-                    Grid.Row="6"
-                    Width="60"
-                    HorizontalAlignment="Right"
-                    Command="{Binding ReloadCommand}"
-                    Content="Reload" />
-            </Grid>
-        </Border>
+                            <Button
+                                Grid.Row="6"
+                                Width="60"
+                                HorizontalAlignment="Right"
+                                Command="{Binding ReloadCommand}"
+                                Content="Reload" />
+                        </Grid>
+                    </Border>
 
-        <GridSplitter Grid.Column="1" Style="{StaticResource VerticalSplitter}" />
+                    <GridSplitter Grid.Column="1" Style="{StaticResource VerticalSplitter}" />
 
-        <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                    <Border Grid.Column="2" Style="{StaticResource BorderStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderColumns}" />
+                            <mah:MetroHeader Grid.Row="0" Content="{Binding HeaderColumns}" />
 
-                <Separator Grid.Row="1" />
+                            <Separator Grid.Row="1" />
 
-                <DataGrid
-                    Name="DataGridColumns"
-                    Grid.Row="2"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Columns}">
-                    <DataGrid.CommandBindings>
-                        <CommandBinding Command="Copy" Executed="DataGridColumns_OnExecuted" />
-                    </DataGrid.CommandBindings>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="Auto"
-                            Binding="{Binding Order}"
-                            Header="Pos." />
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Name}"
-                            Header="Name" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsPrimaryKey}"
-                            Header="PK" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding InIndex}"
-                            Header="Index" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsIdentity}"
-                            Header="Identity" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsNullable}"
-                            Header="Null" />
-                        <DataGridCheckBoxColumn
-                            Width="Auto"
-                            Binding="{Binding IsReplicated}"
-                            Header="Replicated" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <DataGrid
+                                Name="DataGridColumns"
+                                Grid.Row="2"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding Columns}">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="Copy" Executed="DataGridColumns_OnExecuted" />
+                                </DataGrid.CommandBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="Auto"
+                                        Binding="{Binding Order}"
+                                        Header="Pos." />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Name}"
+                                        Header="Name" />
+                                    <DataGridCheckBoxColumn
+                                        Width="Auto"
+                                        Binding="{Binding IsPrimaryKey}"
+                                        Header="PK" />
+                                    <DataGridCheckBoxColumn
+                                        Width="Auto"
+                                        Binding="{Binding InIndex}"
+                                        Header="Index" />
+                                    <DataGridCheckBoxColumn
+                                        Width="Auto"
+                                        Binding="{Binding IsIdentity}"
+                                        Header="Identity" />
+                                    <DataGridCheckBoxColumn
+                                        Width="Auto"
+                                        Binding="{Binding IsNullable}"
+                                        Header="Null" />
+                                    <DataGridCheckBoxColumn
+                                        Width="Auto"
+                                        Binding="{Binding IsReplicated}"
+                                        Header="Replicated" />
+                                </DataGrid.Columns>
+                            </DataGrid>
 
-                <mah:MetroHeader Grid.Row="3" Content="{Binding HeaderIndex}" />
+                            <mah:MetroHeader Grid.Row="3" Content="{Binding HeaderIndex}" />
 
-                <Separator Grid.Row="4" />
+                            <Separator Grid.Row="4" />
 
-                <DataGrid
-                    Name="DataGridIndexes"
-                    Grid.Row="5"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Indexes}">
-                    <DataGrid.CommandBindings>
-                        <CommandBinding Command="Copy" Executed="DataGridIndexes_OnExecuted" />
-                    </DataGrid.CommandBindings>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Name}"
-                            Header="Name" />
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Columns}"
-                            Header="Columns" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
-        </Border>
+                            <DataGrid
+                                Name="DataGridIndexes"
+                                Grid.Row="5"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding Indexes}">
+                                <DataGrid.CommandBindings>
+                                    <CommandBinding Command="Copy" Executed="DataGridIndexes_OnExecuted" />
+                                </DataGrid.CommandBindings>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Name}"
+                                        Header="Name" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Columns}"
+                                        Header="Columns" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Replication articles">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Grid.Row="0"
+                        Content="{Binding HeaderArticles}"
+                        Style="{StaticResource Headline}" />
+
+                    <Separator Grid.Row="1" />
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding ReplicationArticles}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="2*"
+                                Binding="{Binding Publication}"
+                                Header="Publication" />
+                            <DataGridTextColumn
+                                Width="2*"
+                                Binding="{Binding Database}"
+                                Header="Database" />
+                            <DataGridTextColumn
+                                Width="3*"
+                                Binding="{Binding Article}"
+                                Header="Article" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Schema}"
+                                Header="Schema" />
+                            <DataGridTextColumn
+                                Width="3*"
+                                Binding="{Binding Table}"
+                                Header="Table" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Separator Grid.Row="3" />
+
+                    <TextBox
+                        Grid.Row="4"
+                        Width="300"
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource TextBoxFilter}" />
+
+                    <Button
+                        Grid.Row="4"
+                        Width="100"
+                        HorizontalAlignment="Right"
+                        Content="Copy / Export" />
+                </Grid>
+            </TabItem>
+        </TabControl>
 
         <Border
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
             Height="200"
             Margin="15"
             Background="{DynamicResource MahApps.Brushes.Control.Background}"
-            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            BorderBrush="Orange"
             BorderThickness="2"
             CornerRadius="5"
             Opacity="1"
@@ -219,4 +282,6 @@
             </Grid>
         </Border>
     </Grid>
+
+
 </UserControl>

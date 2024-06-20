@@ -1,4 +1,5 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
+using MsSqlToolBelt.DataObjects.Table;
 
 namespace MsSqlToolBelt.Business;
 
@@ -33,6 +34,11 @@ internal class ReplicationManager(string dataSource, string database) : IDisposa
     public TableEntry? SelectedTable { get; set; }
 
     /// <summary>
+    /// Gets the list with the replication articles / tables
+    /// </summary>
+    public List<ReplicationArticle> ReplicationArticles { get; private set; } = [];
+
+    /// <summary>
     /// Loads all tables which are marked for the replication and stores them into <see cref="Tables"/>
     /// </summary>
     /// <returns>The awaitable task</returns>
@@ -40,6 +46,15 @@ internal class ReplicationManager(string dataSource, string database) : IDisposa
     {
         var tables = await _tableManager.LoadTablesAsync();
         Tables = tables.Where(w => w.IsReplicated).ToList();
+    }
+
+    /// <summary>
+    /// Loads the replication articles / tables for the replications of the current database and stores them into <see cref="ReplicationArticles"/>
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    public async Task LoadReplicationArticlesAsync()
+    {
+        ReplicationArticles = await _tableManager.LoadReplicationArticlesAsync();
     }
 
     /// <summary>

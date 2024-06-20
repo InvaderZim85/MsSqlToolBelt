@@ -8,6 +8,7 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MsSqlToolBelt.DataObjects.Table;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -25,6 +26,26 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     private bool _dataLoaded;
 
     #region View Properties
+
+    /// <summary>
+    /// Gets or sets the tab index
+    /// </summary>
+    [ObservableProperty]
+    private int _tabIndex;
+
+    /// <summary>
+    /// The value which indicates if the info panel should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _showInfo = true;
+
+    /// <summary>
+    /// The value which indicates if the control is enabled
+    /// </summary>
+    [ObservableProperty]
+    private bool _controlEnabled;
+
+    #region Tables
 
     /// <summary>
     /// The list with the tables
@@ -111,17 +132,30 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     [ObservableProperty]
     private string _headerIndex = "Indexes";
 
-    /// <summary>
-    /// The value which indicates if the info panel should be shown
-    /// </summary>
-    [ObservableProperty]
-    private bool _showInfo = true;
+    #endregion
+
+    #region Replication articles
 
     /// <summary>
-    /// The value which indicates if the control is enabled
+    /// Gets or sets the replication article header
     /// </summary>
     [ObservableProperty]
-    private bool _controlEnabled;
+    private string _headerArticles = "Articles";
+
+    /// <summary>
+    /// Gets or sets the list with the replication articles
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<ReplicationArticle> _replicationArticles = [];
+    
+    /// <summary>
+    /// Gets or sets the replication article filter
+    /// </summary>
+    [ObservableProperty]
+    private string _repArticleFilter = string.Empty;
+
+    #endregion
+    
     #endregion
 
     /// <summary>

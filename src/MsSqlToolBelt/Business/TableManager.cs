@@ -176,6 +176,15 @@ public sealed class TableManager(string dataSource, string database) : IDisposab
     }
 
     /// <summary>
+    /// Loads all available replication articles / tables
+    /// </summary>
+    /// <returns>The list with the replication articles</returns>
+    public Task<List<ReplicationArticle>> LoadReplicationArticlesAsync()
+    {
+        return _repo.LoadReplicationArticlesAsync();
+    }
+
+    /// <summary>
     /// Releases all resources used by the <see cref="TableManager"/>
     /// </summary>
     public void Dispose()

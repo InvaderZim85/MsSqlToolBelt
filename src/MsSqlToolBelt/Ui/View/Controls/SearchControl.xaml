@@ -370,8 +370,6 @@
                                 IsEnabled="{Binding OpenInClassGenMenuItemEnabled}" />
                         </StackPanel>
 
-
-
                         <Button
                             Grid.Row="4"
                             Width="100"
