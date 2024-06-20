@@ -19,7 +19,10 @@
     </UserControl.DataContext>
 
     <Grid IsEnabled="{Binding ControlEnabled}">
-        <TabControl>
+        <TabControl
+            mah:TabControlHelper.Transition="Left"
+            mah:TabControlHelper.Underlined="SelectedTabItem"
+            SelectedIndex="{Binding TabIndex, UpdateSourceTrigger=PropertyChanged}">
             <TabItem Header="Table information">
                 <Grid IsEnabled="{Binding ControlEnabled}">
                     <Grid.ColumnDefinitions>

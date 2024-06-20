@@ -96,22 +96,19 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     private ObservableCollection<IndexEntry> _indexes = [];
 
     /// <summary>
-    /// Backing field for <see cref="Filter"/>
+    /// Gets or sets the filter
     /// </summary>
+    [ObservableProperty]
     private string _filter = string.Empty;
 
     /// <summary>
-    /// Gets or sets the filter
+    /// Occurs when the filter was changed
     /// </summary>
-    public string Filter
+    /// <param name="value">The new filter value</param>
+    partial void OnFilterChanged(string value)
     {
-        get => _filter;
-        set
-        {
-            SetProperty(ref _filter, value);
-            if (string.IsNullOrEmpty(value))
-                FilterList();
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            FilterList();
     }
 
     /// <summary>
@@ -154,6 +151,12 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     [ObservableProperty]
     private string _repArticleFilter = string.Empty;
 
+    partial void OnRepArticleFilterChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+
+    }
+
     #endregion
     
     #endregion
@@ -177,6 +180,7 @@ internal partial class ReplicationControlViewModel : ViewModelBase
         // Clear the current result
         Tables = [];
         Columns = [];
+        ReplicationArticles = [];
 
         // Reset the manager
         _manager?.Dispose();
@@ -214,11 +218,20 @@ internal partial class ReplicationControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.LoadTablesAsync();
+            if (TabIndex == 0) // 0 = Tables, 1 = Replication articles
+            {
+                await _manager.LoadTablesAsync();
 
+                FilterList();
+            }
+            else
+            {
+                await _manager.LoadReplicationArticlesAsync();
+
+                FilterRepArticleList();
+            }
+            
             _dataLoaded = true;
-
-            FilterList();
         }
         catch (Exception ex)
         {
@@ -246,14 +259,42 @@ internal partial class ReplicationControlViewModel : ViewModelBase
 
         Tables = result.ToObservableCollection();
         HeaderList = Tables.Count > 1
-            ? $"{Tables.Count} tables"
+            ? $"{Tables.Count:N0} tables"
             : Tables.Count == 0
                 ? "Tables"
                 : "1 table";
 
+        // TODO: Hier noch anpassen
         // Show the info if there are no tables available
-        ShowInfo = Tables.Count == 0;
-        ControlEnabled = Tables.Any();
+        //ShowInfo = Tables.Count == 0;
+        //ControlEnabled = Tables.Any();
+    }
+
+    /// <summary>
+    /// Filters the replication article result
+    /// </summary>
+    [RelayCommand]
+    private void FilterRepArticleList()
+    {
+        if (_manager == null)
+            return;
+
+        var result = string.IsNullOrWhiteSpace(RepArticleFilter)
+            ? _manager.ReplicationArticles
+            : _manager.ReplicationArticles.Where(w => w.Publication.ContainsIgnoreCase(Filter) ||
+                                                      w.Database.ContainsIgnoreCase(Filter) ||
+                                                      w.Article.ContainsIgnoreCase(Filter) ||
+                                                      w.Schema.Contains(Filter) ||
+                                                      w.Table.Contains(Filter)).ToList();
+
+        ReplicationArticles = result.ToObservableCollection();
+        HeaderArticles = ReplicationArticles.Count > 1
+            ? $"{ReplicationArticles.Count:N0} replication articles"
+            : ReplicationArticles.Count == 0
+                ? "Replication articles"
+                : "1 replication article";
+
+
     }
 
     /// <summary>
