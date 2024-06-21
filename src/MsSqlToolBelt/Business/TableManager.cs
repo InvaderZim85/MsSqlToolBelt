@@ -5,6 +5,7 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.DataObjects.Table;
 using System.Data;
+using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Business;
 
@@ -179,9 +180,23 @@ public sealed class TableManager(string dataSource, string database) : IDisposab
     /// Loads all available replication articles / tables
     /// </summary>
     /// <returns>The list with the replication articles</returns>
-    public Task<List<ReplicationArticle>> LoadReplicationArticlesAsync()
+    public async Task<List<TableEntry>> LoadReplicationArticlesAsync()
     {
-        return _repo.LoadReplicationArticlesAsync();
+        // First load the tables
+        var tables = await _repo.LoadTablesAsync(string.Empty);
+        if (tables.Count == 0)
+            return []; // Nothing found
+
+        // Now load the replication information
+        var repArticles = await _repo.LoadReplicationArticlesAsync();
+
+        foreach (var entry in tables)
+        {
+            entry.ReplicationInformation = repArticles.Where(w => w.TableName.EqualsIgnoreCase(entry.Name)).ToList();
+            entry.HasReplicationFilter = entry.ReplicationInformation.Any(a => a.HasFilter);
+        }
+
+        return tables;
     }
 
     /// <summary>

@@ -160,15 +160,22 @@ internal partial class TextDialogWindowViewModel : ViewModelBase
     private async Task CloseWindowAsync()
     {
         if (!Settings.ShowValidateButton || Settings.ValidationFunc == null)
+        {
             _closeWindow?.Invoke();
+            return;
+        }
 
         if (CodeValid)
+        {
             _closeWindow?.Invoke();
+            return;
+        }
 
         var message = new StringBuilder()
             .AppendLine("The code has been changed and needs to be validated again. If you close the window anyway, the generation of the class will be aborted.")
             .AppendLine()
             .AppendLine("Close the window anyway?");
+
         var result = await ShowQuestionAsync("Validation", message.ToString(), "Yes", "No");
 
         if (result == MessageDialogResult.Affirmative)

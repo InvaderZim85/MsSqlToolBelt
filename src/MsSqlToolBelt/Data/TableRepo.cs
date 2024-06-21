@@ -42,7 +42,6 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
                 ON s.schema_id = t.schema_id
             WHERE
                 t.is_ms_shipped = 0 -- only user tables
-                
             """;
 
         if (!string.IsNullOrEmpty(search))
@@ -224,17 +223,26 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
             IF NOT EXISTS (SELECT TOP (1) 1 FROM sys.databases WHERE [name] = 'distribution')
                 RETURN; -- Security check because we need the distribution database
             
-            SELECT 
+            SELECT DISTINCT
                 msp.publication,
                 msa.publisher_db AS [Database],
                 msa.source_owner AS [Schema],
                 msa.article AS Article,
-                msa.source_object AS [Table]
+                msa.source_object AS [TableName],
+                sa.dest_table AS DestinationTable,
+                sa.ins_cmd AS InsertCommand,
+                sa.upd_cmd AS UpdateCommand,
+                sa.del_cmd AS DeleteCommand,
+                sa.filter AS HasFilter,
+                ISNULL(sa.filter_clause, '') AS [FilterQuery]
             FROM 
-                distribution.dbo.MSarticles msa
+                [distribution].dbo.MSarticles AS msa
                 
-                INNER JOIN distribution.dbo.MSpublications msp 
+                INNER JOIN [distribution].dbo.MSpublications AS msp
                 ON msa.publication_id = msp.publication_id
+            
+                INNER JOIN dbo.sysarticles AS sa
+                ON sa.objid = OBJECT_ID(msa.source_object)
             ORDER BY 
                 msp.publication, 
                 msa.article
