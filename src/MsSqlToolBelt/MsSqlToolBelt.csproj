@@ -35,7 +35,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="111.2.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="111.2.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
     <PackageReference Include="ZimLabs.Mapper" Version="1.1.0" />
