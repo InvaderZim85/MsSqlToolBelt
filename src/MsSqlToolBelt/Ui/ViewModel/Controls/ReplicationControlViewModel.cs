@@ -6,12 +6,15 @@ using MsSqlToolBelt.Common;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.DataObjects.Table;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
+/// <summary>
+/// Interaction logic for <see cref="View.Controls.ReplicationControl"/>
+/// </summary>
 internal partial class ReplicationControlViewModel : ViewModelBase
 {
     /// <summary>
@@ -24,42 +27,79 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     /// </summary>
     private bool _dataLoaded;
 
+    /// <summary>
+    /// The action to set the CMD text
+    /// </summary>
+    private Action<string>? _setCmdText;
+
     #region View Properties
+
+    /// <summary>
+    /// Gets or sets the tab index
+    /// </summary>
+    [ObservableProperty]
+    private int _tabIndex;
+
+    /// <summary>
+    /// The value which indicates if the info panel should be shown
+    /// </summary>
+    [ObservableProperty]
+    private bool _showInfo = true;
+
+    /// <summary>
+    /// The value which indicates if the control is enabled
+    /// </summary>
+    [ObservableProperty]
+    private bool _controlEnabled;
+
+    /// <summary>
+    /// Gets or sets the list with the publications
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<string> _publications = [];
+
+    /// <summary>
+    /// Gets or sets the selected publication
+    /// </summary>
+    [ObservableProperty]
+    private string _selectedPublication = string.Empty;
+
+    /// <summary>
+    /// Occurs when another publication was selected
+    /// </summary>
+    /// <param name="value">The name of the publication</param>
+    partial void OnSelectedPublicationChanged(string value)
+    {
+        FilterList();
+    }
 
     /// <summary>
     /// The list with the tables
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<TableEntry> _tables = [];
-    
+
     /// <summary>
     /// Backing field for <see cref="SelectedTable"/>
     /// </summary>
+    [ObservableProperty]
     private TableEntry? _selectedTable;
 
     /// <summary>
-    /// Gets or sets the selected table
+    /// Occurs when the selected table changed
     /// </summary>
-    public TableEntry? SelectedTable
+    /// <param name="value">The selected table</param>
+    partial void OnSelectedTableChanged(TableEntry? value)
     {
-        get => _selectedTable;
-        set
-        {
-            SetProperty(ref _selectedTable, value);
+        if (_manager == null)
+            return;
 
-            if (_manager == null)
-                return;
+        _manager.SelectedTable = value;
 
-            _manager.SelectedTable = value;
-
-            if (value is { Columns.Count: > 0 })
-            {
-                SetColumns();
-                SetIndexes();
-            }
-            else
-                EnrichData();
-        }
+        if (_manager.SelectedTable is { Columns.Count: > 0 })
+            SetAdditionalInformation();
+        else
+            EnrichData();
     }
 
     /// <summary>
@@ -75,22 +115,40 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     private ObservableCollection<IndexEntry> _indexes = [];
 
     /// <summary>
-    /// Backing field for <see cref="Filter"/>
+    /// Gets or sets the list with the replication articles
     /// </summary>
-    private string _filter = string.Empty;
+    [ObservableProperty]
+    private ObservableCollection<ReplicationArticle> _repArticles = [];
+
+    /// <summary>
+    /// Gets or sets the selected rep article
+    /// </summary>
+    [ObservableProperty]
+    private ReplicationArticle? _selectedRepArticle;
+
+    /// <summary>
+    /// Occurs when the content of <see cref="SelectedRepArticle"/> was changed
+    /// </summary>
+    /// <param name="value">The selected value</param>
+    partial void OnSelectedRepArticleChanged(ReplicationArticle? value)
+    {
+        _setCmdText?.Invoke(value?.FilterQuery ?? string.Empty);
+    }
 
     /// <summary>
     /// Gets or sets the filter
     /// </summary>
-    public string Filter
+    [ObservableProperty]
+    private string _filter = string.Empty;
+
+    /// <summary>
+    /// Occurs when the filter was changed
+    /// </summary>
+    /// <param name="value">The new filter value</param>
+    partial void OnFilterChanged(string value)
     {
-        get => _filter;
-        set
-        {
-            SetProperty(ref _filter, value);
-            if (string.IsNullOrEmpty(value))
-                FilterList();
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            FilterList();
     }
 
     /// <summary>
@@ -111,18 +169,16 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     [ObservableProperty]
     private string _headerIndex = "Indexes";
 
-    /// <summary>
-    /// The value which indicates if the info panel should be shown
-    /// </summary>
-    [ObservableProperty]
-    private bool _showInfo = true;
+    #endregion
 
     /// <summary>
-    /// The value which indicates if the control is enabled
+    /// Init the view model
     /// </summary>
-    [ObservableProperty]
-    private bool _controlEnabled;
-    #endregion
+    /// <param name="setCmdText">The action to set the text of the cmd control</param>
+    public void InitViewModel(Action<string> setCmdText)
+    {
+        _setCmdText = setCmdText;
+    }
 
     /// <summary>
     /// The command to reload the table types
@@ -170,6 +226,8 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     /// <param name="showProgress"><see langword="true"/> to show the progress, <see langword="false"/> to hide the progress information (optional)</param>
     public async void LoadData(bool showProgress = true)
     {
+        ControlEnabled = false;
+
         if (_dataLoaded || _manager == null)
             return;
 
@@ -180,11 +238,21 @@ internal partial class ReplicationControlViewModel : ViewModelBase
 
         try
         {
-            await _manager.LoadTablesAsync();
+            await _manager.LoadDataAsync();
+
+            if (!_manager.HasReplicatedTables)
+            {
+                ShowInfo = true;
+                return;
+            }
+            
+            // Set the available publications
+            Publications = _manager.Publications.ToObservableCollection();
+            SelectedPublication = "All";
 
             _dataLoaded = true;
 
-            FilterList();
+            ControlEnabled = true;
         }
         catch (Exception ex)
         {
@@ -206,20 +274,15 @@ internal partial class ReplicationControlViewModel : ViewModelBase
         if (_manager == null)
             return;
 
-        var result = string.IsNullOrEmpty(Filter)
-            ? _manager.Tables
-            : _manager.Tables.Where(w => w.Name.ContainsIgnoreCase(Filter)).ToList();
+        // Filter the list
+        _manager.FilterTables(Filter, SelectedPublication);
 
-        Tables = result.ToObservableCollection();
+        Tables = _manager.Tables.ToObservableCollection();
         HeaderList = Tables.Count > 1
-            ? $"{Tables.Count} tables"
+            ? $"{Tables.Count:N0} tables"
             : Tables.Count == 0
                 ? "Tables"
                 : "1 table";
-
-        // Show the info if there are no tables available
-        ShowInfo = Tables.Count == 0;
-        ControlEnabled = Tables.Any();
     }
 
     /// <summary>
@@ -237,8 +300,7 @@ internal partial class ReplicationControlViewModel : ViewModelBase
             await _manager.EnrichTableAsync();
 
             // Set the columns
-            SetColumns();
-            SetIndexes();
+            SetAdditionalInformation();
         }
         catch (Exception ex)
         {
@@ -251,27 +313,20 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Sets the columns
+    /// Sets the additional information
     /// </summary>
-    private void SetColumns()
+    private void SetAdditionalInformation()
     {
         if (_manager?.SelectedTable == null)
             return;
 
         Columns = _manager.SelectedTable.Columns.ToObservableCollection();
-
         HeaderColumns = Columns.Count > 1 ? $"{Columns.Count} columns" : "1 column";
-    }
-
-    /// <summary>
-    /// Sets the indexes
-    /// </summary>
-    private void SetIndexes()
-    {
-        if (_manager?.SelectedTable == null)
-            return;
 
         Indexes = _manager.SelectedTable.Indexes.ToObservableCollection();
         HeaderIndex = Indexes.Count > 1 ? $"{Indexes.Count} indexes" : "1 index";
+
+        RepArticles = _manager.SelectedTable.ReplicationInformation.ToObservableCollection();
+        SelectedRepArticle = RepArticles.FirstOrDefault();
     }
 }

@@ -151,6 +151,7 @@ public partial class MainWindow : MetroWindow
         ControlClassGen.InitControl(_settingsManager);
         ControlDefinitionExport.InitControl(_settingsManager);
         ControlTableTypes.InitControl();
+        ControlReplication.InitControl();
 
         // Set the event
         ControlSearch.OpenInClassGenerator += (_, searchResult) =>

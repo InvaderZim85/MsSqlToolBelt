@@ -1,6 +1,7 @@
 ﻿using MsSqlToolBelt.DataObjects.Search;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using MsSqlToolBelt.DataObjects.Table;
 using ZimLabs.TableCreator;
 
 namespace MsSqlToolBelt.DataObjects.Common;
@@ -30,6 +31,12 @@ public class TableEntry : IdNameBase
     /// Gets or sets the value which indicates if the table is watch by CDC (Change Data Capture)
     /// </summary>
     public bool Cdc { get; set; }
+
+    /// <summary>
+    /// Gets the name of the available publications
+    /// </summary>
+    [Appearance(Ignore = true)]
+    public string Publications => string.Join(", ", ReplicationInformation.Select(s => s.Publication).Distinct().OrderBy(o => o));
 
     /// <summary>
     /// Gets or sets the creation date / time
@@ -70,6 +77,12 @@ public class TableEntry : IdNameBase
     [Appearance(Ignore = true)]
     [JsonIgnore]
     public string Definition { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the list with the replication information
+    /// </summary>
+    [Appearance(Ignore = true)]
+    public List<ReplicationArticle> ReplicationInformation { get; set; } = [];
 
     /// <summary>
     /// Gets an info message of the table

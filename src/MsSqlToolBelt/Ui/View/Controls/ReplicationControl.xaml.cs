@@ -1,9 +1,11 @@
-﻿using MsSqlToolBelt.DataObjects.Common;
+﻿using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
 using MsSqlToolBelt.Ui.Common;
 using MsSqlToolBelt.Ui.ViewModel.Controls;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MsSqlToolBelt.DataObjects.Table;
 
 namespace MsSqlToolBelt.Ui.View.Controls;
 
@@ -18,6 +20,17 @@ public partial class ReplicationControl : UserControl
     public ReplicationControl()
     {
         InitializeComponent();
+    }
+
+    /// <summary>
+    /// Init the control
+    /// </summary>
+    public void InitControl()
+    {
+        if (DataContext is ReplicationControlViewModel viewModel)
+            viewModel.InitViewModel(SetSqlText);
+
+        SqlEditor.InitAvalonEditor(CodeType.Sql);
     }
 
     /// <summary>
@@ -51,7 +64,17 @@ public partial class ReplicationControl : UserControl
     }
 
     /// <summary>
-    /// Occurs when the user hits the CTRL + C
+    /// Sets the text of the sql editor
+    /// </summary>
+    /// <param name="text">The text which should be set</param>
+    private void SetSqlText(string text)
+    {
+        SqlEditor.Text = text;
+        SqlEditor.ScrollToHome();
+    }
+
+    /// <summary>
+    /// Occurs when the user hits CTRL + C
     /// </summary>
     /// <param name="sender">The <see cref="DataGridIndexes"/></param>
     /// <param name="e">The event arguments</param>
@@ -61,7 +84,7 @@ public partial class ReplicationControl : UserControl
     }
 
     /// <summary>
-    /// Occurs when the user hits the CTRL + C
+    /// Occurs when the user hits CTRL + C
     /// </summary>
     /// <param name="sender">The <see cref="DataGridColumns"/></param>
     /// <param name="e">The event arguments</param>
@@ -71,12 +94,22 @@ public partial class ReplicationControl : UserControl
     }
 
     /// <summary>
-    /// Occurs when the user hits the CTRL + C
+    /// Occurs when the user hits CTRL + C
     /// </summary>
     /// <param name="sender">The <see cref="DataGridTables"/></param>
     /// <param name="e">The event arguments</param>
     private void DataGridTables_OnExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         DataGridTables.CopyToClipboard<TableEntry>();
+    }
+
+    /// <summary>
+    /// Occurs when the user hits CTRL + C
+    /// </summary>
+    /// <param name="sender">The <see cref="DataGridRepArticles"/></param>
+    /// <param name="e">The event arguments</param>
+    private void DateGridRepArticles_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        DataGridRepArticles.CopyToClipboard<ReplicationArticle>();
     }
 }

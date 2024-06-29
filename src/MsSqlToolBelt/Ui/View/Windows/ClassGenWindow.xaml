@@ -146,6 +146,7 @@
                     Grid.Column="4"
                     Content="Backing field"
                     IsChecked="{Binding OptionBackingField}" />
+
                 <CheckBox
                     Grid.Row="8"
                     Grid.Column="1"
@@ -169,6 +170,12 @@
                         <iconPacks:Material Kind="Information" />
                     </Button>
                 </StackPanel>
+                <CheckBox
+                    Grid.Row="8"
+                    Grid.Column="4"
+                    Content="Add table name in summary"
+                    IsChecked="{Binding OptionAddTableNameInSummary}"
+                    ToolTip="If this option is activated, the name of the table is added to the summary (name of the table is added in the 'remarks' section). Only works if the 'Summary' option is selected." />
             </Grid>
         </Border>
 

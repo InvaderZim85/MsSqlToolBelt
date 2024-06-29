@@ -1,5 +1,6 @@
 ﻿using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Search;
+using MsSqlToolBelt.DataObjects.Table;
 
 namespace MsSqlToolBelt.Data;
 
@@ -41,7 +42,6 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
                 ON s.schema_id = t.schema_id
             WHERE
                 t.is_ms_shipped = 0 -- only user tables
-                
             """;
 
         if (!string.IsNullOrEmpty(search))
@@ -146,7 +146,7 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
     /// </summary>
     /// <param name="table">The table</param>
     /// <returns>The awaitable task</returns>
-    public async Task<List<IndexDto>> LoadTableIndexAsync(TableEntry table)
+    public Task<List<IndexDto>> LoadTableIndexAsync(TableEntry table)
     {
         const string query =
             """
@@ -166,9 +166,7 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
                 c.object_id = @id
             """;
 
-        var result = await QueryAsListAsync<IndexDto>(query, table);
-
-        return result;
+        return QueryAsListAsync<IndexDto>(query, table);
     }
 
     /// <summary>
@@ -176,7 +174,7 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
     /// </summary>
     /// <param name="table">The table</param>
     /// <returns>The list with the foreign keys</returns>
-    public async Task<List<ForeignKeyDto>> LoadForeignKeyInfoAsync(TableEntry table)
+    public Task<List<ForeignKeyDto>> LoadForeignKeyInfoAsync(TableEntry table)
     {
         const string query =
             """
@@ -211,8 +209,45 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
                 c_parent.name;
             """;
 
-        var result = await QueryAsListAsync<ForeignKeyDto>(query, table);
+        return QueryAsListAsync<ForeignKeyDto>(query, table);
+    }
 
-        return result;
+    /// <summary>
+    /// Loads all replication articles of the current server
+    /// </summary>
+    /// <returns></returns>
+    public Task<List<ReplicationArticle>> LoadReplicationArticlesAsync()
+    {
+        const string query =
+            """
+            IF NOT EXISTS (SELECT TOP (1) 1 FROM sys.databases WHERE [name] = 'distribution')
+                RETURN; -- Security check because we need the distribution database
+            
+            SELECT DISTINCT
+                msp.publication,
+                msa.publisher_db AS [Database],
+                msa.source_owner AS [Schema],
+                msa.article AS Article,
+                msa.source_object AS [TableName],
+                sa.dest_table AS DestinationTable,
+                sa.ins_cmd AS InsertCommand,
+                sa.upd_cmd AS UpdateCommand,
+                sa.del_cmd AS DeleteCommand,
+                sa.filter AS HasFilter,
+                ISNULL(sa.filter_clause, '') AS [FilterQuery]
+            FROM 
+                [distribution].dbo.MSarticles AS msa
+                
+                INNER JOIN [distribution].dbo.MSpublications AS msp
+                ON msa.publication_id = msp.publication_id
+            
+                INNER JOIN dbo.sysarticles AS sa
+                ON sa.objid = OBJECT_ID(msa.source_object)
+            ORDER BY 
+                msp.publication, 
+                msa.article
+            """;
+
+        return QueryAsListAsync<ReplicationArticle>(query);
     }
 }
