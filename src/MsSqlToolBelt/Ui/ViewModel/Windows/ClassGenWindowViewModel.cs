@@ -69,41 +69,37 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     private bool _optionColumnAttribute;
 
     /// <summary>
-    /// The value which indicates if a backing field should be created
+    /// Gets or sets the value which indicates if a backing field should be created
     /// </summary>
+    [ObservableProperty]
     private bool _optionBackingField;
 
     /// <summary>
-    /// Gets or sets the value which indicates if a backing field should be created
+    /// Occurs when the value of the <see cref="OptionBackingField"/> was changed
     /// </summary>
-    public bool OptionBackingField
+    /// <param name="value"></param>
+    partial void OnOptionBackingFieldChanged(bool value)
     {
-        get => _optionBackingField;
-        set
-        {
-            if (SetProperty(ref _optionBackingField, value) && !value)
-                OptionSetField = false;
-        }
+        if (!value)
+            OptionSetField = false;
     }
-
-    /// <summary>
-    /// Backing field for <see cref="OptionSetField"/>
-    /// </summary>
-    private bool _optionSetField;
 
     /// <summary>
     /// Gets or sets the value which indicates if the set field method should be used.
     /// <para />
     /// If this option is enabled, the option <see cref="OptionBackingField"/> will be enabled)
     /// </summary>
-    public bool OptionSetField
+    [ObservableProperty]
+    private bool _optionSetField;
+
+    /// <summary>
+    /// Occurs when the value of <see cref="OptionSetField"/> was changed
+    /// </summary>
+    /// <param name="value">The new value</param>
+    partial void OnOptionSetFieldChanged(bool value)
     {
-        get => _optionSetField;
-        set
-        {
-            if (SetProperty(ref _optionSetField, value) && value)
-                OptionBackingField = true;
-        }
+        if (value)
+            OptionBackingField = true;
     }
 
     /// <summary>
@@ -117,6 +113,12 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private bool _optionNullable;
+
+    /// <summary>
+    /// Gets or sets the value which indicates whether the summary should be added in the summary
+    /// </summary>
+    [ObservableProperty]
+    private bool _optionAddTableNameInSummary;
 
     /// <summary>
     /// The desired namespace
@@ -143,22 +145,19 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
     private string _headerTables = "Tables";
 
     /// <summary>
-    /// Backing field for <see cref="Filter"/>
+    /// Gets or sets the filter
     /// </summary>
+    [ObservableProperty]
     private string _filter = string.Empty;
 
     /// <summary>
-    /// Gets or sets the filter
+    /// Occurs when the value of <see cref="Filter"/> was changed
     /// </summary>
-    public string Filter
+    /// <param name="value">The new filter value</param>
+    partial void OnFilterChanged(string value)
     {
-        get => _filter;
-        set
-        {
-            SetProperty(ref _filter, value);
-            if (string.IsNullOrEmpty(value))
-                FilterList();
-        }
+        if (string.IsNullOrEmpty(value))
+            FilterList();
     }
 
     /// <summary>
@@ -296,7 +295,8 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
             AddSummary = OptionSummary,
             Nullable = OptionNullable,
             AddSetField = OptionSetField,
-            Namespace = Namespace
+            Namespace = Namespace,
+            AddTableNameInSummary = OptionAddTableNameInSummary
         };
     }
 
