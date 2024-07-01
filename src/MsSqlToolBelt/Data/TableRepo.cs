@@ -41,14 +41,15 @@ internal class TableRepo(string dataSource, string database) : BaseRepo(dataSour
                 INNER JOIN sys.schemas AS s
                 ON s.schema_id = t.schema_id
             WHERE
-                t.is_ms_shipped = 0 -- only user tables
+                -- only user tables
+                t.is_ms_shipped = 0
             """;
 
         if (!string.IsNullOrEmpty(search))
         {
             query +=
                 """
-                    AND
+                    AND 
                     (
                         t.[name] LIKE @search
                         OR c.[name] LIKE @search
