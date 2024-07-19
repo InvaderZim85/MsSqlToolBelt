@@ -192,6 +192,15 @@ internal partial class SettingsControlViewModel : ViewModelBase
     private bool _copyGridSingleLineOnlyValue;
     #endregion
 
+    #region ClassGen options
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the class generator options should be saved
+    /// </summary>
+    [ObservableProperty]
+    private bool _saveClassGenOptions;
+    #endregion
+
     #endregion
 
     /// <summary>
@@ -240,6 +249,8 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
             CopyGridSingleLineOnlyValue =
                 await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyGridSingleLineOnlyValue, false);
+
+            SaveClassGenOptions = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SaveClassGenOptions, false);
 
             var tabSettings = SettingsManager.LoadTabSettings();
             SetTabSettings(tabSettings);
@@ -664,6 +675,16 @@ internal partial class SettingsControlViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Saves the class generator options
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    [RelayCommand]
+    private async Task SaveClassGenOptionsAsync()
+    {
+
+    }
+
+    /// <summary>
     /// Exports the settings as JSON file
     /// </summary>
     /// <returns>The awaitable task</returns>
@@ -736,4 +757,4 @@ internal partial class SettingsControlViewModel : ViewModelBase
         }
     }
     #endregion
-} // 717
+}

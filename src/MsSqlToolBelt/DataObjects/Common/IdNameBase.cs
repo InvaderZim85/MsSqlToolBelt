@@ -17,4 +17,26 @@ public class IdNameBase
     /// </summary>
     [ClipboardProperty]
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Creates a new, empty instance of the <see cref="IdNameBase"/>
+    /// </summary>
+    public IdNameBase() { }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="IdNameBase"/>
+    /// </summary>
+    /// <param name="id">The id</param>
+    /// <param name="name">The name</param>
+    public IdNameBase(int id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return Name;
+    }
 }

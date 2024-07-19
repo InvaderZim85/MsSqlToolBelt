@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>24.181.0.996</Version>
-    <FileVersion>24.181.0.996</FileVersion>
-    <AssemblyVersion>24.181.0.996</AssemblyVersion>
+    <Version>24.183.0.491</Version>
+    <FileVersion>24.183.0.491</FileVersion>
+    <AssemblyVersion>24.183.0.491</AssemblyVersion>
     <ApplicationIcon>MsSqlToolBelt.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>

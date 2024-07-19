@@ -45,5 +45,20 @@ public enum SettingsKey
     /// <para />
     /// <b>Note</b>: The values are stored as comma separated string!
     /// </summary>
-    TabSettings = 7
+    TabSettings = 7,
+
+    /// <summary>
+    /// The class generator options
+    /// </summary>
+    ClassGenOptions = 8,
+
+    /// <summary>
+    /// Specifies whether the class generator options should be saved or not
+    /// </summary>
+    SaveClassGenOptions = 9,
+
+    /// <summary>
+    /// The name of the default modifier
+    /// </summary>
+    ClassGenDefaultModifier = 10
 }

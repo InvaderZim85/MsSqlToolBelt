@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:MsSqlToolBelt.Ui.View.Controls"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="650"
+    d:DesignHeight="800"
     d:DesignWidth="600"
     mah:DialogParticipation.Register="{Binding}"
     mc:Ignorable="d">
@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -373,8 +374,11 @@
             </Grid>
         </Border>
 
+        <!--  Class gen options  -->
+        <Border Grid.Row="4" Style="{StaticResource BorderStyle}" />
+
         <!--  Import / Export  -->
-        <Border Grid.Row="4" Style="{StaticResource BorderStyle}">
+        <Border Grid.Row="5" Style="{StaticResource BorderStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

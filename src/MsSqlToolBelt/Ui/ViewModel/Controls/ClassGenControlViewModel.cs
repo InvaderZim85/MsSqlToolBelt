@@ -388,6 +388,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             _dataLoaded = true;
 
             FilterList();
+
+            // Set the options
+            await SetOptionsAsync();
         }
         catch (Exception ex)
         {
@@ -397,6 +400,51 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         {
             if (controller != null)
                 await controller.CloseAsync();
+        }
+    }
+
+    /// <summary>
+    /// Loads and sets the class generator options
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    private async Task SetOptionsAsync()
+    {
+        if (_manager == null)
+            return;
+
+        // Load the options
+        var options = await _manager.LoadClassGenOptionsAsync();
+
+        // Set the options
+        foreach (var (option, value) in options)
+        {
+            switch (option)
+            {
+                case ClassGenOption.AddColumnAttribute:
+                    OptionColumnAttribute = value;
+                    break;
+                case ClassGenOption.AddSetField:
+                    OptionSetField = value;
+                    break;
+                case ClassGenOption.AddSummary:
+                    OptionSummary = value;
+                    break;
+                case ClassGenOption.AddTableNameInSummary:
+                    OptionAddTableNameInSummary = value;
+                    break;
+                case ClassGenOption.DbModel:
+                    OptionDbModel = value;
+                    break;
+                case ClassGenOption.Nullable:
+                    OptionNullable = value;
+                    break;
+                case ClassGenOption.SealedClass:
+                    OptionSealedClass = value;
+                    break;
+                case ClassGenOption.WithBackingField:
+                    OptionBackingField = value;
+                    break;
+            }
         }
     }
 
@@ -535,7 +583,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase
 
         try
         {
-            _classGenResult = _manager.GenerateCode(GetOptions());
+            _classGenResult = await _manager.GenerateCodeAsync(GetOptions());
 
             _setCode?.Invoke(_classGenResult);
 
