@@ -74,6 +74,11 @@ public sealed class ClassGenManager : IDisposable
     private List<ClassGenTypeEntry> _conversionTypes = [];
 
     /// <summary>
+    /// Contains the string with the selected options (<c>10010</c>, each value stand for an option)
+    /// </summary>
+    private string _selectedOptions = string.Empty;
+
+    /// <summary>
     /// Gets the list with the tables
     /// </summary>
     public List<TableDto> Tables { get; private set; } = [];
@@ -252,6 +257,7 @@ public sealed class ClassGenManager : IDisposable
         var result = new SortedList<ClassGenOption, bool>();
         var options = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenOptions, string.Empty);
         options = options.PadRight(Enum.GetNames<ClassGenOption>().Length, '0'); // Add "false" values if the string value is to "short"
+        _selectedOptions = options;
 
         foreach (var option in Enum.GetValues<ClassGenOption>())
         {
@@ -267,7 +273,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The options which should be saved</param>
     /// <returns>The awaitable task</returns>
-    private static async Task SaveClassGenOptionsAsync(ClassGenOptions options)
+    private async Task SaveClassGenOptionsAsync(ClassGenOptions options)
     {
         if (!await SettingsManager.LoadSettingsValueAsync(SettingsKey.SaveClassGenOptions, false))
             return;
@@ -294,6 +300,9 @@ public sealed class ClassGenManager : IDisposable
             else
                 result += false.BoolToString();
         }
+
+        if (_selectedOptions.Equals(result))
+            return; // Nothing was changed, so skip the save process
 
         // Save the value
         await SettingsManager.SaveSettingsValueAsync(SettingsKey.ClassGenOptions, result);
