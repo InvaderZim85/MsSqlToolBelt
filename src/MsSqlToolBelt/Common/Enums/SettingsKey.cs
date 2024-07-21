@@ -60,5 +60,10 @@ public enum SettingsKey
     /// <summary>
     /// The name of the default modifier
     /// </summary>
-    ClassGenDefaultModifier = 10
+    ClassGenDefaultModifier = 10,
+
+    /// <summary>
+    /// The value which indicates whether the SQL Query window in the class generator should be hidden
+    /// </summary>
+    ClassGenHideSqlQuery = 11
 }

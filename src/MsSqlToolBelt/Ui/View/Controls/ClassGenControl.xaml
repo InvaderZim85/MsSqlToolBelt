@@ -157,15 +157,18 @@
                         <DataGridTextColumn
                             Width="Auto"
                             Binding="{Binding DataType}"
-                            Header="Type" />
+                            Header="Type"
+                            IsReadOnly="True" />
                         <DataGridCheckBoxColumn
                             Width="Auto"
                             Binding="{Binding IsPrimaryKey}"
-                            Header="PK" />
+                            Header="PK"
+                            IsReadOnly="True" />
                         <DataGridCheckBoxColumn
                             Width="Auto"
                             Binding="{Binding IsNullable}"
-                            Header="Null" />
+                            Header="Null"
+                            IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -211,7 +214,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="1.5*" />
                     <RowDefinition Height="5" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="{Binding SqlQueryRowHeight}" />
                 </Grid.RowDefinitions>
 
                 <!--  Settings  -->
@@ -418,7 +421,7 @@
                 <GridSplitter Grid.Row="3" Style="{StaticResource HorizontalSplitter}" />
 
                 <!--  SQL code  -->
-                <Grid Grid.Row="4">
+                <Grid Grid.Row="4" Visibility="{Binding SqlQueryVisibility}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

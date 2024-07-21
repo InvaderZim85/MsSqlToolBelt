@@ -137,6 +137,19 @@ internal class ViewModelBase : ObservableObject
     }
 
     /// <summary>
+    /// Shows a question dialog with two buttons
+    /// </summary>
+    /// <param name="entry">The message (header and message)</param>
+    /// <param name="okButtonText">The text of the ok button (optional)</param>
+    /// <param name="cancelButtonText">The text of the cancel button (optional)</param>
+    /// <returns>The dialog result</returns>
+    protected Task<MessageDialogResult> ShowQuestionAsync(MessageEntry entry, string okButtonText = "OK",
+        string cancelButtonText = "Cancel")
+    {
+        return ShowQuestionAsync(entry.Header, entry.Message, okButtonText, cancelButtonText);
+    }
+
+    /// <summary>
     /// Shows an error message and logs the exception
     /// </summary>
     /// <param name="ex">The exception which was thrown</param>

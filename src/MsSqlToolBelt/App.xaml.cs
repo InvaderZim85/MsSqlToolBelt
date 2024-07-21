@@ -82,7 +82,7 @@ public partial class App : Application
     /// <param name="e">The event arguments</param>
     private void App_OnExit(object sender, ExitEventArgs e)
     {
-        Mediator.RemoveAllActions();
+        Mediator.RemoveAll();
 
         if (_mainWindow?.DataContext is MainWindowViewModel viewModel)
             viewModel.CloseViewModel();

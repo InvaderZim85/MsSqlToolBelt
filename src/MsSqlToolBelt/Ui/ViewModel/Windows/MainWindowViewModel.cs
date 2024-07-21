@@ -352,7 +352,7 @@ internal partial class MainWindowViewModel : ViewModelBase
 
         // Set the tab visibility
         SetTabVisibility();
-        Mediator.AddAction(nameof(SetTabVisibility), SetTabVisibility);
+        Mediator.AddAction(MediatorKey.SetTabVisibility, SetTabVisibility);
     }
 
     /// <summary>

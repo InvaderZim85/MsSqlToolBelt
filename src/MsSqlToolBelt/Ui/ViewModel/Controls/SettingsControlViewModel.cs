@@ -199,6 +199,24 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private bool _saveClassGenOptions;
+
+    /// <summary>
+    /// Gets or sets the list of available class modifiers
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<string> _classModifiers = [];
+
+    /// <summary>
+    /// Gets or sets the default class modifier
+    /// </summary>
+    [ObservableProperty]
+    private string _defaultClassModifier = ClassGenManager.ModifierFallback;
+
+    /// <summary>
+    /// Gets or sets the value which indicates if the SQL Query should be hidden
+    /// </summary>
+    [ObservableProperty]
+    private bool _hideSqlQuery;
     #endregion
 
     #endregion
@@ -251,6 +269,9 @@ internal partial class SettingsControlViewModel : ViewModelBase
                 await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyGridSingleLineOnlyValue, false);
 
             SaveClassGenOptions = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SaveClassGenOptions, false);
+            ClassModifiers = ClassGenManager.GetModifierList();
+            DefaultClassModifier =
+                await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
 
             var tabSettings = SettingsManager.LoadTabSettings();
             SetTabSettings(tabSettings);
@@ -681,7 +702,24 @@ internal partial class SettingsControlViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveClassGenOptionsAsync()
     {
+        // Save the class gen options
+        try
+        {
+            var saveList = new SortedList<SettingsKey, object>
+            {
+                { SettingsKey.ClassGenDefaultModifier, DefaultClassModifier },
+                { SettingsKey.SaveClassGenOptions, SaveClassGenOptions },
+                { SettingsKey.ClassGenHideSqlQuery, HideSqlQuery }
+            };
 
+            await SettingsManager.SaveSettingsValuesAsync(saveList);
+
+            await Mediator.ExecuteFunctionAsync(MediatorKey.SetClassGenQueryVisibility);
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
+        }
     }
 
     /// <summary>

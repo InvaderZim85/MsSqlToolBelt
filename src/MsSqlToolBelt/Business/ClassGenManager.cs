@@ -34,6 +34,11 @@ public sealed class ClassGenManager : IDisposable
     private const string ClassGenTypeConversionFileName = "ClassGenTypeConversion.json";
 
     /// <summary>
+    /// The name of the default class modifier
+    /// </summary>
+    public const string ModifierFallback = "public";
+
+    /// <summary>
     /// Contains the tab indent
     /// </summary>
     private static readonly string Tab = new(' ', 4);
@@ -91,8 +96,8 @@ public sealed class ClassGenManager : IDisposable
         _repo = new ClassGenRepo(dataSource, database);
         _settingsManager = settingsManager;
 
-        Mediator.AddAction(nameof(ReloadTemplates), ReloadTemplates);
-        Mediator.AddAction(nameof(ResetConversionTypes), ResetConversionTypes);
+        Mediator.AddAction(MediatorKey.ReloadTemplates, ReloadTemplates);
+        Mediator.AddAction(MediatorKey.ResetConversionTypes, ResetConversionTypes);
     }
 
     #region Loading
@@ -251,7 +256,7 @@ public sealed class ClassGenManager : IDisposable
         foreach (var option in Enum.GetValues<ClassGenOption>())
         {
             var value = options[(int)option];
-            result.Add(option, value.Equals('1'));
+            result.Add(option, value.ToString().StringToBool());
         }
 
         return result;
@@ -262,8 +267,11 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The options which should be saved</param>
     /// <returns>The awaitable task</returns>
-    private async Task SaveClassGenOptionsAsync(ClassGenOptions options)
+    private static async Task SaveClassGenOptionsAsync(ClassGenOptions options)
     {
+        if (!await SettingsManager.LoadSettingsValueAsync(SettingsKey.SaveClassGenOptions, false))
+            return;
+
         var properties = typeof(ClassGenOptions).GetProperties();
 
         // Convert the options into a number list
@@ -275,27 +283,20 @@ public sealed class ClassGenManager : IDisposable
             var property = properties.FirstOrDefault(f => f.Name.Equals(optionName));
             if (property == null)
             {
-                result += '0'; // Add "false" and skip the rest
+                result += false.BoolToString(); // Add "false" and skip the rest
                 continue;
             }
 
             // Get the current value
             var optionValue = property.GetValue(options);
             if (optionValue is bool tmpValue)
-                result += OptionToString(tmpValue);
+                result += tmpValue.BoolToString();
             else
-                result += '0';
+                result += false.BoolToString();
         }
 
         // Save the value
         await SettingsManager.SaveSettingsValueAsync(SettingsKey.ClassGenOptions, result);
-
-        return;
-
-        static string OptionToString(bool option)
-        {
-            return option ? "1" : "0";
-        }
     }
 
     #endregion
@@ -313,45 +314,7 @@ public sealed class ClassGenManager : IDisposable
 
         return SelectedTable == null 
             ? new ClassGenResult() 
-            : GenerateCode(options, SelectedTable);
-    }
-
-    /// <summary>
-    /// Generates a class based on the options and columns
-    /// </summary>
-    /// <param name="options">The desired options</param>
-    /// <param name="table">The desired table</param>
-    /// <param name="createSqlQuery"><see langword="true"/> to generate a sql query, otherwise <see langword="false"/></param>
-    /// <param name="infoText">An info which will be added before the class (optional)</param>
-    /// <returns>The content of the class</returns>
-    private ClassGenResult GenerateCode(ClassGenOptions options, TableDto table, bool createSqlQuery = true, string infoText = "")
-    {
-        // Step 1: Load the conversion types
-        LoadTypeConversion();
-
-        var result = new ClassGenResult
-        {
-            // Class code
-            ClassCode = GenerateClass(options, table, infoText)
-        };
-
-        // Check if the table is a table type, if so, return the result
-        if (table.Type == TableDtoType.TableType)
-            return result;
-
-        // Ef key code
-        if (options.DbModel)
-        {
-            var (completeCode, shortCode) = GenerateEfKeyCode(options, table);
-            result.EfCoreKeyCode = completeCode;
-            result.EfCoreKeyCodeShort = shortCode;
-        }
-
-        // SQL Query
-        if (createSqlQuery)
-            result.SqlQuery = !string.IsNullOrEmpty(options.SqlQuery) ? options.SqlQuery : GenerateSqlQuery();
-
-        return result;
+            : Generate(options, SelectedTable);
     }
 
     /// <summary>
@@ -359,7 +322,7 @@ public sealed class ClassGenManager : IDisposable
     /// </summary>
     /// <param name="options">The options</param>
     /// <returns>The content of the class</returns>
-    public async Task<ClassGenResult> GenerateFromQueryAsync(ClassGenOptions options)
+    public async Task<ClassGenResult> GenerateCodeFromQueryAsync(ClassGenOptions options)
     {
         // Step 1: Load the conversion types
         LoadTypeConversion();
@@ -391,7 +354,45 @@ public sealed class ClassGenManager : IDisposable
                 .AppendLine();
         }
 
-        return GenerateCode(options, tmpTable, infoText: sb.ToString());
+        return Generate(options, tmpTable, infoText: sb.ToString());
+    }
+
+    /// <summary>
+    /// Generates a class based on the options and columns
+    /// </summary>
+    /// <param name="options">The desired options</param>
+    /// <param name="table">The desired table</param>
+    /// <param name="createSqlQuery"><see langword="true"/> to generate a sql query, otherwise <see langword="false"/></param>
+    /// <param name="infoText">An info which will be added before the class (optional)</param>
+    /// <returns>The content of the class</returns>
+    private ClassGenResult Generate(ClassGenOptions options, TableDto table, bool createSqlQuery = true, string infoText = "")
+    {
+        // Step 1: Load the conversion types
+        LoadTypeConversion();
+
+        var result = new ClassGenResult
+        {
+            // Class code
+            ClassCode = GenerateClass(options, table, infoText)
+        };
+
+        // Check if the table is a table type, if so, return the result
+        if (table.Type == TableDtoType.TableType)
+            return result;
+
+        // Ef key code
+        if (options.DbModel)
+        {
+            var (completeCode, shortCode) = GenerateEfKeyCode(options, table);
+            result.EfCoreKeyCode = completeCode;
+            result.EfCoreKeyCodeShort = shortCode;
+        }
+
+        // SQL Query
+        if (createSqlQuery)
+            result.SqlQuery = !string.IsNullOrEmpty(options.SqlQuery) ? options.SqlQuery : GenerateSqlQuery();
+
+        return result;
     }
 
     /// <summary>
@@ -435,7 +436,7 @@ public sealed class ClassGenManager : IDisposable
             }
 
             // Step 2: Create the class
-            var result = GenerateCode(options, table, false);
+            var result = Generate(options, table, false);
 
             // Step 3: Export the class
             await File.WriteAllTextAsync(path, result.ClassCode, Encoding.UTF8, ct);
@@ -459,6 +460,7 @@ public sealed class ClassGenManager : IDisposable
             }
         }
     }
+    #endregion
 
     #region CSharp class
     /// <summary>
@@ -601,12 +603,9 @@ public sealed class ClassGenManager : IDisposable
             if (column.IsPrimaryKey)
                 columnAttributes.Add(new IdNameBase(1, "[Key]"));
 
-            if (options.AddColumnAttribute)
+            if (options.AddColumnAttribute || (!string.IsNullOrEmpty(column.Alias) && !column.Alias.Equals(column.Name)))
             {
-                columnAttributes.Add(new IdNameBase(2,
-                    string.IsNullOrEmpty(column.Alias) 
-                        ? $"[Column(\"{column.Name}\")]"
-                        : $"[Column(\"{column.Alias}\")]"));
+                columnAttributes.Add(new IdNameBase(2, $"[Column(\"{column.Name}\")]"));
             }
 
             if (column.DataType.EqualsIgnoreCase("date"))
@@ -746,7 +745,6 @@ public sealed class ClassGenManager : IDisposable
         };
     }
 
-    #endregion
     #endregion
 
     #region Template
@@ -932,7 +930,7 @@ public sealed class ClassGenManager : IDisposable
 
         File.WriteAllText(path, content, Encoding.UTF8);
 
-        Mediator.ExecuteAction(nameof(ResetConversionTypes));
+        Mediator.ExecuteAction(MediatorKey.ResetConversionTypes);
     }
 
     /// <summary>
@@ -954,6 +952,22 @@ public sealed class ClassGenManager : IDisposable
             return int.TryParse(firstChar, out _);
         }
     }
+
+    /// <summary>
+    /// Checks if there is any duplicated name in the list of columns
+    /// </summary>
+    /// <returns><see langword="true"/> if there are duplicates, otherwise <see langword="false"/></returns>
+    public bool HasDuplicatedPropertyNames()
+    {
+        if (SelectedTable == null)
+            return false;
+
+        var property = SelectedTable.Columns.Where(w => w.Use)
+            .Select(s => string.IsNullOrEmpty(s.Alias) ? s.Name : s.Alias).GroupBy(g => g).Select(s => s.Count())
+            .ToList();
+
+        return property.Any(a => a > 1);
+    }
     #endregion
 
     /// <summary>
@@ -966,7 +980,7 @@ public sealed class ClassGenManager : IDisposable
 
         _tableManager.Dispose();
 
-        Mediator.RemoveAction("LoadTemplates");
+        Mediator.Remove(MediatorKey.ReloadTemplates);
 
         _disposed = true;
     }

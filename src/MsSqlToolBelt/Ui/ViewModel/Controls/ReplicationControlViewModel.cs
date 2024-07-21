@@ -68,6 +68,7 @@ internal partial class ReplicationControlViewModel : ViewModelBase
     /// Occurs when another publication was selected
     /// </summary>
     /// <param name="value">The name of the publication</param>
+    // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnSelectedPublicationChanged(string value)
     {
         FilterList();
@@ -199,6 +200,9 @@ internal partial class ReplicationControlViewModel : ViewModelBase
         // Clear the current result
         Tables = [];
         Columns = [];
+
+        // Reset the filter
+        Filter = string.Empty;
 
         // Reset the manager
         _manager?.Dispose();

@@ -375,7 +375,87 @@
         </Border>
 
         <!--  Class gen options  -->
-        <Border Grid.Row="4" Style="{StaticResource BorderStyle}" />
+        <Border Grid.Row="4" Style="{StaticResource BorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <mah:MetroHeader
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Content="Class generator options" />
+
+                <Separator
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3" />
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="Save class generator options:" />
+                <CheckBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    IsChecked="{Binding SaveClassGenOptions}" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Content="If selected, the Class Gen options are saved for the next time"
+                    Style="{StaticResource ItemHint}" />
+
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Content="Default class modifier:" />
+                <ComboBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    ItemsSource="{Binding ClassModifiers}"
+                    SelectedItem="{Binding DefaultClassModifier}" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    Content="The default class modifier which should be used"
+                    Style="{StaticResource ItemHint}" />
+
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Content="Hide SQL Query:" />
+                <CheckBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    IsChecked="{Binding HideSqlQuery}" />
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="2"
+                    Content="If this option is selected, the 'SQL query' is hidden in the class generator."
+                    Style="{StaticResource ItemHint}" />
+
+                <Button
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Width="60"
+                    HorizontalAlignment="Right"
+                    Command="{Binding SaveClassGenOptionsCommand}"
+                    Content="Save" />
+            </Grid>
+        </Border>
 
         <!--  Import / Export  -->
         <Border Grid.Row="5" Style="{StaticResource BorderStyle}">

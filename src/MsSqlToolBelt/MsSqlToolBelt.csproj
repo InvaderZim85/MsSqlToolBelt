@@ -24,8 +24,8 @@
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="5.0.0" />
     <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -33,10 +33,11 @@
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="171.30.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.10.48" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="111.3.0" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="111.3.0" />
+    <PackageReference Include="RestSharp" Version="111.4.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="111.4.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.2" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
     <PackageReference Include="ZimLabs.Mapper" Version="1.1.0" />
     <PackageReference Include="ZimLabs.TableCreator" Version="2.1.1" />

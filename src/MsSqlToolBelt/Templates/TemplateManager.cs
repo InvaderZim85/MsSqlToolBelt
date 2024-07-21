@@ -85,7 +85,7 @@ internal sealed class TemplateManager
         File.WriteAllText(template.FilePath, template.Content, Encoding.UTF8);
 
         // Execute the reload
-        Mediator.ExecuteAction("ReloadTemplates");
+        Mediator.ExecuteAction(MediatorKey.ReloadTemplates);
     }
 
     /// <summary>
