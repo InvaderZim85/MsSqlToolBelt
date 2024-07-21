@@ -334,6 +334,49 @@ internal static class Helper
         return string.Empty;
     }
 
+    /// <summary>
+    /// Converts the list of bool values into a single string
+    /// </summary>
+    /// <remarks>
+    /// For example: you provided the following list: <c>true, false, true, true, false</c>
+    /// <para />
+    /// The result will be look like this: <c>10110</c>
+    /// <para />
+    /// The counterpart to this function is: <see cref="BoolStringToBoolArray"/>
+    /// </remarks>
+    /// <param name="values">The list with the values</param>
+    /// <returns>The string</returns>
+    public static string BoolListToString(params bool[] values)
+    {
+        return values.Length == 0
+            ? string.Empty
+            : values.Aggregate(string.Empty, (current, value) => current + value.BoolToString());
+    }
+
+    /// <summary>
+    /// Converts a single string with different bool values into an array of bool values
+    /// </summary>
+    /// <remarks>
+    /// For example: You provided the following string: <c>10110</c>
+    /// <para />
+    /// The result will be look like this: <c>true, false, true, true, false</c>
+    /// <para />
+    /// The counterpart to this function is: <see cref="BoolStringToBoolArray"/>
+    /// </remarks>
+    /// <param name="value">The string value</param>
+    /// <returns>The list with the bool values</returns>
+    public static bool[] BoolStringToBoolArray(string value)
+    {
+        var result = new bool[value.Length];
+
+        for (var i = 0; i < value.Length; i++)
+        {
+            result[i] = value[i].ToBool();
+        }
+
+        return result;
+    }
+
     #region Taskbar
     /// <summary>
     /// Sets the taskbar into an indeterminate state

@@ -7,7 +7,7 @@ namespace MsSqlToolBelt.DataObjects.ClassGen;
 /// <summary>
 /// Represents a column (only needed for the class generator). For the normal column see <see cref="ColumnEntry"/>
 /// </summary>
-public class ColumnDto : ObservableObject
+public partial class ColumnDto : ObservableObject
 {
     /// <summary>
     /// Backing field for <see cref="Use"/>
@@ -30,21 +30,21 @@ public class ColumnDto : ObservableObject
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Backing field for <see cref="Alias"/>
+    /// Gets or sets the alias of the column
     /// </summary>
+    [ObservableProperty]
     private string _alias = string.Empty;
 
     /// <summary>
-    /// Gets or sets the alias of the column
+    /// Occurs when the alias was changed
     /// </summary>
-    public string Alias
+    /// <param name="oldValue">The old value</param>
+    /// <param name="newValue">The new value</param>
+    partial void OnAliasChanged(string? oldValue, string newValue)
     {
-        get => _alias;
-        set
-        {
-            SetProperty(ref _alias, value);
-            Use = !string.IsNullOrEmpty(value);
-        }
+        // If the old value was "empty" and the new value is not empty, set "Use" to true
+        if (string.IsNullOrWhiteSpace(oldValue) && !string.IsNullOrWhiteSpace(newValue))
+            Use = true;
     }
 
     /// <summary>

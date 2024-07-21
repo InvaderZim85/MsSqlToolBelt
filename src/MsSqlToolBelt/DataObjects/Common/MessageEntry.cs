@@ -30,7 +30,7 @@ internal class MessageEntry
     /// Creates a new instance of the <see cref="MessageEntry"/>
     /// </summary>
     /// <param name="header">The header / caption</param>
-    /// <param name="messageParts">The message parts</param>
+    /// <param name="messageParts">The message parts. <b>Note</b>: Each entry is added as a new line to the <see cref="Message"/></param>
     public MessageEntry(string header, params string[] messageParts)
     {
         Header = header;

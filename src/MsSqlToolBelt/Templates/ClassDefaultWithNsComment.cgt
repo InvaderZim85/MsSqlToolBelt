@@ -11,6 +11,7 @@ namespace $NAMESPACE$
     /// <summary>
     /// TODO
     /// </summary>
+    $ATTRIBUTES$
     $MODIFIER$$SEALED$ class $NAME$ $INHERITS$
     {
 $PROPERTIES$

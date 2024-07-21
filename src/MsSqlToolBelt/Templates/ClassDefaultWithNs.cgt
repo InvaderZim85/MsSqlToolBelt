@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace $NAMESPACE$
 {
+    $ATTRIBUTES$
     $MODIFIER$$SEALED$ class $NAME$ $INHERITS$
     {
 $PROPERTIES$

@@ -166,6 +166,16 @@ internal static class Extensions
     }
 
     /// <summary>
+    /// Converts a char into a bool (<c>1</c> = <see langword="true"/>, <c>0</c> = <see langword="false" />)
+    /// </summary>
+    /// <param name="value">The char</param>
+    /// <returns>The bool value according to the given input value</returns>
+    public static bool ToBool(this char value)
+    {
+        return value.Equals('1');
+    }
+
+    /// <summary>
     /// Converts a comma separated string list into a bool list. For example: <c>"1;0;1"</c> = <see langword="true"/>, <see langword="false"/>, <see langword="true"/>
     /// </summary>
     /// <param name="value">The value.</param>

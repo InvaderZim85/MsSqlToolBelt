@@ -9,6 +9,7 @@ using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
+using System.Windows;
 using ZimLabs.CoreLib;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
@@ -169,6 +170,18 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     private string _headerColumns = "Columns";
+
+    /// <summary>
+    /// Gets or sets the visibility of the SQL Query region
+    /// </summary>
+    [ObservableProperty]
+    private Visibility _sqlQueryVisibility = Visibility.Visible;
+
+    /// <summary>
+    /// Gets or sets the row height of the row which contains the SQL Query
+    /// </summary>
+    [ObservableProperty]
+    private GridLength _sqlQueryRowHeight = new(1, GridUnitType.Star);
 
     #region Options
 
@@ -331,6 +344,8 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         tmpList.AddRange(Helper.CreateTableDtoTypeList());
         TypeList = tmpList.ToObservableCollection();
         SelectedType = TypeList.FirstOrDefault(f => f.Id == 0);
+
+        Mediator.AddAsyncFunction(MediatorKey.SetClassGenQueryVisibility, SetSqlQueryVisibilityAsync);
     }
 
     /// <summary>
@@ -388,6 +403,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             _dataLoaded = true;
 
             FilterList();
+
+            // Set the options
+            await SetOptionsAsync();
         }
         catch (Exception ex)
         {
@@ -398,6 +416,54 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             if (controller != null)
                 await controller.CloseAsync();
         }
+    }
+
+    /// <summary>
+    /// Loads and sets the class generator options
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    private async Task SetOptionsAsync()
+    {
+        if (_manager == null)
+            return;
+
+        // Load the options
+        var options = await _manager.LoadClassGenOptionsAsync();
+
+        // Set the options
+        foreach (var (option, value) in options)
+        {
+            switch (option)
+            {
+                case ClassGenOption.AddColumnAttribute:
+                    OptionColumnAttribute = value;
+                    break;
+                case ClassGenOption.AddSetField:
+                    OptionSetField = value;
+                    break;
+                case ClassGenOption.AddSummary:
+                    OptionSummary = value;
+                    break;
+                case ClassGenOption.AddTableNameInSummary:
+                    OptionAddTableNameInSummary = value;
+                    break;
+                case ClassGenOption.DbModel:
+                    OptionDbModel = value;
+                    break;
+                case ClassGenOption.Nullable:
+                    OptionNullable = value;
+                    break;
+                case ClassGenOption.SealedClass:
+                    OptionSealedClass = value;
+                    break;
+                case ClassGenOption.WithBackingField:
+                    OptionBackingField = value;
+                    break;
+            }
+        }
+
+        // Load the desired modifier
+        SelectedModifier = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
     }
 
     /// <summary>
@@ -531,11 +597,22 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             return;
         }
 
+        // Check if there are any duplicates in the properties
+        if (_manager.HasDuplicatedPropertyNames())
+        {
+            if (await ShowQuestionAsync(new MessageEntry("Duplicated properties",
+                    "One or more names appear several times in the list of columns.",
+                    "This can lead to errors in the generated class.",
+                    "",
+                    "Continue anyway?")) != MessageDialogResult.Affirmative)
+                return;
+        }
+
         var controller = await ShowProgressAsync("Generating", "Please wait while generating the class...");
 
         try
         {
-            _classGenResult = _manager.GenerateCode(GetOptions());
+            _classGenResult = await _manager.GenerateCodeAsync(GetOptions());
 
             _setCode?.Invoke(_classGenResult);
 
@@ -616,7 +693,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             // because a query can contain more than one table
             options.DbModel = false;
             options.SqlQuery = dialog.Code;
-            _classGenResult = await _manager.GenerateFromQueryAsync(options);
+            _classGenResult = await _manager.GenerateCodeFromQueryAsync(options);
 
             _setCode?.Invoke(_classGenResult);
 
@@ -779,6 +856,25 @@ internal partial class ClassGenControlViewModel : ViewModelBase
             return;
 
         _openInSearch?.Invoke(SelectedTable.Name);
+    }
+
+    /// <summary>
+    /// Sets the visibility of the SQL query region
+    /// </summary>
+    private async Task SetSqlQueryVisibilityAsync()
+    {
+        var hideSqlQuery = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenHideSqlQuery, false);
+
+        if (hideSqlQuery)
+        {
+            SqlQueryVisibility = Visibility.Collapsed;
+            SqlQueryRowHeight = GridLength.Auto;
+        }
+        else
+        {
+            SqlQueryVisibility = Visibility.Visible;
+            SqlQueryRowHeight = new GridLength(1, GridUnitType.Star);
+        }
     }
     #endregion
 }

@@ -487,7 +487,7 @@ public class SettingsManager
         await SaveSettingsValueAsync(SettingsKey.TabSettings, tmpContent);
 
         // Execute the mediator function
-        Mediator.ExecuteAction("SetTabVisibility");
+        Mediator.ExecuteAction(MediatorKey.SetTabVisibility);
     }
     #endregion
 }
