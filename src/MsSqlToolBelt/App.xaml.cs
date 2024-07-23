@@ -108,7 +108,7 @@ public partial class App : Application
 
         try
         {
-            var upTime = await SettingsManager.LoadSettingsValueAsync<long>(SettingsKey.UpTime);
+            var upTime = await SettingsManager.LoadSettingsValueAsync(SettingsKey.UpTime, 0L);
 
             upTime += duration.Ticks;
 

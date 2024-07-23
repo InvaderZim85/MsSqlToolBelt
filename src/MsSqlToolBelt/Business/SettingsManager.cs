@@ -33,21 +33,34 @@ public class SettingsManager
     /// <param name="key">The desired key</param>
     /// <param name="fallback">The desired fallback</param>
     /// <returns>The value</returns>
-    public static async Task<T> LoadSettingsValueAsync<T>(SettingsKey key, T? fallback = default)
+    public static async Task<T> LoadSettingsValueAsync<T>(SettingsKey key, T fallback)
     {
-        await using var context = new AppDbContext();
+        await using var context = new AppDbContext(true);
         var value = await context.Settings.FirstOrDefaultAsync(f => f.KeyId == (int) key);
-        if (value == null)
-            return fallback == null ? Activator.CreateInstance<T>() : fallback;
+        return value == null ? fallback : value.Value.ChangeType(fallback);
+    }
 
-        try
+    /// <summary>
+    /// Loads the values for the specified entries
+    /// </summary>
+    /// <param name="values">The list with the values which should be loaded</param>
+    /// <returns>The awaitable task</returns>
+    public static async Task LoadSettingsValuesAsync(List<SettingsValue> values)
+    {
+        await using var context = new AppDbContext(true);
+
+        var keys = values.Select(s => (int)s.Key).ToList();
+
+        var settings = await context.Settings.Where(w => keys.Contains(w.KeyId)).ToListAsync();
+
+        // Add the settings to the values
+        foreach (var entry in settings)
         {
-            return (T) Convert.ChangeType(value.Value, typeof(T));
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error while loading settings value. Key {key}", key);
-            return fallback == null ? Activator.CreateInstance<T>() : fallback;
+            var value = values.FirstOrDefault(f => (int)f.Key == entry.KeyId);
+            if (value == null) 
+                continue;
+
+            value.OriginalValue = entry.Value;
         }
     }
 
@@ -60,7 +73,7 @@ public class SettingsManager
     /// <returns>The value</returns>
     public static T LoadSettingsValue<T>(SettingsKey key, T? fallback = default)
     {
-        using var context = new AppDbContext();
+        using var context = new AppDbContext(true);
         var value = context.Settings.FirstOrDefault(f => f.KeyId == (int)key);
         if (value == null)
             return fallback == null ? Activator.CreateInstance<T>() : fallback;
@@ -124,7 +137,7 @@ public class SettingsManager
     /// <returns>The list with the servers</returns>
     public async Task LoadServerAsync(bool withTracking = false)
     {
-        await using var context = new AppDbContext();
+        await using var context = new AppDbContext(true);
         ServerList = withTracking
             ? await context.ServerEntries.ToListAsync()
             : await context.ServerEntries.AsNoTracking().ToListAsync();
@@ -232,15 +245,12 @@ public class SettingsManager
     /// <summary>
     /// Loads the list with the filters and stores them into <see cref="FilterList"/>
     /// </summary>
-    /// <param name="withTracking">true to activate the tracking, otherwise false (optional)</param>
     /// <returns>The list with the filter</returns>
-    public async Task LoadFilterAsync(bool withTracking = false)
+    public async Task LoadFilterAsync()
     {
-        await using var context = new AppDbContext();
+        await using var context = new AppDbContext(true);
 
-        FilterList = withTracking
-            ? await context.FilterEntries.ToListAsync()
-            : await context.FilterEntries.AsNoTracking().ToListAsync();
+        FilterList = await context.FilterEntries.ToListAsync();
     }
 
     /// <summary>
@@ -290,11 +300,11 @@ public class SettingsManager
     /// <returns>The awaitable task</returns>
     public static async Task ExportSettingsAsync(string filepath)
     {
-        await using var context = new AppDbContext();
+        await using var context = new AppDbContext(true);
 
-        var settings = await context.Settings.AsNoTracking().ToListAsync();
-        var server = await context.ServerEntries.AsNoTracking().ToListAsync();
-        var filter = await context.FilterEntries.AsNoTracking().ToListAsync();
+        var settings = await context.Settings.ToListAsync();
+        var server = await context.ServerEntries.ToListAsync();
+        var filter = await context.FilterEntries.ToListAsync();
 
         var data = new SettingsDto
         {

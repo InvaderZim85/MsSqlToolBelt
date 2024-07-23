@@ -10,7 +10,10 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.Internal;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using Microsoft.VisualStudio.Threading;
 using ZimLabs.CoreLib;
+using DataRetentionPeriodUnit = Microsoft.SqlServer.Management.Smo.DataRetentionPeriodUnit;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Controls;
 
@@ -239,12 +242,25 @@ internal partial class SettingsControlViewModel : ViewModelBase
     {
         try
         {
+            // Load the settings
+            var values = new List<SettingsValue>
+            {
+                new(SettingsKey.ColorScheme),
+                new(SettingsKey.CopyToClipboardFormat),
+                new(SettingsKey.SearchHistoryEntryCount),
+                new(SettingsKey.CopyGridSingleLineOnlyValue),
+                new(SettingsKey.SaveClassGenOptions),
+                new(SettingsKey.ClassGenDefaultModifier),
+                new(SettingsKey.ClassGenHideSqlQuery)
+            };
+
+            await SettingsManager.LoadSettingsValuesAsync(values);
+
             // Init the filter types
             FilterTypeList = Helper.CreateFilterTypeList().ToObservableCollection();
 
             // Preselect a theme
-            var themeName =
-                await SettingsManager.LoadSettingsValueAsync(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
+            var themeName = values.GetSettingsValue(SettingsKey.ColorScheme, DefaultEntries.ColorScheme);
 
             // Load the colors
             AddColors(themeName);
@@ -258,20 +274,21 @@ internal partial class SettingsControlViewModel : ViewModelBase
             // Set the various data
             var exportList = Helper.CreateExportTypeList(ExportDataType.List);
             ExportTypes = new ObservableCollection<IdTextEntry>(exportList);
-            var exportType = await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyToClipboardFormat,
-                DefaultEntries.CopyToClipboardFormat); // 1 = CSV
+            var exportType =
+                values.GetSettingsValue(SettingsKey.CopyToClipboardFormat, DefaultEntries.CopyToClipboardFormat);
             SelectedExportType = exportList.FirstOrDefault(f => f.Id == exportType);
 
-            SearchHistoryCount = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchHistoryEntryCount,
-                DefaultEntries.SearchHistoryCount);
+            SearchHistoryCount =
+                values.GetSettingsValue(SettingsKey.SearchHistoryEntryCount, DefaultEntries.SearchHistoryCount);
 
-            CopyGridSingleLineOnlyValue =
-                await SettingsManager.LoadSettingsValueAsync(SettingsKey.CopyGridSingleLineOnlyValue, false);
+            CopyGridSingleLineOnlyValue = values.GetSettingsValue(SettingsKey.CopyGridSingleLineOnlyValue, false);
 
-            SaveClassGenOptions = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SaveClassGenOptions, false);
+            // Class gen options
+            SaveClassGenOptions = values.GetSettingsValue(SettingsKey.SaveClassGenOptions, false);
             ClassModifiers = ClassGenManager.GetModifierList();
             DefaultClassModifier =
-                await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
+                values.GetSettingsValue(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
+            HideSqlQuery = values.GetSettingsValue(SettingsKey.ClassGenHideSqlQuery, false);
 
             var tabSettings = SettingsManager.LoadTabSettings();
             SetTabSettings(tabSettings);
@@ -321,7 +338,16 @@ internal partial class SettingsControlViewModel : ViewModelBase
         tmpList.AddRange(ThemeManager.Current.ColorSchemes.Select(s => new ColorEntry(s, false)));
 
         // Add the custom colors
-        tmpList.AddRange(Helper.LoadCustomColors().Select(s => s.Name).Select(s => new ColorEntry(s, true)));
+        var customColors = Helper.LoadCustomColors().Select(s => s.Name).Select(s => new ColorEntry(s, true)).ToList();
+        if (customColors.Any())
+        {
+            tmpList.AddRange(customColors);
+        }
+        else
+        {
+            // No custom colors available, reset the pre selection to the default value
+            preSelection = DefaultEntries.ColorScheme;
+        }
 
         ColorThemeList = tmpList.ToObservableCollection();
 
@@ -375,31 +401,31 @@ internal partial class SettingsControlViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Saves the current theme
+    /// Saves the appearance settings
     /// </summary>
     /// <returns>The awaitable task</returns>
     [RelayCommand]
-    private async Task SaveThemeAsync()
+    private Task SaveAppearanceSettingsAsync()
     {
-        if (SelectedColorTheme == null)
-            return;
+        return SaveSettingsAsync(SaveFuncAsync);
 
-        var controller = await ShowProgressAsync("Save", "Please wait while saving the theme...");
-
-        try
+        async Task SaveFuncAsync()
         {
-            await SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme.Name);
+            await SaveThemeAsync();
 
             await SaveTabSettingsAsync();
         }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex, ErrorMessageType.Save);
-        }
-        finally
-        {
-            await controller.CloseAsync();
-        }
+    }
+
+    /// <summary>
+    /// Saves the current theme
+    /// </summary>
+    /// <returns>The awaitable task</returns>
+    private Task SaveThemeAsync()
+    {
+        return SelectedColorTheme == null
+            ? Task.CompletedTask
+            : SettingsManager.SaveSettingsValueAsync(SettingsKey.ColorScheme, SelectedColorTheme.Name);
     }
 
     /// <summary>
@@ -673,12 +699,13 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// </summary>
     /// <returns>The awaitable task</returns>
     [RelayCommand]
-    private async Task SaveVariousSettingsAsync()
+    private Task SaveVariousSettingsAsync()
     {
-        if (SelectedExportType == null)
-            return;
+        return SelectedExportType == null 
+            ? Task.CompletedTask 
+            : SaveSettingsAsync(SaveFuncAsync);
 
-        try
+        async Task SaveFuncAsync()
         {
             var saveList = new SortedList<SettingsKey, object>
             {
@@ -689,10 +716,6 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
             await SettingsManager.SaveSettingsValuesAsync(saveList);
         }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex, ErrorMessageType.Save);
-        }
     }
 
     /// <summary>
@@ -700,10 +723,12 @@ internal partial class SettingsControlViewModel : ViewModelBase
     /// </summary>
     /// <returns>The awaitable task</returns>
     [RelayCommand]
-    private async Task SaveClassGenOptionsAsync()
+    private Task SaveClassGenOptionsAsync()
     {
         // Save the class gen options
-        try
+        return SaveSettingsAsync(SaveFuncAsync);
+
+        async Task SaveFuncAsync()
         {
             var saveList = new SortedList<SettingsKey, object>
             {
@@ -715,10 +740,6 @@ internal partial class SettingsControlViewModel : ViewModelBase
             await SettingsManager.SaveSettingsValuesAsync(saveList);
 
             await Mediator.ExecuteFunctionAsync(MediatorKey.SetClassGenQueryVisibility);
-        }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex, ErrorMessageType.Save);
         }
     }
 
@@ -794,5 +815,29 @@ internal partial class SettingsControlViewModel : ViewModelBase
             await controller.CloseAsync();
         }
     }
+
+    /// <summary>
+    /// Executes the specified function to save the settings
+    /// </summary>
+    /// <param name="saveFunc">The function to save the settings</param>
+    /// <returns>The awaitable task</returns>
+    private async Task SaveSettingsAsync(Func<Task> saveFunc)
+    {
+        var controller = await ShowProgressAsync("Save", "Please wait while saving the settings...");
+
+        try
+        {
+            await saveFunc();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync(ex, ErrorMessageType.Save);
+        }
+        finally
+        {
+            await controller.CloseAsync();
+        }
+    }
+
     #endregion
 }

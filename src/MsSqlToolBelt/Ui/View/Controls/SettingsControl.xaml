@@ -95,7 +95,7 @@
                     Grid.Column="3"
                     Width="60"
                     HorizontalAlignment="Left"
-                    Command="{Binding SaveThemeCommand}"
+                    Command="{Binding SaveAppearanceSettingsCommand}"
                     Content="Save" />
             </Grid>
         </Border>

@@ -175,13 +175,13 @@ internal partial class ClassGenControlViewModel : ViewModelBase
     /// Gets or sets the visibility of the SQL Query region
     /// </summary>
     [ObservableProperty]
-    private Visibility _sqlQueryVisibility = Visibility.Visible;
+    private Visibility _sqlQueryVisibility = Visibility.Collapsed;
 
     /// <summary>
     /// Gets or sets the row height of the row which contains the SQL Query
     /// </summary>
     [ObservableProperty]
-    private GridLength _sqlQueryRowHeight = new(1, GridUnitType.Star);
+    private GridLength _sqlQueryRowHeight = GridLength.Auto;
 
     #region Options
 
@@ -464,6 +464,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase
 
         // Load the desired modifier
         SelectedModifier = await SettingsManager.LoadSettingsValueAsync(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
+
+        // Set the "hide sql" option
+        await SetSqlQueryVisibilityAsync();
     }
 
     /// <summary>
