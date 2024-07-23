@@ -79,7 +79,7 @@ public partial class InfoControl : UserControl
 
         try
         {
-            _totalUpTime = await SettingsManager.LoadSettingsValueAsync<long>(SettingsKey.UpTime);
+            _totalUpTime = await SettingsManager.LoadSettingsValueAsync(SettingsKey.UpTime, 0L);
         }
         catch (Exception ex)
         {

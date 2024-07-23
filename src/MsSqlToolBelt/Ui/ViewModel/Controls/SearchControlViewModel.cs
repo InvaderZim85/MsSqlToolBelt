@@ -589,7 +589,7 @@ internal partial class SearchControlViewModel : ViewModelBase
             AddWildcardAutomatically =
                 await SettingsManager.LoadSettingsValueAsync(SettingsKey.AutoWildcard, DefaultEntries.AutoWildcard);
 
-            var searchOptions = await SettingsManager.LoadSettingsValueAsync<string>(SettingsKey.SearchOptions);
+            var searchOptions = await SettingsManager.LoadSettingsValueAsync(SettingsKey.SearchOptions, string.Empty);
             if (string.IsNullOrWhiteSpace(searchOptions))
                 return;
 

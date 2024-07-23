@@ -1,6 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
+using Microsoft.SqlServer.Management.Smo;
+using MsSqlToolBelt.Common.Enums;
+using MsSqlToolBelt.DataObjects.Internal;
+using Serilog;
 using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
@@ -195,5 +199,42 @@ internal static class Extensions
     public static Visibility ToVisibility(this bool value)
     {
         return value ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// Tries to change the type of the provided value
+    /// </summary>
+    /// <typeparam name="T">The desired target type</typeparam>
+    /// <param name="value">The string value</param>
+    /// <param name="fallback">The desired fallback</param>
+    /// <returns>The value</returns>
+    public static T ChangeType<T>(this string value, T fallback)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return fallback;
+
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error has occurred while changing the type of value '{value}'. Target type: {type}", value, typeof(T));
+            return fallback;
+        }
+    }
+
+    /// <summary>
+    /// Gets the desired settings value
+    /// </summary>
+    /// <typeparam name="T">The desired target type</typeparam>
+    /// <param name="values">The list with the values</param>
+    /// <param name="key">The key of the desired value</param>
+    /// <param name="fallback">The fallback</param>
+    /// <returns>The value</returns>
+    public static T GetSettingsValue<T>(this List<SettingsValue> values, SettingsKey key, T fallback)
+    {
+        var value = values.FirstOrDefault(f => f.Key == key);
+        return value == null ? fallback : value.GetValue(fallback);
     }
 }
