@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.11.20" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="112.0.0" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="111.4.1" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
