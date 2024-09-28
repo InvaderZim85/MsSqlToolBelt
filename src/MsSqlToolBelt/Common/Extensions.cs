@@ -1,7 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Media;
-using Microsoft.SqlServer.Management.Smo;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Internal;
 using Serilog;
@@ -14,6 +15,14 @@ namespace MsSqlToolBelt.Common;
 /// </summary>
 internal static class Extensions
 {
+    /// <summary>
+    /// Provides the serializer options
+    /// </summary>
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        MaxDepth = 64 // 64 is the max. possible depth. For more information see: https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.maxdepth?view=net-8.0
+    };
+    
     /// <summary>
     /// Checks if the char is a number
     /// </summary>
@@ -81,16 +90,26 @@ internal static class Extensions
     }
 
     /// <summary>
-    /// Creates a clone of the desired entry
+    /// Creates a clone of the desired object
     /// </summary>
-    /// <typeparam name="T">The type of the entry</typeparam>
-    /// <param name="entry">The entry which should be cloned</param>
-    /// <returns>The cloned entry</returns>
-    public static T Clone<T>(this T entry) where T : class, new()
+    /// <typeparam name="T">The type of the object</typeparam>
+    /// <param name="obj">The object which should be cloned</param>
+    /// <returns>The cloned object</returns>
+    public static T? Clone<T>(this T obj)
     {
-        return Mapper.CreateAndMap<T, T>(entry);
-    }
+        // Create a stream where we can store the content of the object
+        using var stream = new MemoryStream();
 
+        // Serialize the object
+        JsonSerializer.Serialize(stream, obj, SerializerOptions);
+
+        // Go to the beginning of the stream, otherwise we won't be able to deserialize the content
+        stream.Seek(0, SeekOrigin.Begin);
+
+        // Return the result
+        return JsonSerializer.Deserialize<T>(stream) ?? default;
+    }
+    
     /// <summary>
     /// Converts the value into a decimal value
     /// </summary>
