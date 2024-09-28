@@ -285,7 +285,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
             // Class gen options
             SaveClassGenOptions = values.GetSettingsValue(SettingsKey.SaveClassGenOptions, false);
-            ClassModifiers = ClassGenManager.GetModifierList();
+            ClassModifiers = CommonValues.GetModifierList();
             DefaultClassModifier =
                 values.GetSettingsValue(SettingsKey.ClassGenDefaultModifier, ClassGenManager.ModifierFallback);
             HideSqlQuery = values.GetSettingsValue(SettingsKey.ClassGenHideSqlQuery, false);

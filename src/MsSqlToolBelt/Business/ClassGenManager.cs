@@ -6,7 +6,6 @@ using MsSqlToolBelt.DataObjects.Common;
 using MsSqlToolBelt.DataObjects.TableType;
 using MsSqlToolBelt.Templates;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using ZimLabs.CoreLib;
@@ -16,7 +15,7 @@ namespace MsSqlToolBelt.Business;
 /// <summary>
 /// Provides the functions for the generation of a class
 /// </summary>
-public sealed class ClassGenManager : IDisposable
+public sealed partial class ClassGenManager : IDisposable
 {
     /// <summary>
     /// Contains the value which indicates if the class was already disposed
@@ -64,11 +63,6 @@ public sealed class ClassGenManager : IDisposable
     private readonly SettingsManager _settingsManager;
 
     /// <summary>
-    /// The instance for the interaction with the templates
-    /// </summary>
-    private readonly TemplateManager _templateManager = new();
-
-    /// <summary>
     /// The list with the conversion types
     /// </summary>
     private List<ClassGenTypeEntry> _conversionTypes = [];
@@ -101,7 +95,7 @@ public sealed class ClassGenManager : IDisposable
         _repo = new ClassGenRepo(dataSource, database);
         _settingsManager = settingsManager;
 
-        Mediator.AddAction(MediatorKey.ReloadTemplates, ReloadTemplates);
+        Mediator.AddAction(MediatorKey.ReloadTemplates, () => TemplateManager.LoadTemplates());
         Mediator.AddAction(MediatorKey.ResetConversionTypes, ResetConversionTypes);
     }
 
@@ -167,84 +161,6 @@ public sealed class ClassGenManager : IDisposable
                 column.Alias = CleanColumnName(column.Name);
             }
         }
-    }
-
-    /// <summary>
-    /// Cleans the name and removes "illegal" chars like a underscore in the name
-    /// </summary>
-    /// <param name="name">The original name</param>
-    /// <returns>The cleaned name</returns>
-    private static string CleanColumnName(string name)
-    {
-        var replaceValues = GetReplaceList();
-
-        foreach (var entry in replaceValues.Where(w => name.Contains(w.OldValue)))
-        {
-            name = name.Replace(entry.OldValue, entry.NewValue);
-        }
-
-        // If this happens something is pretty broken
-        if (name.Length == 0)
-            return "Column";
-
-        // Check if the name starts with a digit, if so, add "Column" to prevent errors
-        // because a property / variable hast to start with a "char" and not a number...
-        if (name[0].IsNumeric())
-            name = $"Column{name}";
-
-        return name;
-    }
-
-    /// <summary>
-    /// Cleans the name of the namespace and removes spaces
-    /// </summary>
-    /// <param name="name">The name</param>
-    /// <returns>The cleaned namespace name</returns>
-    private static string CleanNamespace(string name)
-    {
-        const char dot = '.';
-        if (!name.Contains(dot)) 
-            return name.FirstChatToUpper().Replace(" ", "");
-
-        var content = name.Split(dot, StringSplitOptions.RemoveEmptyEntries).ToList();
-        name = string.Join(dot, content.Select(s => s.FirstChatToUpper()));
-
-        return name.FirstChatToUpper().Replace(" ", "");
-    }
-
-    /// <summary>
-    /// Generates a "valid" class name
-    /// </summary>
-    /// <param name="tableName">The original name of the table</param>
-    /// <returns>The generated class name</returns>
-    private static string GenerateClassName(string tableName)
-    {
-        IEnumerable<ReplaceEntry> replaceList;
-
-        // Check if the class name contains a underscore
-        if (tableName.Contains('_'))
-        {
-            replaceList = GetReplaceList(false);
-
-            // Split entry at underscore
-            var content = tableName.Split('_', StringSplitOptions.RemoveEmptyEntries);
-
-            // Create a new "class" name
-            tableName = content.Aggregate(string.Empty, (current, entry) => current + entry.FirstChatToUpper());
-        }
-        else
-        {
-            replaceList = GetReplaceList();
-            tableName = tableName.FirstChatToUpper();
-        }
-
-        // Remove all "invalid" chars
-        foreach (var entry in replaceList.Where(w => tableName.Contains(w.OldValue)))
-        {
-            tableName = tableName.Replace(entry.OldValue, entry.NewValue);
-        }
-
-        return tableName;
     }
 
     /// <summary>
@@ -364,6 +280,12 @@ public sealed class ClassGenManager : IDisposable
         }
 
         return Generate(options, tmpTable, infoText: sb.ToString());
+
+        string GetSqlTypeBySystemType(string systemType)
+        {
+            return _conversionTypes.FirstOrDefault(f => f.CSharpSystemType.EqualsIgnoreCase(systemType))?.SqlType ??
+                   systemType;
+        }
     }
 
     /// <summary>
@@ -472,20 +394,10 @@ public sealed class ClassGenManager : IDisposable
     #endregion
 
     #region CSharp class
-    /// <summary>
-    /// Loads the templates
-    /// </summary>
-    private void ReloadTemplates()
-    {
-        _templateManager.LoadTemplates();
-    }
 
     /// <summary>
     /// Generates the class code
     /// </summary>
-    /// <remarks>
-    ///
-    /// </remarks>
     /// <param name="options">The desired options</param>
     /// <param name="table">The desired table</param>
     /// <param name="infoText">An info which will be added before the class</param>
@@ -493,7 +405,7 @@ public sealed class ClassGenManager : IDisposable
     private string GenerateClass(ClassGenOptions options, TableDto table, string infoText)
     {
         // Load the templates
-        _templateManager.LoadTemplates(false);
+        TemplateManager.LoadTemplates(false);
 
         ClassGenTemplateType classType;
         if (options.WithNamespace)
@@ -509,7 +421,7 @@ public sealed class ClassGenManager : IDisposable
                 : ClassGenTemplateType.ClassDefault;
         }
 
-        var classTemplate = _templateManager.GetTemplateContent(classType);
+        var classTemplate = TemplateManager.GetTemplateContent(classType);
 
         // Generate the properties
         var properties = table.Columns.Where(w => w.Use).OrderBy(o => o.Order).Select(column => GenerateColumn(options, column)).ToList();
@@ -648,37 +560,16 @@ public sealed class ClassGenManager : IDisposable
         }
 
         return sb.ToString();
-    }
 
-    /// <summary>
-    /// Creates the name of the backing field
-    /// </summary>
-    /// <param name="name">The name of the backing field</param>
-    /// <returns>The backing field name</returns>
-    private static string CreateBackingFieldName(string name)
-    {
-        return $"_{name.FirstCharToLower()}";
-    }
+        string CreateBackingFieldName(string name)
+        {
+            return $"_{name.FirstCharToLower()}";
+        }
 
-    /// <summary>
-    /// Gets the CSharp type according to the specified sql type
-    /// </summary>
-    /// <param name="sqlType">The sql type</param>
-    /// <returns>The type entry</returns>
-    private ClassGenTypeEntry GetCSharpType(string sqlType)
-    {
-        return _conversionTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(sqlType)) ?? new ClassGenTypeEntry();
-    }
-
-    /// <summary>
-    /// Gets the CSharp type according to the specified system type
-    /// </summary>
-    /// <param name="systemType">The system type like "System.Int32"</param>
-    /// <returns>The type entry</returns>
-    private string GetSqlTypeBySystemType(string systemType)
-    {
-        return _conversionTypes.FirstOrDefault(f => f.CSharpSystemType.EqualsIgnoreCase(systemType))?.SqlType ??
-               systemType;
+        ClassGenTypeEntry GetCSharpType(string sqlType)
+        {
+            return _conversionTypes.FirstOrDefault(f => f.SqlType.EqualsIgnoreCase(sqlType)) ?? new ClassGenTypeEntry();
+        }
     }
     #endregion
 
@@ -691,7 +582,7 @@ public sealed class ClassGenManager : IDisposable
     /// <returns>The code for the keys</returns>
     private (string completeCode, string shortCode) GenerateEfKeyCode(ClassGenOptions options, TableDto table)
     {
-        var template = _templateManager.GetTemplateContent(ClassGenTemplateType.EfCreatingBuilder);
+        var template = TemplateManager.GetTemplateContent(ClassGenTemplateType.EfCreatingBuilder);
 
         var keyColumns = table.Columns.Where(w => w.IsPrimaryKey).ToList();
         if (keyColumns.Count == 0)
@@ -768,17 +659,17 @@ public sealed class ClassGenManager : IDisposable
         var template = options.AddSummary switch
         {
             true when options is { WithBackingField: true, AddSetField: false } =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldComment),
             true when options is { WithBackingField: true, AddSetField: true } =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldCommentSetField),
             true when !options.WithBackingField =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefaultComment),
             false when options is { WithBackingField: true, AddSetField: false } =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefault),
             false when options is { WithBackingField: true, AddSetField: true } =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyBackingFieldDefaultSetField),
             false when !options.WithBackingField =>
-                _templateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
+                TemplateManager.GetTemplateContent(ClassGenTemplateType.PropertyDefault),
             _ => string.Empty
         };
 
@@ -843,47 +734,6 @@ public sealed class ClassGenManager : IDisposable
     #endregion
 
     #region Various
-    /// <summary>
-    /// Gets the list with the "replace" values
-    /// </summary>
-    /// <param name="includeUnderscore"><see langword="true"/> to include the underscore in the list, otherwise <see langword="false"/> (optional)</param>
-    /// <returns>The list with the "replace" values</returns>
-    private static List<ReplaceEntry> GetReplaceList(bool includeUnderscore = true)
-    {
-        var tmpList = new List<ReplaceEntry>
-        {
-            new("_", ""),
-            new(" ", ""), // this should never happen...
-            new("ä", "ae"),
-            new("ö", "oe"),
-            new("ü", "ue"),
-            new("ß", "ss"),
-            new("Ä", "Ae"),
-            new("Ö", "Oe"),
-            new("Ü", "Ue")
-        };
-
-        if (includeUnderscore)
-            tmpList.Add(new ReplaceEntry("_", ""));
-
-        return tmpList;
-    }
-
-    /// <summary>
-    /// Gets the list with the modifier
-    /// </summary>
-    /// <returns>The list with the modifier</returns>
-    public static ObservableCollection<string> GetModifierList()
-    {
-        return
-        [
-            "public",
-            "internal",
-            "protected",
-            "protected internal"
-        ];
-    }
-
     /// <summary>
     /// Loads the conversion types
     /// </summary>
