@@ -7,13 +7,11 @@ using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.ClassGen;
 using MsSqlToolBelt.Ui.View.Windows;
 using System.Collections.ObjectModel;
-using System.Windows;
-using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 
 /// <summary>
-/// Provides the logic for the <see cref="View.Windows.DataTypeWindow"/>
+/// Provides the logic for the <see cref="DataTypeWindow"/>
 /// </summary>
 internal partial class DataTypeWindowViewModel : ViewModelBase
 {

@@ -358,7 +358,7 @@ internal partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Sets the tab visibility
     /// </summary>
-    public void SetTabVisibility()
+    private void SetTabVisibility()
     {
         var values = SettingsManager.LoadTabSettings();
 

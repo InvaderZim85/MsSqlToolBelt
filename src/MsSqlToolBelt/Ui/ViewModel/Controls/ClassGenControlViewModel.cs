@@ -127,6 +127,9 @@ internal partial class ClassGenControlViewModel : ViewModelBase
         {
             SetProperty(ref _filter, value);
 
+            // Remove the preselection if the filter was changed
+            Preselection = string.Empty;
+
             if (_ignoreFilterChange)
                 return;
 
@@ -396,7 +399,7 @@ internal partial class ClassGenControlViewModel : ViewModelBase
 
         try
         {
-            ModifierList = ClassGenManager.GetModifierList();
+            ModifierList = CommonValues.GetModifierList();
 
             await _manager.LoadTablesAsync();
 

@@ -16,11 +16,6 @@ namespace MsSqlToolBelt.Ui.ViewModel.Windows;
 internal partial class TemplateWindowViewModel : ViewModelBase
 {
     /// <summary>
-    /// The instance for the interaction with the templates
-    /// </summary>
-    private readonly TemplateManager _manager = new();
-
-    /// <summary>
     /// Sets the text of the code editor
     /// </summary>
     private Action<string>? _setCodeEditorText;
@@ -63,9 +58,9 @@ internal partial class TemplateWindowViewModel : ViewModelBase
     {
         _setCodeEditorText = setEditorText;
         _getCodeEditorText = getEditorText;
-        _manager.LoadTemplates();
+        TemplateManager.LoadTemplates();
 
-        Templates = _manager.Templates.ToObservableCollection();
+        Templates = TemplateManager.Templates.ToObservableCollection();
     }
 
     /// <summary>

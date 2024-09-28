@@ -10,19 +10,33 @@ namespace MsSqlToolBelt.Templates;
 /// <summary>
 /// Provides the functions for the interaction with the templates
 /// </summary>
-internal sealed class TemplateManager
+internal static class TemplateManager
 {
+    /// <summary>
+    /// Contains the templates
+    /// </summary>
+    private static readonly List<TemplateEntry> TemplateList = [];
+
     /// <summary>
     /// Gets the list with the templates
     /// </summary>
-    public List<TemplateEntry> Templates { get; } = [];
+    public static List<TemplateEntry> Templates
+    {
+        get
+        {
+            if (TemplateList.Count == 0)
+                LoadTemplates();
+
+            return TemplateList;
+        }
+    }
 
     /// <summary>
     /// Loads the desired template
     /// </summary>
     /// <param name="type">The type of the template</param>
     /// <returns>The content of the template</returns>
-    public string GetTemplateContent(ClassGenTemplateType type)
+    public static string GetTemplateContent(ClassGenTemplateType type)
     {
         if (Templates.Count == 0)
             LoadTemplates();
@@ -32,10 +46,10 @@ internal sealed class TemplateManager
     }
 
     /// <summary>
-    /// Loads all available templates and stores them into <see cref="Templates"/>
+    /// Loads all available templates and stores them into <see cref="TemplateList"/>
     /// </summary>
     /// <param name="reload">true to reload all templates, otherwise false</param>
-    public void LoadTemplates(bool reload = true)
+    public static void LoadTemplates(bool reload = true)
     {
         if (Templates.Count > 0 && !reload)
             return;

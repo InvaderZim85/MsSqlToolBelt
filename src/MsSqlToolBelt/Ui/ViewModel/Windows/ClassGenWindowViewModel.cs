@@ -194,7 +194,7 @@ internal partial class ClassGenWindowViewModel : ViewModelBase
 
         FilterList();
 
-        ModifierList = ClassGenManager.GetModifierList();
+        ModifierList = CommonValues.GetModifierList();
         SelectedModifier = "public";
     }
 
