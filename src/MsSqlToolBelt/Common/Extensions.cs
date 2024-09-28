@@ -6,7 +6,6 @@ using System.Windows.Media;
 using MsSqlToolBelt.Common.Enums;
 using MsSqlToolBelt.DataObjects.Internal;
 using Serilog;
-using ZimLabs.Mapper;
 
 namespace MsSqlToolBelt.Common;
 
