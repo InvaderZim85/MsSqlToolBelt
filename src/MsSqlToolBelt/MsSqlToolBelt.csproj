@@ -37,7 +37,7 @@
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
     <PackageReference Include="ZimLabs.TableCreator" Version="2.1.1" />
   </ItemGroup>
