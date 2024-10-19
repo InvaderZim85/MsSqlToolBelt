@@ -580,7 +580,7 @@ public sealed partial class ClassGenManager : IDisposable
     /// <param name="options">The options</param>
     /// <param name="table">The desired table</param>
     /// <returns>The code for the keys</returns>
-    private (string completeCode, string shortCode) GenerateEfKeyCode(ClassGenOptions options, TableDto table)
+    private static (string completeCode, string shortCode) GenerateEfKeyCode(ClassGenOptions options, TableDto table)
     {
         var template = TemplateManager.GetTemplateContent(ClassGenTemplateType.EfCreatingBuilder);
 
@@ -654,7 +654,7 @@ public sealed partial class ClassGenManager : IDisposable
     /// <param name="options">The options</param>
     /// <param name="dataType">Gets the data type</param>
     /// <returns>The template</returns>
-    private string LoadTemplate(ClassGenOptions options, ClassGenTypeEntry dataType)
+    private static string LoadTemplate(ClassGenOptions options, ClassGenTypeEntry dataType)
     {
         var template = options.AddSummary switch
         {

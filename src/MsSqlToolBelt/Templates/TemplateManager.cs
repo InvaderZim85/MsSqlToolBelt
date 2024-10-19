@@ -38,9 +38,6 @@ internal static class TemplateManager
     /// <returns>The content of the template</returns>
     public static string GetTemplateContent(ClassGenTemplateType type)
     {
-        if (Templates.Count == 0)
-            LoadTemplates();
-
         return Templates.FirstOrDefault(f => f.Type == type)?.Content ??
                string.Empty;
     }
@@ -51,16 +48,16 @@ internal static class TemplateManager
     /// <param name="reload">true to reload all templates, otherwise false</param>
     public static void LoadTemplates(bool reload = true)
     {
-        if (Templates.Count > 0 && !reload)
+        if (TemplateList.Count > 0 && !reload)
             return;
 
         // Remove all loaded templates
-        Templates.Clear();
+        TemplateList.Clear();
 
         foreach (var type in Enum.GetValues<ClassGenTemplateType>())
         {
             // Load and store the template
-            Templates.Add(LoadTemplate(type));
+            TemplateList.Add(LoadTemplate(type));
         }
     }
 
