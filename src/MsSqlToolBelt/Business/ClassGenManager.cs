@@ -721,7 +721,7 @@ public sealed partial class ClassGenManager : IDisposable
     /// <param name="lines">The list with the lines</param>
     /// <param name="value">The value to search for</param>
     /// <returns>The index of the line, if nothing was found, -1 will be returned</returns>
-    private static int GetLineIndex(IReadOnlyList<string> lines, string value)
+    private static int GetLineIndex(List<string> lines, string value)
     {
         for (var i = 0; i < lines.Count; i++)
         {

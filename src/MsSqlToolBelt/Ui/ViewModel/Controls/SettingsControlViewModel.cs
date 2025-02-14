@@ -339,7 +339,7 @@ internal partial class SettingsControlViewModel : ViewModelBase
 
         // Add the custom colors
         var customColors = Helper.LoadCustomColors().Select(s => s.Name).Select(s => new ColorEntry(s, true)).ToList();
-        if (customColors.Any())
+        if (customColors.Count > 0)
         {
             tmpList.AddRange(customColors);
         }
