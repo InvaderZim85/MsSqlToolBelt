@@ -15,31 +15,31 @@
     <Content Include="MsSqlToolBelt.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="Azure.Identity" Version="1.13.2" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+    <PackageReference Include="Azure.Identity" Version="1.14.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Dapper" Version="2.1.44" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.1.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="5.1.0" />
-    <PackageReference Include="Markdig" Version="0.40.0" />
+    <PackageReference Include="Markdig" Version="0.41.2" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="172.14.1" />
-    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="172.52.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.12.19" />
+    <PackageReference Include="Microsoft.SqlServer.Management.SqlParser" Version="172.20.0" />
+    <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="172.76.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="112.1.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.6" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
-    <PackageReference Include="ZimLabs.TableCreator" Version="2.1.1" />
+    <PackageReference Include="ZimLabs.TableCreator" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
