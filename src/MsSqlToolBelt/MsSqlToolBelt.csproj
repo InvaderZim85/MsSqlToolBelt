@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -39,7 +39,7 @@
     <PackageReference Include="System.Formats.Asn1" Version="9.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
     <PackageReference Include="ZimLabs.CoreLib" Version="2.3.0" />
-    <PackageReference Include="ZimLabs.TableCreator" Version="2.1.1" />
+    <PackageReference Include="ZimLabs.TableCreator" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ClassGenTypeConversion.json">
