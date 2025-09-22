@@ -19,7 +19,7 @@
     <PackageReference Include="Azure.Identity" Version="1.15.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.1.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.PixelartIcons" Version="6.1.0" />
     <PackageReference Include="Markdig" Version="0.42.0" />
